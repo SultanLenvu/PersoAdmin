@@ -741,15 +741,15 @@ void MasterGUI::createSettingsTab() {
 
   LogSystemListenIpLabel = new QLabel("Прослушиваемый IP");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLabel, 0, 0, 1, 1);
-  LogSystemListenIpLineEdit = new QLineEdit(
-      settings.value("LogSystem/PersoServer/ListenIp").toString());
+  LogSystemListenIpLineEdit =
+      new QLineEdit(settings.value("LogSystem/PersoServer/Ip").toString());
   LogSystemListenIpLineEdit->setMaxLength(300);
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLineEdit, 0, 1, 1, 1);
 
   LogSystemListenPortLabel = new QLabel("Прослушиваемый порт");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLabel, 1, 0, 1, 1);
-  LogSystemListenPortLineEdit = new QLineEdit(
-      settings.value("LogSystem/PersoServer/ListenPort").toString());
+  LogSystemListenPortLineEdit =
+      new QLineEdit(settings.value("LogSystem/PersoServer/Port").toString());
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLineEdit, 1, 1, 1,
                                          1);
 

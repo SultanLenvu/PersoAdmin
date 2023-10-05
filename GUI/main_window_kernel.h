@@ -30,8 +30,10 @@ class MainWindowKernel : public QMainWindow {
   QAction* RequestAuthorizationGuiAct;
 
   AdminManager* Manager;
-  LogSystem* Logger;
   UserInteractionSystem* Interactor;
+
+  QThread* LoggerThread;
+  LogSystem* Logger;
 
   DatabaseTableModel* RandomModel;
   DatabaseTableModel* OrderModel;
@@ -99,18 +101,9 @@ class MainWindowKernel : public QMainWindow {
   void createMasterGui(void);
   void connectMasterGui(void);
 
-  void createLogger(void);
-  void createInterructor(void);
+  void createLoggerInstance(void);
   void createManager(void);
   void createModels(void);
   void createMatchingTable(void);
-
- private slots:
-  void proxyLogging(const QString& log) const;
-
-  void on_RequestMasterGui_slot(void);
-
- signals:
-  void logging(const QString& log) const;
 };
 #endif  // MAINWINDOWKERNEL_H

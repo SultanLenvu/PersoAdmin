@@ -9,18 +9,12 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
 
   // Графический интерфейс пока не создан
   CurrentGUI = nullptr;
-  Manager = nullptr;
-  Logger = nullptr;
-  Interactor = nullptr;
 
   // Создаем систему логгирования
-  createLogger();
-
-  // Создаем графический интерфейс окна авторизации
-  createAuthorazationGui();
+  createLoggerInstance();
 
   // Cистема взаимодействия с пользователем
-  createInterructor();
+  Interactor = new UserInteractionSystem(this, CurrentGUI);
 
   // Управляющий модуль
   createManager();
@@ -30,6 +24,9 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
 
   // Создаем таблицу соответствий
   createMatchingTable();
+
+  // Создаем графический интерфейс окна авторизации
+  createAuthorazationGui();
 }
 
 MainWindowKernel::~MainWindowKernel() {}
@@ -317,6 +314,9 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   settings.setValue("Database/Log/Active",
                     gui->DatabaseLogOption->checkState() == Qt::Checked);
 
+  settings.setValue(
+      "LogSystem/Enable",
+      gui->LogSystemEnableCheckBox->checkState() == Qt::Checked ? true : false);
   settings.setValue("LogSystem/Save/Directory",
                     gui->LogSystemSavePathLineEdit->text());
   settings.setValue(
@@ -324,9 +324,9 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
       gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
           ? true
           : false);
-  settings.setValue("LogSystem/PersoServer/ListenIp",
+  settings.setValue("LogSystem/PersoServer/Ip",
                     gui->LogSystemListenIpLineEdit->text());
-  settings.setValue("LogSystem/PersoServer/ListenPort",
+  settings.setValue("LogSystem/PersoServer/Port",
                     gui->LogSystemListenPortLineEdit->text().toInt());
 
   // Применение новых настроек
@@ -339,17 +339,6 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
 /*
  * Приватные методы
  */
-
-void MainWindowKernel::proxyLogging(const QString& log) const {
-  if (sender()->objectName() == QString("AdminManager"))
-    emit logging(QString("Manager - ") + log);
-  else
-    emit logging(QString("Unknown - ") + log);
-}
-
-void MainWindowKernel::on_RequestMasterGui_slot(void) {
-  createMasterGui();
-}
 
 void MainWindowKernel::loadSettings() const {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
@@ -762,16 +751,23 @@ void MainWindowKernel::connectMasterGui() {
 
   // Связываем отображения графиков с логикой их формирования
 }
-void MainWindowKernel::createInterructor() {
-  delete Interactor;
-  Interactor = new UserInteractionSystem(this, this);
+
+void MainWindowKernel::createLoggerInstance() {
+  Logger = new LogSystem(nullptr);
+  LoggerThread = new QThread(this);
+
+  Logger->moveToThread(LoggerThread);
+
+  connect(LoggerThread, &QThread::finished, LoggerThread,
+          &QThread::deleteLater);
+  connect(LoggerThread, &QThread::finished, Logger, &LogSystem::deleteLater);
+
+  LoggerThread->start();
 }
 
 void MainWindowKernel::createManager(void) {
-  delete Manager;
   Manager = new AdminManager(this);
-  connect(Manager, &AdminManager::logging, this,
-          &MainWindowKernel::proxyLogging);
+  connect(Manager, &AdminManager::logging, Logger, &LogSystem::generate);
   connect(Manager, &AdminManager::notifyUser, Interactor,
           &UserInteractionSystem::generateNotification);
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
@@ -782,14 +778,6 @@ void MainWindowKernel::createManager(void) {
           &UserInteractionSystem::performeProgressDialogStep);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
           &UserInteractionSystem::completeProgressDialog);
-  connect(Manager, &AdminManager::requestMasterGui_signal, this,
-          &MainWindowKernel::on_RequestMasterGui_slot);
-}
-
-void MainWindowKernel::createLogger() {
-  delete Logger;
-  Logger = new LogSystem(this);
-  connect(this, &MainWindowKernel::logging, Logger, &LogSystem::generate);
 }
 
 void MainWindowKernel::createModels() {

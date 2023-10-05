@@ -1,8 +1,12 @@
 #ifndef LOGSYSTEM_H
 #define LOGSYSTEM_H
 
+#include <QHostAddress>
 #include <QObject>
+#include <QSettings>
+#include <QThread>
 #include <QTime>
+#include <QUdpSocket>
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -11,18 +15,30 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  bool EnableIndicator;
+  bool GlobalEnableOption;
+
+  bool PersoServerLogEnable;
+  uint32_t PersoServerLogPort;
+  QHostAddress PersoServerLogAddress;
+  QUdpSocket* PersoServerLogSocket;
 
  public:
   LogSystem(QObject* parent);
   ~LogSystem();
 
- public:
+ public slots:
   void clear(void);
   void setEnable(bool option);
-
- public slots:
+  void applySettings(void);
   void generate(const QString& log);
+
+ private:
+  void loadSettings(void);
+  void startListeningPersoServerLog(void);
+  void stopListeningPersoServerLog(void);
+
+ private slots:
+  void on_PersoServerLogSocketReadyRead_slot(void);
 
  signals:
   void requestDisplayLog(const QString& logData);
