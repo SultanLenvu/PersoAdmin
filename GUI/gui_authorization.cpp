@@ -60,13 +60,14 @@ void AuthorizationGUI::createAuthorizationMenu() {
   DatabaseUserPasswordLineEdit = new QLineEdit();
   DatabaseUserPasswordLineEdit->setText(
       settings.value("Database/User/Password").toString());
+  DatabaseUserPasswordLineEdit->setEchoMode(QLineEdit::Password);
   DatabaseUserPasswordLineEdit->setMaxLength(AUTH_USER_INPUT_MAX_LENGTH);
   AuthorizationMenuLayout->addWidget(DatabaseUserPasswordLineEdit, 4, 1, 1, 1);
 
   AuthorizePushButton = new QPushButton("Авторизироваться");
-  AuthorizationMenuLayout->addWidget(AuthorizePushButton, 5, 1, 1, 2);
+  AuthorizationMenuLayout->addWidget(AuthorizePushButton, 5, 0, 1, 2);
 
   ConnectButtonSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  AuthorizationMenuLayout->addItem(ConnectButtonSpacer, 6, 1, 1, 2);
+  AuthorizationMenuLayout->addItem(ConnectButtonSpacer, 6, 0, 1, 2);
 }

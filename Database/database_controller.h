@@ -22,8 +22,7 @@ class IDatabaseController : public QObject {
  public:
   explicit IDatabaseController(QObject* parent);
 
-  virtual bool connect(
-      const std::shared_ptr<QMap<QString, QString> > authDataPtr) = 0;
+  virtual bool connect(const QMap<QString, QString>* authData) = 0;
   virtual void disconnect(void) = 0;
 
   virtual bool openTransaction(void) const = 0;

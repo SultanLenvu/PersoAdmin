@@ -43,8 +43,7 @@ class AdminManager : public QObject {
 
   void applySettings();
 
-  void performAuthorization(
-      const std::shared_ptr<QMap<QString, QString>> authDataPtr);
+  void performAuthorization(const QMap<QString, QString>* authData);
   void connectDatabaseManually(void);
   void disconnectDatabaseManually(void);
   void showDatabaseTable(const QString& name, DatabaseTableModel* model);
@@ -127,10 +126,8 @@ class AdminManager : public QObject {
 
   void applySettings_signal(void);
 
-  void authorize_signal(
-      const std::shared_ptr<QMap<QString, QString>> authDataPtr);
-  void authorizationSuccess_signal(
-      const std::shared_ptr<QMap<QString, QString>> authDataPtr);
+  void authorize_signal(const QMap<QString, QString>* authData);
+  void requestMasterGui_signal(const QMap<QString, QString>* authData);
   void getDatabaseTable_signal(const QString& tableName,
                                DatabaseTableModel* model);
   void clearDatabaseTable_signal(const QString& tableName);

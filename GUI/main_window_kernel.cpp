@@ -14,16 +14,16 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   Interactor = nullptr;
 
   // Создаем систему логгирования
-  setupLogger();
+  createLogger();
 
-  // Создаем графический интерфейс окна начальной конфигурации
-  on_OpenAuthorizationGuiRequestAct_slot();
+  // Создаем графический интерфейс окна авторизации
+  createAuthorazationGui();
 
   // Cистема взаимодействия с пользователем
-  setupInterructionSystem();
+  createInterructor();
 
   // Управляющий модуль
-  setupManager();
+  createManager();
 
   // Создаем модели для представлений
   createModels();
@@ -34,28 +34,26 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
 
 MainWindowKernel::~MainWindowKernel() {}
 
-void MainWindowKernel::on_OpenAuthorizationGuiRequestAct_slot() {
+void MainWindowKernel::on_RequestAuthorizationGuiAct_slot() {
   createAuthorazationGui();
-  connectAuthorizationGui();
 }
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   if (!checkAuthorizationData()) {
     Interactor->generateError("Введенные данные авторизации некорректны. ");
     return;
   }
 
-  std::shared_ptr<QMap<QString, QString>> authDataPtr(
-      new QMap<QString, QString>());
-  authDataPtr->insert("database_ip", gui->DatabaseIpLineEdit->text());
-  authDataPtr->insert("database_port", gui->DatabasePortLineEdit->text());
-  authDataPtr->insert("database_name", gui->DatabaseNameLineEdit->text());
-  authDataPtr->insert("user_name", gui->UserNameLabel->text());
-  authDataPtr->insert("user_password", gui->UserPasswordLabel->text());
+  QMap<QString, QString> authData;
+  authData.insert("database_ip", gui->DatabaseIpLineEdit->text());
+  authData.insert("database_port", gui->DatabasePortLineEdit->text());
+  authData.insert("database_name", gui->DatabaseNameLineEdit->text());
+  authData.insert("user_name", gui->UserNameLabel->text());
+  authData.insert("user_password", gui->UserPasswordLabel->text());
 
-  Manager->performAuthorization(authDataPtr);
+  Manager->performAuthorization(&authData);
 }
 
 void MainWindowKernel::on_ShowDatabaseTablePushButton_slot() {
@@ -359,8 +357,17 @@ void MainWindowKernel::proxyLogging(const QString& log) const {
     emit logging(QString("Unknown - ") + log);
 }
 
-void MainWindowKernel::on_AuthorizationSuccess_slot(
-    const std::shared_ptr<QMap<QString, QString>> authData) {}
+void MainWindowKernel::on_RequestMasterGui_slot(
+    const QMap<QString, QString>* authData) {
+  QSettings settings;
+
+  createMasterGui();
+
+  settings.setValue("Database/Ip", authData->value("database_ip"));
+  settings.setValue("Database/Port", authData->value("database_port"));
+  settings.setValue("Database/Name", authData->value("database_name"));
+  settings.setValue("Database/User/Name", authData->value("user_name"));
+}
 
 void MainWindowKernel::loadSettings() const {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
@@ -369,7 +376,7 @@ void MainWindowKernel::loadSettings() const {
 }
 
 bool MainWindowKernel::checkAuthorizationData() const {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   QString databaseIp = gui->DatabaseIpLineEdit->text();
   QString databasePort = gui->DatabasePortLineEdit->text();
@@ -660,18 +667,18 @@ void MainWindowKernel::createTopMenu() {
   createTopMenuActions();
 
   ServiceMenu = menuBar()->addMenu("Сервис");
-  ServiceMenu->addAction(OpenAuthorizationGUIRequestAct);
+  ServiceMenu->addAction(RequestAuthorizationGuiAct);
 
   HelpMenu = menuBar()->addMenu("Справка");
   HelpMenu->addAction(AboutProgramAct);
 }
 
 void MainWindowKernel::createTopMenuActions() {
-  OpenAuthorizationGUIRequestAct = new QAction("Начальный интерфейс");
-  OpenAuthorizationGUIRequestAct->setStatusTip(
+  RequestAuthorizationGuiAct = new QAction("Авторизация");
+  RequestAuthorizationGuiAct->setStatusTip(
       "Закрыть текущий интерфейс и создать начальный интерфейс");
-  connect(OpenAuthorizationGUIRequestAct, &QAction::triggered, this,
-          &MainWindowKernel::on_OpenAuthorizationGuiRequestAct_slot);
+  connect(RequestAuthorizationGuiAct, &QAction::triggered, this,
+          &MainWindowKernel::on_RequestAuthorizationGuiAct_slot);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -690,8 +697,11 @@ void MainWindowKernel::createAuthorazationGui() {
   CurrentGUI->create();
 
   // Настраиваем размер главного окна
-  setGeometry(DesktopGeometry.width() * 0.3, DesktopGeometry.height() * 0.3,
-              DesktopGeometry.width() * 0.4, DesktopGeometry.height() * 0.4);
+  setGeometry(DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.2,
+              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.2);
+
+  // Подключаем интерфейс
+  connectAuthorizationGui();
 }
 
 void MainWindowKernel::connectAuthorizationGui() {
@@ -718,6 +728,9 @@ void MainWindowKernel::createMasterGui() {
 
   // Создаем верхнее меню
   createTopMenu();
+
+  // Подключаем интерфейс
+  connectMasterGui();
 }
 
 void MainWindowKernel::connectMasterGui() {
@@ -787,12 +800,12 @@ void MainWindowKernel::connectMasterGui() {
 
   // Связываем отображения графиков с логикой их формирования
 }
-void MainWindowKernel::setupInterructionSystem() {
+void MainWindowKernel::createInterructor() {
   delete Interactor;
   Interactor = new UserInteractionSystem(this, this);
 }
 
-void MainWindowKernel::setupManager(void) {
+void MainWindowKernel::createManager(void) {
   delete Manager;
   Manager = new AdminManager(this);
   connect(Manager, &AdminManager::logging, this,
@@ -807,9 +820,11 @@ void MainWindowKernel::setupManager(void) {
           &UserInteractionSystem::performeProgressDialogStep);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
           &UserInteractionSystem::completeProgressDialog);
+  connect(Manager, &AdminManager::requestMasterGui_signal, this,
+          &MainWindowKernel::on_RequestMasterGui_slot);
 }
 
-void MainWindowKernel::setupLogger() {
+void MainWindowKernel::createLogger() {
   delete Logger;
   Logger = new LogSystem(this);
   connect(this, &MainWindowKernel::logging, Logger, &LogSystem::generate);

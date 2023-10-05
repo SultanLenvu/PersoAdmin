@@ -26,9 +26,8 @@ class MainWindowKernel : public QMainWindow {
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
-  QAction* ProductionInterfaceRequestAct;
   QAction* AboutProgramAct;
-  QAction* OpenAuthorizationGUIRequestAct;
+  QAction* RequestAuthorizationGuiAct;
 
   AdminManager* Manager;
   LogSystem* Logger;
@@ -46,7 +45,7 @@ class MainWindowKernel : public QMainWindow {
   ~MainWindowKernel();
 
  public slots:
-  void on_OpenAuthorizationGuiRequestAct_slot(void);
+  void on_RequestAuthorizationGuiAct_slot(void);
 
   // Авторизация
   void on_AuthorizePushButton_slot(void);
@@ -100,17 +99,16 @@ class MainWindowKernel : public QMainWindow {
   void createMasterGui(void);
   void connectMasterGui(void);
 
-  void setupLogger(void);
-  void setupInterructionSystem(void);
-  void setupManager(void);
+  void createLogger(void);
+  void createInterructor(void);
+  void createManager(void);
   void createModels(void);
   void createMatchingTable(void);
 
  private slots:
   void proxyLogging(const QString& log) const;
 
-  void on_AuthorizationSuccess_slot(
-      const std::shared_ptr<QMap<QString, QString>> authDataPtr);
+  void on_RequestMasterGui_slot(const QMap<QString, QString>* authDataPtr);
 
  signals:
   void logging(const QString& log) const;

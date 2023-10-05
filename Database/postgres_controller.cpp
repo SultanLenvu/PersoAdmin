@@ -13,15 +13,14 @@ PostgresController::~PostgresController() {
   QSqlDatabase::removeDatabase(ConnectionName);
 }
 
-bool PostgresController::connect(
-    const std::shared_ptr<QMap<QString, QString> > authDataPtr) {
+bool PostgresController::connect(const QMap<QString, QString>* authData) {
   if (QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres уже установлено. ");
     return true;
   }
 
   // Создаем соединение
-  createDatabaseConnection(authDataPtr);
+  createDatabaseConnection(authData);
 
   if (!QSqlDatabase::database(ConnectionName).open()) {
     sendLog(
@@ -658,14 +657,14 @@ void PostgresController::loadSettings() {
 }
 
 void PostgresController::createDatabaseConnection(
-    const std::shared_ptr<QMap<QString, QString> > authDataPtr) {
+    const QMap<QString, QString>* authData) {
   QSqlDatabase postgres = QSqlDatabase::addDatabase("QPSQL", ConnectionName);
 
-  postgres.setHostName(authDataPtr->value("database_ip"));
-  postgres.setPort(authDataPtr->value("database_port").toInt());
-  postgres.setDatabaseName(authDataPtr->value("database_name"));
-  postgres.setUserName(authDataPtr->value("user_name"));
-  postgres.setPassword(authDataPtr->value("user_password"));
+  postgres.setHostName(authData->value("database_ip"));
+  postgres.setPort(authData->value("database_port").toInt());
+  postgres.setDatabaseName(authData->value("database_name"));
+  postgres.setUserName(authData->value("user_name"));
+  postgres.setPassword(authData->value("user_password"));
 }
 
 void PostgresController::convertResponseToBuffer(

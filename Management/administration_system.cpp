@@ -17,7 +17,7 @@ void AdministrationSystem::applySettings() {
 }
 
 void AdministrationSystem::authorize(
-    const std::shared_ptr<QMap<QString, QString> > authDataPtr) {
+    const QMap<QString, QString>* authDataPtr) {
   emit logging("Подключение к базе данных. ");
   if (!Database->connect(authDataPtr)) {
     processingOperationResult(

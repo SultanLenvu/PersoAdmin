@@ -24,8 +24,7 @@ class PostgresController : public IDatabaseController {
 
  public:
   // IDatabaseController interface
-  virtual bool connect(
-      const std::shared_ptr<QMap<QString, QString> > authDataPtr) override;
+  virtual bool connect(const QMap<QString, QString>* authData) override;
   virtual void disconnect(void) override;
 
   virtual bool openTransaction(void) const override;
@@ -74,8 +73,7 @@ class PostgresController : public IDatabaseController {
 
  private:
   void loadSettings(void);
-  void createDatabaseConnection(
-      const std::shared_ptr<QMap<QString, QString> > authDataPtr);
+  void createDatabaseConnection(const QMap<QString, QString>* authData);
   void convertResponseToBuffer(QSqlQuery& request,
                                DatabaseTableModel* buffer) const;
   void convertResponseToMap(QSqlQuery& request,

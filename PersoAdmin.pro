@@ -19,7 +19,6 @@ SOURCES += \
     GUI/gui_delegates.cpp \
     GUI/user_interaction_system.cpp \
     Management/admin_manager.cpp \
-    Security/des.cpp \
     Log/log_system.cpp \
     Management/administration_system.cpp \
     Management/administration_system_builder.cpp \
@@ -37,7 +36,6 @@ HEADERS += \
     GUI/gui.h \
     GUI/gui_delegates.h \
     GUI/user_interaction_system.h \
-    Security/des.h \
     Log/log_system.h \
     Management/administration_system.h \
     Management/administration_system_builder.h

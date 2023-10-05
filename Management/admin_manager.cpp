@@ -31,20 +31,20 @@ void AdminManager::applySettings() {
 }
 
 void AdminManager::performAuthorization(
-    const std::shared_ptr<QMap<QString, QString> > authDataPtr) {
+    const QMap<QString, QString>* authData) {
   // Начинаем выполнение операции
   if (!startOperationExecution("performAuthorization")) {
     return;
   }
 
   emit logging("Подключение к базе данных. ");
-  emit authorize_signal(authDataPtr);
+  emit authorize_signal(authData);
 
   // Запускаем цикл ожидания
   WaitingLoop->exec();
 
   if (CurrentState == Completed) {
-    emit authorizationSuccess_signal(authDataPtr);
+    emit requestMasterGui_signal(authData);
   }
 
   // Завершаем выполнение операции
@@ -659,6 +659,9 @@ void AdminManager::on_AdministratorBuilderCompleted_slot() {
           &AdminManager::on_AdministratorFinished_slot);
 
   // Подключаем функционал
+  connect(this, &AdminManager::authorize_signal, Administrator,
+          &AdministrationSystem::authorize);
+
   connect(this, &AdminManager::getDatabaseTable_signal, Administrator,
           &AdministrationSystem::getDatabaseTable);
   connect(this, &AdminManager::getCustomResponse_signal, Administrator,
