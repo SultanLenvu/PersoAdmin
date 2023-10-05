@@ -31,8 +31,8 @@ class MasterGUI : public GUI {
   QGroupBox* ServerControlPanelGroup;
   QVBoxLayout* ServerControlPanelLayout;
 
-  QPushButton* ServerStartPushButton;
-  QPushButton* ServerStopPushButton;
+  QPushButton* GetStatisticPushButton;
+  QPushButton* SendSetupPushButton;
   QSpacerItem* ServerControlPanelVS;
 
   // Отображение записей в БД
@@ -239,7 +239,7 @@ class MasterGUI : public GUI {
   QTableView* IssuerTableView;
   //============================================================
 
-  /* Настройки сервера */
+  /* Настройки админпанели */
   //============================================================
   QWidget* SettingsTab;
   QHBoxLayout* SettingsMainLayout;
@@ -248,20 +248,6 @@ class MasterGUI : public GUI {
 
   QSpacerItem* SettingsHorizontalSpacer1;
   QSpacerItem* SettingsVerticalSpacer1;
-
-  // Настройки сервера
-  QGroupBox* PersoServerSettingsGroupBox;
-  QGridLayout* PersoServerSettingsLayout;
-  QLabel* PersoServerIpLabel;
-  QLineEdit* PersoServerIpLineEdit;
-  QLabel* PersoServerPortLabel;
-  QLineEdit* PersoServerPortLineEdit;
-  QLabel* MaxNumberClientConnectionLabel;
-  QLineEdit* MaxNumberClientConnectionLineEdit;
-  QLabel* ClientConnectionMaxDurationLabel;
-  QLineEdit* ClientConnectionMaxDurationLineEdit;
-  QLabel* ExtenededLoggingEnableLabel;
-  QCheckBox* ExtenededLoggingEnableCheckBox;
 
   // Настройки базы данных
   QGroupBox* DatabaseSettingsGroupBox;
@@ -272,22 +258,33 @@ class MasterGUI : public GUI {
   QLineEdit* DatabasePortLineEdit;
   QLabel* DatabaseNameLabel;
   QLineEdit* DatabaseNameLineEdit;
-  QLabel* UserNameLabel;
+  QLabel* DatabaseUserNameLabel;
   QLineEdit* DatabaseUserNameLineEdit;
-  QLabel* UserPasswordLabel;
+  QLabel* DatabaseUserPasswordLabel;
   QLineEdit* DatabaseUserPasswordLineEdit;
   QLabel* DatabaseLogOptionLabel;
   QCheckBox* DatabaseLogOption;
 
-  // Настройки генератора прошивок
-  QGroupBox* FirmwareSettingsGroupBox;
-  QGridLayout* FirmwareSettingsLayout;
-  QLabel* FirmwareBaseFilePathLabel;
-  QLineEdit* FirmwareBaseFilePathLineEdit;
-  QPushButton* ExploreFirmwareBaseFilePathPushButton;
-  QLabel* FirmwareDataFilePathLabel;
-  QLineEdit* FirmwareDataFilePathLineEdit;
-  QPushButton* ExploreFirmwareDataFilePathPushButton;
+  // Настройки системы логгирования
+  QGroupBox* LogSystemSettingsGroupBox;
+  QGridLayout* LogSystemSettingsLayout;
+  QLabel* LogSystemEnableLabel;
+  QCheckBox* LogSystemEnableCheckBox;
+
+  QWidget* LogSystemProxyWidget1;
+  QGridLayout* LogSystemProxyWidget1Layout;
+  QLabel* LogSystemSavePathLabel;
+  QLineEdit* LogSystemSavePathLineEdit;
+  QPushButton* LogSystemSavePathExplorePushButton;
+  QLabel* LogSystemListenPersoServerLabel;
+  QCheckBox* LogSystemListenPersoServerCheckBox;
+
+  QWidget* LogSystemProxyWidget2;
+  QGridLayout* LogSystemProxyWidget2Layout;
+  QLabel* LogSystemListenIpLabel;
+  QLineEdit* LogSystemListenIpLineEdit;
+  QLabel* LogSystemListenPortLabel;
+  QLineEdit* LogSystemListenPortLineEdit;
   //============================================================
 
  public:
@@ -314,14 +311,14 @@ class MasterGUI : public GUI {
   void createSettingsTab(void);
 
  private slots:
-
   void on_PanFileExplorePushButton_slot(void);
-
-  void on_ExploreFirmwareBaseFilePathPushButton_slot(void);
-  void on_ExploreFirmwareDataFilePathPushButton_slot(void);
 
   void on_SearchTransponderByComboBox_slot(const QString& text);
   void on_RereleaseTransponderByComboBox_slot(const QString& text);
+
+  void on_LogSystemSavePathExplorePushButton_slot(void);
+  void on_LogSystemEnableCheckBox_slot(int state);
+  void on_LogSystemListenPersoServerCheckBox_slot(int state);
 
  signals:
 };

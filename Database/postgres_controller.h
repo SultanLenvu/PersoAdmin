@@ -12,11 +12,12 @@ class PostgresController : public IDatabaseController {
 
  private:
   QString ConnectionName;
+
   QHostAddress HostAddress;
-  uint32_t Port;
+  uint32_t HostPort;
   QString DatabaseName;
   QString UserName;
-  QString Password;
+  QString UserPassword;
 
  public:
   explicit PostgresController(QObject* parent, const QString& connectionName);
@@ -24,7 +25,7 @@ class PostgresController : public IDatabaseController {
 
  public:
   // IDatabaseController interface
-  virtual bool connect(const QMap<QString, QString>* authData) override;
+  virtual bool connect(void) override;
   virtual void disconnect(void) override;
 
   virtual bool openTransaction(void) const override;
@@ -36,7 +37,6 @@ class PostgresController : public IDatabaseController {
                         DatabaseTableModel* buffer) const override;
   virtual bool execCustomRequest(const QString& req,
                                  DatabaseTableModel* buffer) const override;
-  virtual void applySettings() override;
 
   virtual bool clearTable(const QString& tableName) const override;
 
@@ -71,9 +71,11 @@ class PostgresController : public IDatabaseController {
       const QString& tableName,
       QMap<QString, QString>& condition) const override;
 
+  virtual void applySettings() override;
+
  private:
   void loadSettings(void);
-  void createDatabaseConnection(const QMap<QString, QString>* authData);
+  void createDatabaseConnection(void);
   void convertResponseToBuffer(QSqlQuery& request,
                                DatabaseTableModel* buffer) const;
   void convertResponseToMap(QSqlQuery& request,

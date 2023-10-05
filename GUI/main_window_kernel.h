@@ -108,7 +108,7 @@ class MainWindowKernel : public QMainWindow {
  private slots:
   void proxyLogging(const QString& log) const;
 
-  void on_RequestMasterGui_slot(const QMap<QString, QString>* authDataPtr);
+  void on_RequestMasterGui_slot(void);
 
  signals:
   void logging(const QString& log) const;

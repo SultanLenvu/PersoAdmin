@@ -39,21 +39,14 @@ void MainWindowKernel::on_RequestAuthorizationGuiAct_slot() {
 }
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
-  AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-
   if (!checkAuthorizationData()) {
-    Interactor->generateError("Введенные данные авторизации некорректны. ");
+    Interactor->generateError("Неверный логин или пароль. ");
     return;
   }
 
-  QMap<QString, QString> authData;
-  authData.insert("database_ip", gui->DatabaseIpLineEdit->text());
-  authData.insert("database_port", gui->DatabasePortLineEdit->text());
-  authData.insert("database_name", gui->DatabaseNameLineEdit->text());
-  authData.insert("user_name", gui->UserNameLabel->text());
-  authData.insert("user_password", gui->UserPasswordLabel->text());
+  createMasterGui();
 
-  Manager->performAuthorization(&authData);
+  Manager->performDatabaseConnecting();
 }
 
 void MainWindowKernel::on_ShowDatabaseTablePushButton_slot() {
@@ -313,17 +306,6 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   }
 
   // Считывание пользовательского ввода
-  settings.setValue("PersoHost/Ip", gui->PersoServerIpLineEdit->text());
-  settings.setValue("PersoHost/Port",
-                    gui->PersoServerPortLineEdit->text().toInt());
-  settings.setValue("PersoHost/MaxNumberClientConnection",
-                    gui->MaxNumberClientConnectionLineEdit->text().toInt());
-  settings.setValue("PersoHost/ClientConnection/MaxDuration",
-                    gui->ClientConnectionMaxDurationLineEdit->text().toInt());
-  settings.setValue(
-      "PersoHost/ClientConnection/ExtenededLoggingEnable",
-      gui->ExtenededLoggingEnableCheckBox->checkState() == Qt::Checked ? true
-                                                                       : false);
   settings.setValue("Database/Server/Ip", gui->DatabaseIpLineEdit->text());
   settings.setValue("Database/Server/Port",
                     gui->DatabasePortLineEdit->text().toInt());
@@ -334,10 +316,18 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
                     gui->DatabaseUserPasswordLineEdit->text());
   settings.setValue("Database/Log/Active",
                     gui->DatabaseLogOption->checkState() == Qt::Checked);
-  settings.setValue("Firmware/Base/Path",
-                    gui->FirmwareBaseFilePathLineEdit->text());
-  settings.setValue("Firmware/Data/Path",
-                    gui->FirmwareDataFilePathLineEdit->text());
+
+  settings.setValue("LogSystem/Save/Directory",
+                    gui->LogSystemSavePathLineEdit->text());
+  settings.setValue(
+      "LogSystem/PersoServer/Enable",
+      gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
+          ? true
+          : false);
+  settings.setValue("LogSystem/PersoServer/ListenIp",
+                    gui->LogSystemListenIpLineEdit->text());
+  settings.setValue("LogSystem/PersoServer/ListenPort",
+                    gui->LogSystemListenPortLineEdit->text().toInt());
 
   // Применение новых настроек
   Manager->applySettings();
@@ -357,16 +347,8 @@ void MainWindowKernel::proxyLogging(const QString& log) const {
     emit logging(QString("Unknown - ") + log);
 }
 
-void MainWindowKernel::on_RequestMasterGui_slot(
-    const QMap<QString, QString>* authData) {
-  QSettings settings;
-
+void MainWindowKernel::on_RequestMasterGui_slot(void) {
   createMasterGui();
-
-  settings.setValue("Database/Ip", authData->value("database_ip"));
-  settings.setValue("Database/Port", authData->value("database_port"));
-  settings.setValue("Database/Name", authData->value("database_name"));
-  settings.setValue("Database/User/Name", authData->value("user_name"));
 }
 
 void MainWindowKernel::loadSettings() const {
@@ -378,18 +360,15 @@ void MainWindowKernel::loadSettings() const {
 bool MainWindowKernel::checkAuthorizationData() const {
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
-  QString databaseIp = gui->DatabaseIpLineEdit->text();
-  QString databasePort = gui->DatabasePortLineEdit->text();
+  QString login = gui->LoginLineEdit->text();
+  QString password = gui->PasswordLineEdit->text();
 
-  QHostAddress ip(databaseIp);
-  if (ip.isNull()) {
+  if ((login != MASTER_ACCESS_LOGIN) || (password != MASTER_ACCESS_PASSWORD)) {
     return false;
   }
 
-  if ((databasePort.toInt() < IP_PORT_MIN_VALUE) ||
-      (databasePort > IP_PORT_MAX_VALUE)) {
-    return false;
-  }
+  QSettings settings;
+  settings.setValue("Authorization/Login", login);
 
   return true;
 }
@@ -397,45 +376,28 @@ bool MainWindowKernel::checkAuthorizationData() const {
 bool MainWindowKernel::checkNewSettings() const {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
-  QHostAddress ip = QHostAddress(gui->PersoServerIpLineEdit->text());
-
+  QHostAddress ip = QHostAddress(gui->LogSystemListenIpLineEdit->text());
   if (ip.isNull()) {
     return false;
   }
 
-  int32_t port = gui->PersoServerPortLineEdit->text().toInt();
-
+  int32_t port = gui->LogSystemListenPortLineEdit->text().toInt();
   if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
   }
 
-  if (gui->MaxNumberClientConnectionLineEdit->text().toInt() <= 0) {
-    return false;
-  }
-
-  if (gui->ClientConnectionMaxDurationLineEdit->text().toInt() <= 0) {
-    return false;
-  }
-
   ip = QHostAddress(gui->DatabaseIpLineEdit->text());
-
   if (ip.isNull()) {
     return false;
   }
 
   port = gui->DatabasePortLineEdit->text().toInt();
-
   if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
   }
 
-  QFileInfo fileInfo(gui->FirmwareBaseFilePathLineEdit->text());
-  if ((!fileInfo.isFile()) || (!fileInfo.exists())) {
-    return false;
-  }
-
-  fileInfo.setFile(gui->FirmwareDataFilePathLineEdit->text());
-  if ((!fileInfo.isFile()) || (!fileInfo.exists())) {
+  QFileInfo info(gui->LogSystemSavePathLineEdit->text());
+  if (!info.isDir()) {
     return false;
   }
 
@@ -697,8 +659,8 @@ void MainWindowKernel::createAuthorazationGui() {
   CurrentGUI->create();
 
   // Настраиваем размер главного окна
-  setGeometry(DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.2,
-              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.2);
+  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
+              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
 
   // Подключаем интерфейс
   connectAuthorizationGui();

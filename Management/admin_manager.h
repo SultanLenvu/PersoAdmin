@@ -43,9 +43,8 @@ class AdminManager : public QObject {
 
   void applySettings();
 
-  void performAuthorization(const QMap<QString, QString>* authData);
-  void connectDatabaseManually(void);
-  void disconnectDatabaseManually(void);
+  void performDatabaseConnecting(void);
+  void performDatabaseDisconnecting(void);
   void showDatabaseTable(const QString& name, DatabaseTableModel* model);
   void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
 
@@ -126,7 +125,8 @@ class AdminManager : public QObject {
 
   void applySettings_signal(void);
 
-  void authorize_signal(const QMap<QString, QString>* authData);
+  void connectDatabase_signal(void);
+  void disconnectDatabase_signal(void);
   void requestMasterGui_signal(const QMap<QString, QString>* authData);
   void getDatabaseTable_signal(const QString& tableName,
                                DatabaseTableModel* model);

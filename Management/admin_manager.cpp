@@ -30,25 +30,36 @@ void AdminManager::applySettings() {
   emit applySettings_signal();
 }
 
-void AdminManager::performAuthorization(
-    const QMap<QString, QString>* authData) {
+void AdminManager::performDatabaseConnecting() {
   // Начинаем выполнение операции
-  if (!startOperationExecution("performAuthorization")) {
+  if (!startOperationExecution("performDatabaseConnecting")) {
     return;
   }
 
-  emit logging("Подключение к базе данных. ");
-  emit authorize_signal(authData);
+  emit logging("Прямое подключение к базе данных. ");
+  emit connectDatabase_signal();
 
   // Запускаем цикл ожидания
   WaitingLoop->exec();
 
-  if (CurrentState == Completed) {
-    emit requestMasterGui_signal(authData);
+  // Завершаем выполнение операции
+  endOperationExecution("performDatabaseConnecting");
+}
+
+void AdminManager::performDatabaseDisconnecting() {
+  // Начинаем выполнение операции
+  if (!startOperationExecution("performDatabaseDisconnecting")) {
+    return;
   }
 
+  emit logging("Прямое отключение от базы данных. ");
+  emit disconnectDatabase_signal();
+
+  // Запускаем цикл ожидания
+  WaitingLoop->exec();
+
   // Завершаем выполнение операции
-  endOperationExecution("performAuthorization");
+  endOperationExecution("performDatabaseDisconnecting");
 }
 
 void AdminManager::showDatabaseTable(const QString& name,
@@ -659,9 +670,10 @@ void AdminManager::on_AdministratorBuilderCompleted_slot() {
           &AdminManager::on_AdministratorFinished_slot);
 
   // Подключаем функционал
-  connect(this, &AdminManager::authorize_signal, Administrator,
-          &AdministrationSystem::authorize);
-
+  connect(this, &AdminManager::connectDatabase_signal, Administrator,
+          &AdministrationSystem::connectDatabase);
+  connect(this, &AdminManager::disconnectDatabase_signal, Administrator,
+          &AdministrationSystem::disconnectDatabase);
   connect(this, &AdminManager::getDatabaseTable_signal, Administrator,
           &AdministrationSystem::getDatabaseTable);
   connect(this, &AdminManager::getCustomResponse_signal, Administrator,

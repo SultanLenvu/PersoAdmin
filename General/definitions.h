@@ -3,14 +3,15 @@
 
 /* Общие определения */
 //===============================================================
-#define PROGRAM_NAME "PersoHost"
+#define PROGRAM_NAME "PersoAdmin"
 #define ORGANIZATION_DOMAIN "powersynt.ru"
 #define ORGANIZATION_NAME "PowerSyntez"
 
-#define MASTER_ACCESS_PASSWORD "1995"
-#define TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
-
 #define AUTH_USER_INPUT_MAX_LENGTH 50
+#define MASTER_ACCESS_LOGIN "admin"
+#define MASTER_ACCESS_PASSWORD "12345"
+
+#define TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
 
 #define IP_PORT_MAX_VALUE 65535
 #define IP_PORT_MIN_VALUE 0

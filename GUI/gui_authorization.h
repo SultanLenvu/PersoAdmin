@@ -14,20 +14,11 @@ class AuthorizationGUI : public GUI {
   QGroupBox* AuthorizationMenuGroup;
   QGridLayout* AuthorizationMenuLayout;
 
-  QLabel* DatabaseIpLabel;
-  QLineEdit* DatabaseIpLineEdit;
+  QLabel* LoginLabel;
+  QLineEdit* LoginLineEdit;
 
-  QLabel* DatabasePortLabel;
-  QLineEdit* DatabasePortLineEdit;
-
-  QLabel* DatabaseNameLabel;
-  QLineEdit* DatabaseNameLineEdit;
-
-  QLabel* UserNameLabel;
-  QLineEdit* DatabaseUserNameLineEdit;
-
-  QLabel* UserPasswordLabel;
-  QLineEdit* DatabaseUserPasswordLineEdit;
+  QLabel* PasswordLabel;
+  QLineEdit* PasswordLineEdit;
 
   QPushButton* AuthorizePushButton;
 

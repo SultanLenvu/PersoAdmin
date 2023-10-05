@@ -16,14 +16,20 @@ void AdministrationSystem::applySettings() {
   Database->applySettings();
 }
 
-void AdministrationSystem::authorize(
-    const QMap<QString, QString>* authDataPtr) {
+void AdministrationSystem::connectDatabase() {
   emit logging("Подключение к базе данных. ");
-  if (!Database->connect(authDataPtr)) {
+  if (!Database->connect()) {
     processingOperationResult(
         "Не удалось установить соединение с базой данных. ",
         DatabaseConnectionError);
   }
+
+  emit operationFinished(CompletedSuccessfully);
+}
+
+void AdministrationSystem::disconnectDatabase() {
+  emit logging("Отключение от базы данных. ");
+  Database->disconnect();
 
   emit operationFinished(CompletedSuccessfully);
 }

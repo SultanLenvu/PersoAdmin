@@ -31,7 +31,8 @@ class AdministrationSystem : public QObject {
   void applySettings(void);
 
  public slots:
-  void authorize(const QMap<QString, QString>* authDataPtr);
+  void connectDatabase(void);
+  void disconnectDatabase(void);
 
   void clearDatabaseTable(const QString& tableName);
   void getDatabaseTable(const QString& tableName, DatabaseTableModel* buffer);

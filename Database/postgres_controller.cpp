@@ -13,15 +13,13 @@ PostgresController::~PostgresController() {
   QSqlDatabase::removeDatabase(ConnectionName);
 }
 
-bool PostgresController::connect(const QMap<QString, QString>* authData) {
+bool PostgresController::connect(void) {
   if (QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres уже установлено. ");
     return true;
   }
 
-  // Создаем соединение
-  createDatabaseConnection(authData);
-
+  createDatabaseConnection();
   if (!QSqlDatabase::database(ConnectionName).open()) {
     sendLog(
         QString("Соединение с Postgres не может быть установлено. Ошибка: %1.")
@@ -143,11 +141,6 @@ bool PostgresController::execCustomRequest(const QString& req,
     sendLog("Отправленный запрос: " + req);
     return false;
   }
-}
-
-void PostgresController::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
 }
 
 bool PostgresController::clearTable(const QString& tableName) const {
@@ -649,22 +642,38 @@ bool PostgresController::removeLastRecordByCondition(
   }
 }
 
+void PostgresController::applySettings() {
+  sendLog("Применение новых настроек. ");
+  loadSettings();
+
+  createDatabaseConnection();
+}
+
 void PostgresController::loadSettings() {
   // Загружаем настройки
   QSettings settings;
 
   LogOption = settings.value("Database/Log/Active").toBool();
+  HostAddress = settings.value("Database/Server/Ip").toString();
+  HostPort = settings.value("Database/Server/Port").toInt();
+  DatabaseName = settings.value("Database/Name").toString();
+  UserName = settings.value("Database/User/Name").toString();
+  UserPassword = settings.value("Database/User/Password").toString();
 }
 
-void PostgresController::createDatabaseConnection(
-    const QMap<QString, QString>* authData) {
+void PostgresController::createDatabaseConnection(void) {
+  if (QSqlDatabase::database(ConnectionName).isValid()) {
+    sendLog("Удаление текущего соединения. ");
+    QSqlDatabase::removeDatabase(ConnectionName);
+  }
+  sendLog("Создание новго соединения. ");
   QSqlDatabase postgres = QSqlDatabase::addDatabase("QPSQL", ConnectionName);
 
-  postgres.setHostName(authData->value("database_ip"));
-  postgres.setPort(authData->value("database_port").toInt());
-  postgres.setDatabaseName(authData->value("database_name"));
-  postgres.setUserName(authData->value("user_name"));
-  postgres.setPassword(authData->value("user_password"));
+  postgres.setHostName(HostAddress.toString());
+  postgres.setPort(HostPort);
+  postgres.setDatabaseName(DatabaseName);
+  postgres.setUserName(UserName);
+  postgres.setPassword(UserPassword);
 }
 
 void PostgresController::convertResponseToBuffer(

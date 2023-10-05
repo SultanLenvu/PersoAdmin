@@ -12,7 +12,7 @@ void MasterGUI::create() {
   createLog();
 
   // Настраиваем пропорции отображаемых элементов
-  MainLayout->setStretch(0, 2);
+  MainLayout->setStretch(0, 1);
   MainLayout->setStretch(1, 1);
 }
 
@@ -74,11 +74,11 @@ void MasterGUI::createServerTab() {
   ServerControlPanelGroup->setLayout(ServerControlPanelLayout);
 
   // Кнопки
-  ServerStartPushButton = new QPushButton("Запустить");
-  ServerControlPanelLayout->addWidget(ServerStartPushButton);
+  GetStatisticPushButton = new QPushButton("Запрос статистики");
+  ServerControlPanelLayout->addWidget(GetStatisticPushButton);
 
-  ServerStopPushButton = new QPushButton("Остановить");
-  ServerControlPanelLayout->addWidget(ServerStopPushButton);
+  SendSetupPushButton = new QPushButton("Отправить настройки");
+  ServerControlPanelLayout->addWidget(SendSetupPushButton);
 
   ServerControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -630,57 +630,6 @@ void MasterGUI::createSettingsTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
   SettingsMainLayout->addItem(SettingsHorizontalSpacer1);
 
-  // Настройки сервера
-  PersoServerSettingsGroupBox = new QGroupBox(QString("Настройки сервера"));
-  SettingsMainSubLayout->addWidget(PersoServerSettingsGroupBox);
-
-  PersoServerSettingsLayout = new QGridLayout();
-  PersoServerSettingsGroupBox->setLayout(PersoServerSettingsLayout);
-
-  PersoServerIpLabel = new QLabel("IP-адрес ");
-  PersoServerSettingsLayout->addWidget(PersoServerIpLabel, 0, 0, 1, 1);
-
-  PersoServerIpLineEdit =
-      new QLineEdit(settings.value("PersoHost/Ip").toString());
-  PersoServerSettingsLayout->addWidget(PersoServerIpLineEdit, 0, 1, 1, 1);
-
-  PersoServerPortLabel = new QLabel("Порт ");
-  PersoServerSettingsLayout->addWidget(PersoServerPortLabel, 1, 0, 1, 1);
-
-  PersoServerPortLineEdit =
-      new QLineEdit(settings.value("PersoHost/Port").toString());
-  PersoServerSettingsLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
-
-  MaxNumberClientConnectionLabel =
-      new QLabel("Максимальное количество клиентов");
-  PersoServerSettingsLayout->addWidget(MaxNumberClientConnectionLabel, 2, 0, 1,
-                                       1);
-
-  MaxNumberClientConnectionLineEdit = new QLineEdit(
-      settings.value("PersoHost/MaxNumberClientConnection").toString());
-  PersoServerSettingsLayout->addWidget(MaxNumberClientConnectionLineEdit, 2, 1,
-                                       1, 1);
-
-  ClientConnectionMaxDurationLabel =
-      new QLabel("Максимальная длительность подключения клиентов (мс)");
-  PersoServerSettingsLayout->addWidget(ClientConnectionMaxDurationLabel, 3, 0,
-                                       1, 1);
-  ClientConnectionMaxDurationLineEdit = new QLineEdit(
-      settings.value("PersoHost/ClientConnection/MaxDuration").toString());
-  PersoServerSettingsLayout->addWidget(ClientConnectionMaxDurationLineEdit, 3,
-                                       1, 1, 1);
-
-  ExtenededLoggingEnableLabel = new QLabel("Расширенное логгирование");
-  PersoServerSettingsLayout->addWidget(ExtenededLoggingEnableLabel, 4, 0, 1, 1);
-  ExtenededLoggingEnableCheckBox = new QCheckBox();
-  ExtenededLoggingEnableCheckBox->setCheckState(
-      settings.value("PersoHost/ClientConnection/ExtenededLoggingEnable")
-              .toBool()
-          ? Qt::Checked
-          : Qt::Unchecked);
-  PersoServerSettingsLayout->addWidget(ExtenededLoggingEnableCheckBox, 4, 1, 1,
-                                       1);
-
   // Настройки базы данных
   DatabaseSettingsGroupBox = new QGroupBox(QString("Настройки базы данных"));
   SettingsMainSubLayout->addWidget(DatabaseSettingsGroupBox);
@@ -709,15 +658,15 @@ void MasterGUI::createSettingsTab() {
       new QLineEdit(settings.value("Database/Name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseNameLineEdit, 2, 1, 1, 1);
 
-  UserNameLabel = new QLabel("Имя пользователя ");
-  DatabaseSettingsLayout->addWidget(UserNameLabel, 3, 0, 1, 1);
+  DatabaseUserNameLabel = new QLabel("Имя пользователя ");
+  DatabaseSettingsLayout->addWidget(DatabaseUserNameLabel, 3, 0, 1, 1);
 
   DatabaseUserNameLineEdit =
       new QLineEdit(settings.value("Database/User/Name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLineEdit, 3, 1, 1, 1);
 
-  UserPasswordLabel = new QLabel("Пароль пользователя ");
-  DatabaseSettingsLayout->addWidget(UserPasswordLabel, 4, 0, 1, 1);
+  DatabaseUserPasswordLabel = new QLabel("Пароль пользователя ");
+  DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLabel, 4, 0, 1, 1);
 
   DatabaseUserPasswordLineEdit =
       new QLineEdit(settings.value("Database/User/Password").toString());
@@ -732,36 +681,77 @@ void MasterGUI::createSettingsTab() {
                                                      : Qt::Unchecked);
   DatabaseSettingsLayout->addWidget(DatabaseLogOption, 5, 1, 1, 1);
 
-  // Настройки генератора прошивок
-  FirmwareSettingsGroupBox = new QGroupBox("Настройки генератора прошивок");
-  SettingsMainSubLayout->addWidget(FirmwareSettingsGroupBox);
+  // Настройки логгера
+  LogSystemSettingsGroupBox = new QGroupBox("Настройки системы логгирования");
+  SettingsMainSubLayout->addWidget(LogSystemSettingsGroupBox);
 
-  FirmwareSettingsLayout = new QGridLayout();
-  FirmwareSettingsGroupBox->setLayout(FirmwareSettingsLayout);
+  LogSystemSettingsLayout = new QGridLayout();
+  LogSystemSettingsGroupBox->setLayout(LogSystemSettingsLayout);
 
-  FirmwareBaseFilePathLabel = new QLabel("Путь к файлу с прошивкой");
-  FirmwareSettingsLayout->addWidget(FirmwareBaseFilePathLabel, 0, 0, 1, 1);
-  FirmwareBaseFilePathLineEdit =
-      new QLineEdit(settings.value("Firmware/Base/Path").toString());
-  FirmwareBaseFilePathLineEdit->setMaxLength(200);
-  FirmwareSettingsLayout->addWidget(FirmwareBaseFilePathLineEdit, 0, 1, 1, 1);
-  ExploreFirmwareBaseFilePathPushButton = new QPushButton("Обзор");
-  FirmwareSettingsLayout->addWidget(ExploreFirmwareBaseFilePathPushButton, 0, 2,
-                                    1, 1);
-  connect(ExploreFirmwareBaseFilePathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_ExploreFirmwareBaseFilePathPushButton_slot);
+  LogSystemEnableLabel = new QLabel("Вкл/выкл системы логгирования");
+  LogSystemSettingsLayout->addWidget(LogSystemEnableLabel, 0, 0, 1, 1);
+  LogSystemEnableCheckBox = new QCheckBox();
+  LogSystemEnableCheckBox->setCheckState(
+      settings.value("LogSystem/Enable").toBool() ? Qt::Checked
+                                                  : Qt::Unchecked);
+  LogSystemSettingsLayout->addWidget(LogSystemEnableCheckBox, 0, 1, 1, 1);
+  connect(LogSystemEnableCheckBox, &QCheckBox::stateChanged, this,
+          &MasterGUI::on_LogSystemEnableCheckBox_slot);
 
-  FirmwareDataFilePathLabel = new QLabel("Путь к файлу с данными");
-  FirmwareSettingsLayout->addWidget(FirmwareDataFilePathLabel, 1, 0, 1, 1);
-  FirmwareDataFilePathLineEdit =
-      new QLineEdit(settings.value("Firmware/Data/Path").toString());
-  FirmwareDataFilePathLineEdit->setMaxLength(200);
-  FirmwareSettingsLayout->addWidget(FirmwareDataFilePathLineEdit, 1, 1, 1, 1);
-  ExploreFirmwareDataFilePathPushButton = new QPushButton("Обзор");
-  FirmwareSettingsLayout->addWidget(ExploreFirmwareDataFilePathPushButton, 1, 2,
-                                    1, 1);
-  connect(ExploreFirmwareDataFilePathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_ExploreFirmwareDataFilePathPushButton_slot);
+  LogSystemProxyWidget1 = new QWidget();
+  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 3, 0, 1, 2);
+  if (!LogSystemEnableCheckBox->isChecked()) {
+    LogSystemProxyWidget1->hide();
+  }
+  LogSystemProxyWidget1Layout = new QGridLayout();
+  LogSystemProxyWidget1->setLayout(LogSystemProxyWidget1Layout);
+
+  LogSystemSavePathLabel = new QLabel("Директория для лог-файлов");
+  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLabel, 1, 0, 1, 2);
+  LogSystemSavePathLineEdit =
+      new QLineEdit(settings.value("LogSystem/Save/Directory").toString());
+  LogSystemSavePathLineEdit->setMaxLength(300);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLineEdit, 1, 1, 1, 1);
+  LogSystemSavePathExplorePushButton = new QPushButton("Обзор");
+  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathExplorePushButton, 1,
+                                         2, 1, 1);
+  connect(LogSystemSavePathExplorePushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_LogSystemSavePathExplorePushButton_slot);
+
+  LogSystemListenPersoServerLabel =
+      new QLabel("Получение логов с сервера персонализации");
+  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerLabel, 2, 0,
+                                         1, 1);
+  LogSystemListenPersoServerCheckBox = new QCheckBox();
+  LogSystemListenPersoServerCheckBox->setCheckState(
+      settings.value("LogSystem/PersoServer/Enable").toBool() ? Qt::Checked
+                                                              : Qt::Unchecked);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 2,
+                                         1, 1, 1);
+  connect(LogSystemListenPersoServerCheckBox, &QCheckBox::stateChanged, this,
+          &MasterGUI::on_LogSystemListenPersoServerCheckBox_slot);
+
+  LogSystemProxyWidget2 = new QWidget();
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 3, 0, 1, 2);
+  if (!LogSystemListenPersoServerCheckBox->isChecked()) {
+    LogSystemProxyWidget2->hide();
+  }
+  LogSystemProxyWidget2Layout = new QGridLayout();
+  LogSystemProxyWidget2->setLayout(LogSystemProxyWidget2Layout);
+
+  LogSystemListenIpLabel = new QLabel("Прослушиваемый IP");
+  LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLabel, 0, 0, 1, 1);
+  LogSystemListenIpLineEdit = new QLineEdit(
+      settings.value("LogSystem/PersoServer/ListenIp").toString());
+  LogSystemListenIpLineEdit->setMaxLength(300);
+  LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLineEdit, 0, 1, 1, 1);
+
+  LogSystemListenPortLabel = new QLabel("Прослушиваемый порт");
+  LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLabel, 1, 0, 1, 1);
+  LogSystemListenPortLineEdit = new QLineEdit(
+      settings.value("LogSystem/PersoServer/ListenPort").toString());
+  LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLineEdit, 1, 1, 1,
+                                         1);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
@@ -817,14 +807,26 @@ void MasterGUI::on_RereleaseTransponderByComboBox_slot(const QString& text) {
   }
 }
 
-void MasterGUI::on_ExploreFirmwareBaseFilePathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.hex, *.bin");
-  FirmwareBaseFilePathLineEdit->setText(filePath);
+void MasterGUI::on_LogSystemSavePathExplorePushButton_slot() {
+  QString dir = QFileDialog::getExistingDirectory(
+      nullptr, "Выбрать директорию", "", QFileDialog::ShowDirsOnly);
+  if (!dir.isEmpty()) {
+    LogSystemSavePathLineEdit->setText(dir);
+  }
 }
 
-void MasterGUI::on_ExploreFirmwareDataFilePathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.hex, *.bin");
-  FirmwareDataFilePathLineEdit->setText(filePath);
+void MasterGUI::on_LogSystemEnableCheckBox_slot(int state) {
+  if (state == Qt::Checked) {
+    LogSystemProxyWidget1->show();
+  } else {
+    LogSystemProxyWidget1->hide();
+  }
+}
+
+void MasterGUI::on_LogSystemListenPersoServerCheckBox_slot(int state) {
+  if (state == Qt::Checked) {
+    LogSystemProxyWidget2->show();
+  } else {
+    LogSystemProxyWidget2->hide();
+  }
 }
