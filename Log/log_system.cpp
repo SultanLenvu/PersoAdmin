@@ -23,7 +23,10 @@ void LogSystem::setEnable(bool option) {
   GlobalEnableOption = option;
 }
 
-void LogSystem::applySettings() {}
+void LogSystem::applySettings() {
+  generate("LogSystem - Применение новых настроек. ");
+  loadSettings();
+}
 
 void LogSystem::generate(const QString& log) {
   if (!GlobalEnableOption) {

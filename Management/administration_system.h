@@ -13,14 +13,14 @@
 class AdministrationSystem : public QObject {
   Q_OBJECT
  public:
-  enum ExecutionStatus {
+  enum ReturnStatus {
     NotExecuted,
     DatabaseConnectionError,
+    DatabaseTransactionError,
     DatabaseQueryError,
     LogicError,
-    ReleaserError,
     UnknowError,
-    CompletedSuccessfully
+    Completed
   };
 
  private:
@@ -30,37 +30,36 @@ class AdministrationSystem : public QObject {
   explicit AdministrationSystem(QObject* parent);
   void applySettings(void);
 
- public slots:
-  void connectDatabase(void);
-  void disconnectDatabase(void);
+  ReturnStatus connectDatabase(void);
+  ReturnStatus disconnectDatabase(void);
 
-  void clearDatabaseTable(const QString& tableName);
-  void getDatabaseTable(const QString& tableName, DatabaseTableModel* buffer);
-  void getCustomResponse(const QString& req, DatabaseTableModel* buffer);
+  ReturnStatus clearDatabaseTable(const QString& tableName);
+  ReturnStatus getDatabaseTable(const QString& tableName,
+                                DatabaseTableModel* buffer);
+  ReturnStatus getCustomResponse(const QString& req,
+                                 DatabaseTableModel* buffer);
 
-  void createNewOrder(const QMap<QString, QString>* orderParameters);
-  void startOrderAssembling(const QString& orderId);
-  void stopOrderAssembling(const QString& orderId);
-  void deleteLastOrder(void);
+  ReturnStatus createNewOrder(const QMap<QString, QString>* orderParameters);
+  ReturnStatus startOrderAssembling(const QString& orderId);
+  ReturnStatus stopOrderAssembling(const QString& orderId);
+  ReturnStatus deleteLastOrder(void);
 
-  void createNewProductionLine(
+  ReturnStatus createNewProductionLine(
       const QMap<QString, QString>* productionLineParameters);
-  void allocateInactiveProductionLines(const QString& orderId);
-  void linkProductionLineWithBox(const QMap<QString, QString>* linkParameters);
-  void shutdownAllProductionLines(void);
-  void deleteLastProductionLine(void);
+  ReturnStatus allocateInactiveProductionLines(const QString& orderId);
+  ReturnStatus linkProductionLineWithBox(
+      const QMap<QString, QString>* linkParameters);
+  ReturnStatus shutdownAllProductionLines(void);
+  ReturnStatus deleteLastProductionLine(void);
 
-  void initIssuerTable(void);
-  void initTransportMasterKeysTable(void);
-  void linkIssuerWithMasterKeys(const QMap<QString, QString>* linkParameters);
+  ReturnStatus initIssuerTable(void);
+  ReturnStatus initTransportMasterKeysTable(void);
+  ReturnStatus linkIssuerWithMasterKeys(
+      const QMap<QString, QString>* linkParameters);
 
  private:
   void createDatabaseController(void);
   void loadSettings(void);
-
-  bool initOperation(void);
-  void processingOperationResult(const QString& log,
-                                 const ExecutionStatus status);
 
   bool addOrder(const QMap<QString, QString>* orderParameters) const;
   bool addPallets(const QMap<QString, QString>* orderParameters) const;
@@ -88,7 +87,6 @@ class AdministrationSystem : public QObject {
 
  signals:
   void logging(const QString& log) const;
-  void operationFinished(ExecutionStatus status);
 };
 
 #endif  // ORDERCREATIONSYSTEM_H

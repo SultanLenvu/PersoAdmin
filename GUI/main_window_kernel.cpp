@@ -10,14 +10,14 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Графический интерфейс пока не создан
   CurrentGUI = nullptr;
 
-  // Создаем систему логгирования
-  createLoggerInstance();
-
   // Cистема взаимодействия с пользователем
   Interactor = new UserInteractionSystem(this, CurrentGUI);
 
+  // Создаем систему логгирования
+  createLoggerInstance();
+
   // Управляющий модуль
-  createManager();
+  createManagerInstance();
 
   // Создаем модели для представлений
   createModels();
@@ -29,7 +29,13 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   createAuthorazationGui();
 }
 
-MainWindowKernel::~MainWindowKernel() {}
+MainWindowKernel::~MainWindowKernel() {
+  ManagerThread->quit();
+  ManagerThread->wait();
+
+  LoggerThread->quit();
+  LoggerThread->wait();
+}
 
 void MainWindowKernel::on_RequestAuthorizationGuiAct_slot() {
   createAuthorazationGui();
@@ -43,15 +49,15 @@ void MainWindowKernel::on_AuthorizePushButton_slot() {
 
   createMasterGui();
 
-  Manager->performDatabaseConnecting();
+  emit connectDatabase_signal();
 }
 
 void MainWindowKernel::on_ShowDatabaseTablePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   Logger->clear();
 
-  Manager->showDatabaseTable(gui->DatabaseTableChoice->currentText(),
-                             RandomModel);
+  emit showDatabaseTable_signal(gui->DatabaseTableChoice->currentText(),
+                                RandomModel);
 
   CurrentGUI->update();
 }
@@ -60,8 +66,8 @@ void MainWindowKernel::on_ClearDatabaseTablePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   Logger->clear();
 
-  Manager->clearDatabaseTable(gui->DatabaseTableChoice->currentText(),
-                              RandomModel);
+  emit clearDatabaseTable_signal(gui->DatabaseTableChoice->currentText(),
+                                 RandomModel);
 
   CurrentGUI->update();
 }
@@ -70,8 +76,8 @@ void MainWindowKernel::on_TransmitCustomRequestPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   Logger->clear();
 
-  Manager->performCustomRequest(gui->CustomRequestLineEdit->text(),
-                                RandomModel);
+  emit performCustomRequest_signal(gui->CustomRequestLineEdit->text(),
+                                   RandomModel);
 
   CurrentGUI->update();
 }
@@ -106,7 +112,7 @@ void MainWindowKernel::on_CreateNewOrderPushButton_slot() {
   orderParameters.insert("manufacturer_id",
                          gui->ManufacturerIdLineEdit->text());
 
-  Manager->createNewOrder(&orderParameters, OrderModel);
+  emit createNewOrder_signal(&orderParameters, OrderModel);
 
   CurrentGUI->update();
 }
@@ -120,8 +126,7 @@ void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
     return;
   }
 
-  Manager->startOrderAssemblingManually(gui->OrderIdLineEdit1->text(),
-                                        OrderModel);
+  emit startOrderAssembling_signal(gui->OrderIdLineEdit1->text(), OrderModel);
 
   CurrentGUI->update();
 }
@@ -135,8 +140,7 @@ void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
     return;
   }
 
-  Manager->stopOrderAssemblingManually(gui->OrderIdLineEdit1->text(),
-                                       OrderModel);
+  emit stopOrderAssembling_signal(gui->OrderIdLineEdit1->text(), OrderModel);
 
   CurrentGUI->update();
 }
@@ -144,7 +148,7 @@ void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
 void MainWindowKernel::on_UpdateOrderViewPushButton_slot() {
   Logger->clear();
 
-  Manager->showDatabaseTable("orders", OrderModel);
+  emit showDatabaseTable_signal("orders", OrderModel);
 
   CurrentGUI->update();
 }
@@ -152,7 +156,7 @@ void MainWindowKernel::on_UpdateOrderViewPushButton_slot() {
 void MainWindowKernel::on_DeleteLastOrderPushButton_slot() {
   Logger->clear();
 
-  Manager->deleteLastOrder(OrderModel);
+  emit deleteLastOrder_signal(OrderModel);
 
   CurrentGUI->update();
 }
@@ -170,8 +174,8 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
   QMap<QString, QString> productionLineParameters;
   productionLineParameters.insert("login", gui->LoginLineEdit1->text());
   productionLineParameters.insert("password", gui->PasswordLineEdit1->text());
-  Manager->createNewProductionLine(&productionLineParameters,
-                                   ProductionLineModel);
+  emit createNewProductionLine_signal(&productionLineParameters,
+                                      ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -185,8 +189,8 @@ void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
     return;
   }
 
-  Manager->allocateInactiveProductionLinesManually(
-      gui->OrderIdLineEdit2->text(), ProductionLineModel);
+  emit allocateInactiveProductionLines_signal(gui->OrderIdLineEdit2->text(),
+                                              ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -207,8 +211,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   linkParameters.insert("password", gui->PasswordLineEdit1->text());
   linkParameters.insert("box_id", gui->BoxIdLineEdit->text());
 
-  Manager->linkProductionLineWithBoxManually(&linkParameters,
-                                             ProductionLineModel);
+  emit linkProductionLineWithBox_signal(&linkParameters, ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -216,7 +219,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
 void MainWindowKernel::on_DeactivateAllProductionLinesPushButton_slot() {
   Logger->clear();
 
-  Manager->shutdownAllProductionLinesManually(ProductionLineModel);
+  emit shutdownAllProductionLines_signal(ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -224,7 +227,7 @@ void MainWindowKernel::on_DeactivateAllProductionLinesPushButton_slot() {
 void MainWindowKernel::on_UpdateProductionLineViewPushButton_slot() {
   Logger->clear();
 
-  Manager->showDatabaseTable("production_lines", ProductionLineModel);
+  emit showDatabaseTable_signal("production_lines", ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -232,7 +235,7 @@ void MainWindowKernel::on_UpdateProductionLineViewPushButton_slot() {
 void MainWindowKernel::on_DeleteLastProductionLinePushButton_slot() {
   Logger->clear();
 
-  Manager->deleteLastProductionLine(ProductionLineModel);
+  emit deleteLastProductionLine_signal(ProductionLineModel);
 
   CurrentGUI->update();
 }
@@ -242,7 +245,7 @@ void MainWindowKernel::on_ShowIssuerTablePushButton_slot() {
   QString tableName = gui->IssuerTableChoice->currentText();
   Logger->clear();
 
-  Manager->showDatabaseTable(MatchingTable->value(tableName), IssuerModel);
+  emit showDatabaseTable_signal(MatchingTable->value(tableName), IssuerModel);
 
   CurrentGUI->update();
 }
@@ -250,7 +253,7 @@ void MainWindowKernel::on_ShowIssuerTablePushButton_slot() {
 void MainWindowKernel::on_InitTransportMasterKeysPushButton_slot() {
   Logger->clear();
 
-  Manager->initTransportMasterKeys(IssuerModel);
+  emit initTransportMasterKeys_signal(IssuerModel);
 
   CurrentGUI->update();
 }
@@ -258,7 +261,7 @@ void MainWindowKernel::on_InitTransportMasterKeysPushButton_slot() {
 void MainWindowKernel::on_InitIssuerTablePushButton_slot() {
   Logger->clear();
 
-  Manager->initIssuers(IssuerModel);
+  emit initIssuers_signal(IssuerModel);
 
   CurrentGUI->update();
 }
@@ -285,7 +288,7 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
   linkParameters.insert("master_keys_type",
                         MatchingTable->value(masterKeysType));
 
-  Manager->linkIssuerWithMasterKeys(IssuerModel, &linkParameters);
+  emit linkIssuerWithMasterKeys_signal(IssuerModel, &linkParameters);
 
   CurrentGUI->update();
 }
@@ -330,7 +333,7 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
                     gui->LogSystemListenPortLineEdit->text().toInt());
 
   // Применение новых настроек
-  Manager->applySettings();
+  emit applySettings_signal();
 
   // Оповещаем пользователя
   Interactor->generateNotification("Новые настройки успешно применены. ");
@@ -754,19 +757,20 @@ void MainWindowKernel::connectMasterGui() {
 
 void MainWindowKernel::createLoggerInstance() {
   Logger = new LogSystem(nullptr);
+  connect(this, &MainWindowKernel::applySettings_signal, Logger,
+          &LogSystem::applySettings);
+
   LoggerThread = new QThread(this);
-
-  Logger->moveToThread(LoggerThread);
-
   connect(LoggerThread, &QThread::finished, LoggerThread,
           &QThread::deleteLater);
   connect(LoggerThread, &QThread::finished, Logger, &LogSystem::deleteLater);
 
+  Logger->moveToThread(LoggerThread);
   LoggerThread->start();
 }
 
-void MainWindowKernel::createManager(void) {
-  Manager = new AdminManager(this);
+void MainWindowKernel::createManagerInstance() {
+  Manager = new AdminManager(nullptr);
   connect(Manager, &AdminManager::logging, Logger, &LogSystem::generate);
   connect(Manager, &AdminManager::notifyUser, Interactor,
           &UserInteractionSystem::generateNotification);
@@ -778,6 +782,58 @@ void MainWindowKernel::createManager(void) {
           &UserInteractionSystem::performeProgressDialogStep);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
           &UserInteractionSystem::completeProgressDialog);
+
+  // Подключаем функционал
+  connect(this, &MainWindowKernel::applySettings_signal, Manager,
+          &AdminManager::applySettings);
+  connect(this, &MainWindowKernel::connectDatabase_signal, Manager,
+          &AdminManager::connectDatabase);
+  connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager,
+          &AdminManager::disconnectDatabase);
+  connect(this, &MainWindowKernel::showDatabaseTable_signal, Manager,
+          &AdminManager::showDatabaseTable);
+  connect(this, &MainWindowKernel::clearDatabaseTable_signal, Manager,
+          &AdminManager::clearDatabaseTable);
+  connect(this, &MainWindowKernel::performCustomRequest_signal, Manager,
+          &AdminManager::performCustomRequest);
+  connect(this, &MainWindowKernel::createNewOrder_signal, Manager,
+          &AdminManager::createNewOrder);
+  connect(this, &MainWindowKernel::startOrderAssembling_signal, Manager,
+          &AdminManager::startOrderAssembling);
+  connect(this, &MainWindowKernel::stopOrderAssembling_signal, Manager,
+          &AdminManager::stopOrderAssembling);
+  connect(this, &MainWindowKernel::deleteLastOrder_signal, Manager,
+          &AdminManager::deleteLastOrder);
+  connect(this, &MainWindowKernel::showOrderTable_signal, Manager,
+          &AdminManager::showOrderTable);
+  connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
+          &AdminManager::createNewProductionLine);
+  connect(this, &MainWindowKernel::allocateInactiveProductionLines_signal,
+          Manager, &AdminManager::allocateInactiveProductionLines);
+  connect(this, &MainWindowKernel::shutdownAllProductionLines_signal, Manager,
+          &AdminManager::shutdownAllProductionLines);
+  connect(this, &MainWindowKernel::deleteLastProductionLine_signal, Manager,
+          &AdminManager::deleteLastProductionLine);
+  connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
+          &AdminManager::showProductionLineTable);
+  connect(this, &MainWindowKernel::linkProductionLineWithBox_signal, Manager,
+          &AdminManager::linkProductionLineWithBox);
+  connect(this, &MainWindowKernel::initIssuers_signal, Manager,
+          &AdminManager::initIssuers);
+  connect(this, &MainWindowKernel::initTransportMasterKeys_signal, Manager,
+          &AdminManager::initTransportMasterKeys);
+  connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal, Manager,
+          &AdminManager::linkIssuerWithMasterKeys);
+
+  ManagerThread = new QThread(this);
+  connect(ManagerThread, &QThread::finished, ManagerThread,
+          &QThread::deleteLater);
+  connect(ManagerThread, &QThread::finished, Manager, &LogSystem::deleteLater);
+  connect(ManagerThread, &QThread::started, Manager,
+          &AdminManager::on_InsctanceThreadStarted);
+
+  Manager->moveToThread(ManagerThread);
+  ManagerThread->start();
 }
 
 void MainWindowKernel::createModels() {
@@ -791,5 +847,5 @@ void MainWindowKernel::createMatchingTable() {
   MatchingTable = new QMap<QString, QString>;
   MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
-  MatchingTable->insert("Заказчики", "issuers");
+  MatchingTable->insert("Эмитенты", "issuers");
 }

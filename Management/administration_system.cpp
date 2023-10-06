@@ -2,10 +2,8 @@
 
 AdministrationSystem::AdministrationSystem(QObject* parent) : QObject(parent) {
   setObjectName("AdministrationSystem");
-
-  qRegisterMetaType<ExecutionStatus>("ExecutionStatus");
-
   loadSettings();
+  qRegisterMetaType<ReturnStatus>("ReturnStatus");
 
   createDatabaseController();
 }
@@ -16,22 +14,21 @@ void AdministrationSystem::applySettings() {
   Database->applySettings();
 }
 
-void AdministrationSystem::connectDatabase() {
+AdministrationSystem::ReturnStatus AdministrationSystem::connectDatabase() {
   emit logging("Подключение к базе данных. ");
   if (!Database->connect()) {
-    processingOperationResult(
-        "Не удалось установить соединение с базой данных. ",
-        DatabaseConnectionError);
+    emit logging("Не удалось установить соединение с базой данных. ");
+    return DatabaseConnectionError;
   }
 
-  emit operationFinished(CompletedSuccessfully);
+  return Completed;
 }
 
-void AdministrationSystem::disconnectDatabase() {
+AdministrationSystem::ReturnStatus AdministrationSystem::disconnectDatabase() {
   emit logging("Отключение от базы данных. ");
   Database->disconnect();
 
-  emit operationFinished(CompletedSuccessfully);
+  return Completed;
 }
 
 void AdministrationSystem::createDatabaseController() {
@@ -40,107 +37,125 @@ void AdministrationSystem::createDatabaseController() {
           &AdministrationSystem::proxyLogging);
 }
 
-void AdministrationSystem::clearDatabaseTable(const QString& tableName) {
-  emit logging(QString("Очистка таблицы %1 базы данных. ").arg(tableName));
-
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+AdministrationSystem::ReturnStatus AdministrationSystem::clearDatabaseTable(
+    const QString& tableName) {
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   if (!Database->clearTable(tableName)) {
-    processingOperationResult("Очистка не выполнена. ", DatabaseQueryError);
-    return;
+    emit logging(
+        QString("Получена ошибка при очистке таблицы %1. ").arg(tableName));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Очистка выполнена. ", CompletedSuccessfully);
+  emit logging(QString("Таблица %1 очищена. ").arg(tableName));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::getDatabaseTable(const QString& tableName,
-                                            DatabaseTableModel* buffer) {
-  emit logging(
-      QString("Получение данных из таблицы %1 базы данных. ").arg(tableName));
-
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+AdministrationSystem::ReturnStatus AdministrationSystem::getDatabaseTable(
+    const QString& tableName,
+    DatabaseTableModel* buffer) {
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   if (!Database->getTable(tableName, 10, buffer)) {
-    processingOperationResult(
-        "Получена ошибка при получении данных из таблицы базы данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при получении данных из таблицы %1. ")
+                     .arg(tableName));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Данные из таблицы базы данных получены. ",
-                            CompletedSuccessfully);
+  emit logging(
+      QString("Данные из таблицы %1 успешно получены. ").arg(tableName));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::getCustomResponse(const QString& req,
-                                             DatabaseTableModel* buffer) {
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+AdministrationSystem::ReturnStatus AdministrationSystem::getCustomResponse(
+    const QString& req,
+    DatabaseTableModel* buffer) {
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   if (!Database->execCustomRequest(req, buffer)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении кастомного запроса. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении кастомного запроса. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Кастомный запрос успешно выполнен. ",
-                            CompletedSuccessfully);
+  emit logging("Кастомный запрос успешно выполнен. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::createNewOrder(
+AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
     const QMap<QString, QString>* orderParameters) {
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   emit logging("Добавление заказа. ");
   if (!addOrder(orderParameters)) {
-    processingOperationResult("Получена ошибка при добавлении заказа. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при добавлении заказа. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   emit logging("Добавление палет. ");
   if (!addPallets(orderParameters)) {
-    processingOperationResult("Получена ошибка при добавлении палет. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при добавлении палет. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   emit logging("Добавление боксов. ");
   if (!addBoxes(orderParameters)) {
-    processingOperationResult("Получена ошибка при добавлении боксов. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при добавлении боксов. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   emit logging("Добавление транспондеров. ");
   if (!addTransponders(orderParameters)) {
-    processingOperationResult("Получена ошибка при добавлении транспондеров. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при добавлении транспондеров. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Новый заказ успешно создан. ",
-                            CompletedSuccessfully);
+  emit logging("Новый заказ успешно создан. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::startOrderAssembling(const QString& orderId) {
+AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
+    const QString& orderId) {
   QMap<QString, QString> boxRecord;
   QMap<QString, QString> productionLineRecord;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   // Ищем все неактивные производственные линии
@@ -151,11 +166,11 @@ void AdministrationSystem::startOrderAssembling(const QString& orderId) {
     productionLineRecord.insert("id", "");
     productionLineRecord.insert("active", "false");
     if (!Database->getRecordByPart("production_lines", productionLineRecord)) {
-      processingOperationResult(QString("Получена ошибка при поиске неактивной "
-                                        "производственной линии '%1'. ")
-                                    .arg(productionLineRecord.value("login")),
-                                DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при поиске неактивной "
+                           "производственной линии '%1'. ")
+                       .arg(productionLineRecord.value("login")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Если незадействованная линия не найдена
@@ -167,11 +182,10 @@ void AdministrationSystem::startOrderAssembling(const QString& orderId) {
     // Ищем бокс для производственной линии
     if (!searchBoxForProductionLine(orderId, productionLineRecord.value("id"),
                                     boxRecord)) {
-      processingOperationResult(
-          QString("Получена ошибка при запуске сборки бокса %1. ")
-              .arg(boxRecord.value("id")),
-          DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при запуске сборки бокса %1. ")
+                       .arg(boxRecord.value("id")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Если свободных боксов не найдено
@@ -183,28 +197,33 @@ void AdministrationSystem::startOrderAssembling(const QString& orderId) {
     // Запускаем сборку бокса
     if (!startBoxProcessing(boxRecord.value("id"),
                             productionLineRecord.value("id"))) {
-      processingOperationResult(
-          QString("Получена ошибка при запуске сборки бокса %1. ")
-              .arg(boxRecord.value("id")),
-          DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при запуске сборки бокса %1. ")
+                       .arg(boxRecord.value("id")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     boxRecord.clear();
     productionLineRecord.clear();
   }
 
-  processingOperationResult(QString("Сборка заказа %1 запущена. ").arg(orderId),
-                            CompletedSuccessfully);
+  emit logging(QString("Сборка заказа %1 запущена. ").arg(orderId));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::stopOrderAssembling(const QString& orderId) {
+AdministrationSystem::ReturnStatus AdministrationSystem::stopOrderAssembling(
+    const QString& orderId) {
   QMap<QString, QString> conditions;
   QMap<QString, QString> newValues;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    Database->abortTransaction();
+    return DatabaseTransactionError;
   }
 
   emit logging("Деактивация линий производства. ");
@@ -213,10 +232,9 @@ void AdministrationSystem::stopOrderAssembling(const QString& orderId) {
   newValues.insert("transponder_id", "NULL");
   if (!Database->updateAllRecordsByPart("production_lines", conditions,
                                         newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке линий производства. "),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке линий производства. "));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -225,10 +243,9 @@ void AdministrationSystem::stopOrderAssembling(const QString& orderId) {
   conditions.insert("in_process", "true");
   newValues.insert("in_process", "false");
   if (!Database->updateAllRecordsByPart("boxes", conditions, newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки всех боксов. "),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки всех боксов. "));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -237,10 +254,9 @@ void AdministrationSystem::stopOrderAssembling(const QString& orderId) {
   conditions.insert("in_process", "true");
   newValues.insert("in_process", "false");
   if (!Database->updateAllRecordsByPart("pallets", conditions, newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки всех паллет."),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки всех паллет."));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -249,23 +265,26 @@ void AdministrationSystem::stopOrderAssembling(const QString& orderId) {
   newValues.insert("id", orderId);
   newValues.insert("in_process", "false");
   if (!Database->updateRecordById("orders", newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки заказа %1.").arg(orderId),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки заказа %1.")
+                     .arg(orderId));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult(
-      QString("Сборка заказа %1 остановлена. ").arg(orderId),
-      CompletedSuccessfully);
+  emit logging(QString("Сборка заказа %1 остановлена. ").arg(orderId));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::deleteLastOrder() {
+AdministrationSystem::ReturnStatus AdministrationSystem::deleteLastOrder() {
   QMap<QString, QString> conditions;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   emit logging("Удаление последнего добавленного заказа. ");
@@ -273,56 +292,69 @@ void AdministrationSystem::deleteLastOrder() {
   conditions.insert("ready_indicator", "false");
   Database->removeLastRecordByCondition("orders", conditions);
 
-  processingOperationResult("Последний добавленный заказ успешно удален. ",
-                            CompletedSuccessfully);
+  emit logging("Последний добавленный заказ успешно удален. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::createNewProductionLine(
+AdministrationSystem::ReturnStatus
+AdministrationSystem::createNewProductionLine(
     const QMap<QString, QString>* productionLineParameters) {
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   // Добавляем линию производства
   emit logging("Добавление линии производства. ");
   if (!addProductionLine(productionLineParameters)) {
-    processingOperationResult(
-        "Получена ошибка при добавлении производственной линии. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при добавлении производственной линии. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Новая линия производства успешно создана. ",
-                            CompletedSuccessfully);
+  emit logging("Новая линия производства успешно создана. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::deleteLastProductionLine() {
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+AdministrationSystem::ReturnStatus
+AdministrationSystem::deleteLastProductionLine() {
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   if (!removeLastProductionLine()) {
-    processingOperationResult(
-        "Получена ошибка при удалении последней линии производства. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при удалении последней линии производства. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult("Последняя линия производства успешно удалена. ",
-                            CompletedSuccessfully);
+  emit logging("Последняя линия производства успешно удалена. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::linkProductionLineWithBox(
+AdministrationSystem::ReturnStatus
+AdministrationSystem::linkProductionLineWithBox(
     const QMap<QString, QString>* linkParameters) {
   QMap<QString, QString> productionLineRecord;
   QMap<QString, QString> newBoxRecord;
   QMap<QString, QString> transponderRecord;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   // Запрашиваем данные о производственной линии
@@ -331,12 +363,12 @@ void AdministrationSystem::linkProductionLineWithBox(
   productionLineRecord.insert("transponder_id", "");
   productionLineRecord.insert("id", "");
   if (!Database->getRecordByPart("production_lines", productionLineRecord)) {
-    processingOperationResult(
+    emit logging(
         QString(
             "Получена ошибка при поиске данных производственной линии '%1'. ")
-            .arg(productionLineRecord.value("login")),
-        DatabaseQueryError);
-    return;
+            .arg(productionLineRecord.value("login")));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   // Получаем данные о новом боксе
@@ -345,42 +377,37 @@ void AdministrationSystem::linkProductionLineWithBox(
   newBoxRecord.insert("in_process", "");
   newBoxRecord.insert("pallet_id", "");
   if (!Database->getRecordById("boxes", newBoxRecord)) {
-    processingOperationResult(
-        QString("Получена ошибка при поиске данных бокса %1. ")
-            .arg(linkParameters->value("box_id")),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при поиске данных бокса %1. ")
+                     .arg(linkParameters->value("box_id")));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   // Если бокс не найден, то связывание недопустимо
   if (newBoxRecord.isEmpty()) {
-    processingOperationResult(QString("Бокс %1 не существует, связывание с "
-                                      "производственной линией %2 невозможно. ")
-                                  .arg(linkParameters->value("box_id"),
-                                       productionLineRecord.value("id")),
-                              LogicError);
-    return;
+    emit logging(QString("Бокс %1 не существует, связывание с "
+                         "производственной линией %2 невозможно. ")
+                     .arg(linkParameters->value("box_id"),
+                          productionLineRecord.value("id")));
+    return LogicError;
   }
 
   // Если бокс уже собран, то связывание недопустимо
   if (newBoxRecord.value("ready_indicator") == "true") {
-    processingOperationResult(QString("Бокс %1 уже собран, связывание с "
-                                      "производственной линией %2 невозможно. ")
-                                  .arg(linkParameters->value("box_id"),
-                                       productionLineRecord.value("id")),
-                              LogicError);
-    return;
+    emit logging(QString("Бокс %1 уже собран, связывание с "
+                         "производственной линией %2 невозможно. ")
+                     .arg(linkParameters->value("box_id"),
+                          productionLineRecord.value("id")));
+    return LogicError;
   }
   // Если бокс занят другой производственной линией, то связывание
   // недопустимо
   if (newBoxRecord.value("in_process") == "true") {
-    processingOperationResult(
-        QString("Бокс %1 уже в процессе сборки, связывание с "
-                "производственной линией %2 невозможно. ")
-            .arg(linkParameters->value("box_id"),
-                 productionLineRecord.value("id")),
-        LogicError);
-    return;
+    emit logging(QString("Бокс %1 уже в процессе сборки, связывание с "
+                         "производственной линией %2 невозможно. ")
+                     .arg(linkParameters->value("box_id"),
+                          productionLineRecord.value("id")));
+    return LogicError;
   }
 
   // Получаем данные текущего транспондера, если он был определен
@@ -389,46 +416,49 @@ void AdministrationSystem::linkProductionLineWithBox(
                              productionLineRecord.value("transponder_id"));
     transponderRecord.insert("box_id", "");
     if (!Database->getRecordById("transponders", transponderRecord)) {
-      processingOperationResult(
+      emit logging(
           QString("Получена ошибка при поиске данных транспондера %1. ")
-              .arg(productionLineRecord.value("transponder_id")),
-          DatabaseQueryError);
-      return;
+              .arg(productionLineRecord.value("transponder_id")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Останавливаем сборку соответсвующего бокса
     if (!stopBoxProcessing(transponderRecord.value("box_id"))) {
-      processingOperationResult(
-          QString("Получена ошибка при остановке сборки бокса %1. ")
-              .arg(transponderRecord.value("box_id")),
-          DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при остановке сборки бокса %1. ")
+                       .arg(transponderRecord.value("box_id")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
   }
 
   // Запускаем процесс сборки бокса
   if (!startBoxProcessing(newBoxRecord.value("id"),
                           productionLineRecord.value("id"))) {
-    processingOperationResult(
-        QString("Получена ошибка при запуске сборки бокса %1. ")
-            .arg(newBoxRecord.value("id")),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при запуске сборки бокса %1. ")
+                     .arg(newBoxRecord.value("id")));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult(
+  emit logging(
       QString("Линия производства %1 успешно связана с боксом %2. ")
-          .arg(productionLineRecord.value("id"), newBoxRecord.value("id")),
-      CompletedSuccessfully);
+          .arg(productionLineRecord.value("id"), newBoxRecord.value("id")));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::shutdownAllProductionLines() {
+AdministrationSystem::ReturnStatus
+AdministrationSystem::shutdownAllProductionLines() {
   QMap<QString, QString> conditions;
   QMap<QString, QString> newValues;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   emit logging("Деактивация линий производства. ");
@@ -437,10 +467,9 @@ void AdministrationSystem::shutdownAllProductionLines() {
   newValues.insert("transponder_id", "NULL");
   if (!Database->updateAllRecordsByPart("production_lines", conditions,
                                         newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке линий производства. "),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке линий производства. "));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -449,10 +478,9 @@ void AdministrationSystem::shutdownAllProductionLines() {
   conditions.insert("in_process", "true");
   newValues.insert("in_process", "false");
   if (!Database->updateAllRecordsByPart("boxes", conditions, newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки всех боксов. "),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки всех боксов. "));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -461,10 +489,9 @@ void AdministrationSystem::shutdownAllProductionLines() {
   conditions.insert("in_process", "true");
   newValues.insert("in_process", "false");
   if (!Database->updateAllRecordsByPart("pallets", conditions, newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки всех паллет."),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки всех паллет."));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
@@ -473,28 +500,31 @@ void AdministrationSystem::shutdownAllProductionLines() {
   conditions.insert("in_process", "true");
   newValues.insert("in_process", "false");
   if (!Database->updateAllRecordsByPart("orders", conditions, newValues)) {
-    processingOperationResult(
-        QString("Получена ошибка при остановке сборки всех заказов."),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при остановке сборки всех заказов."));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   newValues.clear();
   conditions.clear();
 
-  processingOperationResult(QString("Все линии производства остановлены. "),
-                            CompletedSuccessfully);
+  emit logging(QString("Все линии производства остановлены. "));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::allocateInactiveProductionLines(
-    const QString& orderId) {
+AdministrationSystem::ReturnStatus
+AdministrationSystem::allocateInactiveProductionLines(const QString& orderId) {
   QMap<QString, QString> productionLineRecord;
   QMap<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   // Ищем все неактивные производственные линии
@@ -505,18 +535,21 @@ void AdministrationSystem::allocateInactiveProductionLines(
     productionLineRecord.insert("id", "");
     productionLineRecord.insert("active", "false");
     if (!Database->getRecordByPart("production_lines", productionLineRecord)) {
-      processingOperationResult(QString("Получена ошибка при поиске неактивной "
-                                        "производственной линии '%1'. ")
-                                    .arg(productionLineRecord.value("login")),
-                                DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при поиске неактивной "
+                           "производственной линии '%1'. ")
+                       .arg(productionLineRecord.value("login")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Если незадействованная линия не найдена
     if (productionLineRecord.isEmpty()) {
-      processingOperationResult(QString("Все производственные линии активны. "),
-                                CompletedSuccessfully);
-      return;
+      emit logging(QString("Все производственные линии активны. "));
+      if (!Database->closeTransaction()) {
+        emit logging("Получена ошибка при закрытии транзакции. ");
+        return DatabaseTransactionError;
+      }
+      return Completed;
     }
 
     // Ищем свободные боксы в заказе
@@ -531,11 +564,10 @@ void AdministrationSystem::allocateInactiveProductionLines(
     mergedRecord.insert("boxes.ready_indicator", "false");
     mergedRecord.insert("pallets.order_id", orderId);
     if (!Database->getMergedRecordByPart(tables, foreignKeys, mergedRecord)) {
-      processingOperationResult(
-          QString("Получена ошибка при поиске свободного бокса в заказе %1. ")
-              .arg(orderId),
-          DatabaseQueryError);
-      return;
+      emit logging(
+          QString("Получена ошибка при поиске свободного бокса в заказе %1. "));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Если свободных боксов в заказе не нашлось
@@ -548,22 +580,21 @@ void AdministrationSystem::allocateInactiveProductionLines(
     productionLineRecord.insert("transponder_id", mergedRecord.value("id"));
     productionLineRecord.insert("active", "true");
     if (!Database->updateRecordById("production_lines", productionLineRecord)) {
-      processingOperationResult(
+      emit logging(
           QString("Получена ошибка при активации производственной линии "
                   "производственной линии %1. ")
-              .arg(productionLineRecord.value("if")),
-          DatabaseQueryError);
-      return;
+              .arg(productionLineRecord.value("if")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     // Запускаем сборку бокса
     if (!startBoxProcessing(mergedRecord.value("box_id"),
                             productionLineRecord.value("id"))) {
-      processingOperationResult(
-          QString("Получена ошибка при запуске сборки бокса %1. ")
-              .arg(mergedRecord.value("box_id")),
-          DatabaseQueryError);
-      return;
+      emit logging(QString("Получена ошибка при запуске сборки бокса %1. ")
+                       .arg(mergedRecord.value("box_id")));
+      Database->abortTransaction();
+      return DatabaseQueryError;
     }
 
     productionLineRecord.clear();
@@ -572,25 +603,29 @@ void AdministrationSystem::allocateInactiveProductionLines(
     tables.clear();
   }
 
-  processingOperationResult(QString("Все линии производства распределены. "),
-                            CompletedSuccessfully);
+  emit logging(QString("Все производственные линии активны. "));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::initIssuerTable() {
+AdministrationSystem::ReturnStatus AdministrationSystem::initIssuerTable() {
   QMap<QString, QString> record;
   int32_t lastId = 0;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   // Получаем идентифкатор последнего добавленного заказа
   record.insert("id", "");
   if (!Database->getLastRecord("issuers", record)) {
-    processingOperationResult("Получена ошибка при поиске последнего заказа. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   lastId = record.value("id").toInt();
 
@@ -599,10 +634,9 @@ void AdministrationSystem::initIssuerTable() {
   record.insert("name", "Пауэр Синтез");
   record.insert("efc_context_mark", "000000000001");
   if (!Database->addRecord("issuers", record)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении запроса в базу данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   record.clear();
 
@@ -610,10 +644,9 @@ void AdministrationSystem::initIssuerTable() {
   record.insert("name", "Автодор");
   record.insert("efc_context_mark", "570002FF0070");
   if (!Database->addRecord("issuers", record)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении запроса в базу данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   record.clear();
 
@@ -621,10 +654,9 @@ void AdministrationSystem::initIssuerTable() {
   record.insert("name", "Новое качество дорог");
   record.insert("efc_context_mark", "000000000001");
   if (!Database->addRecord("issuers", record)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении запроса в базу данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   record.clear();
 
@@ -632,10 +664,9 @@ void AdministrationSystem::initIssuerTable() {
   record.insert("name", "Западный скоростной диаметр");
   record.insert("efc_context_mark", "570001FF0070");
   if (!Database->addRecord("issuers", record)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении запроса в базу данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   record.clear();
 
@@ -643,30 +674,34 @@ void AdministrationSystem::initIssuerTable() {
   record.insert("name", "Объединенные системы сбора платы");
   record.insert("efc_context_mark", "000000000001");
   if (!Database->addRecord("issuers", record)) {
-    processingOperationResult(
-        "Получена ошибка при выполнении запроса в базу данных. ",
-        DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при выполнении запроса в базу данных. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
   record.clear();
 
-  processingOperationResult("Инициализация успешно завершена. ",
-                            CompletedSuccessfully);
+  emit logging("Таблица эмитентов успешно инициализирована. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::initTransportMasterKeysTable() {
+AdministrationSystem::ReturnStatus
+AdministrationSystem::initTransportMasterKeysTable() {
   QMap<QString, QString> transportKeysRecord;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   transportKeysRecord.insert("id", "");
   if (!Database->getLastRecord("transport_master_keys", transportKeysRecord)) {
-    processingOperationResult("Получена ошибка при поиске последнего заказа. ",
-                              DatabaseQueryError);
-    return;
+    emit logging("Получена ошибка при поиске последнего заказа. ");
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
   // Конструируем запись
@@ -685,24 +720,28 @@ void AdministrationSystem::initTransportMasterKeysTable() {
 
   // Если транспортные ключи для эмитента отсутствуют, то создаем новую запись
   if (!Database->addRecord("transport_master_keys", transportKeysRecord)) {
-    processingOperationResult(
-        QString("Получена ошибка при добавлении транспортных мастер ключей. "),
-        DatabaseQueryError);
-    return;
+    emit logging(
+        QString("Получена ошибка при добавлении транспортных мастер ключей. "));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult(
-      "Инициализация таблицы транспортных мастер ключей успешно завершена. ",
-      CompletedSuccessfully);
+  emit logging("Таблица транспортных ключей успешно инициализирована. ");
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
-void AdministrationSystem::linkIssuerWithMasterKeys(
+AdministrationSystem::ReturnStatus
+AdministrationSystem::linkIssuerWithMasterKeys(
     const QMap<QString, QString>* linkParameters) {
   QMap<QString, QString> issuerRecord;
 
-  // Инициализируем выполнение операции
-  if (!initOperation()) {
-    return;
+  if (!Database->openTransaction()) {
+    emit logging("Получена ошибка при открытиеи транзакции. ");
+    return DatabaseTransactionError;
   }
 
   emit logging(QString("Обновление записи эмитента %1.")
@@ -715,56 +754,25 @@ void AdministrationSystem::linkIssuerWithMasterKeys(
     issuerRecord.insert("commercial_master_keys_id",
                         linkParameters->value("master_keys_id"));
   }
+
   if (!Database->updateRecordById("issuers", issuerRecord)) {
-    processingOperationResult(
-        QString("Получена ошибка при обновлении записи эмитента %1.")
-            .arg(linkParameters->value("issuer_id")),
-        DatabaseQueryError);
-    return;
+    emit logging(QString("Получена ошибка при обновлении записи эмитента %1.")
+                     .arg(linkParameters->value("issuer_id")));
+    Database->abortTransaction();
+    return DatabaseQueryError;
   }
 
-  processingOperationResult(
-      QString("Эмитент %1 успешно связан с мастер ключами %2. ")
-          .arg(linkParameters->value("issuer_id"),
-               linkParameters->value("master_keys_id")),
-      CompletedSuccessfully);
+  emit logging(QString("Эмитент %1 успешно связан с мастер ключами %2. ")
+                   .arg(linkParameters->value("issuer_id"),
+                        linkParameters->value("master_keys_id")));
+  if (!Database->closeTransaction()) {
+    emit logging("Получена ошибка при закрытии транзакции. ");
+    return DatabaseTransactionError;
+  }
+  return Completed;
 }
 
 void AdministrationSystem::loadSettings() {}
-
-bool AdministrationSystem::initOperation() {
-  emit logging("Открытие транзакции. ");
-  if (!Database->openTransaction()) {
-    processingOperationResult("Получена ошибка при открытии транзакции. ",
-                              DatabaseQueryError);
-    return false;
-  }
-
-  return true;
-}
-
-void AdministrationSystem::processingOperationResult(
-    const QString& log,
-    const ExecutionStatus status) {
-  if (status == DatabaseConnectionError) {
-    emit operationFinished(status);
-    return;
-  }
-
-  // Закрываем транзакцию
-  if (status == CompletedSuccessfully) {
-    if (!Database->closeTransaction()) {
-      emit logging("Получена ошибка при закрытии транзакции. ");
-    }
-  } else {
-    if (!Database->abortTransaction()) {
-      emit logging("Получена ошибка при закрытии транзакции. ");
-    }
-  }
-
-  emit logging(log);
-  emit operationFinished(status);
-}
 
 bool AdministrationSystem::addOrder(
     const QMap<QString, QString>* orderParameters) const {

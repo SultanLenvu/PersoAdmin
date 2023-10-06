@@ -21,7 +21,6 @@ SOURCES += \
     Management/admin_manager.cpp \
     Log/log_system.cpp \
     Management/administration_system.cpp \
-    Management/administration_system_builder.cpp \
     main.cpp
 
 HEADERS += \
@@ -37,8 +36,7 @@ HEADERS += \
     GUI/gui_delegates.h \
     GUI/user_interaction_system.h \
     Log/log_system.h \
-    Management/administration_system.h \
-    Management/administration_system_builder.h
+    Management/administration_system.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

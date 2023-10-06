@@ -16,7 +16,6 @@
 #include "Database/postgres_controller.h"
 #include "Transponder/transponder_seed_model.h"
 #include "administration_system.h"
-#include "administration_system_builder.h"
 
 class AdminManager : public QObject {
   Q_OBJECT
@@ -26,13 +25,9 @@ class AdminManager : public QObject {
 
  private:
   OperationState CurrentState;
-  QString NotificarionText;
 
   AdministrationSystem* Administrator;
-  AdministrationSystemBuilder* AdministratorBuilder;
-  QThread* AdministratorThread;
 
-  QEventLoop* WaitingLoop;
   QTimer* ODTimer;
   QTimer* ODQTimer;
   QElapsedTimer* ODMeter;
@@ -41,52 +36,34 @@ class AdminManager : public QObject {
   AdminManager(QObject* parent);
   ~AdminManager();
 
+ public slots:
   void applySettings();
+  void on_InsctanceThreadStarted(void);
 
-  void performDatabaseConnecting(void);
-  void performDatabaseDisconnecting(void);
+  void connectDatabase(void);
+  void disconnectDatabase(void);
   void showDatabaseTable(const QString& name, DatabaseTableModel* model);
   void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
-
   void performCustomRequest(const QString& req, DatabaseTableModel* model);
 
   void createNewOrder(const QMap<QString, QString>* orderParameterseters,
                       DatabaseTableModel* model);
-  void startOrderAssemblingManually(const QString& orderId,
-                                    DatabaseTableModel* model);
-  void stopOrderAssemblingManually(const QString& orderId,
-                                   DatabaseTableModel* model);
   void deleteLastOrder(DatabaseTableModel* model);
+  void startOrderAssembling(const QString& orderId, DatabaseTableModel* model);
+  void stopOrderAssembling(const QString& orderId, DatabaseTableModel* model);
   void showOrderTable(DatabaseTableModel* model);
 
   void createNewProductionLine(
       const QMap<QString, QString>* productionLineParameterseters,
       DatabaseTableModel* model);
-  void allocateInactiveProductionLinesManually(const QString& orderId,
-                                               DatabaseTableModel* model);
-  void shutdownAllProductionLinesManually(DatabaseTableModel* model);
+  void allocateInactiveProductionLines(const QString& orderId,
+                                       DatabaseTableModel* model);
+  void shutdownAllProductionLines(DatabaseTableModel* model);
   void deleteLastProductionLine(DatabaseTableModel* model);
   void showProductionLineTable(DatabaseTableModel* model);
-  void linkProductionLineWithBoxManually(
+  void linkProductionLineWithBox(
       const QMap<QString, QString>* linkParameterseters,
       DatabaseTableModel* model);
-
-  void releaseTransponderManually(
-      const QMap<QString, QString>* releaseParameters,
-      TransponderSeedModel* seed);
-  void confirmTransponderReleaseManually(
-      const QMap<QString, QString>* confirmParameters,
-      TransponderSeedModel* seed);
-  void rereleaseTransponderManually(
-      const QMap<QString, QString>* rereleaseParameters,
-      TransponderSeedModel* seed);
-  void confirmTransponderRereleaseManually(
-      const QMap<QString, QString>* confirmParameters,
-      TransponderSeedModel* seed);
-  void searchTransponderManually(const QMap<QString, QString>* searchParameters,
-                                 TransponderSeedModel* seed);
-  void refundTransponderManually(const QMap<QString, QString>* refundParameters,
-                                 TransponderSeedModel* seed);
 
   void initIssuers(DatabaseTableModel* model);
   void initTransportMasterKeys(DatabaseTableModel* model);
@@ -94,23 +71,21 @@ class AdminManager : public QObject {
                                 const QMap<QString, QString>* Parameterseters);
 
  private:
-  void createAdministratorInstance(void);
+  void loadSettings(void);
+
+  void createAdministrator(void);
 
   void createWaitingLoop(void);
   void createTimers(void);
   void setupODQTimer(uint32_t msecs);
 
   bool startOperationExecution(const QString& operationName);
-  void endOperationExecution(const QString& operationName);
+  void finishOperationExecution(const QString& operationName,
+                                const QString& msg);
 
  private slots:
   void proxyLogging(const QString& log);
 
-  void on_AdministratorBuilderCompleted_slot(void);
-  void on_AdministratorThreadFinished_slot(void);
-
-  void on_AdministratorFinished_slot(
-      AdministrationSystem::ExecutionStatus status);
   void on_ODTimerTimeout_slot(void);
   void on_ODQTimerTimeout_slot(void);
 
@@ -121,36 +96,6 @@ class AdminManager : public QObject {
   void operationPerfomingStarted(void);
   void operationStepPerfomed(void);
   void operationPerformingFinished(void);
-  void waitingEnd(void);
-
-  void applySettings_signal(void);
-
-  void connectDatabase_signal(void);
-  void disconnectDatabase_signal(void);
-  void requestMasterGui_signal(const QMap<QString, QString>* authData);
-  void getDatabaseTable_signal(const QString& tableName,
-                               DatabaseTableModel* model);
-  void clearDatabaseTable_signal(const QString& tableName);
-  void getCustomResponse_signal(const QString& req, DatabaseTableModel* model);
-
-  void createNewOrder_signal(
-      const QMap<QString, QString>* orderParameterseters);
-  void startOrderAssembling_signal(const QString& orderId);
-  void stopOrderAssembling_signal(const QString& orderId);
-  void deleteLastOrder_signal(void);
-
-  void createNewProductionLine_signal(
-      const QMap<QString, QString>* productionLineParameterseters);
-  void allocateInactiveProductionLines_signal(const QString& orderId);
-  void shutdownAllProductionLines_signal(void);
-  void removeLastProductionLine_signal(void);
-  void linkProductionLineWithBox_signal(
-      const QMap<QString, QString>* linkParameterseters);
-
-  void initIssuerTable_signal(void);
-  void initTransportMasterKeysTable_signal(void);
-  void linkIssuerWithMasterKeys_signal(
-      const QMap<QString, QString>* linkParameterseters);
 };
 
 //==================================================================================

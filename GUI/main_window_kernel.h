@@ -29,8 +29,10 @@ class MainWindowKernel : public QMainWindow {
   QAction* AboutProgramAct;
   QAction* RequestAuthorizationGuiAct;
 
-  AdminManager* Manager;
   UserInteractionSystem* Interactor;
+
+  QThread* ManagerThread;
+  AdminManager* Manager;
 
   QThread* LoggerThread;
   LogSystem* Logger;
@@ -102,8 +104,47 @@ class MainWindowKernel : public QMainWindow {
   void connectMasterGui(void);
 
   void createLoggerInstance(void);
-  void createManager(void);
+  void createManagerInstance(void);
   void createModels(void);
   void createMatchingTable(void);
+
+ signals:
+  void applySettings_signal();
+
+  void connectDatabase_signal(void);
+  void disconnectDatabase_signal(void);
+  void showDatabaseTable_signal(const QString& name, DatabaseTableModel* model);
+  void clearDatabaseTable_signal(const QString& name,
+                                 DatabaseTableModel* model);
+
+  void performCustomRequest_signal(const QString& req,
+                                   DatabaseTableModel* model);
+
+  void createNewOrder_signal(const QMap<QString, QString>* orderParameterseters,
+                             DatabaseTableModel* model);
+  void startOrderAssembling_signal(const QString& orderId,
+                                   DatabaseTableModel* model);
+  void stopOrderAssembling_signal(const QString& orderId,
+                                  DatabaseTableModel* model);
+  void deleteLastOrder_signal(DatabaseTableModel* model);
+  void showOrderTable_signal(DatabaseTableModel* model);
+
+  void createNewProductionLine_signal(
+      const QMap<QString, QString>* productionLineParameterseters,
+      DatabaseTableModel* model);
+  void allocateInactiveProductionLines_signal(const QString& orderId,
+                                              DatabaseTableModel* model);
+  void shutdownAllProductionLines_signal(DatabaseTableModel* model);
+  void deleteLastProductionLine_signal(DatabaseTableModel* model);
+  void showProductionLineTable_signal(DatabaseTableModel* model);
+  void linkProductionLineWithBox_signal(
+      const QMap<QString, QString>* linkParameterseters,
+      DatabaseTableModel* model);
+
+  void initIssuers_signal(DatabaseTableModel* model);
+  void initTransportMasterKeys_signal(DatabaseTableModel* model);
+  void linkIssuerWithMasterKeys_signal(
+      DatabaseTableModel* model,
+      const QMap<QString, QString>* Parameterseters);
 };
 #endif  // MAINWINDOWKERNEL_H
