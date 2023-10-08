@@ -9,13 +9,15 @@
 
 class TestTableView_ColorDelegate : public QStyledItemDelegate
 {
-public:
-  explicit TestTableView_ColorDelegate(QObject* parent) : QStyledItemDelegate(parent)
-  {
-  }
+ public:
+  explicit TestTableView_ColorDelegate(QObject* parent);
 
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  QSize sizeHint(const QStyleOptionViewItem& option,
+                 const QModelIndex& index) const override;
+
+ private:
+  Q_DISABLE_COPY(TestTableView_ColorDelegate)
 };
 
 //==================================================================================

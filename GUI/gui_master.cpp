@@ -630,6 +630,44 @@ void MasterGUI::createSettingsTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
   SettingsMainLayout->addItem(SettingsHorizontalSpacer1);
 
+  // Настройки системы адиминистрирования
+  AdministrationSystemSettingsGroupBox =
+      new QGroupBox(QString("Настройки системы администрирования"));
+  SettingsMainSubLayout->addWidget(AdministrationSystemSettingsGroupBox);
+  AdministrationSystemSettingsLayout = new QGridLayout();
+  AdministrationSystemSettingsGroupBox->setLayout(
+      AdministrationSystemSettingsLayout);
+
+  AdministrationSystemLogEnableLabel = new QLabel("Логирование ");
+  AdministrationSystemSettingsLayout->addWidget(
+      AdministrationSystemLogEnableLabel, 0, 0, 1, 1);
+  AdministrationSystemLogEnable = new QCheckBox();
+  AdministrationSystemLogEnable->setCheckState(
+      settings.value("AdministrationSystem/LogEnable").toBool()
+          ? Qt::Checked
+          : Qt::Unchecked);
+  AdministrationSystemSettingsLayout->addWidget(AdministrationSystemLogEnable,
+                                                0, 1, 1, 1);
+
+  // Настройки системы взаимодействия с пользователем
+  UserInteractionSystemSettingsGroupBox = new QGroupBox(
+      QString("Настройки системы взаимодействия с пользователем"));
+  SettingsMainSubLayout->addWidget(UserInteractionSystemSettingsGroupBox);
+  UserInteractionSystemSettingsLayout = new QGridLayout();
+  UserInteractionSystemSettingsGroupBox->setLayout(
+      UserInteractionSystemSettingsLayout);
+
+  UserInteractionSystemLogEnableLabel = new QLabel("Логирование ");
+  UserInteractionSystemSettingsLayout->addWidget(
+      UserInteractionSystemLogEnableLabel, 0, 0, 1, 1);
+  UserInteractionSystemLogEnable = new QCheckBox();
+  UserInteractionSystemLogEnable->setCheckState(
+      settings.value("UserInteractionSystem/LogEnable").toBool()
+          ? Qt::Checked
+          : Qt::Unchecked);
+  UserInteractionSystemSettingsLayout->addWidget(UserInteractionSystemLogEnable,
+                                                 0, 1, 1, 1);
+
   // Настройки базы данных
   DatabaseSettingsGroupBox = new QGroupBox(QString("Настройки базы данных"));
   SettingsMainSubLayout->addWidget(DatabaseSettingsGroupBox);
@@ -641,45 +679,46 @@ void MasterGUI::createSettingsTab() {
   DatabaseSettingsLayout->addWidget(DatabaseIpLabel, 0, 0, 1, 1);
 
   DatabaseIpLineEdit =
-      new QLineEdit(settings.value("Database/Server/Ip").toString());
+      new QLineEdit(settings.value("PostgresController/Server/Ip").toString());
   DatabaseSettingsLayout->addWidget(DatabaseIpLineEdit, 0, 1, 1, 1);
 
   DatabasePortLabel = new QLabel("Порт ");
   DatabaseSettingsLayout->addWidget(DatabasePortLabel, 1, 0, 1, 1);
 
-  DatabasePortLineEdit =
-      new QLineEdit(settings.value("Database/Server/Port").toString());
+  DatabasePortLineEdit = new QLineEdit(
+      settings.value("PostgresController/Server/Port").toString());
   DatabaseSettingsLayout->addWidget(DatabasePortLineEdit, 1, 1, 1, 1);
 
   DatabaseNameLabel = new QLabel("Название базы данных ");
   DatabaseSettingsLayout->addWidget(DatabaseNameLabel, 2, 0, 1, 1);
 
-  DatabaseNameLineEdit =
-      new QLineEdit(settings.value("Database/Name").toString());
+  DatabaseNameLineEdit = new QLineEdit(
+      settings.value("PostgresController/Database/Name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseNameLineEdit, 2, 1, 1, 1);
 
   DatabaseUserNameLabel = new QLabel("Имя пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLabel, 3, 0, 1, 1);
 
   DatabaseUserNameLineEdit =
-      new QLineEdit(settings.value("Database/User/Name").toString());
+      new QLineEdit(settings.value("PostgresController/User/Name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLineEdit, 3, 1, 1, 1);
 
   DatabaseUserPasswordLabel = new QLabel("Пароль пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLabel, 4, 0, 1, 1);
 
-  DatabaseUserPasswordLineEdit =
-      new QLineEdit(settings.value("Database/User/Password").toString());
+  DatabaseUserPasswordLineEdit = new QLineEdit(
+      settings.value("PostgresController/User/Password").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLineEdit, 4, 1, 1, 1);
 
-  DatabaseLogOptionLabel = new QLabel("Логирование ");
-  DatabaseSettingsLayout->addWidget(DatabaseLogOptionLabel, 5, 0, 1, 1);
+  IDatabaseControllerLogEnableLabel = new QLabel("Логирование ");
+  DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnableLabel, 5, 0, 1,
+                                    1);
 
-  DatabaseLogOption = new QCheckBox();
-  DatabaseLogOption->setCheckState(
-      settings.value("Database/Log/Active").toBool() ? Qt::Checked
-                                                     : Qt::Unchecked);
-  DatabaseSettingsLayout->addWidget(DatabaseLogOption, 5, 1, 1, 1);
+  IDatabaseControllerLogEnable = new QCheckBox();
+  IDatabaseControllerLogEnable->setCheckState(
+      settings.value("IDatabaseController/LogEnable").toBool() ? Qt::Checked
+                                                               : Qt::Unchecked);
+  DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnable, 5, 1, 1, 1);
 
   // Настройки логгера
   LogSystemSettingsGroupBox = new QGroupBox("Настройки системы логгирования");
@@ -692,7 +731,7 @@ void MasterGUI::createSettingsTab() {
   LogSystemSettingsLayout->addWidget(LogSystemEnableLabel, 0, 0, 1, 1);
   LogSystemEnableCheckBox = new QCheckBox();
   LogSystemEnableCheckBox->setCheckState(
-      settings.value("LogSystem/Enable").toBool() ? Qt::Checked
+      settings.value("Global/LogEnable").toBool() ? Qt::Checked
                                                   : Qt::Unchecked);
   LogSystemSettingsLayout->addWidget(LogSystemEnableCheckBox, 0, 1, 1, 1);
   connect(LogSystemEnableCheckBox, &QCheckBox::stateChanged, this,

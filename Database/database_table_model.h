@@ -20,7 +20,7 @@ class DatabaseTableModel : public QAbstractTableModel {
 
   void build(QVector<QString>* headers, QVector<QVector<QString>*>* data);
   void clear(void);
-  bool isEmpty(void);
+  bool isEmpty(void) const;
 
   // Функционал модели
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -31,6 +31,7 @@ class DatabaseTableModel : public QAbstractTableModel {
                       int role = Qt::DisplayRole) const override;
 
  private:
+  Q_DISABLE_COPY(DatabaseTableModel)
   void deleteAll(void);
 };
 

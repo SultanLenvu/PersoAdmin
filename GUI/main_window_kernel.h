@@ -1,10 +1,12 @@
 #ifndef MAINWINDOWKERNEL_H
 #define MAINWINDOWKERNEL_H
 
+#include <QDebug>
 #include <QMainWindow>
 #include <QMap>
 #include <QRegularExpression>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QString>
 
 #include "Database/database_table_model.h"
@@ -55,6 +57,8 @@ class MainWindowKernel : public QMainWindow {
   void on_AuthorizePushButton_slot(void);
 
   // Функционал для работы с базой данных
+  void on_ConnectDatabasePushButton_slot(void);
+  void on_DisconnectDatabasePushButton_slot(void);
   void on_ShowDatabaseTablePushButton_slot(void);
   void on_ClearDatabaseTablePushButton_slot(void);
   void on_TransmitCustomRequestPushButton_slot(void);
@@ -84,7 +88,9 @@ class MainWindowKernel : public QMainWindow {
   void on_ApplySettingsPushButton_slot(void);
 
  private:
+  Q_DISABLE_COPY(MainWindowKernel)
   void loadSettings(void) const;
+  void saveSettings(void) const;
   bool checkAuthorizationData(void) const;
   bool checkNewSettings(void) const;
   bool checkNewOrderInput(void) const;
@@ -105,12 +111,18 @@ class MainWindowKernel : public QMainWindow {
 
   void createLoggerInstance(void);
   void createManagerInstance(void);
+  void createInteractorInstance(void);
   void createModels(void);
   void createMatchingTable(void);
 
  signals:
   void applySettings_signal();
 
+  // Сигналы для логгера
+  void loggerClear_signal(void);
+  void loggerGenerate_signal(const QString& log);
+
+  // Сигналы для менеджера
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
   void showDatabaseTable_signal(const QString& name, DatabaseTableModel* model);
@@ -120,8 +132,9 @@ class MainWindowKernel : public QMainWindow {
   void performCustomRequest_signal(const QString& req,
                                    DatabaseTableModel* model);
 
-  void createNewOrder_signal(const QMap<QString, QString>* orderParameterseters,
-                             DatabaseTableModel* model);
+  void createNewOrder_signal(
+      const QSharedPointer<QMap<QString, QString> > orderParameterseters,
+      DatabaseTableModel* model);
   void startOrderAssembling_signal(const QString& orderId,
                                    DatabaseTableModel* model);
   void stopOrderAssembling_signal(const QString& orderId,

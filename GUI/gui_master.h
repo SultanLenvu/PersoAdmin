@@ -249,6 +249,18 @@ class MasterGUI : public GUI {
   QSpacerItem* SettingsHorizontalSpacer1;
   QSpacerItem* SettingsVerticalSpacer1;
 
+  // Настройки системы адиминистрирования
+  QGroupBox* AdministrationSystemSettingsGroupBox;
+  QGridLayout* AdministrationSystemSettingsLayout;
+  QLabel* AdministrationSystemLogEnableLabel;
+  QCheckBox* AdministrationSystemLogEnable;
+
+  // Настройки системы взаимодействия с пользователем
+  QGroupBox* UserInteractionSystemSettingsGroupBox;
+  QGridLayout* UserInteractionSystemSettingsLayout;
+  QLabel* UserInteractionSystemLogEnableLabel;
+  QCheckBox* UserInteractionSystemLogEnable;
+
   // Настройки базы данных
   QGroupBox* DatabaseSettingsGroupBox;
   QGridLayout* DatabaseSettingsLayout;
@@ -262,8 +274,8 @@ class MasterGUI : public GUI {
   QLineEdit* DatabaseUserNameLineEdit;
   QLabel* DatabaseUserPasswordLabel;
   QLineEdit* DatabaseUserPasswordLineEdit;
-  QLabel* DatabaseLogOptionLabel;
-  QCheckBox* DatabaseLogOption;
+  QLabel* IDatabaseControllerLogEnableLabel;
+  QCheckBox* IDatabaseControllerLogEnable;
 
   // Настройки системы логгирования
   QGroupBox* LogSystemSettingsGroupBox;
@@ -285,7 +297,6 @@ class MasterGUI : public GUI {
   QLineEdit* LogSystemListenIpLineEdit;
   QLabel* LogSystemListenPortLabel;
   QLineEdit* LogSystemListenPortLineEdit;
-  //============================================================
 
  public:
   explicit MasterGUI(QWidget* parent);
@@ -298,6 +309,7 @@ class MasterGUI : public GUI {
   void clearLogDisplay(void);
 
  private:
+  Q_DISABLE_COPY(MasterGUI)
   void createTabs(void);
 
   void createServerTab(void);

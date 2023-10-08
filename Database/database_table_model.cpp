@@ -45,10 +45,7 @@ void DatabaseTableModel::clear() {
   endResetModel();
 }
 
-bool DatabaseTableModel::isEmpty() {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
+bool DatabaseTableModel::isEmpty() const {
   return ((!Headers) && (!Data)) ? true : false;
 }
 

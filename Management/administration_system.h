@@ -22,8 +22,11 @@ class AdministrationSystem : public QObject {
     UnknowError,
     Completed
   };
+  Q_ENUM(ReturnStatus)
 
  private:
+  bool LogEnable;
+
   PostgresController* Database;
 
  public:
@@ -39,7 +42,8 @@ class AdministrationSystem : public QObject {
   ReturnStatus getCustomResponse(const QString& req,
                                  DatabaseTableModel* buffer);
 
-  ReturnStatus createNewOrder(const QMap<QString, QString>* orderParameters);
+  ReturnStatus createNewOrder(
+      const QSharedPointer<QMap<QString, QString> > orderParameters);
   ReturnStatus startOrderAssembling(const QString& orderId);
   ReturnStatus stopOrderAssembling(const QString& orderId);
   ReturnStatus deleteLastOrder(void);
@@ -58,13 +62,19 @@ class AdministrationSystem : public QObject {
       const QMap<QString, QString>* linkParameters);
 
  private:
+  Q_DISABLE_COPY(AdministrationSystem)
   void createDatabaseController(void);
   void loadSettings(void);
+  void sendLog(const QString& log) const;
 
-  bool addOrder(const QMap<QString, QString>* orderParameters) const;
-  bool addPallets(const QMap<QString, QString>* orderParameters) const;
-  bool addBoxes(const QMap<QString, QString>* orderParameters) const;
-  bool addTransponders(const QMap<QString, QString>* orderParameters) const;
+  bool addOrder(
+      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+  bool addPallets(
+      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+  bool addBoxes(
+      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+  bool addTransponders(
+      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
   bool addProductionLine(
       const QMap<QString, QString>* productionLineParameters) const;
 

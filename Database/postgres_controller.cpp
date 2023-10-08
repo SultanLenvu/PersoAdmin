@@ -3,6 +3,7 @@
 PostgresController::PostgresController(QObject* parent,
                                        const QString& connectionName)
     : IDatabaseController(parent) {
+  setObjectName("PostgresController");
   loadSettings();
 
   ConnectionName = connectionName;
@@ -653,12 +654,19 @@ void PostgresController::loadSettings() {
   // Загружаем настройки
   QSettings settings;
 
-  LogOption = settings.value("Database/Log/Active").toBool();
-  HostAddress = settings.value("Database/Server/Ip").toString();
-  HostPort = settings.value("Database/Server/Port").toInt();
-  DatabaseName = settings.value("Database/Name").toString();
-  UserName = settings.value("Database/User/Name").toString();
-  UserPassword = settings.value("Database/User/Password").toString();
+  LogEnable = ((settings.value("IDatabaseController/LogEnable").toBool()) &&
+               (settings.value("Global/LogEnable").toBool()));
+  HostAddress = settings.value("PostgresController/Server/Ip").toString();
+  HostPort = settings.value("PostgresController/Server/Port").toInt();
+  DatabaseName = settings.value("PostgresController/Name").toString();
+  UserName = settings.value("PostgresController/User/Name").toString();
+  UserPassword = settings.value("PostgresController/User/Password").toString();
+}
+
+void PostgresController::sendLog(const QString& log) const {
+  if (LogEnable) {
+    emit logging(log);
+  }
 }
 
 void PostgresController::createDatabaseConnection(void) {

@@ -1,15 +1,11 @@
 #ifndef ADMIN_MANAGER_H
 #define ADMIN_MANAGER_H
 
-#include <QElapsedTimer>
 #include <QList>
 #include <QMap>
 #include <QObject>
 #include <QSettings>
-#include <QTcpServer>
 #include <QThread>
-#include <QTimer>
-#include <QVector>
 
 #include "Database/database_controller.h"
 #include "Database/database_table_model.h"
@@ -22,15 +18,13 @@ class AdminManager : public QObject {
 
  public:
   enum OperationState { Ready, WaitingExecution, Failed, Completed };
+  Q_ENUM(OperationState)
 
  private:
+  bool LogEnable;
   OperationState CurrentState;
 
   AdministrationSystem* Administrator;
-
-  QTimer* ODTimer;
-  QTimer* ODQTimer;
-  QElapsedTimer* ODMeter;
 
  public:
   AdminManager(QObject* parent);
@@ -46,8 +40,9 @@ class AdminManager : public QObject {
   void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
   void performCustomRequest(const QString& req, DatabaseTableModel* model);
 
-  void createNewOrder(const QMap<QString, QString>* orderParameterseters,
-                      DatabaseTableModel* model);
+  void createNewOrder(
+      const QSharedPointer<QMap<QString, QString> > orderParameterseters,
+      DatabaseTableModel* model);
   void deleteLastOrder(DatabaseTableModel* model);
   void startOrderAssembling(const QString& orderId, DatabaseTableModel* model);
   void stopOrderAssembling(const QString& orderId, DatabaseTableModel* model);
@@ -71,13 +66,11 @@ class AdminManager : public QObject {
                                 const QMap<QString, QString>* Parameterseters);
 
  private:
+  Q_DISABLE_COPY(AdminManager)
   void loadSettings(void);
+  void sendLog(const QString& log) const;
 
   void createAdministrator(void);
-
-  void createWaitingLoop(void);
-  void createTimers(void);
-  void setupODQTimer(uint32_t msecs);
 
   bool startOperationExecution(const QString& operationName);
   void finishOperationExecution(const QString& operationName,
@@ -86,16 +79,12 @@ class AdminManager : public QObject {
  private slots:
   void proxyLogging(const QString& log);
 
-  void on_ODTimerTimeout_slot(void);
-  void on_ODQTimerTimeout_slot(void);
-
  signals:
-  void logging(const QString& log);
+  void logging(const QString& log) const;
   void notifyUser(const QString& data);
   void notifyUserAboutError(const QString& data);
-  void operationPerfomingStarted(void);
-  void operationStepPerfomed(void);
-  void operationPerformingFinished(void);
+  void operationPerfomingStarted(const QString& operationName);
+  void operationPerformingFinished(const QString& operationName);
 };
 
 //==================================================================================

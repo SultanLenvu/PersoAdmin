@@ -11,6 +11,8 @@ class PostgresController : public IDatabaseController {
   Q_OBJECT
 
  private:
+  bool LogEnable;
+
   QString ConnectionName;
 
   QHostAddress HostAddress;
@@ -74,7 +76,9 @@ class PostgresController : public IDatabaseController {
   virtual void applySettings() override;
 
  private:
+  Q_DISABLE_COPY(PostgresController)
   void loadSettings(void);
+  void sendLog(const QString& log) const;
   void createDatabaseConnection(void);
   void convertResponseToBuffer(QSqlQuery& request,
                                DatabaseTableModel* buffer) const;

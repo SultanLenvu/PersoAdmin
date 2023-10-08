@@ -33,6 +33,7 @@ class LogSystem : public QObject {
   void generate(const QString& log);
 
  private:
+  Q_DISABLE_COPY(LogSystem)
   void loadSettings(void);
   void startListeningPersoServerLog(void);
   void stopListeningPersoServerLog(void);

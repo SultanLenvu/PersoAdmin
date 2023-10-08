@@ -10,11 +10,11 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Графический интерфейс пока не создан
   CurrentGUI = nullptr;
 
-  // Cистема взаимодействия с пользователем
-  Interactor = new UserInteractionSystem(this, CurrentGUI);
-
   // Создаем систему логгирования
   createLoggerInstance();
+
+  // Cистема взаимодействия с пользователем
+  createInteractorInstance();
 
   // Управляющий модуль
   createManagerInstance();
@@ -27,6 +27,9 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
 
   // Создаем графический интерфейс окна авторизации
   createAuthorazationGui();
+
+  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
+      "QSharedPointer<QMap<QString, QString> >");
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -52,74 +55,80 @@ void MainWindowKernel::on_AuthorizePushButton_slot() {
   emit connectDatabase_signal();
 }
 
+void MainWindowKernel::on_ConnectDatabasePushButton_slot() {
+  emit loggerClear_signal();
+
+  emit connectDatabase_signal();
+}
+
+void MainWindowKernel::on_DisconnectDatabasePushButton_slot() {
+  emit loggerClear_signal();
+
+  emit disconnectDatabase_signal();
+}
+
 void MainWindowKernel::on_ShowDatabaseTablePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit showDatabaseTable_signal(gui->DatabaseTableChoice->currentText(),
                                 RandomModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_ClearDatabaseTablePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit clearDatabaseTable_signal(gui->DatabaseTableChoice->currentText(),
                                  RandomModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_TransmitCustomRequestPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit performCustomRequest_signal(gui->CustomRequestLineEdit->text(),
                                    RandomModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_CreateNewOrderPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
-  Logger->clear();
+  emit loggerClear_signal();
 
   if (!checkNewOrderInput()) {
     Interactor->generateError("Некорректный ввод параметров нового заказа. ");
     return;
   }
 
-  QMap<QString, QString> orderParameters;
-  orderParameters.insert("issuer_name", gui->IssuerNameComboBox->currentText());
-  orderParameters.insert("transponder_quantity",
-                         gui->TransponderQuantityLineEdit->text());
-  orderParameters.insert("box_capacity", gui->BoxCapacityLineEdit->text());
-  orderParameters.insert("pallet_capacity",
-                         gui->PalletCapacityLineEdit->text());
-  orderParameters.insert(
+  QSharedPointer<QMap<QString, QString>> orderParameters(
+      new QMap<QString, QString>);
+  orderParameters->insert("issuer_name",
+                          gui->IssuerNameComboBox->currentText());
+  orderParameters->insert("transponder_quantity",
+                          gui->TransponderQuantityLineEdit->text());
+  orderParameters->insert("box_capacity", gui->BoxCapacityLineEdit->text());
+  orderParameters->insert("pallet_capacity",
+                          gui->PalletCapacityLineEdit->text());
+  orderParameters->insert(
       "full_personalization",
       gui->FullPersonalizationCheckBox->checkState() == Qt::Checked ? "true"
                                                                     : "false");
-  orderParameters.insert("pan_file_path", gui->PanFilePathLineEdit->text());
-  orderParameters.insert("transponder_model",
-                         gui->TransponderModelLineEdit->text());
-  orderParameters.insert("accr_reference", gui->AccrReferenceLineEdit->text());
-  orderParameters.insert("equipment_class",
-                         gui->EquipmentClassLineEdit->text());
-  orderParameters.insert("manufacturer_id",
-                         gui->ManufacturerIdLineEdit->text());
+  orderParameters->insert("pan_file_path", gui->PanFilePathLineEdit->text());
+  orderParameters->insert("transponder_model",
+                          gui->TransponderModelLineEdit->text());
+  orderParameters->insert("accr_reference", gui->AccrReferenceLineEdit->text());
+  orderParameters->insert("equipment_class",
+                          gui->EquipmentClassLineEdit->text());
+  orderParameters->insert("manufacturer_id",
+                          gui->ManufacturerIdLineEdit->text());
 
-  emit createNewOrder_signal(&orderParameters, OrderModel);
-
-  CurrentGUI->update();
+  emit createNewOrder_signal(orderParameters, OrderModel);
 }
 
 void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
     Interactor->generateError("Некорректный ввод идентификатора заказа. ");
@@ -127,13 +136,11 @@ void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
   }
 
   emit startOrderAssembling_signal(gui->OrderIdLineEdit1->text(), OrderModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
     Interactor->generateError("Некорректный ввод идентификатора заказа. ");
@@ -141,29 +148,23 @@ void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
   }
 
   emit stopOrderAssembling_signal(gui->OrderIdLineEdit1->text(), OrderModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_UpdateOrderViewPushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit showDatabaseTable_signal("orders", OrderModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_DeleteLastOrderPushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit deleteLastOrder_signal(OrderModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   if (!checkNewProductionLineInput()) {
     Interactor->generateError(
@@ -182,7 +183,7 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
 
 void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit2->text().toInt() == 0) {
     Interactor->generateError("Некорректный ввод идентификатора заказа. ");
@@ -191,13 +192,11 @@ void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
 
   emit allocateInactiveProductionLines_signal(gui->OrderIdLineEdit2->text(),
                                               ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
   if ((!checkNewProductionLineInput()) ||
       (gui->BoxIdLineEdit->text().toInt() == 0)) {
@@ -212,58 +211,44 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   linkParameters.insert("box_id", gui->BoxIdLineEdit->text());
 
   emit linkProductionLineWithBox_signal(&linkParameters, ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_DeactivateAllProductionLinesPushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit shutdownAllProductionLines_signal(ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_UpdateProductionLineViewPushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit showDatabaseTable_signal("production_lines", ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_DeleteLastProductionLinePushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit deleteLastProductionLine_signal(ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_ShowIssuerTablePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QString tableName = gui->IssuerTableChoice->currentText();
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit showDatabaseTable_signal(MatchingTable->value(tableName), IssuerModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_InitTransportMasterKeysPushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit initTransportMasterKeys_signal(IssuerModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_InitIssuerTablePushButton_slot() {
-  Logger->clear();
+  emit loggerClear_signal();
 
   emit initIssuers_signal(IssuerModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
@@ -273,7 +258,7 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
   QString masterKeysId = gui->MasterKeysLineEdit1->text();
   QString masterKeysType = gui->MasterKeysChoice->currentText();
 
-  Logger->clear();
+  emit loggerClear_signal();
 
   // Проверка пользовательского ввода
   if (!checkLinkIssuerInput()) {
@@ -289,15 +274,10 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
                         MatchingTable->value(masterKeysType));
 
   emit linkIssuerWithMasterKeys_signal(IssuerModel, &linkParameters);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::on_ApplySettingsPushButton_slot() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  QSettings settings;
-
-  Logger->clear();
+  emit loggerClear_signal();
 
   // Проверка пользовательского ввода
   if (!checkNewSettings()) {
@@ -305,32 +285,8 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
     return;
   }
 
-  // Считывание пользовательского ввода
-  settings.setValue("Database/Server/Ip", gui->DatabaseIpLineEdit->text());
-  settings.setValue("Database/Server/Port",
-                    gui->DatabasePortLineEdit->text().toInt());
-  settings.setValue("Database/Name", gui->DatabaseNameLineEdit->text());
-  settings.setValue("Database/User/Name",
-                    gui->DatabaseUserNameLineEdit->text());
-  settings.setValue("Database/User/Password",
-                    gui->DatabaseUserPasswordLineEdit->text());
-  settings.setValue("Database/Log/Active",
-                    gui->DatabaseLogOption->checkState() == Qt::Checked);
-
-  settings.setValue(
-      "LogSystem/Enable",
-      gui->LogSystemEnableCheckBox->checkState() == Qt::Checked ? true : false);
-  settings.setValue("LogSystem/Save/Directory",
-                    gui->LogSystemSavePathLineEdit->text());
-  settings.setValue(
-      "LogSystem/PersoServer/Enable",
-      gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
-          ? true
-          : false);
-  settings.setValue("LogSystem/PersoServer/Ip",
-                    gui->LogSystemListenIpLineEdit->text());
-  settings.setValue("LogSystem/PersoServer/Port",
-                    gui->LogSystemListenPortLineEdit->text().toInt());
+  // Сохранение настроек
+  saveSettings();
 
   // Применение новых настроек
   emit applySettings_signal();
@@ -347,6 +303,52 @@ void MainWindowKernel::loadSettings() const {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
+}
+
+void MainWindowKernel::saveSettings() const {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSettings settings;
+
+  // Настройки системы администрирования
+  settings.setValue(
+      "AdministrationSystem/LogEnable",
+      gui->AdministrationSystemLogEnable->checkState() == Qt::Checked);
+
+  // Настройки системы взаимодействия с пользователем
+  settings.setValue(
+      "UserInteractionSystem/LogEnable",
+      gui->UserInteractionSystemLogEnable->checkState() == Qt::Checked);
+
+  // Настройки системы логгирования
+  settings.setValue(
+      "Global/LogEnable",
+      gui->LogSystemEnableCheckBox->checkState() == Qt::Checked ? true : false);
+  settings.setValue("LogSystem/Save/Directory",
+                    gui->LogSystemSavePathLineEdit->text());
+  settings.setValue(
+      "LogSystem/PersoServer/Enable",
+      gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
+          ? true
+          : false);
+  settings.setValue("LogSystem/PersoServer/Ip",
+                    gui->LogSystemListenIpLineEdit->text());
+  settings.setValue("LogSystem/PersoServer/Port",
+                    gui->LogSystemListenPortLineEdit->text().toInt());
+
+  // Настройки контроллера базы данных
+  settings.setValue("PostgresController/Server/Ip",
+                    gui->DatabaseIpLineEdit->text());
+  settings.setValue("PostgresController/Server/Port",
+                    gui->DatabasePortLineEdit->text().toInt());
+  settings.setValue("PostgresController/Database/Name",
+                    gui->DatabaseNameLineEdit->text());
+  settings.setValue("PostgresController/User/Name",
+                    gui->DatabaseUserNameLineEdit->text());
+  settings.setValue("PostgresController/User/Password",
+                    gui->DatabaseUserPasswordLineEdit->text());
+  settings.setValue(
+      "IDatabaseController/LogEnable",
+      gui->IDatabaseControllerLogEnable->checkState() == Qt::Checked);
 }
 
 bool MainWindowKernel::checkAuthorizationData() const {
@@ -652,7 +654,7 @@ void MainWindowKernel::createAuthorazationGui() {
 
   // Настраиваем размер главного окна
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
+              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.1);
 
   // Подключаем интерфейс
   connectAuthorizationGui();
@@ -691,6 +693,10 @@ void MainWindowKernel::connectMasterGui() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
   // База данных
+  connect(gui->ConnectDatabasePushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_ConnectDatabasePushButton_slot);
+  connect(gui->DisconnectDatabasePushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_DisconnectDatabasePushButton_slot);
   connect(gui->ShowDatabaseTablePushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_ShowDatabaseTablePushButton_slot);
   connect(gui->ClearDatabaseTablePushButton, &QPushButton::clicked, this,
@@ -759,6 +765,10 @@ void MainWindowKernel::createLoggerInstance() {
   Logger = new LogSystem(nullptr);
   connect(this, &MainWindowKernel::applySettings_signal, Logger,
           &LogSystem::applySettings);
+  connect(this, &MainWindowKernel::loggerClear_signal, Logger,
+          &LogSystem::clear);
+  connect(this, &MainWindowKernel::loggerGenerate_signal, Logger,
+          &LogSystem::generate);
 
   LoggerThread = new QThread(this);
   connect(LoggerThread, &QThread::finished, LoggerThread,
@@ -777,11 +787,9 @@ void MainWindowKernel::createManagerInstance() {
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
           &UserInteractionSystem::generateError);
   connect(Manager, &AdminManager::operationPerfomingStarted, Interactor,
-          &UserInteractionSystem::generateProgressDialog);
-  connect(Manager, &AdminManager::operationStepPerfomed, Interactor,
-          &UserInteractionSystem::performeProgressDialogStep);
+          &UserInteractionSystem::startOperationProgressDialog);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
-          &UserInteractionSystem::completeProgressDialog);
+          &UserInteractionSystem::finishOperationProgressDialog);
 
   // Подключаем функционал
   connect(this, &MainWindowKernel::applySettings_signal, Manager,
@@ -828,12 +836,21 @@ void MainWindowKernel::createManagerInstance() {
   ManagerThread = new QThread(this);
   connect(ManagerThread, &QThread::finished, ManagerThread,
           &QThread::deleteLater);
-  connect(ManagerThread, &QThread::finished, Manager, &LogSystem::deleteLater);
+  connect(ManagerThread, &QThread::finished, Manager,
+          &AdminManager::deleteLater);
   connect(ManagerThread, &QThread::started, Manager,
           &AdminManager::on_InsctanceThreadStarted);
 
   Manager->moveToThread(ManagerThread);
   ManagerThread->start();
+}
+
+void MainWindowKernel::createInteractorInstance() {
+  Interactor = new UserInteractionSystem(CurrentGUI);
+  connect(Interactor, &UserInteractionSystem::logging, Logger,
+          &LogSystem::generate);
+  connect(this, &MainWindowKernel::applySettings_signal, Interactor,
+          &UserInteractionSystem::applySettings);
 }
 
 void MainWindowKernel::createModels() {

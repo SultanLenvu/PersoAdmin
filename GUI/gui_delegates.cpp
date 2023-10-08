@@ -3,9 +3,12 @@
 /* Делегат для изменения цвета таблиц, отображающих результаты тестирования */
 //==================================================================================
 
-void TestTableView_ColorDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
-                                        const QModelIndex& index) const
-{
+TestTableView_ColorDelegate::TestTableView_ColorDelegate(QObject* parent)
+    : QStyledItemDelegate(parent) {}
+
+void TestTableView_ColorDelegate::paint(QPainter* painter,
+                                        const QStyleOptionViewItem& option,
+                                        const QModelIndex& index) const {
   // Получаем данные из модели
   QString text = index.data(Qt::DisplayRole).toString();
 

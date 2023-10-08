@@ -10,6 +10,7 @@ class GUI : public QWidget {
   Q_OBJECT
  public:
   enum GUI_Type { InitialConfiguration, Master, Production };
+  Q_ENUM(GUI_Type)
 
  protected:
   GUI_Type Type;
@@ -25,6 +26,9 @@ class GUI : public QWidget {
   virtual void update(void) = 0;
 
   GUI_Type type(void);
+
+ private:
+  Q_DISABLE_COPY(GUI)
 
  signals:
 };
