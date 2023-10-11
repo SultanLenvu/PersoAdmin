@@ -43,6 +43,7 @@ class MainWindowKernel : public QMainWindow {
   DatabaseTableModel* OrderModel;
   DatabaseTableModel* ProductionLineModel;
   DatabaseTableModel* IssuerModel;
+  DatabaseTableModel* StickerModel;
 
   QMap<QString, QString>* MatchingTable;
 
@@ -83,6 +84,11 @@ class MainWindowKernel : public QMainWindow {
   void on_InitTransportMasterKeysPushButton_slot(void);
   void on_InitIssuerTablePushButton_slot(void);
   void on_LinkIssuerWithKeysPushButton_slot(void);
+
+  // Функционал для работы с принтером стикеров
+  void on_PrintTransponderStickerPushButton_slot(void);
+  void on_PrintBoxStickerPushButton_slot(void);
+  void on_PrintPalletStickerPushButton_slot(void);
 
   // Функционал для настройки сервера
   void on_ApplySettingsPushButton_slot(void);
@@ -159,5 +165,10 @@ class MainWindowKernel : public QMainWindow {
   void linkIssuerWithMasterKeys_signal(
       DatabaseTableModel* model,
       const QMap<QString, QString>* Parameterseters);
+
+  void printTransponderSticker_signal(const QString& id,
+                                      DatabaseTableModel* model);
+  void printBoxSticker_signal(const QString& id, DatabaseTableModel* model);
+  void printPalletSticker_signal(const QString& id, DatabaseTableModel* model);
 };
 #endif  // MAINWINDOWKERNEL_H

@@ -10,6 +10,8 @@
 #include "Database/database_controller.h"
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
+#include "StickerPrinter/isticker_printer.h"
+#include "StickerPrinter/te310_printer.h"
 #include "Transponder/transponder_seed_model.h"
 #include "administration_system.h"
 
@@ -25,6 +27,7 @@ class AdminManager : public QObject {
   OperationState CurrentState;
 
   AdministrationSystem* Administrator;
+  IStickerPrinter* StickerPrinter;
 
  public:
   AdminManager(QObject* parent);
@@ -65,12 +68,17 @@ class AdminManager : public QObject {
   void linkIssuerWithMasterKeys(DatabaseTableModel* model,
                                 const QMap<QString, QString>* Parameterseters);
 
+  void printTransponderSticker(const QString& id, DatabaseTableModel* model);
+  void printBoxSticker(const QString& id, DatabaseTableModel* model);
+  void printPalletSticker(const QString& id, DatabaseTableModel* model);
+
  private:
   Q_DISABLE_COPY(AdminManager)
   void loadSettings(void);
   void sendLog(const QString& log) const;
 
   void createAdministrator(void);
+  void createStickerPrinter(void);
 
   bool startOperationExecution(const QString& operationName);
   void finishOperationExecution(const QString& operationName,

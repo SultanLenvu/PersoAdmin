@@ -148,7 +148,7 @@ class MasterGUI : public GUI {
 
   QHBoxLayout* BoxIdLayout;
   QLabel* BoxIdLabel;
-  QLineEdit* BoxIdLineEdit;
+  QLineEdit* BoxIdLineEdit1;
   QPushButton* LinkProductionLinePushButton;
   QSpacerItem* ProductionLinesControlPanelVS3;
 
@@ -239,6 +239,26 @@ class MasterGUI : public GUI {
   QTableView* IssuerTableView;
   //============================================================
 
+  /* Принтер стикеров */
+  //============================================================
+  QWidget* StickerTab;
+  QHBoxLayout* StickerMainLayout;
+
+  QGroupBox* StickerControlPanel;
+  QVBoxLayout* StickerControlPanelLayout;
+  QLineEdit* TransponderIdLineEdit;
+  QPushButton* PrintTransponderStickerPushButton;
+  QLineEdit* BoxIdLineEdit2;
+  QPushButton* PrintBoxStickerPushButton;
+  QLineEdit* PalletIdLineEdit;
+  QPushButton* PrintPalletStickerPushButton;
+  QSpacerItem* StickerControlPanelVS;
+
+  QGroupBox* StickerDataViewGroup;
+  QVBoxLayout* StickerDataViewLayout;
+  QTableView* StickerDataTableView;
+  //============================================================
+
   /* Настройки админпанели */
   //============================================================
   QWidget* SettingsTab;
@@ -298,6 +318,13 @@ class MasterGUI : public GUI {
   QLabel* LogSystemListenPortLabel;
   QLineEdit* LogSystemListenPortLineEdit;
 
+  // Настройки принтера
+  QGroupBox* StickerPrinterSettingsGroupBox;
+  QGridLayout* StickerPrinterSettingsMainLayout;
+  QLabel* StickerPrinterLibPathLabel;
+  QLineEdit* StickerPrinterLibPathLineEdit;
+  QPushButton* StickerPrinterLibPathPushButton;
+
  public:
   explicit MasterGUI(QWidget* parent);
 
@@ -318,9 +345,10 @@ class MasterGUI : public GUI {
   void createProductionLineTab(void);
   void createTransponderTab(void);
   void createIssuerTab(void);
-  void createLog(void);
-
+  void createStickerTab(void);
   void createSettingsTab(void);
+
+  void createLog(void);
 
  private slots:
   void on_PanFileExplorePushButton_slot(void);
@@ -331,6 +359,8 @@ class MasterGUI : public GUI {
   void on_LogSystemSavePathExplorePushButton_slot(void);
   void on_LogSystemEnableCheckBox_slot(int state);
   void on_LogSystemListenPersoServerCheckBox_slot(int state);
+
+  void on_StickerPrinterLibPathPushButton_slot(void);
 
  signals:
 };

@@ -21,8 +21,11 @@ void AdminManager::applySettings() {
 }
 
 void AdminManager::on_InsctanceThreadStarted() {
-  // Создаем среду выполнения для инициализатора
+  // Создаем администратора
   createAdministrator();
+
+  // Создаем стикер принтер
+  createStickerPrinter();
 }
 
 void AdminManager::connectDatabase() {
@@ -214,7 +217,8 @@ void AdminManager::startOrderAssembling(const QString& orderId,
   }
 
   sendLog(QString("Запуск сборки заказа %1. ").arg(orderId));
-  if (Administrator->startOrderAssembling(orderId)) {
+  if (Administrator->startOrderAssembling(orderId) !=
+      AdministrationSystem::Completed) {
     CurrentState = Failed;
     finishOperationExecution(
         "startOrderAssembling",
@@ -224,7 +228,8 @@ void AdminManager::startOrderAssembling(const QString& orderId,
 
   model->clear();
   sendLog("Отображение заказов. ");
-  if (Administrator->getDatabaseTable("orders", model)) {
+  if (Administrator->getDatabaseTable("orders", model) !=
+      AdministrationSystem::Completed) {
     CurrentState = Failed;
     finishOperationExecution(
         "startOrderAssembling",
@@ -536,10 +541,97 @@ void AdminManager::linkIssuerWithMasterKeys(
   finishOperationExecution("linkIssuerWithMasterKeys", "Выполнено. ");
 }
 
+void AdminManager::printTransponderSticker(const QString& id,
+                                           DatabaseTableModel* model) {
+  if (!startOperationExecution("printTransponderSticker")) {
+    return;
+  }
+
+  QMap<QString, QString> transponderData;
+  if (Administrator->getTransponderData(id, &transponderData) !=
+      AdministrationSystem::Completed) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при получении данных транспондера. ");
+    return;
+  }
+
+  if (!StickerPrinter->printTransponderSticker(&transponderData)) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при печати стикера транспондера. ");
+    return;
+  }
+
+  // Завершаем выполнение операции
+  CurrentState = Completed;
+  finishOperationExecution("printTransponderSticker", "Выполнено. ");
+}
+
+void AdminManager::printBoxSticker(const QString& id,
+                                   DatabaseTableModel* model) {
+  if (!startOperationExecution("printBoxSticker")) {
+    return;
+  }
+
+  QMap<QString, QString> boxData;
+  if (Administrator->getBoxData(id, &boxData) !=
+      AdministrationSystem::Completed) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при получении данных транспондера. ");
+    return;
+  }
+
+  if (!StickerPrinter->printBoxSticker(&boxData)) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при печати стикера транспондера. ");
+    return;
+  }
+
+  // Завершаем выполнение операции
+  CurrentState = Completed;
+  finishOperationExecution("printBoxSticker", "Выполнено. ");
+}
+
+void AdminManager::printPalletSticker(const QString& id,
+                                      DatabaseTableModel* model) {
+  if (!startOperationExecution("printPalletSticker")) {
+    return;
+  }
+
+  QMap<QString, QString> palletData;
+  if (Administrator->getPalletData(id, &palletData) !=
+      AdministrationSystem::Completed) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при получении данных транспондера. ");
+    return;
+  }
+
+  if (!StickerPrinter->printPalletSticker(&palletData)) {
+    CurrentState = Failed;
+    finishOperationExecution(
+        "printTransponderSticker",
+        "Получена ошибка при печати стикера транспондера. ");
+    return;
+  }
+
+  // Завершаем выполнение операции
+  CurrentState = Completed;
+  finishOperationExecution("printPalletSticker", "Выполнено. ");
+}
+
 void AdminManager::loadSettings() {
   QSettings settings;
 
-  LogEnable = settings.value("Global/LogEnable").toBool();
+  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
 void AdminManager::sendLog(const QString& log) const {
@@ -551,6 +643,12 @@ void AdminManager::sendLog(const QString& log) const {
 void AdminManager::createAdministrator() {
   Administrator = new AdministrationSystem(this);
   connect(Administrator, &AdministrationSystem::logging, this,
+          &AdminManager::proxyLogging);
+}
+
+void AdminManager::createStickerPrinter() {
+  StickerPrinter = new TE310Printer(this);
+  connect(StickerPrinter, &IStickerPrinter::logging, this,
           &AdminManager::proxyLogging);
 }
 
@@ -574,9 +672,6 @@ void AdminManager::finishOperationExecution(const QString& operationName,
                                             const QString& msg) {
   sendLog(msg);
 
-  // Сигнал о завершении текущей операции
-  emit operationPerformingFinished(operationName);
-
   // Оповещаем пользователя о результатах
   if (CurrentState == Completed) {
     emit notifyUser(msg);
@@ -586,6 +681,9 @@ void AdminManager::finishOperationExecution(const QString& operationName,
 
   // Готовы к следующей операции
   CurrentState = Ready;
+
+  // Сигнал о завершении текущей операции
+  emit operationPerformingFinished(operationName);
 }
 
 /*

@@ -18,6 +18,7 @@ class LogSystem : public QObject {
   bool GlobalEnableOption;
 
   bool PersoServerLogEnable;
+  QString SaveDir;
   uint32_t PersoServerLogPort;
   QHostAddress PersoServerLogAddress;
   QUdpSocket* PersoServerLogSocket;

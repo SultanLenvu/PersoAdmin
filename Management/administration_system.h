@@ -61,6 +61,11 @@ class AdministrationSystem : public QObject {
   ReturnStatus linkIssuerWithMasterKeys(
       const QMap<QString, QString>* linkParameters);
 
+  ReturnStatus getTransponderData(const QString& id,
+                                  QMap<QString, QString>* data);
+  ReturnStatus getBoxData(const QString& id, QMap<QString, QString>* data);
+  ReturnStatus getPalletData(const QString& id, QMap<QString, QString>* data);
+
  private:
   Q_DISABLE_COPY(AdministrationSystem)
   void createDatabaseController(void);

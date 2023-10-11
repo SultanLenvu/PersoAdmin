@@ -45,11 +45,11 @@ void LogSystem::generate(const QString& log) {
 void LogSystem::loadSettings() {
   QSettings settings;
 
-  GlobalEnableOption = settings.value("LogSystem/Enable").toBool();
-  PersoServerLogEnable =
-      settings.value("LogSystem/PersoServer/Enable").toBool();
-  PersoServerLogAddress = settings.value("LogSystem/PersoServer/Ip").toString();
-  PersoServerLogPort = settings.value("LogSystem/PersoServer/Port").toInt();
+  GlobalEnableOption = settings.value("log_system/global_enable").toBool();
+  SaveDir = settings.value("log_system/save_directory").toBool();
+  PersoServerLogEnable = settings.value("log_system/udp_log_enable").toBool();
+  PersoServerLogAddress = settings.value("log_system/udp_bind_ip").toString();
+  PersoServerLogPort = settings.value("log_system/udp_bind_port").toInt();
 }
 
 void LogSystem::startListeningPersoServerLog() {

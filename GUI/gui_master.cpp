@@ -34,6 +34,21 @@ void MasterGUI::update() {
 
   IssuerTableView->resizeColumnsToContents();
   IssuerTableView->update();
+
+  StickerDataTableView->resizeColumnsToContents();
+  StickerDataTableView->update();
+}
+
+void MasterGUI::displayLog(const QString& data) {
+  if (LogDisplay->toPlainText().length() > 500000)
+    LogDisplay->clear();
+
+  if (LogDisplay)
+    LogDisplay->appendPlainText(data);
+}
+
+void MasterGUI::clearLogDisplay() {
+  LogDisplay->clear();
 }
 
 void MasterGUI::createTabs() {
@@ -43,17 +58,13 @@ void MasterGUI::createTabs() {
   // Задаем стартовую страницу
   Tabs->setCurrentIndex(0);
 
-  // Конструируем вкладку для управления сервером
   createServerTab();
-
-  // Контруируем вкладки для взаимодействия с базой данных
   createDatabaseTab();
   createOrderTab();
   createProductionLineTab();
   createTransponderTab();
   createIssuerTab();
-
-  // Конструируем вкладку настроек
+  createStickerTab();
   createSettingsTab();
 }
 
@@ -356,8 +367,8 @@ void MasterGUI::createProductionLineTab() {
   ProductionLinesControlPanelLayout->addLayout(BoxIdLayout);
   BoxIdLabel = new QLabel("ID бокса: ");
   BoxIdLayout->addWidget(BoxIdLabel);
-  BoxIdLineEdit = new QLineEdit();
-  BoxIdLayout->addWidget(BoxIdLineEdit);
+  BoxIdLineEdit1 = new QLineEdit();
+  BoxIdLayout->addWidget(BoxIdLineEdit1);
   LinkProductionLinePushButton =
       new QPushButton("Связать с производственной линией");
   ProductionLinesControlPanelLayout->addWidget(LinkProductionLinePushButton);
@@ -597,21 +608,55 @@ void MasterGUI::createIssuerTab() {
   IssuerTabMainLayout->setStretch(1, 3);
 }
 
-void MasterGUI::createLog() {
-  LogGroup = new QGroupBox("Лог");
-  LogGroup->setAlignment(Qt::AlignCenter);
-  MainLayout->addWidget(LogGroup);
+void MasterGUI::createStickerTab() {
+  StickerTab = new QWidget();
+  Tabs->addTab(StickerTab, "Стикеры");
 
-  LogLayout = new QVBoxLayout();
-  LogGroup->setLayout(LogLayout);
+  // Основной макет
+  StickerMainLayout = new QHBoxLayout();
+  StickerTab->setLayout(StickerMainLayout);
 
-  LogDisplay = new QPlainTextEdit();
-  LogDisplay = new QPlainTextEdit();
-  LogDisplay->setEnabled(true);
-  LogDisplay->setTabletTracking(true);
-  LogDisplay->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-  LogDisplay->setCenterOnScroll(false);
-  LogLayout->addWidget(LogDisplay);
+  // Панель управления
+  StickerControlPanel = new QGroupBox(QString("Панель управления"));
+  StickerControlPanel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  StickerMainLayout->addWidget(StickerControlPanel);
+
+  StickerControlPanelLayout = new QVBoxLayout();
+  StickerControlPanel->setLayout(StickerControlPanelLayout);
+
+  TransponderIdLineEdit = new QLineEdit();
+  StickerControlPanelLayout->addWidget(TransponderIdLineEdit);
+  PrintTransponderStickerPushButton =
+      new QPushButton("Распечатать стикер для транспондера");
+  StickerControlPanelLayout->addWidget(PrintTransponderStickerPushButton);
+  BoxIdLineEdit2 = new QLineEdit();
+  StickerControlPanelLayout->addWidget(BoxIdLineEdit2);
+  PrintBoxStickerPushButton = new QPushButton("Распечатать стикер для бокса");
+  StickerControlPanelLayout->addWidget(PrintBoxStickerPushButton);
+  PalletIdLineEdit = new QLineEdit();
+  StickerControlPanelLayout->addWidget(PalletIdLineEdit);
+  PrintPalletStickerPushButton =
+      new QPushButton("Распечатать стикер для паллеты");
+  StickerControlPanelLayout->addWidget(PrintPalletStickerPushButton);
+
+  StickerControlPanelVS =
+      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  StickerControlPanelLayout->addItem(StickerControlPanelVS);
+
+  // Отображение информации о стикере
+  StickerDataViewGroup = new QGroupBox(QString("Данные стикера"));
+  StickerDataViewGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  StickerMainLayout->addWidget(StickerDataViewGroup);
+
+  StickerDataViewLayout = new QVBoxLayout();
+  StickerDataViewGroup->setLayout(StickerDataViewLayout);
+
+  StickerDataTableView = new QTableView();
+  StickerDataViewLayout->addWidget(StickerDataTableView);
+
+  // Настройка пропорций
+  StickerMainLayout->setStretch(0, 1);
+  StickerMainLayout->setStretch(1, 2);
 }
 
 void MasterGUI::createSettingsTab() {
@@ -643,7 +688,7 @@ void MasterGUI::createSettingsTab() {
       AdministrationSystemLogEnableLabel, 0, 0, 1, 1);
   AdministrationSystemLogEnable = new QCheckBox();
   AdministrationSystemLogEnable->setCheckState(
-      settings.value("AdministrationSystem/LogEnable").toBool()
+      settings.value("administration_system/log_enable").toBool()
           ? Qt::Checked
           : Qt::Unchecked);
   AdministrationSystemSettingsLayout->addWidget(AdministrationSystemLogEnable,
@@ -662,7 +707,7 @@ void MasterGUI::createSettingsTab() {
       UserInteractionSystemLogEnableLabel, 0, 0, 1, 1);
   UserInteractionSystemLogEnable = new QCheckBox();
   UserInteractionSystemLogEnable->setCheckState(
-      settings.value("UserInteractionSystem/LogEnable").toBool()
+      settings.value("user_interaction_system/log_enable").toBool()
           ? Qt::Checked
           : Qt::Unchecked);
   UserInteractionSystemSettingsLayout->addWidget(UserInteractionSystemLogEnable,
@@ -679,35 +724,35 @@ void MasterGUI::createSettingsTab() {
   DatabaseSettingsLayout->addWidget(DatabaseIpLabel, 0, 0, 1, 1);
 
   DatabaseIpLineEdit =
-      new QLineEdit(settings.value("PostgresController/Server/Ip").toString());
+      new QLineEdit(settings.value("postgres_controller/server_ip").toString());
   DatabaseSettingsLayout->addWidget(DatabaseIpLineEdit, 0, 1, 1, 1);
 
   DatabasePortLabel = new QLabel("Порт ");
   DatabaseSettingsLayout->addWidget(DatabasePortLabel, 1, 0, 1, 1);
 
   DatabasePortLineEdit = new QLineEdit(
-      settings.value("PostgresController/Server/Port").toString());
+      settings.value("postgres_controller/server_port").toString());
   DatabaseSettingsLayout->addWidget(DatabasePortLineEdit, 1, 1, 1, 1);
 
   DatabaseNameLabel = new QLabel("Название базы данных ");
   DatabaseSettingsLayout->addWidget(DatabaseNameLabel, 2, 0, 1, 1);
 
   DatabaseNameLineEdit = new QLineEdit(
-      settings.value("PostgresController/Database/Name").toString());
+      settings.value("postgres_controller/database_name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseNameLineEdit, 2, 1, 1, 1);
 
   DatabaseUserNameLabel = new QLabel("Имя пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLabel, 3, 0, 1, 1);
 
   DatabaseUserNameLineEdit =
-      new QLineEdit(settings.value("PostgresController/User/Name").toString());
+      new QLineEdit(settings.value("postgres_controller/user_name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLineEdit, 3, 1, 1, 1);
 
   DatabaseUserPasswordLabel = new QLabel("Пароль пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLabel, 4, 0, 1, 1);
 
   DatabaseUserPasswordLineEdit = new QLineEdit(
-      settings.value("PostgresController/User/Password").toString());
+      settings.value("postgres_controller/user_password").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLineEdit, 4, 1, 1, 1);
 
   IDatabaseControllerLogEnableLabel = new QLabel("Логирование ");
@@ -716,8 +761,9 @@ void MasterGUI::createSettingsTab() {
 
   IDatabaseControllerLogEnable = new QCheckBox();
   IDatabaseControllerLogEnable->setCheckState(
-      settings.value("IDatabaseController/LogEnable").toBool() ? Qt::Checked
-                                                               : Qt::Unchecked);
+      settings.value("postgres_controller/log_enable").toBool()
+          ? Qt::Checked
+          : Qt::Unchecked);
   DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnable, 5, 1, 1, 1);
 
   // Настройки логгера
@@ -731,8 +777,8 @@ void MasterGUI::createSettingsTab() {
   LogSystemSettingsLayout->addWidget(LogSystemEnableLabel, 0, 0, 1, 1);
   LogSystemEnableCheckBox = new QCheckBox();
   LogSystemEnableCheckBox->setCheckState(
-      settings.value("Global/LogEnable").toBool() ? Qt::Checked
-                                                  : Qt::Unchecked);
+      settings.value("log_system/global_enable").toBool() ? Qt::Checked
+                                                          : Qt::Unchecked);
   LogSystemSettingsLayout->addWidget(LogSystemEnableCheckBox, 0, 1, 1, 1);
   connect(LogSystemEnableCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemEnableCheckBox_slot);
@@ -748,7 +794,7 @@ void MasterGUI::createSettingsTab() {
   LogSystemSavePathLabel = new QLabel("Директория для лог-файлов");
   LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLabel, 1, 0, 1, 2);
   LogSystemSavePathLineEdit =
-      new QLineEdit(settings.value("LogSystem/Save/Directory").toString());
+      new QLineEdit(settings.value("log_system/save_directory").toString());
   LogSystemSavePathLineEdit->setMaxLength(300);
   LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLineEdit, 1, 1, 1, 1);
   LogSystemSavePathExplorePushButton = new QPushButton("Обзор");
@@ -763,8 +809,8 @@ void MasterGUI::createSettingsTab() {
                                          1, 1);
   LogSystemListenPersoServerCheckBox = new QCheckBox();
   LogSystemListenPersoServerCheckBox->setCheckState(
-      settings.value("LogSystem/PersoServer/Enable").toBool() ? Qt::Checked
-                                                              : Qt::Unchecked);
+      settings.value("log_system/udp_log_enable").toBool() ? Qt::Checked
+                                                           : Qt::Unchecked);
   LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 2,
                                          1, 1, 1);
   connect(LogSystemListenPersoServerCheckBox, &QCheckBox::stateChanged, this,
@@ -781,16 +827,36 @@ void MasterGUI::createSettingsTab() {
   LogSystemListenIpLabel = new QLabel("Прослушиваемый IP");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLabel, 0, 0, 1, 1);
   LogSystemListenIpLineEdit =
-      new QLineEdit(settings.value("LogSystem/PersoServer/Ip").toString());
+      new QLineEdit(settings.value("log_system/udp_bind_ip").toString());
   LogSystemListenIpLineEdit->setMaxLength(300);
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLineEdit, 0, 1, 1, 1);
 
   LogSystemListenPortLabel = new QLabel("Прослушиваемый порт");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLabel, 1, 0, 1, 1);
   LogSystemListenPortLineEdit =
-      new QLineEdit(settings.value("LogSystem/PersoServer/Port").toString());
+      new QLineEdit(settings.value("log_system/udp_bind_port").toString());
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLineEdit, 1, 1, 1,
                                          1);
+
+  // Настройки принтера стикеров
+  StickerPrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
+  SettingsMainSubLayout->addWidget(StickerPrinterSettingsGroupBox);
+
+  StickerPrinterSettingsMainLayout = new QGridLayout();
+  StickerPrinterSettingsGroupBox->setLayout(StickerPrinterSettingsMainLayout);
+
+  StickerPrinterLibPathLabel = new QLabel("Путь к библиотеке");
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
+                                              1, 1);
+  StickerPrinterLibPathLineEdit =
+      new QLineEdit(settings.value("sticker_printer/library_path").toString());
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
+                                              1, 1, 1);
+  StickerPrinterLibPathPushButton = new QPushButton("Обзор");
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathPushButton,
+                                              0, 2, 1, 1);
+  connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_StickerPrinterLibPathPushButton_slot);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
@@ -802,18 +868,22 @@ void MasterGUI::createSettingsTab() {
   SettingsMainSubLayout->addItem(SettingsVerticalSpacer1);
 }
 
-void MasterGUI::displayLog(const QString& data) {
-  if (LogDisplay->toPlainText().length() > 500000)
-    LogDisplay->clear();
+void MasterGUI::createLog() {
+  LogGroup = new QGroupBox("Лог");
+  LogGroup->setAlignment(Qt::AlignCenter);
+  MainLayout->addWidget(LogGroup);
 
-  if (LogDisplay)
-    LogDisplay->appendPlainText(data);
+  LogLayout = new QVBoxLayout();
+  LogGroup->setLayout(LogLayout);
+
+  LogDisplay = new QPlainTextEdit();
+  LogDisplay = new QPlainTextEdit();
+  LogDisplay->setEnabled(true);
+  LogDisplay->setTabletTracking(true);
+  LogDisplay->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+  LogDisplay->setCenterOnScroll(false);
+  LogLayout->addWidget(LogDisplay);
 }
-
-void MasterGUI::clearLogDisplay() {
-  LogDisplay->clear();
-}
-
 void MasterGUI::on_PanFileExplorePushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(nullptr, "Выбрать файл", "./", "*.csv");
@@ -868,4 +938,10 @@ void MasterGUI::on_LogSystemListenPersoServerCheckBox_slot(int state) {
   } else {
     LogSystemProxyWidget2->hide();
   }
+}
+
+void MasterGUI::on_StickerPrinterLibPathPushButton_slot() {
+  QString filePath =
+      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
+  StickerPrinterLibPathLineEdit->setText(filePath);
 }

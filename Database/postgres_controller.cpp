@@ -654,13 +654,12 @@ void PostgresController::loadSettings() {
   // Загружаем настройки
   QSettings settings;
 
-  LogEnable = ((settings.value("IDatabaseController/LogEnable").toBool()) &&
-               (settings.value("Global/LogEnable").toBool()));
-  HostAddress = settings.value("PostgresController/Server/Ip").toString();
-  HostPort = settings.value("PostgresController/Server/Port").toInt();
-  DatabaseName = settings.value("PostgresController/Name").toString();
-  UserName = settings.value("PostgresController/User/Name").toString();
-  UserPassword = settings.value("PostgresController/User/Password").toString();
+  LogEnable = settings.value("postgres_controller/log_enable").toBool();
+  HostAddress = settings.value("postgres_controller/server_ip").toString();
+  HostPort = settings.value("postgres_controller/server_port").toInt();
+  DatabaseName = settings.value("postgres_controller/database_name").toString();
+  UserName = settings.value("postgres_controller/user_name").toString();
+  UserPassword = settings.value("postgres_controller/user_password").toString();
 }
 
 void PostgresController::sendLog(const QString& log) const {

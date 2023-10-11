@@ -199,7 +199,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   emit loggerClear_signal();
 
   if ((!checkNewProductionLineInput()) ||
-      (gui->BoxIdLineEdit->text().toInt() == 0)) {
+      (gui->BoxIdLineEdit1->text().toInt() == 0)) {
     Interactor->generateError(
         "Некорректный ввод параметров производственной линии. ");
     return;
@@ -208,7 +208,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   QMap<QString, QString> linkParameters;
   linkParameters.insert("login", gui->LoginLineEdit1->text());
   linkParameters.insert("password", gui->PasswordLineEdit1->text());
-  linkParameters.insert("box_id", gui->BoxIdLineEdit->text());
+  linkParameters.insert("box_id", gui->BoxIdLineEdit1->text());
 
   emit linkProductionLineWithBox_signal(&linkParameters, ProductionLineModel);
 }
@@ -276,6 +276,46 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
   emit linkIssuerWithMasterKeys_signal(IssuerModel, &linkParameters);
 }
 
+void MainWindowKernel::on_PrintTransponderStickerPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  emit loggerClear_signal();
+
+  if (gui->TransponderIdLineEdit->text().toUInt() == 0) {
+    Interactor->generateError(
+        "Введен некорректный идентификатор транспондера. ");
+    return;
+  }
+
+  emit printTransponderSticker_signal(gui->TransponderIdLineEdit->text(),
+                                      StickerModel);
+}
+
+void MainWindowKernel::on_PrintBoxStickerPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  emit loggerClear_signal();
+
+  if (gui->BoxIdLineEdit2->text().toUInt() == 0) {
+    Interactor->generateError(
+        "Введен некорректный идентификатор транспондера. ");
+    return;
+  }
+
+  emit printBoxSticker_signal(gui->BoxIdLineEdit2->text(), StickerModel);
+}
+
+void MainWindowKernel::on_PrintPalletStickerPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  emit loggerClear_signal();
+
+  if (gui->PalletIdLineEdit->text().toUInt() == 0) {
+    Interactor->generateError(
+        "Введен некорректный идентификатор транспондера. ");
+    return;
+  }
+
+  emit printPalletSticker_signal(gui->PalletIdLineEdit->text(), StickerModel);
+}
+
 void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   emit loggerClear_signal();
 
@@ -303,6 +343,10 @@ void MainWindowKernel::loadSettings() const {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
+
+  QSettings::setDefaultFormat(QSettings::IniFormat);
+  QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                     QCoreApplication::applicationDirPath());
 }
 
 void MainWindowKernel::saveSettings() const {
@@ -311,44 +355,48 @@ void MainWindowKernel::saveSettings() const {
 
   // Настройки системы администрирования
   settings.setValue(
-      "AdministrationSystem/LogEnable",
+      "administration_system/log_enable",
       gui->AdministrationSystemLogEnable->checkState() == Qt::Checked);
 
   // Настройки системы взаимодействия с пользователем
   settings.setValue(
-      "UserInteractionSystem/LogEnable",
+      "user_interaction_system/log_enable",
       gui->UserInteractionSystemLogEnable->checkState() == Qt::Checked);
 
   // Настройки системы логгирования
   settings.setValue(
-      "Global/LogEnable",
+      "log_system/global_enable",
       gui->LogSystemEnableCheckBox->checkState() == Qt::Checked ? true : false);
-  settings.setValue("LogSystem/Save/Directory",
+  settings.setValue("log_system/save_directory",
                     gui->LogSystemSavePathLineEdit->text());
   settings.setValue(
-      "LogSystem/PersoServer/Enable",
+      "log_system/udp_log_enable",
       gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
           ? true
           : false);
-  settings.setValue("LogSystem/PersoServer/Ip",
+  settings.setValue("log_system/udp_bind_ip",
                     gui->LogSystemListenIpLineEdit->text());
-  settings.setValue("LogSystem/PersoServer/Port",
+  settings.setValue("log_system/udp_bind_port",
                     gui->LogSystemListenPortLineEdit->text().toInt());
 
   // Настройки контроллера базы данных
-  settings.setValue("PostgresController/Server/Ip",
+  settings.setValue("postgres_controller/server_ip",
                     gui->DatabaseIpLineEdit->text());
-  settings.setValue("PostgresController/Server/Port",
+  settings.setValue("postgres_controller/server_port",
                     gui->DatabasePortLineEdit->text().toInt());
-  settings.setValue("PostgresController/Database/Name",
+  settings.setValue("postgres_controller/database_name",
                     gui->DatabaseNameLineEdit->text());
-  settings.setValue("PostgresController/User/Name",
+  settings.setValue("postgres_controller/user_name",
                     gui->DatabaseUserNameLineEdit->text());
-  settings.setValue("PostgresController/User/Password",
+  settings.setValue("postgres_controller/user_password",
                     gui->DatabaseUserPasswordLineEdit->text());
   settings.setValue(
-      "IDatabaseController/LogEnable",
+      "postgres_controller/log_enable",
       gui->IDatabaseControllerLogEnable->checkState() == Qt::Checked);
+
+  // Принтер стикеров
+  settings.setValue("sticker_printer/library_path",
+                    gui->StickerPrinterLibPathLineEdit->text());
 }
 
 bool MainWindowKernel::checkAuthorizationData() const {
@@ -362,13 +410,14 @@ bool MainWindowKernel::checkAuthorizationData() const {
   }
 
   QSettings settings;
-  settings.setValue("Authorization/Login", login);
+  settings.setValue("authorization/login", login);
 
   return true;
 }
 
 bool MainWindowKernel::checkNewSettings() const {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QFileInfo info;
 
   QHostAddress ip = QHostAddress(gui->LogSystemListenIpLineEdit->text());
   if (ip.isNull()) {
@@ -390,8 +439,13 @@ bool MainWindowKernel::checkNewSettings() const {
     return false;
   }
 
-  QFileInfo info(gui->LogSystemSavePathLineEdit->text());
+  info.setFile(gui->LogSystemSavePathLineEdit->text());
   if (!info.isDir()) {
+    return false;
+  }
+
+  info.setFile(gui->StickerPrinterLibPathLineEdit->text());
+  if (!info.isFile()) {
     return false;
   }
 
@@ -743,6 +797,14 @@ void MainWindowKernel::connectMasterGui() {
   connect(gui->LinkIssuerWithKeysPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot);
 
+  // Стикеры
+  connect(gui->PrintTransponderStickerPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintTransponderStickerPushButton_slot);
+  connect(gui->PrintBoxStickerPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintBoxStickerPushButton_slot);
+  connect(gui->PrintPalletStickerPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintPalletStickerPushButton_slot);
+
   // Сохранение настроек
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_ApplySettingsPushButton_slot);
@@ -757,6 +819,7 @@ void MainWindowKernel::connectMasterGui() {
   gui->OrderTableView->setModel(OrderModel);
   gui->ProductionLineTableView->setModel(ProductionLineModel);
   gui->IssuerTableView->setModel(IssuerModel);
+  gui->StickerDataTableView->setModel(StickerModel);
 
   // Связываем отображения графиков с логикой их формирования
 }
@@ -832,6 +895,12 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::initTransportMasterKeys);
   connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal, Manager,
           &AdminManager::linkIssuerWithMasterKeys);
+  connect(this, &MainWindowKernel::printTransponderSticker_signal, Manager,
+          &AdminManager::printTransponderSticker);
+  connect(this, &MainWindowKernel::printBoxSticker_signal, Manager,
+          &AdminManager::printBoxSticker);
+  connect(this, &MainWindowKernel::printPalletSticker_signal, Manager,
+          &AdminManager::printPalletSticker);
 
   ManagerThread = new QThread(this);
   connect(ManagerThread, &QThread::finished, ManagerThread,
@@ -858,6 +927,7 @@ void MainWindowKernel::createModels() {
   OrderModel = new DatabaseTableModel(this);
   ProductionLineModel = new DatabaseTableModel(this);
   IssuerModel = new DatabaseTableModel(this);
+  StickerModel = new DatabaseTableModel(this);
 }
 
 void MainWindowKernel::createMatchingTable() {

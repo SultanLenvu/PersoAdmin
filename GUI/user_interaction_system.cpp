@@ -60,9 +60,8 @@ void UserInteractionSystem::finishOperationProgressDialog(
   // Измеряем и сохраняем длительность операции
   uint64_t duration = ODMeter->elapsed();
   sendLog(QString("Длительность операции: %1.").arg(QString::number(duration)));
-  settings.setValue(
-      QString("Operations/") + operationName + QString("/Duration"),
-      QVariant::fromValue(duration));
+  settings.setValue(QString("duration_of_operations/") + operationName,
+                    QVariant::fromValue(duration));
 
   // Останавливаем таймер для контроля максимальной длительности операции
   ODTimer->stop();
@@ -86,8 +85,7 @@ void UserInteractionSystem::applySettings() {
 void UserInteractionSystem::loadSettings() {
   QSettings settings;
 
-  LogEnable = ((settings.value("UserInteractionSystem/LogEnable").toBool()) &&
-               (settings.value("Global/LogEnable").toBool()));
+  LogEnable = settings.value("user_interaction_system/log_enable").toBool();
 }
 
 void UserInteractionSystem::sendLog(const QString& log) {

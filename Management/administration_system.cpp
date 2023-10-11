@@ -172,7 +172,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 
     // Если незадействованная линия не найдена
     if (productionLineRecord.isEmpty()) {
-      sendLog(QString("Все производственные линии активны. "));
+      sendLog(QString("Все свободные производственные линии задействованы. "));
       break;
     }
 
@@ -187,7 +187,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 
     // Если свободных боксов не найдено
     if (boxRecord.isEmpty()) {
-      sendLog(QString("В заказе %1 заняты все боксы. ").arg(orderId));
+      sendLog(QString("В заказе %1 все боксы заняты. ").arg(orderId));
       break;
     }
 
@@ -766,10 +766,79 @@ AdministrationSystem::linkIssuerWithMasterKeys(
   return Completed;
 }
 
+AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
+    const QString& id,
+    QMap<QString, QString>* data) {
+  QStringList tables;
+  QStringList foreignKeys;
+  QString keyTableName;
+  QMap<QString, QString> mergedRecord;
+
+  // Запрашиваем атрибуты
+  tables.append("transponders");
+  tables.append("boxes");
+  tables.append("pallets");
+  tables.append("orders");
+  tables.append("issuers");
+
+  foreignKeys.append("box_id");
+  foreignKeys.append("pallet_id");
+  foreignKeys.append("order_id");
+  foreignKeys.append("issuer_id");
+
+  mergedRecord.insert("manufacturer_id", "");
+  mergedRecord.insert("personal_account_number", "");
+  mergedRecord.insert("box_id", "");
+  mergedRecord.insert("pallet_id", "");
+  mergedRecord.insert("order_id", "");
+  mergedRecord.insert("issuer_id", "");
+  mergedRecord.insert("issuers.name", "");
+  mergedRecord.insert("transponders.id", id);
+
+  if (!Database->getMergedRecordByPart(tables, foreignKeys, *data)) {
+    return DatabaseQueryError;
+  }
+
+  // Генерируем дату активации батареи
+  QDate date = QDate::currentDate();
+  QString batteryInsertationDate =
+      QString("%1%2")
+          .arg(QString::number(date.weekNumber()), 2, QChar('0'))
+          .arg(QString::number(date.year() % 100), 2, QChar('0'));
+  mergedRecord.insert("battery_insertation_date",
+                      batteryInsertationDate.toUtf8());
+
+  // Преобразуем в десятичный формат
+  data->insert("manufacturer_id",
+               QString::number(
+                   mergedRecord.value("manufacturer_id").toInt(nullptr, 16)));
+
+  // Дополняем серийник до 10 цифр нулями слева
+  data->insert("sn",
+               QString("%1").arg(mergedRecord.value("id"), 10, QChar('0')));
+
+  // Вычленяем символ F из PAN
+  QString tempPan = mergedRecord.value("personal_account_number");
+  data->insert("pan", tempPan.remove(QChar('F')));
+
+  // Добавляем название эмитента
+  data->insert("issuer_name", mergedRecord.value("name"));
+
+  return Completed;
+}
+
+AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
+    const QString& id,
+    QMap<QString, QString>* data) {}
+
+AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
+    const QString& id,
+    QMap<QString, QString>* data) {}
+
 void AdministrationSystem::loadSettings() {
   QSettings settings;
 
-  LogEnable = settings.value("AdministrationSystem/LogEnable").toBool();
+  LogEnable = settings.value("administration_system/log_enable").toBool();
 }
 
 void AdministrationSystem::sendLog(const QString& log) const {
