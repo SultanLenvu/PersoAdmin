@@ -14,12 +14,11 @@
 
 #include "General/definitions.h"
 
-class UserInteractionSystem : public QObject {
+class UserInteractionSystem : public QWidget {
   Q_OBJECT
 
  private:
   bool LogEnable;
-  QWidget* ParentWindow;
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
 
@@ -31,9 +30,9 @@ class UserInteractionSystem : public QObject {
   explicit UserInteractionSystem(QWidget* window);
 
  public slots:
-  void generateNotification(const QString& pass);
+  void generateMessage(const QString& pass);
   void getMasterPassword(QString& pass);
-  void generateError(const QString& text);
+  void generateErrorMessage(const QString& text);
 
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);

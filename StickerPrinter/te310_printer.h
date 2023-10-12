@@ -1,6 +1,9 @@
 #ifndef TE310PRINTER_H
 #define TE310PRINTER_H
 
+#include <QHostInfo>
+
+#include "General/definitions.h"
 #include "isticker_printer.h"
 
 class TE310Printer : public IStickerPrinter {

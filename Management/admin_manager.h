@@ -35,7 +35,7 @@ class AdminManager : public QObject {
 
  public slots:
   void applySettings();
-  void on_InsctanceThreadStarted(void);
+  void on_InsctanceThreadStarted_slot(void);
 
   void connectDatabase(void);
   void disconnectDatabase(void);

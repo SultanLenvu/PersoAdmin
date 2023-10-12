@@ -769,10 +769,9 @@ AdministrationSystem::linkIssuerWithMasterKeys(
 AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
     const QString& id,
     QMap<QString, QString>* data) {
+  QMap<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
-  QString keyTableName;
-  QMap<QString, QString> mergedRecord;
 
   // Запрашиваем атрибуты
   tables.append("transponders");
@@ -780,14 +779,20 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
   tables.append("pallets");
   tables.append("orders");
   tables.append("issuers");
-
   foreignKeys.append("box_id");
   foreignKeys.append("pallet_id");
   foreignKeys.append("order_id");
   foreignKeys.append("issuer_id");
 
   mergedRecord.insert("manufacturer_id", "");
+  mergedRecord.insert("equipment_class", "");
+  mergedRecord.insert("transponder_model", "");
+  mergedRecord.insert("accr_reference", "");
+  mergedRecord.insert("ucid", "");
+
+  mergedRecord.insert("efc_context_mark", "");
   mergedRecord.insert("personal_account_number", "");
+
   mergedRecord.insert("box_id", "");
   mergedRecord.insert("pallet_id", "");
   mergedRecord.insert("order_id", "");
@@ -795,33 +800,41 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
   mergedRecord.insert("issuers.name", "");
   mergedRecord.insert("transponders.id", id);
 
-  if (!Database->getMergedRecordByPart(tables, foreignKeys, *data)) {
+  if (!Database->getMergedRecordByPart(tables, foreignKeys, mergedRecord)) {
     return DatabaseQueryError;
   }
 
-  // Генерируем дату активации батареи
+  // Данные переносимые без изменений
+  data->insert("box_id", mergedRecord.value("box_id"));
+  data->insert("pallet_id", mergedRecord.value("pallet_id"));
+  data->insert("order_id", mergedRecord.value("order_id"));
+  data->insert("transponder_model", mergedRecord.value("transponder_model"));
+
+  // Преобразуем в десятичный формат
+  QString manufacturerId =
+      QString::number(mergedRecord.value("manufacturer_id").toInt(nullptr, 16));
+
+  // Дата сборки
   QDate date = QDate::currentDate();
   QString batteryInsertationDate =
       QString("%1%2")
           .arg(QString::number(date.weekNumber()), 2, QChar('0'))
           .arg(QString::number(date.year() % 100), 2, QChar('0'));
-  mergedRecord.insert("battery_insertation_date",
-                      batteryInsertationDate.toUtf8());
-
-  // Преобразуем в десятичный формат
-  data->insert("manufacturer_id",
-               QString::number(
-                   mergedRecord.value("manufacturer_id").toInt(nullptr, 16)));
 
   // Дополняем серийник до 10 цифр нулями слева
-  data->insert("sn",
-               QString("%1").arg(mergedRecord.value("id"), 10, QChar('0')));
+  QString extendedTransponderId =
+      QString("%1").arg(mergedRecord.value("id"), 10, QChar('0'));
 
-  // Вычленяем символ F из PAN
+  // Конструируем серийный номер транспондера
+  data->insert("sn", QString("%1 %2 %3")
+                         .arg(manufacturerId, batteryInsertationDate,
+                              extendedTransponderId));
+
+  // Вычленяем символ F из personal_account_number
   QString tempPan = mergedRecord.value("personal_account_number");
   data->insert("pan", tempPan.remove(QChar('F')));
 
-  // Добавляем название эмитента
+  // Название компании-заказчика
   data->insert("issuer_name", mergedRecord.value("name"));
 
   return Completed;
@@ -829,11 +842,134 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
     const QString& id,
-    QMap<QString, QString>* data) {}
+    QMap<QString, QString>* data) {
+  QMap<QString, QString> boxRecord;
+  QMap<QString, QString> transponderRecord;
+  QMap<QString, QString> transponderData;
+
+  boxRecord.insert("id", id);
+  boxRecord.insert("quantity", "");
+  if (!Database->getRecordById("boxes", boxRecord)) {
+    emit logging(QString("Получена ошибка при поиске бокса с id %1. ").arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем данные бокса
+  data->insert("id", id);
+  data->insert("quantity", boxRecord.value("quantity"));
+
+  // Ищем первый транспондер в боксе
+  transponderRecord.insert("id", "");
+  transponderRecord.insert("box_id", id);
+  if (!Database->getRecordByPart("transponders", transponderRecord, true)) {
+    emit logging(
+        QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
+            .arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Запрашиваем данные транспондера
+  if (!getTransponderData(transponderRecord.value("id"), &transponderData)) {
+    emit logging(
+        QString("Получена ошибка при получении данных транспондера %1. ")
+            .arg(transponderRecord.value("id")));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем серийник первого транспондера в боксе
+  data->insert("first_transponder_sn", transponderData.value("sn"));
+  transponderData.clear();
+  transponderRecord.clear();
+
+  // Ищем последний транспондер в боксе
+  transponderRecord.insert("id", "");
+  transponderRecord.insert("box_id", id);
+  if (!Database->getRecordByPart("transponders", transponderRecord, false)) {
+    emit logging(
+        QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
+            .arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Запрашиваем данные транспондера
+  if (!getTransponderData(transponderRecord.value("id"), &transponderData)) {
+    emit logging(
+        QString("Получена ошибка при получении данных транспондера %1. ")
+            .arg(transponderRecord.value("id")));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем серийник последнего транспондера в боксе
+  data->insert("last_transponder_sn", transponderData.value("sn"));
+
+  // Сохраняем модель транспондера
+  data->insert("transponder_model", transponderData.value("transponder_model"));
+
+  // Добавляем полную дату сборки
+  data->insert("assembling_date",
+               QDate::currentDate().toString(BOX_STICKER_DATE_TEMPLATE));
+
+  return Completed;
+}
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
     const QString& id,
-    QMap<QString, QString>* data) {}
+    QMap<QString, QString>* data) {
+  QMap<QString, QString> boxRecord;
+  QMap<QString, QString> palletRecord;
+  QMap<QString, QString> orderRecord;
+
+  palletRecord.insert("id", id);
+  palletRecord.insert("quantity", "");
+  palletRecord.insert("order_id", "");
+  if (!Database->getRecordById("pallets", palletRecord)) {
+    emit logging(
+        QString("Получена ошибка при поиске паллеты с id %1. ").arg(id));
+    return DatabaseQueryError;
+  }
+
+  orderRecord.insert("id", palletRecord.value("pallet_id"));
+  orderRecord.insert("transponder_model", "");
+  if (!Database->getRecordById("orders", orderRecord)) {
+    emit logging(
+        QString("Получена ошибка при поиске паллеты с id %1. ").arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем данные паллеты
+  data->insert("id", id);
+  data->insert("quantity", palletRecord.value("quantity"));
+  data->insert("transponder_model", orderRecord.value("transponder_model"));
+
+  // Ищем первый бокс в паллете
+  boxRecord.insert("id", "");
+  boxRecord.insert("pallet_id", id);
+  if (!Database->getRecordByPart("boxes", boxRecord, true)) {
+    emit logging(
+        QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
+            .arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем идентификатор первого бокса
+  data->insert("first_box_id", boxRecord.value("id"));
+  boxRecord.clear();
+
+  // Ищем последний бокс в паллете
+  boxRecord.insert("id", "");
+  boxRecord.insert("pallet_id", id);
+  if (!Database->getRecordByPart("boxes", boxRecord, true)) {
+    emit logging(
+        QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
+            .arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Сохраняем идентификатор последнего бокса
+  data->insert("last_box_id", boxRecord.value("id"));
+
+  return Completed;
+}
 
 void AdministrationSystem::loadSettings() {
   QSettings settings;
@@ -871,7 +1007,7 @@ bool AdministrationSystem::addOrder(
   // Формируем новую запись
   orderRecord.insert("id", QString::number(lastId + 1));
   orderRecord.insert("issuer_id", issuerRecord.value("id"));
-  orderRecord.insert("capacity", "0");
+  orderRecord.insert("quantity", "0");
   orderRecord.insert("full_personalization",
                      orderParameters->value("full_personalization"));
   orderRecord.insert("transponder_model",
@@ -903,7 +1039,7 @@ bool AdministrationSystem::addPallets(
 
   // Поиск идентификатора незаполненного заказа
   orderRecord.insert("id", "");
-  orderRecord.insert("capacity", "0");
+  orderRecord.insert("quantity", "0");
   if (!Database->getRecordByPart("orders", orderRecord)) {
     sendLog(
         "Получена ошибка при поиске идентификатора незаполненного заказа. ");
@@ -922,7 +1058,7 @@ bool AdministrationSystem::addPallets(
 
     // Формируем новую запись
     palletRecord.insert("id", QString::number(lastId + 1));
-    palletRecord.insert("capacity", "0");
+    palletRecord.insert("quantity", "0");
     palletRecord.insert("order_id", orderRecord.value("id"));
     // Добавляем новую запись
     if (!Database->addRecord("pallets", palletRecord)) {
@@ -932,7 +1068,7 @@ bool AdministrationSystem::addPallets(
   }
 
   // Заполнение заказа
-  orderRecord.insert("capacity", QString::number(orderCapacity));
+  orderRecord.insert("quantity", QString::number(orderCapacity));
   if (!Database->updateRecordById("orders", orderRecord)) {
     sendLog(QString("Получена ошибка при заполнении заказа %1. ")
                 .arg(orderRecord.value("id")));
@@ -956,7 +1092,7 @@ bool AdministrationSystem::addBoxes(
   for (uint32_t i = 0; i < palletCount; i++) {
     // Получаем идентификатор незаполненной палеты
     palletRecord.insert("id", "");
-    palletRecord.insert("capacity", "0");
+    palletRecord.insert("quantity", "0");
     if (!Database->getRecordByPart("pallets", palletRecord)) {
       sendLog(
           "Получена ошибка при поиске идентификатора незаполненной палеты. ");
@@ -975,7 +1111,7 @@ bool AdministrationSystem::addBoxes(
 
       // Формируем новую запись
       boxRecord.insert("id", QString::number(lastId + 1));
-      boxRecord.insert("capacity", "0");
+      boxRecord.insert("quantity", "0");
       boxRecord.insert("pallet_id", palletRecord.value("id"));
       // Добавляем новую запись
       if (!Database->addRecord("boxes", boxRecord)) {
@@ -985,7 +1121,7 @@ bool AdministrationSystem::addBoxes(
     }
 
     // Заполнение палеты
-    palletRecord.insert("capacity", QString::number(palletCapacity));
+    palletRecord.insert("quantity", QString::number(palletCapacity));
     if (!Database->updateRecordById("pallets", palletRecord)) {
       sendLog(QString("Получена ошибка при заполнении палеты %1. ")
                   .arg(palletRecord.value("id")));
@@ -1016,7 +1152,7 @@ bool AdministrationSystem::addTransponders(
   for (uint32_t i = 0; i < boxCount; i++) {
     // Получаем идентификатор незаполненного бокса
     boxRecord.insert("id", "");
-    boxRecord.insert("capacity", "0");
+    boxRecord.insert("quantity", "0");
     if (!Database->getRecordByPart("boxes", boxRecord)) {
       sendLog(
           "Получена ошибка при поиске идентификатора незаполненного бокса. ");
@@ -1049,7 +1185,7 @@ bool AdministrationSystem::addTransponders(
     }
 
     // Заполнение бокса
-    boxRecord.insert("capacity", QString::number(boxCapacity));
+    boxRecord.insert("quantity", QString::number(boxCapacity));
     if (!Database->updateRecordById("boxes", boxRecord)) {
       sendLog(QString("Получена ошибка при заполнении бокса %1. ")
                   .arg(boxRecord.value("id")));

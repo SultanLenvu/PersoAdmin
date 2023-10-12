@@ -20,7 +20,7 @@ void AdminManager::applySettings() {
   Administrator->applySettings();
 }
 
-void AdminManager::on_InsctanceThreadStarted() {
+void AdminManager::on_InsctanceThreadStarted_slot() {
   // Создаем администратора
   createAdministrator();
 
@@ -691,10 +691,13 @@ void AdminManager::finishOperationExecution(const QString& operationName,
  */
 
 void AdminManager::proxyLogging(const QString& log) {
-  if (sender()->objectName() == QString("AdministrationSystem"))
+  if (sender()->objectName() == QString("AdministrationSystem")) {
     sendLog(QString("Administrator - ") + log);
-  else
+  } else if (sender()->objectName() == QString("TE310Printer")) {
+    sendLog(QString("TE310 - ") + log);
+  } else {
     sendLog(QString("Unknown - ") + log);
+  }
 }
 
 //==================================================================================

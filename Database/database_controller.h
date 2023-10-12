@@ -2,11 +2,10 @@
 #define DATABASECONTROLLER_H
 
 #include <QAbstractTableModel>
-#include <QMap>
 #include <QObject>
 #include <QSettings>
-#include <QString>
 #include <QStringList>
+#include <QVector>
 
 #include "General/definitions.h"
 #include "database_table_model.h"
@@ -40,7 +39,8 @@ class IDatabaseController : public QObject {
   virtual bool getRecordById(const QString& tableName,
                              QMap<QString, QString>& record) const = 0;
   virtual bool getRecordByPart(const QString& tableName,
-                               QMap<QString, QString>& record) const = 0;
+                               QMap<QString, QString>& record,
+                               bool order = true) const = 0;
   virtual bool getLastRecord(const QString& tableName,
                              QMap<QString, QString>& record) const = 0;
   virtual bool getMergedRecordById(const QStringList& tables,
@@ -65,7 +65,7 @@ class IDatabaseController : public QObject {
   void sendLog(const QString& log) const;
 
  private:
-  Q_DISABLE_COPY(IDatabaseController)
+  Q_DISABLE_COPY(IDatabaseController);
 
  signals:
   void logging(const QString& log) const;

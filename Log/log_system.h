@@ -29,9 +29,9 @@ class LogSystem : public QObject {
 
  public slots:
   void clear(void);
-  void setEnable(bool option);
-  void applySettings(void);
   void generate(const QString& log);
+
+  void applySettings(void);
 
  private:
   Q_DISABLE_COPY(LogSystem)

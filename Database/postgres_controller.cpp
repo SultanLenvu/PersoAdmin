@@ -14,13 +14,15 @@ PostgresController::~PostgresController() {
   QSqlDatabase::removeDatabase(ConnectionName);
 }
 
-bool PostgresController::connect(void) {
+bool PostgresController::connect() {
   if (QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres уже установлено. ");
     return true;
   }
 
+  // Создаем соединение
   createDatabaseConnection();
+
   if (!QSqlDatabase::database(ConnectionName).open()) {
     sendLog(
         QString("Соединение с Postgres не может быть установлено. Ошибка: %1.")
@@ -89,6 +91,32 @@ bool PostgresController::abortTransaction() const {
   }
 }
 
+bool PostgresController::execCustomRequest(const QString& req,
+                                           DatabaseTableModel* buffer) const {
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  // Выполняем запрос
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (request.exec(req)) {
+    sendLog("Запрос выполнен. ");
+    if (request.next()) {
+      sendLog("Ответные данные получены. ");
+      convertResponseToBuffer(request, buffer);
+    } else {
+      sendLog("Ответные данные не получены. ");
+      buffer->clear();
+    }
+    return true;
+  } else {  // Обработка ошибки выполнения запроса
+    sendLog(request.lastError().text());
+    sendLog("Отправленный запрос: " + req);
+    return false;
+  }
+}
+
 bool PostgresController::getTable(const QString& tableName,
                                   uint32_t rowCount,
                                   DatabaseTableModel* buffer) const {
@@ -114,32 +142,6 @@ bool PostgresController::getTable(const QString& tableName,
   } else {  // Обработка ошибки выполнения запроса
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
-    return false;
-  }
-}
-
-bool PostgresController::execCustomRequest(const QString& req,
-                                           DatabaseTableModel* buffer) const {
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog("Соединение с Postgres не установлено. ");
-    return false;
-  }
-
-  // Выполняем запрос
-  QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  if (request.exec(req)) {
-    sendLog("Запрос выполнен. ");
-    if (request.next()) {
-      sendLog("Ответные данные получены. ");
-      convertResponseToBuffer(request, buffer);
-    } else {
-      sendLog("Ответные данные не получены. ");
-      buffer->clear();
-    }
-    return true;
-  } else {  // Обработка ошибки выполнения запроса
-    sendLog(request.lastError().text());
-    sendLog("Отправленный запрос: " + req);
     return false;
   }
 }
@@ -233,7 +235,8 @@ bool PostgresController::getRecordById(const QString& tableName,
 }
 
 bool PostgresController::getRecordByPart(const QString& tableName,
-                                         QMap<QString, QString>& record) const {
+                                         QMap<QString, QString>& record,
+                                         bool order) const {
   // Проверка соединения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -263,7 +266,11 @@ bool PostgresController::getRecordByPart(const QString& tableName,
   if (flag) {
     requestText.chop(4);
   }
-  requestText += " ORDER BY id ASC LIMIT 1;";
+  if (order) {
+    requestText += " ORDER BY id ASC LIMIT 1;";
+  } else {
+    requestText += " ORDER BY id DESC LIMIT 1;";
+  }
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -647,40 +654,35 @@ void PostgresController::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
 
-  createDatabaseConnection();
+  if (QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Удаление предыущего подключения к базе данных. ");
+    QSqlDatabase::removeDatabase(ConnectionName);
+
+    sendLog("Создание нового подключения к базе данных. ");
+    createDatabaseConnection();
+  }
 }
 
 void PostgresController::loadSettings() {
   // Загружаем настройки
   QSettings settings;
 
-  LogEnable = settings.value("postgres_controller/log_enable").toBool();
   HostAddress = settings.value("postgres_controller/server_ip").toString();
-  HostPort = settings.value("postgres_controller/server_port").toInt();
+  Port = settings.value("postgres_controller/server_port").toInt();
   DatabaseName = settings.value("postgres_controller/database_name").toString();
   UserName = settings.value("postgres_controller/user_name").toString();
-  UserPassword = settings.value("postgres_controller/user_password").toString();
+  Password = settings.value("postgres_controller/user_password").toString();
+  LogEnable = settings.value("postgres_controller/log_enable").toBool();
 }
 
-void PostgresController::sendLog(const QString& log) const {
-  if (LogEnable) {
-    emit logging(log);
-  }
-}
-
-void PostgresController::createDatabaseConnection(void) {
-  if (QSqlDatabase::database(ConnectionName).isValid()) {
-    sendLog("Удаление текущего соединения. ");
-    QSqlDatabase::removeDatabase(ConnectionName);
-  }
-  sendLog("Создание новго соединения. ");
+void PostgresController::createDatabaseConnection() {
   QSqlDatabase postgres = QSqlDatabase::addDatabase("QPSQL", ConnectionName);
 
   postgres.setHostName(HostAddress.toString());
-  postgres.setPort(HostPort);
+  postgres.setPort(Port);
   postgres.setDatabaseName(DatabaseName);
   postgres.setUserName(UserName);
-  postgres.setPassword(UserPassword);
+  postgres.setPassword(Password);
 }
 
 void PostgresController::convertResponseToBuffer(

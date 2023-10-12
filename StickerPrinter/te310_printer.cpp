@@ -1,6 +1,7 @@
 #include "te310_printer.h"
 
 TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
+  setObjectName("TE310Printer");
   loadSetting();
 
   TscLib = new QLibrary(TscLibPath, this);
@@ -9,8 +10,13 @@ TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
 
 bool TE310Printer::printTransponderSticker(
     const QMap<QString, QString>* parameters) {
+  if (parameters->value("issuer_name").isNull()) {
+    emit logging(QString("Отсутсвует название компании-заказчика. Сброс."));
+    return false;
+  }
+
   emit logging(QString("Печать стикера транспондера для %1.")
-                   .arg(parameters->value("IssuerName")));
+                   .arg(parameters->value("issuer_name")));
 
   if (!TscLib->isLoaded()) {
     emit logging("Библиотека не загружена. Сброс. ");
@@ -42,7 +48,39 @@ bool TE310Printer::printLastTransponderSticker() {
   return printTransponderSticker(&LastTransponderSticker);
 }
 
-bool TE310Printer::printBoxSticker(const QMap<QString, QString>* parameters) {}
+bool TE310Printer::printBoxSticker(const QMap<QString, QString>* parameters) {
+  if (parameters->value("id").isNull()) {
+    emit logging(QString("Отсутсвует идентификатор бокса. Сброс."));
+    return false;
+  }
+  emit logging(
+      QString("Печать стикера для бокса %1.").arg(parameters->value("id")));
+
+  openPort(QString("\\\\%1\\TSC TE310 (Network)")
+               .arg(QHostInfo::localHostName())
+               .toUtf8()
+               .constData());
+  sendCommand("SIZE 100 mm, 50 mm");
+  sendCommand("GAP 2 mm,2 mm");
+  sendCommand("REFERENCE 0,0");
+  sendCommand("DIRECTION 1");
+  sendCommand("CLS");
+  sendCommand(QString("TEXT 600,30,\"E8.FNT\",0,3,3,2,\"JSC %1\"")
+                  .arg(ORGANIZATION_NAME)
+                  .toUtf8()
+                  .constData());
+
+  sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
+                  .arg(parameters->value("manufacturer_id"),
+                       parameters->value("battery_insertation_date"),
+                       parameters->value("sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("PRINT 1");
+  closePort();
+
+  return true;
+}
 
 bool TE310Printer::printPalletSticker(
     const QMap<QString, QString>* parameters) {}

@@ -46,7 +46,7 @@ void MainWindowKernel::on_RequestAuthorizationGuiAct_slot() {
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
   if (!checkAuthorizationData()) {
-    Interactor->generateError("Неверный логин или пароль. ");
+    Interactor->generateErrorMessage("Неверный логин или пароль. ");
     return;
   }
 
@@ -97,7 +97,8 @@ void MainWindowKernel::on_CreateNewOrderPushButton_slot() {
   emit loggerClear_signal();
 
   if (!checkNewOrderInput()) {
-    Interactor->generateError("Некорректный ввод параметров нового заказа. ");
+    Interactor->generateErrorMessage(
+        "Некорректный ввод параметров нового заказа. ");
     return;
   }
 
@@ -131,7 +132,8 @@ void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
-    Interactor->generateError("Некорректный ввод идентификатора заказа. ");
+    Interactor->generateErrorMessage(
+        "Некорректный ввод идентификатора заказа. ");
     return;
   }
 
@@ -143,7 +145,8 @@ void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
-    Interactor->generateError("Некорректный ввод идентификатора заказа. ");
+    Interactor->generateErrorMessage(
+        "Некорректный ввод идентификатора заказа. ");
     return;
   }
 
@@ -167,7 +170,7 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
   emit loggerClear_signal();
 
   if (!checkNewProductionLineInput()) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Некорректный ввод параметров нового производственной линии. ");
     return;
   }
@@ -186,7 +189,8 @@ void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit2->text().toInt() == 0) {
-    Interactor->generateError("Некорректный ввод идентификатора заказа. ");
+    Interactor->generateErrorMessage(
+        "Некорректный ввод идентификатора заказа. ");
     return;
   }
 
@@ -200,7 +204,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
 
   if ((!checkNewProductionLineInput()) ||
       (gui->BoxIdLineEdit1->text().toInt() == 0)) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Некорректный ввод параметров производственной линии. ");
     return;
   }
@@ -262,7 +266,7 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
 
   // Проверка пользовательского ввода
   if (!checkLinkIssuerInput()) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Введены некорректные данные для связывания эмитента с ключами. ");
     return;
   }
@@ -281,7 +285,7 @@ void MainWindowKernel::on_PrintTransponderStickerPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->TransponderIdLineEdit->text().toUInt() == 0) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Введен некорректный идентификатор транспондера. ");
     return;
   }
@@ -295,7 +299,7 @@ void MainWindowKernel::on_PrintBoxStickerPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->BoxIdLineEdit2->text().toUInt() == 0) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Введен некорректный идентификатор транспондера. ");
     return;
   }
@@ -308,7 +312,7 @@ void MainWindowKernel::on_PrintPalletStickerPushButton_slot() {
   emit loggerClear_signal();
 
   if (gui->PalletIdLineEdit->text().toUInt() == 0) {
-    Interactor->generateError(
+    Interactor->generateErrorMessage(
         "Введен некорректный идентификатор транспондера. ");
     return;
   }
@@ -321,7 +325,8 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
 
   // Проверка пользовательского ввода
   if (!checkNewSettings()) {
-    Interactor->generateError("Введены некорректные данные для настроек. ");
+    Interactor->generateErrorMessage(
+        "Введены некорректные данные для настроек. ");
     return;
   }
 
@@ -332,7 +337,7 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   emit applySettings_signal();
 
   // Оповещаем пользователя
-  Interactor->generateNotification("Новые настройки успешно применены. ");
+  Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
 /*
@@ -846,9 +851,9 @@ void MainWindowKernel::createManagerInstance() {
   Manager = new AdminManager(nullptr);
   connect(Manager, &AdminManager::logging, Logger, &LogSystem::generate);
   connect(Manager, &AdminManager::notifyUser, Interactor,
-          &UserInteractionSystem::generateNotification);
+          &UserInteractionSystem::generateMessage);
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
-          &UserInteractionSystem::generateError);
+          &UserInteractionSystem::generateErrorMessage);
   connect(Manager, &AdminManager::operationPerfomingStarted, Interactor,
           &UserInteractionSystem::startOperationProgressDialog);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
@@ -908,7 +913,7 @@ void MainWindowKernel::createManagerInstance() {
   connect(ManagerThread, &QThread::finished, Manager,
           &AdminManager::deleteLater);
   connect(ManagerThread, &QThread::started, Manager,
-          &AdminManager::on_InsctanceThreadStarted);
+          &AdminManager::on_InsctanceThreadStarted_slot);
 
   Manager->moveToThread(ManagerThread);
   ManagerThread->start();

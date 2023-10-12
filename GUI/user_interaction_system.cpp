@@ -1,11 +1,10 @@
 #include "user_interaction_system.h"
 
 UserInteractionSystem::UserInteractionSystem(QWidget* parent)
-    : QObject(parent) {
+    : QWidget(parent) {
   setObjectName("UserInteractionSystem");
   loadSettings();
 
-  ParentWindow = parent;
   ProgressDialog = nullptr;
   CurrentOperationStep = 0;
 
@@ -13,18 +12,17 @@ UserInteractionSystem::UserInteractionSystem(QWidget* parent)
   createTimers();
 }
 
-void UserInteractionSystem::generateNotification(const QString& data) {
-  QMessageBox::information(ParentWindow, "Сообщение", data, QMessageBox::Ok);
+void UserInteractionSystem::generateMessage(const QString& data) {
+  QMessageBox::information(this, "Сообщение", data, QMessageBox::Ok);
 }
 
 void UserInteractionSystem::getMasterPassword(QString& pass) {
-  pass =
-      QInputDialog::getText(ParentWindow, "Мастер доступ",
-                            "Введите пароль:", QLineEdit::Normal, "", nullptr);
+  pass = QInputDialog::getText(
+      this, "Мастер доступ", "Введите пароль:", QLineEdit::Normal, "", nullptr);
 }
 
-void UserInteractionSystem::generateError(const QString& text) {
-  QMessageBox::critical(ParentWindow, "Ошибка", text, QMessageBox::Ok);
+void UserInteractionSystem::generateErrorMessage(const QString& text) {
+  QMessageBox::critical(this, "Ошибка", text, QMessageBox::Ok);
 }
 
 void UserInteractionSystem::startOperationProgressDialog(
@@ -137,7 +135,7 @@ void UserInteractionSystem::on_ProgressDialogCanceled_slot() {
 
 void UserInteractionSystem::on_ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
-  generateError("Операция выполняется слишком долго. Сброс. ");
+  generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
 void UserInteractionSystem::on_ODQTimerTimeout_slot() {
