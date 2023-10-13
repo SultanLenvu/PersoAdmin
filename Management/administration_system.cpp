@@ -826,9 +826,9 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
       QString("%1").arg(mergedRecord.value("id"), 10, QChar('0'));
 
   // Конструируем серийный номер транспондера
-  data->insert("sn", QString("%1 %2 %3")
-                         .arg(manufacturerId, batteryInsertationDate,
-                              extendedTransponderId));
+  data->insert("sn",
+               QString("%1%2%3").arg(manufacturerId, batteryInsertationDate,
+                                     extendedTransponderId));
 
   // Вычленяем символ F из personal_account_number
   QString tempPan = mergedRecord.value("personal_account_number");
@@ -903,7 +903,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
   data->insert("last_transponder_sn", transponderData.value("sn"));
 
   // Сохраняем модель транспондера
-  data->insert("transponder_model", transponderData.value("transponder_model"));
+  QString modelTemp = transponderData.value("transponder_model");
+  data->insert("transponder_model", modelTemp.remove(' '));
 
   // Добавляем полную дату сборки
   data->insert("assembling_date",

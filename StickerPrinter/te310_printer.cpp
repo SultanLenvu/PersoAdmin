@@ -58,24 +58,44 @@ IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
   emit logging(
       QString("Печать стикера для бокса %1.").arg(parameters->value("id")));
 
-  openPort(QString("\\\\%1\\TSC TE310 (Network)")
-               .arg(QHostInfo::localHostName())
-               .toUtf8()
-               .constData());
+  openPort(Name.toUtf8().constData());
   sendCommand("SIZE 100 mm, 50 mm");
   sendCommand("GAP 2 mm,2 mm");
   sendCommand("REFERENCE 0,0");
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
-  sendCommand(QString("TEXT 600,30,\"E8.FNT\",0,3,3,2,\"JSC %1\"")
-                  .arg(ORGANIZATION_NAME)
+  sendCommand("TEXT 600,10,\"D.FNT\",0,2,2,2,\"JSC PowerSyntez\"");
+  sendCommand("BOX 25, 50, 1150, 560, 4 ");
+  sendCommand("TEXT 50, 90, \"D.FNT\", 0, 2, 2, 1,\"MODEL:\"");
+  sendCommand(QString("TEXT 600, 90, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(parameters->value("transponder_model"))
                   .toUtf8()
                   .constData());
-
-  sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
-                  .arg(parameters->value("manufacturer_id"),
-                       parameters->value("battery_insertation_date"),
-                       parameters->value("sn"))
+  /* На случай если модель будет заменена на артикул */
+  //  sendCommand("TEXT 50, 90, \"D.FNT\", 0, 2, 2, 1,\"ARTICLE NO:\"");
+  //  sendCommand(QString("BARCODE 600, 75, \"128M\", 50, 2, 0, 2, 4, 1,
+  //  \"%1\"")
+  //                  .arg(parameters->value("transponder_model"))
+  //                  .toUtf8()
+  //                  .constData());
+  sendCommand("TEXT 50, 190, \"D.FNT\", 0, 2, 2, 1, \"QUANTITY:\"");
+  sendCommand(QString("TEXT 600, 190, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(parameters->value("quantity"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("TEXT 50, 290, \"D.FNT\", 0, 2, 2, 1, \"SERIAL NO FROM:\"");
+  sendCommand(QString("BARCODE 600, 275, \"128M\", 50, 2, 0, 2, 4, 1, \"%1\"")
+                  .arg(parameters->value("first_transponder_sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("TEXT 50, 390, \"D.FNT\", 0, 2, 2, 1, \"SERIAL NO TO:\"");
+  sendCommand(QString("BARCODE 600, 375, \"128M\", 50, 2, 0, 2, 4, 1, \"%1\"")
+                  .arg(parameters->value("last_transponder_sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("TEXT 50, 490, \"D.FNT\", 0, 2, 2, 1, \"BOX NO:\"");
+  sendCommand(QString("BARCODE 600, 475, \"128M\", 50, 2, 0, 2, 4, 1, \"%1\"")
+                  .arg(parameters->value("id"))
                   .toUtf8()
                   .constData());
   sendCommand("PRINT 1");
