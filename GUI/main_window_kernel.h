@@ -89,6 +89,7 @@ class MainWindowKernel : public QMainWindow {
   void on_PrintTransponderStickerPushButton_slot(void);
   void on_PrintBoxStickerPushButton_slot(void);
   void on_PrintPalletStickerPushButton_slot(void);
+  void on_ExecStickerPrinterCommandScriptPushButton_slot(void);
 
   // Функционал для настройки сервера
   void on_ApplySettingsPushButton_slot(void);
@@ -170,5 +171,7 @@ class MainWindowKernel : public QMainWindow {
                                       DatabaseTableModel* model);
   void printBoxSticker_signal(const QString& id, DatabaseTableModel* model);
   void printPalletSticker_signal(const QString& id, DatabaseTableModel* model);
+  void execPrinterStickerCommandScript_signal(
+      const QSharedPointer<QStringList> commandScript);
 };
 #endif  // MAINWINDOWKERNEL_H

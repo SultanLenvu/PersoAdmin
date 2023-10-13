@@ -30,6 +30,7 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
 
   qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
       "QSharedPointer<QMap<QString, QString> >");
+  qRegisterMetaType<QSharedPointer<QStringList>>("QSharedPointer<QStringList>");
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -320,6 +321,16 @@ void MainWindowKernel::on_PrintPalletStickerPushButton_slot() {
   emit printPalletSticker_signal(gui->PalletIdLineEdit->text(), StickerModel);
 }
 
+void MainWindowKernel::on_ExecStickerPrinterCommandScriptPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
+  QSharedPointer<QStringList> commandScript(new QStringList(
+      gui->StickerPrinterCommandScriptInput->toPlainText().split("\n")));
+  emit execPrinterStickerCommandScript_signal(commandScript);
+}
+
 void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   emit loggerClear_signal();
 
@@ -402,6 +413,8 @@ void MainWindowKernel::saveSettings() const {
   // Принтер стикеров
   settings.setValue("sticker_printer/library_path",
                     gui->StickerPrinterLibPathLineEdit->text());
+  settings.setValue("sticker_printer/name",
+                    gui->StickerPrinterNameLineEdit->text());
 }
 
 bool MainWindowKernel::checkAuthorizationData() const {
@@ -809,6 +822,9 @@ void MainWindowKernel::connectMasterGui() {
           &MainWindowKernel::on_PrintBoxStickerPushButton_slot);
   connect(gui->PrintPalletStickerPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintPalletStickerPushButton_slot);
+  connect(gui->ExecStickerPrinterCommandScriptPushButton, &QPushButton::clicked,
+          this,
+          &MainWindowKernel::on_ExecStickerPrinterCommandScriptPushButton_slot);
 
   // Сохранение настроек
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
@@ -906,6 +922,8 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::printBoxSticker);
   connect(this, &MainWindowKernel::printPalletSticker_signal, Manager,
           &AdminManager::printPalletSticker);
+  connect(this, &MainWindowKernel::execPrinterStickerCommandScript_signal,
+          Manager, &AdminManager::execPrinterStickerCommandScript);
 
   ManagerThread = new QThread(this);
   connect(ManagerThread, &QThread::finished, ManagerThread,

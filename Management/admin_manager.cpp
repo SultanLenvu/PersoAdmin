@@ -7,7 +7,6 @@ AdminManager::AdminManager(QObject* parent) : QObject(parent) {
   loadSettings();
 
   // Готовы к выполнению операций
-  CurrentState = Ready;
 }
 
 AdminManager::~AdminManager() {
@@ -30,250 +29,191 @@ void AdminManager::on_InsctanceThreadStarted_slot() {
 
 void AdminManager::connectDatabase() {
   // Начинаем выполнение операции
-  if (!startOperationExecution("connectDatabase")) {
-    return;
-  }
+  startOperationPerforming("connectDatabase");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Подключение к базе данных. ");
-  if (Administrator->connectDatabase() != AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("connectDatabase",
-                             "Получена ошибка при подключении к базе данных. ");
+  status = Administrator->connectDatabase();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "connectDatabase");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("connectDatabase", "Выполнено. ");
+  finishOperationPerforming("connectDatabase");
 }
 
 void AdminManager::disconnectDatabase() {
   // Начинаем выполнение операции
-  if (!startOperationExecution("disconnectDatabase")) {
-    return;
-  }
+  startOperationPerforming("disconnectDatabase");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Отключение от базы данных. ");
-  if (Administrator->connectDatabase() != AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("disconnectDatabase",
-                             "Получена ошибка при отключении от базы данных. ");
+  status = Administrator->connectDatabase();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "disconnectDatabase");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("disconnectDatabase", "Выполнено. ");
+  finishOperationPerforming("disconnectDatabase");
 }
 
 void AdminManager::showDatabaseTable(const QString& name,
                                      DatabaseTableModel* model) {
   // Начинаем выполнение операции
-  if (!startOperationExecution("showDatabaseTable")) {
-    return;
-  }
+  startOperationPerforming("showDatabaseTable");
+
+  AdministrationSystem::ReturnStatus status;
 
   model->clear();
   sendLog(QString("Отображение таблицы %1. ").arg(name));
-  if (Administrator->getDatabaseTable(name, model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "showDatabaseTable",
-        QString("Получена ошибка при загрузке данных из таблицы '%1'. ")
-            .arg(name));
+  status = Administrator->getDatabaseTable(name, model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "showDatabaseTable");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("showDatabaseTable", "Выполнено. ");
+  finishOperationPerforming("showDatabaseTable");
 }
 
 void AdminManager::clearDatabaseTable(const QString& name,
                                       DatabaseTableModel* model) {
   // Начинаем выполнение операции
-  if (!startOperationExecution("clearDatabaseTable")) {
-    return;
-  }
+  startOperationPerforming("clearDatabaseTable");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Очистка таблицы %1. ").arg(name));
-  if (Administrator->clearDatabaseTable(name) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "clearDatabaseTable",
-        QString("Получена ошибка при очистке таблицы %1. ").arg(name));
+  status = Administrator->clearDatabaseTable(name);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "clearDatabaseTable");
     return;
   }
 
   model->clear();
   sendLog("Отображение таблицы базы данных. ");
-  if (Administrator->getDatabaseTable(name, model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "clearDatabaseTable",
-        QString("Получена ошибка при загрузке данных из таблицы '%1'. ")
-            .arg(name));
+  status = Administrator->getDatabaseTable(name, model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "clearDatabaseTable");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("clearDatabaseTable", "Выполнено. ");
+  finishOperationPerforming("clearDatabaseTable");
 }
 
 void AdminManager::performCustomRequest(const QString& req,
                                         DatabaseTableModel* model) {
   // Начинаем выполнение операции
-  if (!startOperationExecution("performCustomRequest")) {
-    return;
-  }
+  startOperationPerforming("performCustomRequest");
+
+  AdministrationSystem::ReturnStatus status;
 
   model->clear();
   sendLog("Представление ответа на кастомный запрос. ");
-  if (Administrator->getCustomResponse(req, model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "performCustomRequest",
-        QString("Получена ошибка при выполнении произвольного запроса. "));
+  status = Administrator->getCustomResponse(req, model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "performCustomRequest");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("performCustomRequest", "Выполнено. ");
+  finishOperationPerforming("performCustomRequest");
 }
 
 void AdminManager::createNewOrder(
     const QSharedPointer<QMap<QString, QString> > orderParameters,
     DatabaseTableModel* model) {
-  if (!startOperationExecution("createNewOrder")) {
-    return;
-  }
+  startOperationPerforming("createNewOrder");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Создание нового заказа. ");
-  if (Administrator->createNewOrder(orderParameters) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "createNewOrder",
-        QString("Получена ошибка при добавлении нового заказа. "));
+  status = Administrator->createNewOrder(orderParameters);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "createNewOrder");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  if (Administrator->getDatabaseTable("orders", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "createNewOrder",
-        QString("Получена ошибка при загрузке данных из таблицы заказов. "));
+  status = Administrator->getDatabaseTable("orders", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "createNewOrder");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("createNewOrder", "Выполнено. ");
+  finishOperationPerforming("createNewOrder");
 }
 
 void AdminManager::deleteLastOrder(DatabaseTableModel* model) {
-  if (!startOperationExecution("deleteLastOrder")) {
-    return;
-  }
+  startOperationPerforming("deleteLastOrder");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Удаление последнего заказа. ");
-  if (Administrator->deleteLastOrder() != AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "deleteLastOrder",
-        QString("Получена ошибка при удалении последнего заказа. "));
+  status = Administrator->deleteLastOrder();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "deleteLastOrder");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  if (Administrator->getDatabaseTable("orders", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "deleteLastOrder",
-        QString("Получена ошибка при загрузке данных из таблицы заказов. "));
+  status = Administrator->getDatabaseTable("orders", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "deleteLastOrder");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("deleteLastOrder", "Выполнено. ");
+  finishOperationPerforming("deleteLastOrder");
 }
 
 void AdminManager::startOrderAssembling(const QString& orderId,
                                         DatabaseTableModel* model) {
-  if (!startOperationExecution("startOrderAssembling")) {
-    return;
-  }
+  startOperationPerforming("startOrderAssembling");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Запуск сборки заказа %1. ").arg(orderId));
-  if (Administrator->startOrderAssembling(orderId) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "startOrderAssembling",
-        QString("Получена ошибка при запуске сборки заказа %1. ").arg(orderId));
+  status = Administrator->startOrderAssembling(orderId);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "startOrderAssembling");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  if (Administrator->getDatabaseTable("orders", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "startOrderAssembling",
-        QString("Получена ошибка при загрузке данных из таблицы заказов. "));
+  status = Administrator->getDatabaseTable("orders", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "startOrderAssembling");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("startOrderAssembling", "Выполнено. ");
+  finishOperationPerforming("startOrderAssembling");
 }
 
 void AdminManager::stopOrderAssembling(const QString& orderId,
                                        DatabaseTableModel* model) {
-  if (!startOperationExecution("stopOrderAssembling")) {
-    return;
-  }
+  startOperationPerforming("stopOrderAssembling");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Остановка сборки заказа %1. ").arg(orderId));
-  if (Administrator->stopOrderAssembling(orderId) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "stopOrderAssembling",
-        QString("Получена ошибка при остановке сборки заказа %1. ")
-            .arg(orderId));
+  status = Administrator->stopOrderAssembling(orderId);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "stopOrderAssembling");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  if (Administrator->getDatabaseTable("orders", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "stopOrderAssembling",
-        QString("Получена ошибка при загрузке данных из таблицы заказов. ")
-            .arg(orderId));
+  status = Administrator->getDatabaseTable("orders", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "stopOrderAssembling");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("stopOrderAssembling", "Выполнено. ");
+  finishOperationPerforming("stopOrderAssembling");
 }
 
 void AdminManager::showOrderTable(DatabaseTableModel* model) {
@@ -283,131 +223,97 @@ void AdminManager::showOrderTable(DatabaseTableModel* model) {
 void AdminManager::createNewProductionLine(
     const QMap<QString, QString>* productionLineParameters,
     DatabaseTableModel* model) {
-  if (!startOperationExecution("createNewProductionLine")) {
-    return;
-  }
+  startOperationPerforming("createNewProductionLine");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Создание новой линии производства. ");
-  if (Administrator->createNewProductionLine(productionLineParameters) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "createNewProductionLine",
-        QString("Получена ошибка при создании новой линии производства. "));
+  status = Administrator->createNewProductionLine(productionLineParameters);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "createNewProductionLine");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  if (Administrator->getDatabaseTable("production_lines", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("createNewProductionLine",
-                             QString("Получена ошибка при загрузке данных из "
-                                     "таблицы линий производства. "));
+  status = Administrator->getDatabaseTable("production_lines", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "createNewProductionLine");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("createNewProductionLine", "Выполнено. ");
+  finishOperationPerforming("createNewProductionLine");
 }
 
 void AdminManager::allocateInactiveProductionLines(const QString& orderId,
                                                    DatabaseTableModel* model) {
-  if (!startOperationExecution("allocateInactiveProductionLines")) {
-    return;
-  }
+  startOperationPerforming("allocateInactiveProductionLines");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Распределение неактивных линий производства в заказе %1. ")
               .arg(orderId));
-  if (Administrator->allocateInactiveProductionLines(orderId) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "allocateInactiveProductionLines",
-        QString("Получена ошибка при распределении неактивных линий "
-                "производства в заказе %1. ")
-            .arg(orderId));
+  status = Administrator->allocateInactiveProductionLines(orderId);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "allocateInactiveProductionLines");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  if (Administrator->getDatabaseTable("production_lines", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("allocateInactiveProductionLines",
-                             QString("Получена ошибка при загрузке данных из "
-                                     "таблицы производственных линий. "));
+  status = Administrator->getDatabaseTable("production_lines", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "allocateInactiveProductionLines");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("allocateInactiveProductionLines", "Выполнено. ");
+  finishOperationPerforming("allocateInactiveProductionLines");
 }
 
 void AdminManager::shutdownAllProductionLines(DatabaseTableModel* model) {
-  if (!startOperationExecution("shutdownAllProductionLines")) {
-    return;
-  }
+  startOperationPerforming("shutdownAllProductionLines");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Остановка всех производственных линий. "));
-  if (Administrator->shutdownAllProductionLines() !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "shutdownAllProductionLines",
-        QString("Получена ошибка при остановке всех производственных линий. "));
+  status = Administrator->shutdownAllProductionLines();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "shutdownAllProductionLines");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  if (Administrator->getDatabaseTable("production_lines", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("shutdownAllProductionLines",
-                             QString("Получена ошибка при загрузке данных из "
-                                     "таблицы производственных линий. "));
+  status = Administrator->getDatabaseTable("production_lines", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "shutdownAllProductionLines");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("shutdownAllProductionLines", "Выполнено. ");
+  finishOperationPerforming("shutdownAllProductionLines");
 }
 
 void AdminManager::deleteLastProductionLine(DatabaseTableModel* model) {
-  if (!startOperationExecution("deleteLastProductionLine")) {
-    return;
-  }
+  startOperationPerforming("deleteLastProductionLine");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Удаление последней линии производства. ");
-  if (Administrator->deleteLastProductionLine() !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("deleteLastProductionLine",
-                             QString("Получена ошибка при удалении последней "
-                                     "созданной производственной линии. "));
+  status = Administrator->deleteLastProductionLine();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "deleteLastProductionLine");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  if (Administrator->getDatabaseTable("production_lines", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution("deleteLastProductionLine",
-                             QString("Получена ошибка при загрузке данных из "
-                                     "таблицы производственных линий. "));
+  status = Administrator->getDatabaseTable("production_lines", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "deleteLastProductionLine");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("deleteLastProductionLine", "Выполнено. ");
+  finishOperationPerforming("deleteLastProductionLine");
 }
 
 void AdminManager::showProductionLineTable(DatabaseTableModel* model) {
@@ -417,215 +323,192 @@ void AdminManager::showProductionLineTable(DatabaseTableModel* model) {
 void AdminManager::linkProductionLineWithBox(
     const QMap<QString, QString>* parameters,
     DatabaseTableModel* model) {
-  if (!startOperationExecution("linkProductionLineWithBoxManually")) {
-    return;
-  }
+  startOperationPerforming("linkProductionLineWithBoxManually");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Связывание линии производства с определенным боксом. ");
-  if (Administrator->linkProductionLineWithBox(parameters)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "linkProductionLineWithBox",
-        "Получена ошибка при связывании линии производства с "
-        "определенным боксом. ");
+  status = Administrator->linkProductionLineWithBox(parameters);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "linkProductionLineWithBox");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  if (Administrator->getDatabaseTable("production_lines", model)) {
-    CurrentState = Failed;
-    finishOperationExecution("linkProductionLineWithBox",
-                             "Получена ошибка при загрузке данных из таблицы "
-                             "производственных линий. ");
+  status = Administrator->getDatabaseTable("production_lines", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "linkProductionLineWithBox");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("linkProductionLineWithBox", "Выполнено. ");
+  finishOperationPerforming("linkProductionLineWithBox");
 }
 
 void AdminManager::initIssuers(DatabaseTableModel* model) {
-  if (!startOperationExecution("initIssuers")) {
-    return;
-  }
+  startOperationPerforming("initIssuers");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Инициализация данных об эмитентах. ");
-  if (Administrator->initIssuerTable()) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "initIssuers", "Получена ошибка при инициализации таблицы эмитентов. ");
+  status = Administrator->initIssuerTable();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "initIssuers");
     return;
   }
 
   model->clear();
   sendLog("Отображение эмитентов. ");
-  if (Administrator->getDatabaseTable("issuers", model)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "initIssuers",
-        "Получена ошибка при загрузке данных из таблицы эмитентов. ");
+  status = Administrator->getDatabaseTable("issuers", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "initIssuers");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("initIssuers", "Выполнено. ");
+  finishOperationPerforming("initIssuers");
 }
 
 void AdminManager::initTransportMasterKeys(DatabaseTableModel* model) {
-  if (!startOperationExecution("initTransportMasterKeys")) {
-    return;
-  }
+  startOperationPerforming("initTransportMasterKeys");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog("Инициализация транспортных мастер ключей. ");
-  if (Administrator->initTransportMasterKeysTable()) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "initTransportMasterKeys",
-        "Получена ошибка при инициализации транспортных мастер ключей. ");
+  status = Administrator->initTransportMasterKeysTable();
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "initTransportMasterKeys");
     return;
   }
 
   model->clear();
   sendLog("Отображение транспортных мастер ключей. ");
-  if (Administrator->getDatabaseTable("transport_master_keys", model)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "initTransportMasterKeys",
-        "Получена ошибка при загрузке данных из таблицы мастер ключей. ");
+  status = Administrator->getDatabaseTable("transport_master_keys", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "initTransportMasterKeys");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("initTransportMasterKeys", "Выполнено. ");
+  finishOperationPerforming("initTransportMasterKeys");
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
     DatabaseTableModel* model,
     const QMap<QString, QString>* parameters) {
-  if (!startOperationExecution("linkIssuerWithMasterKeys")) {
-    return;
-  }
+  startOperationPerforming("linkIssuerWithMasterKeys");
+
+  AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Связывание эмитента %1 с мастер ключами %2. ")
               .arg(parameters->value("issuer_id"),
                    parameters->value("master_keys_id")));
-  if (Administrator->linkIssuerWithMasterKeys(parameters) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "linkIssuerWithMasterKeys",
-        QString(
-            "Получена ошибка при связывании эмитента %1 с мастер ключами %2. ")
-            .arg(parameters->value("issuer_id"),
-                 parameters->value("master_keys_id")));
+  status = Administrator->linkIssuerWithMasterKeys(parameters);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;
   }
 
   model->clear();
   sendLog("Отображение таблицы эмитентов. ");
-  if (Administrator->getDatabaseTable("issuers", model) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "linkIssuerWithMasterKeys",
-        "Получена ошибка при загрузке данных из таблицы эмитентов. ");
+  status = Administrator->getDatabaseTable("issuers", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("linkIssuerWithMasterKeys", "Выполнено. ");
+  finishOperationPerforming("linkIssuerWithMasterKeys");
 }
 
 void AdminManager::printTransponderSticker(const QString& id,
                                            DatabaseTableModel* model) {
-  if (!startOperationExecution("printTransponderSticker")) {
-    return;
-  }
+  startOperationPerforming("printTransponderSticker");
+
+  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AdministrationSystem::ReturnStatus administratorStatus;
 
   QMap<QString, QString> transponderData;
-  if (Administrator->getTransponderData(id, &transponderData) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при получении данных транспондера. ");
+  sendLog("Запрос данных транспондера. ");
+  administratorStatus = Administrator->getTransponderData(id, &transponderData);
+  if (administratorStatus != AdministrationSystem::Completed) {
+    processAdministratorError(administratorStatus, "printTransponderSticker");
     return;
   }
 
-  if (!StickerPrinter->printTransponderSticker(&transponderData)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при печати стикера транспондера. ");
+  sendLog("Печать стикера транспондера. ");
+  stickerPrinterStatus =
+      StickerPrinter->printTransponderSticker(&transponderData);
+  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+    processStickerPrinterError(stickerPrinterStatus, "printTransponderSticker");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("printTransponderSticker", "Выполнено. ");
+  finishOperationPerforming("printTransponderSticker");
 }
 
 void AdminManager::printBoxSticker(const QString& id,
                                    DatabaseTableModel* model) {
-  if (!startOperationExecution("printBoxSticker")) {
-    return;
-  }
+  startOperationPerforming("printBoxSticker");
+
+  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AdministrationSystem::ReturnStatus administratorStatus;
 
   QMap<QString, QString> boxData;
-  if (Administrator->getBoxData(id, &boxData) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при получении данных транспондера. ");
+  sendLog("Запрос данных бокса. ");
+  administratorStatus = Administrator->getBoxData(id, &boxData);
+  if (administratorStatus != AdministrationSystem::Completed) {
+    processAdministratorError(administratorStatus, "printBoxSticker");
     return;
   }
 
-  if (!StickerPrinter->printBoxSticker(&boxData)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при печати стикера транспондера. ");
+  sendLog("Печать стикера бокса. ");
+  stickerPrinterStatus = StickerPrinter->printBoxSticker(&boxData);
+  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+    processStickerPrinterError(stickerPrinterStatus, "printBoxSticker");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("printBoxSticker", "Выполнено. ");
+  finishOperationPerforming("printBoxSticker");
 }
 
 void AdminManager::printPalletSticker(const QString& id,
                                       DatabaseTableModel* model) {
-  if (!startOperationExecution("printPalletSticker")) {
-    return;
-  }
+  startOperationPerforming("printPalletSticker");
+
+  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AdministrationSystem::ReturnStatus administratorStatus;
 
   QMap<QString, QString> palletData;
-  if (Administrator->getPalletData(id, &palletData) !=
-      AdministrationSystem::Completed) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при получении данных транспондера. ");
+  sendLog("Запрос данных паллеты. ");
+  administratorStatus = Administrator->getPalletData(id, &palletData);
+  if (administratorStatus != AdministrationSystem::Completed) {
+    processAdministratorError(administratorStatus, "printTransponderSticker");
     return;
   }
 
-  if (!StickerPrinter->printPalletSticker(&palletData)) {
-    CurrentState = Failed;
-    finishOperationExecution(
-        "printTransponderSticker",
-        "Получена ошибка при печати стикера транспондера. ");
+  sendLog("Печать стикера паллеты. ");
+  stickerPrinterStatus = StickerPrinter->printPalletSticker(&palletData);
+  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+    processStickerPrinterError(stickerPrinterStatus, "printPalletSticker");
     return;
   }
 
-  // Завершаем выполнение операции
-  CurrentState = Completed;
-  finishOperationExecution("printPalletSticker", "Выполнено. ");
+  finishOperationPerforming("printPalletSticker");
+}
+
+void AdminManager::execPrinterStickerCommandScript(
+    const QSharedPointer<QStringList> commandScript) {
+  startOperationPerforming("execPrinterStickerCommandScript");
+
+  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+
+  sendLog("Выполнение командного скрипта принтера стикеров. ");
+  stickerPrinterStatus = StickerPrinter->exec(commandScript.get());
+  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+    processStickerPrinterError(stickerPrinterStatus,
+                               "execPrinterStickerCommandScript");
+    return;
+  }
+
+  finishOperationPerforming("execPrinterStickerCommandScript");
 }
 
 void AdminManager::loadSettings() {
@@ -644,46 +527,77 @@ void AdminManager::createAdministrator() {
   Administrator = new AdministrationSystem(this);
   connect(Administrator, &AdministrationSystem::logging, this,
           &AdminManager::proxyLogging);
+
+  // Заполняем таблицу соответствий статусов возврата
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::NotExecuted,
+                                        "Выполнение операции не началось.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::DatabaseConnectionError,
+      "Не удалось подключиться к базе данных. ");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::DatabaseTransactionError, "Ошибка транзакции. ");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::DatabaseQueryError,
+      "Получена ошибка при выполнении запроса к базе данных.");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::LogicError,
+                                        "Логическая ошибка.");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::UnknownError,
+                                        "Неизвествная ошибка. ");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::Completed,
+                                        "Выполнено. ");
 }
 
 void AdminManager::createStickerPrinter() {
   StickerPrinter = new TE310Printer(this);
   connect(StickerPrinter, &IStickerPrinter::logging, this,
           &AdminManager::proxyLogging);
+
+  // Заполняем таблицу соответствий статусов возврата
+  StickerPrinterReturnStatusMatch.insert(
+      IStickerPrinter::ParameterError,
+      "Получены некорректные параметры для стикера.");
+  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
+                                         "Не удалось распечать стикер.");
+  StickerPrinterReturnStatusMatch.insert(
+      IStickerPrinter::LibraryMissing,
+      "Отсутствует библиотека для работы с принтером стикеров.");
+  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::NotConnected,
+                                         "Принтер стикеров не подключен.");
+  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Completed,
+                                         "Выполнено.");
 }
 
-bool AdminManager::startOperationExecution(const QString& operationName) {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready) {
-    sendLog("Предыдущая операция не завершена. Выполнение новой невозможно. ");
-    return false;
-  }
+void AdminManager::startOperationPerforming(const QString& operationName) {
+  Mutex.lock();
 
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
-
-  // Отправляем сигнал о начале выполнения длительной операции
   emit operationPerfomingStarted(operationName);
-
-  return true;
 }
 
-void AdminManager::finishOperationExecution(const QString& operationName,
-                                            const QString& msg) {
-  sendLog(msg);
-
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(msg);
-  } else {
-    emit notifyUserAboutError(msg);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
-
+void AdminManager::finishOperationPerforming(const QString& operationName) {
   // Сигнал о завершении текущей операции
   emit operationPerformingFinished(operationName);
+
+  // Опопвещаем пользователя
+  emit notifyUser("Выполнено.");
+
+  // Разблокируем мьютекс
+  Mutex.unlock();
+}
+
+void AdminManager::processAdministratorError(
+    AdministrationSystem::ReturnStatus status,
+    const QString& operationName) {
+  emit operationPerformingFinished(operationName);
+  emit notifyUserAboutError(AdministratorReturnStatusMatch.value(status));
+  Mutex.unlock();
+}
+
+void AdminManager::processStickerPrinterError(
+    IStickerPrinter::ReturnStatus status,
+    const QString& operationName) {
+  emit operationPerformingFinished(operationName);
+  emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
+  Mutex.unlock();
 }
 
 /*

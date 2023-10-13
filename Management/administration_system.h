@@ -19,7 +19,7 @@ class AdministrationSystem : public QObject {
     DatabaseTransactionError,
     DatabaseQueryError,
     LogicError,
-    UnknowError,
+    UnknownError,
     Completed
   };
   Q_ENUM(ReturnStatus)

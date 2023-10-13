@@ -18,16 +18,17 @@
 class AdminManager : public QObject {
   Q_OBJECT
 
- public:
-  enum OperationState { Ready, WaitingExecution, Failed, Completed };
-  Q_ENUM(OperationState)
-
  private:
   bool LogEnable;
-  OperationState CurrentState;
 
   AdministrationSystem* Administrator;
+  QMap<AdministrationSystem::ReturnStatus, QString>
+      AdministratorReturnStatusMatch;
+
   IStickerPrinter* StickerPrinter;
+  QMap<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
+
+  QMutex Mutex;
 
  public:
   AdminManager(QObject* parent);
@@ -71,6 +72,8 @@ class AdminManager : public QObject {
   void printTransponderSticker(const QString& id, DatabaseTableModel* model);
   void printBoxSticker(const QString& id, DatabaseTableModel* model);
   void printPalletSticker(const QString& id, DatabaseTableModel* model);
+  void execPrinterStickerCommandScript(
+      const QSharedPointer<QStringList> commandScript);
 
  private:
   Q_DISABLE_COPY(AdminManager)
@@ -80,9 +83,13 @@ class AdminManager : public QObject {
   void createAdministrator(void);
   void createStickerPrinter(void);
 
-  bool startOperationExecution(const QString& operationName);
-  void finishOperationExecution(const QString& operationName,
-                                const QString& msg);
+  void startOperationPerforming(const QString& operationName);
+  void finishOperationPerforming(const QString& operationName);
+
+  void processAdministratorError(AdministrationSystem::ReturnStatus status,
+                                 const QString& operationName);
+  void processStickerPrinterError(IStickerPrinter::ReturnStatus status,
+                                  const QString& operationName);
 
  private slots:
   void proxyLogging(const QString& log);

@@ -253,10 +253,12 @@ class MasterGUI : public GUI {
   QLineEdit* PalletIdLineEdit;
   QPushButton* PrintPalletStickerPushButton;
   QSpacerItem* StickerControlPanelVS;
+  QPushButton* ExecStickerPrinterCommandScriptPushButton;
 
   QGroupBox* StickerDataViewGroup;
   QVBoxLayout* StickerDataViewLayout;
   QTableView* StickerDataTableView;
+  QPlainTextEdit* StickerPrinterCommandScriptInput;
   //============================================================
 
   /* Настройки админпанели */
@@ -324,6 +326,8 @@ class MasterGUI : public GUI {
   QLabel* StickerPrinterLibPathLabel;
   QLineEdit* StickerPrinterLibPathLineEdit;
   QPushButton* StickerPrinterLibPathPushButton;
+  QLabel* StickerPrinterNameLabel;
+  QLineEdit* StickerPrinterNameLineEdit;
 
  public:
   explicit MasterGUI(QWidget* parent);

@@ -8,20 +8,24 @@ TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
   loadTscLib();
 }
 
-bool TE310Printer::printTransponderSticker(
+IStickerPrinter::ReturnStatus TE310Printer::printTransponderSticker(
     const QMap<QString, QString>* parameters) {
-  if (parameters->value("issuer_name").isNull()) {
-    emit logging(QString("Отсутсвует название компании-заказчика. Сброс."));
-    return false;
+  // Проврека параметров
+  if (parameters->value("issuer_name").isEmpty() ||
+      parameters->value("sn").isEmpty() || parameters->value("pan").isEmpty()) {
+    emit logging(QString("Получены некорректные параметры. Сброс."));
+    return ParameterError;
   }
-
   emit logging(QString("Печать стикера транспондера для %1.")
                    .arg(parameters->value("issuer_name")));
 
   if (!TscLib->isLoaded()) {
     emit logging("Библиотека не загружена. Сброс. ");
-    return false;
+    return LibraryMissing;
   }
+
+  // Сохраняем данные стикера
+  LastTransponderSticker = *parameters;
 
   if (parameters->value("issuer_name") == "Новое качество дорог") {
     printNkdSticker(parameters);
@@ -30,28 +34,26 @@ bool TE310Printer::printTransponderSticker(
     printZsdSticker(parameters);
   } else {
     emit logging("Получено неизвестное название компании-эмитента. Сброс.");
-    return false;
+    return ParameterError;
   }
 
-  // Сохраняем данные распечатнного стикера
-  LastTransponderSticker = *parameters;
-
-  return true;
+  return Completed;
 }
 
-bool TE310Printer::printLastTransponderSticker() {
+IStickerPrinter::ReturnStatus TE310Printer::printLastTransponderSticker() {
   if (LastTransponderSticker.isEmpty()) {
     emit logging("Данные о последнем распечанном стикере отсутствуют. Сброс. ");
-    return false;
+    return ParameterError;
   }
 
   return printTransponderSticker(&LastTransponderSticker);
 }
 
-bool TE310Printer::printBoxSticker(const QMap<QString, QString>* parameters) {
-  if (parameters->value("id").isNull()) {
+IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
+    const QMap<QString, QString>* parameters) {
+  if (parameters->value("id").isEmpty()) {
     emit logging(QString("Отсутсвует идентификатор бокса. Сброс."));
-    return false;
+    return ParameterError;
   }
   emit logging(
       QString("Печать стикера для бокса %1.").arg(parameters->value("id")));
@@ -79,20 +81,23 @@ bool TE310Printer::printBoxSticker(const QMap<QString, QString>* parameters) {
   sendCommand("PRINT 1");
   closePort();
 
-  return true;
+  return Completed;
 }
 
-bool TE310Printer::printPalletSticker(
+IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
     const QMap<QString, QString>* parameters) {}
 
-void TE310Printer::exec(const QStringList* commandScript) {
-  openPort("TSC TE310");
+IStickerPrinter::ReturnStatus TE310Printer::exec(
+    const QStringList* commandScript) {
+  openPort(Name.toUtf8().constData());
 
   for (int32_t i = 0; i < commandScript->size(); i++) {
     sendCommand(commandScript->at(i).toUtf8());
   }
 
   closePort();
+
+  return Completed;
 }
 
 void TE310Printer::applySetting() {
@@ -104,7 +109,7 @@ void TE310Printer::applySetting() {
 }
 
 void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
-  openPort("TSC TE310");
+  openPort(Name.toUtf8().constData());
   sendCommand("SIZE 27 mm, 27 mm");
   sendCommand("GAP 2 mm,2 mm");
   sendCommand("REFERENCE 0,0");
@@ -133,7 +138,7 @@ void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
 }
 
 void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
-  openPort("TSC TE310");
+  openPort(Name.toUtf8().constData());
   sendCommand("SIZE 30 mm, 20 mm");
   sendCommand("GAP 2 mm, 1 mm");
   sendCommand("DIRECTION 1");
@@ -156,6 +161,7 @@ void TE310Printer::loadSetting() {
   QSettings settings;
 
   TscLibPath = settings.value("sticker_printer/library_path").toString();
+  Name = settings.value("sticker_printer/name").toString();
 }
 
 void TE310Printer::loadTscLib() {

@@ -643,6 +643,11 @@ void MasterGUI::createStickerTab() {
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   StickerControlPanelLayout->addItem(StickerControlPanelVS);
 
+  ExecStickerPrinterCommandScriptPushButton =
+      new QPushButton("Выполнить скрипт");
+  StickerControlPanelLayout->addWidget(
+      ExecStickerPrinterCommandScriptPushButton);
+
   // Отображение информации о стикере
   StickerDataViewGroup = new QGroupBox(QString("Данные стикера"));
   StickerDataViewGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -653,6 +658,8 @@ void MasterGUI::createStickerTab() {
 
   StickerDataTableView = new QTableView();
   StickerDataViewLayout->addWidget(StickerDataTableView);
+  StickerPrinterCommandScriptInput = new QPlainTextEdit();
+  StickerDataViewLayout->addWidget(StickerPrinterCommandScriptInput);
 
   // Настройка пропорций
   StickerMainLayout->setStretch(0, 1);
@@ -857,6 +864,14 @@ void MasterGUI::createSettingsTab() {
                                               0, 2, 1, 1);
   connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
           &MasterGUI::on_StickerPrinterLibPathPushButton_slot);
+
+  StickerPrinterNameLabel = new QLabel("Название");
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterNameLabel, 1, 0, 1,
+                                              1);
+  StickerPrinterNameLineEdit =
+      new QLineEdit(settings.value("sticker_printer/name").toString());
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1,
+                                              1, 2);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");

@@ -16,9 +16,10 @@ class IStickerPrinter : public QObject {
   };
 
   enum ReturnStatus {
+    ParameterError,
+    LibraryMissing,
+    NotConnected,
     Failed,
-    DllMissing,
-    PrinterNotConnected,
     Completed,
   };
 
@@ -28,13 +29,16 @@ class IStickerPrinter : public QObject {
  public:
   IStickerPrinter(QObject* parent, PrinterType type);
 
-  virtual bool printTransponderSticker(
+  virtual ReturnStatus printTransponderSticker(
       const QMap<QString, QString>* parameters) = 0;
-  virtual bool printLastTransponderSticker(void) = 0;
-  virtual bool printBoxSticker(const QMap<QString, QString>* parameters) = 0;
-  virtual bool printPalletSticker(const QMap<QString, QString>* parameters) = 0;
+  virtual ReturnStatus printLastTransponderSticker(void) = 0;
+  virtual ReturnStatus printBoxSticker(
+      const QMap<QString, QString>* parameters) = 0;
+  virtual ReturnStatus printPalletSticker(
+      const QMap<QString, QString>* parameters) = 0;
 
-  virtual void exec(const QStringList* commandScript) = 0;
+  virtual ReturnStatus exec(const QStringList* commandScript) = 0;
+
   virtual void applySetting(void) = 0;
 
  signals:

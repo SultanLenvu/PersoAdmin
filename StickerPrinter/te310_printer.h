@@ -17,6 +17,8 @@ class TE310Printer : public IStickerPrinter {
   typedef int (*TscClosePort)(void);
 
  private:
+  QString Name;
+
   QString TscLibPath;
   QLibrary* TscLib;
 
@@ -31,15 +33,16 @@ class TE310Printer : public IStickerPrinter {
  public:
   explicit TE310Printer(QObject* parent);
 
-  virtual bool printTransponderSticker(
+  virtual ReturnStatus printTransponderSticker(
       const QMap<QString, QString>* parameters) override;
-  virtual bool printLastTransponderSticker(void) override;
-  virtual bool printBoxSticker(
+  virtual ReturnStatus printLastTransponderSticker(void) override;
+  virtual ReturnStatus printBoxSticker(
       const QMap<QString, QString>* parameters) override;
-  virtual bool printPalletSticker(
+  virtual ReturnStatus printPalletSticker(
       const QMap<QString, QString>* parameters) override;
 
-  virtual void exec(const QStringList* commandScript) override;
+  virtual ReturnStatus exec(const QStringList* commandScript) override;
+
   virtual void applySetting(void) override;
 
  private:
