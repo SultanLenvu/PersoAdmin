@@ -848,7 +848,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
   QMap<QString, QString> transponderData;
 
   boxRecord.insert("id", id);
-  boxRecord.insert("quantity", "");
+  boxRecord.insert("assembled_units", "");
   if (!Database->getRecordById("boxes", boxRecord)) {
     emit logging(QString("Получена ошибка при поиске бокса с id %1. ").arg(id));
     return DatabaseQueryError;
@@ -856,7 +856,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
 
   // Сохраняем данные бокса
   data->insert("id", id);
-  data->insert("quantity", boxRecord.value("quantity"));
+  data->insert("assembled_units", boxRecord.value("assembled_units"));
 
   // Ищем первый транспондер в боксе
   transponderRecord.insert("id", "");
@@ -921,26 +921,31 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
   QMap<QString, QString> orderRecord;
 
   palletRecord.insert("id", id);
-  palletRecord.insert("quantity", "");
+  palletRecord.insert("assembled_units", "");
   palletRecord.insert("order_id", "");
+  palletRecord.insert("assembling_end", "");
   if (!Database->getRecordById("pallets", palletRecord)) {
     emit logging(
         QString("Получена ошибка при поиске паллеты с id %1. ").arg(id));
     return DatabaseQueryError;
   }
 
-  orderRecord.insert("id", palletRecord.value("pallet_id"));
+  orderRecord.insert("id", palletRecord.value("order_id"));
   orderRecord.insert("transponder_model", "");
   if (!Database->getRecordById("orders", orderRecord)) {
-    emit logging(
-        QString("Получена ошибка при поиске паллеты с id %1. ").arg(id));
+    emit logging(QString("Получена ошибка при поиске заказа с id %1. ")
+                     .arg(palletRecord.value("order_id")));
     return DatabaseQueryError;
   }
 
   // Сохраняем данные паллеты
   data->insert("id", id);
-  data->insert("quantity", palletRecord.value("quantity"));
-  data->insert("transponder_model", orderRecord.value("transponder_model"));
+  QStringList tempDate = palletRecord.value("assembling_end").split("T");
+  data->insert(
+      "assembly_date",
+      QDate::fromString(tempDate.first(), "yyyy-MM-dd").toString("dd.MM.yyyy"));
+  QString tempModel = orderRecord.value("transponder_model");
+  data->insert("transponder_model", tempModel.remove(" "));
 
   // Ищем первый бокс в паллете
   boxRecord.insert("id", "");
@@ -958,8 +963,9 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
 
   // Ищем последний бокс в паллете
   boxRecord.insert("id", "");
+  boxRecord.insert("quantity", "");
   boxRecord.insert("pallet_id", id);
-  if (!Database->getRecordByPart("boxes", boxRecord, true)) {
+  if (!Database->getRecordByPart("boxes", boxRecord, false)) {
     emit logging(
         QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
             .arg(id));
@@ -968,6 +974,9 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
 
   // Сохраняем идентификатор последнего бокса
   data->insert("last_box_id", boxRecord.value("id"));
+  uint32_t totalQuantity = palletRecord.value("assembled_units").toInt() *
+                           boxRecord.value("quantity").toInt();
+  data->insert("quantity", QString::number(totalQuantity));
 
   return Completed;
 }

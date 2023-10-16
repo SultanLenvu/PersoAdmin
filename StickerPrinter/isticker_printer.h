@@ -18,7 +18,7 @@ class IStickerPrinter : public QObject {
   enum ReturnStatus {
     ParameterError,
     LibraryMissing,
-    NotConnected,
+    ConnectionError,
     Failed,
     Completed,
   };

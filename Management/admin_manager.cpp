@@ -561,8 +561,8 @@ void AdminManager::createStickerPrinter() {
   StickerPrinterReturnStatusMatch.insert(
       IStickerPrinter::LibraryMissing,
       "Отсутствует библиотека для работы с принтером стикеров.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::NotConnected,
-                                         "Принтер стикеров не подключен.");
+  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
+                                         "Не удалось подключиться к принтеру.");
   StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Completed,
                                          "Выполнено.");
 }
