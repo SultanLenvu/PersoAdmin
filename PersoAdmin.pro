@@ -14,30 +14,36 @@ SOURCES += \
     Database/database_table_model.cpp \
     GUI/gui_authorization.cpp \
     GUI/gui_master.cpp \
-    GUI/main_window_kernel.cpp \
     GUI/gui.cpp \
     GUI/gui_delegates.cpp \
-    GUI/user_interaction_system.cpp \
-    Management/admin_manager.cpp \
+    GUI/interaction_system.cpp \
+    GUI/main_window_kernel.cpp \
+    Log/file_log_backend.cpp \
+    Log/widget_log_backend.cpp \
+    Log/log_backend.cpp \
     Log/log_system.cpp \
+    Management/admin_manager.cpp \
     Management/administration_system.cpp \
     StickerPrinter/isticker_printer.cpp \
     StickerPrinter/te310_printer.cpp \
     main.cpp
 
 HEADERS += \
-    GUI/gui_authorization.h \
-    Management/admin_manager.h \
+    GUI/interaction_system.h \
+    GUI/main_window_kernel.h \
+    Log/file_log_backend.h \
+    Log/widget_log_backend.h \
+    Log/log_backend.h \
+    Log/log_system.h \
     General/definitions.h \
     Database/database_controller.h \
     Database/postgres_controller.h \
     Database/database_table_model.h \
+    GUI/gui_authorization.h \
     GUI/gui_master.h \
-    GUI/main_window_kernel.h \
     GUI/gui.h \
     GUI/gui_delegates.h \
-    GUI/user_interaction_system.h \
-    Log/log_system.h \
+    Management/admin_manager.h \
     Management/administration_system.h \
     StickerPrinter/isticker_printer.h \
     StickerPrinter/te310_printer.h

@@ -278,10 +278,10 @@ class MasterGUI : public GUI {
   QCheckBox* AdministrationSystemLogEnable;
 
   // Настройки системы взаимодействия с пользователем
-  QGroupBox* UserInteractionSystemSettingsGroupBox;
-  QGridLayout* UserInteractionSystemSettingsLayout;
-  QLabel* UserInteractionSystemLogEnableLabel;
-  QCheckBox* UserInteractionSystemLogEnable;
+  QGroupBox* InteractionSystemSettingsGroupBox;
+  QGridLayout* InteractionSystemSettingsLayout;
+  QLabel* InteractionSystemLogEnableLabel;
+  QCheckBox* InteractionSystemLogEnable;
 
   // Настройки базы данных
   QGroupBox* DatabaseSettingsGroupBox;
@@ -302,14 +302,15 @@ class MasterGUI : public GUI {
   // Настройки системы логгирования
   QGroupBox* LogSystemSettingsGroupBox;
   QGridLayout* LogSystemSettingsLayout;
-  QLabel* LogSystemEnableLabel;
-  QCheckBox* LogSystemEnableCheckBox;
+  QLabel* LogSystemGlobalEnableLabel;
+  QCheckBox* LogSystemGlobalEnableCheckBox;
 
   QWidget* LogSystemProxyWidget1;
   QGridLayout* LogSystemProxyWidget1Layout;
-  QLabel* LogSystemSavePathLabel;
-  QLineEdit* LogSystemSavePathLineEdit;
-  QPushButton* LogSystemSavePathExplorePushButton;
+
+  QLabel* LogSystemDisplayEnableLabel;
+  QCheckBox* LogSystemDisplayEnableCheckBox;
+
   QLabel* LogSystemListenPersoServerLabel;
   QCheckBox* LogSystemListenPersoServerCheckBox;
 
@@ -319,6 +320,14 @@ class MasterGUI : public GUI {
   QLineEdit* LogSystemListenIpLineEdit;
   QLabel* LogSystemListenPortLabel;
   QLineEdit* LogSystemListenPortLineEdit;
+
+  QLabel* LogSystemFileEnableLabel;
+  QCheckBox* LogSystemFileEnableCheckBox;
+
+  QWidget* LogSystemProxyWidget3;
+  QGridLayout* LogSystemProxyWidget3Layout;
+  QLabel* LogSystemFileMaxNumberLabel;
+  QLineEdit* LogSystemFileMaxNumberLineEdit;
 
   // Настройки принтера
   QGroupBox* StickerPrinterSettingsGroupBox;
@@ -360,9 +369,9 @@ class MasterGUI : public GUI {
   void on_SearchTransponderByComboBox_slot(const QString& text);
   void on_RereleaseTransponderByComboBox_slot(const QString& text);
 
-  void on_LogSystemSavePathExplorePushButton_slot(void);
-  void on_LogSystemEnableCheckBox_slot(int state);
-  void on_LogSystemListenPersoServerCheckBox_slot(int state);
+  void on_LogSystemEnableCheckBox_slot(int32_t state);
+  void on_LogSystemListenPersoServerCheckBox_slot(int32_t state);
+  void on_LogSystemFileEnableCheckBox_slot(int32_t state);
 
   void on_StickerPrinterLibPathPushButton_slot(void);
 

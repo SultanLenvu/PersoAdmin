@@ -1,5 +1,5 @@
-#ifndef USER_INTERACTION_SYSTEM_H
-#define USER_INTERACTION_SYSTEM_H
+#ifndef INTERACTION_SYSTEM_H
+#define INTERACTION_SYSTEM_H
 
 #include <QDebug>
 #include <QElapsedTimer>
@@ -14,7 +14,7 @@
 
 #include "General/definitions.h"
 
-class UserInteractionSystem : public QWidget {
+class InteractionSystem : public QWidget {
   Q_OBJECT
 
  private:
@@ -27,7 +27,7 @@ class UserInteractionSystem : public QWidget {
   QElapsedTimer* ODMeter;
 
  public:
-  explicit UserInteractionSystem(QWidget* window);
+  static InteractionSystem* instance(void);
 
  public slots:
   void generateMessage(const QString& pass);
@@ -40,7 +40,8 @@ class UserInteractionSystem : public QWidget {
   void applySettings(void);
 
  private:
-  Q_DISABLE_COPY(UserInteractionSystem)
+  explicit InteractionSystem(QWidget* window);
+  Q_DISABLE_COPY(InteractionSystem)
   void loadSettings(void);
   void sendLog(const QString& log);
 
@@ -59,4 +60,4 @@ class UserInteractionSystem : public QWidget {
   void abortCurrentOperation(void);
 };
 
-#endif  // USER_INTERACTION_SYSTEM_H
+#endif  // INTERACTION_SYSTEM_H

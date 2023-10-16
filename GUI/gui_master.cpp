@@ -702,23 +702,22 @@ void MasterGUI::createSettingsTab() {
                                                 0, 1, 1, 1);
 
   // Настройки системы взаимодействия с пользователем
-  UserInteractionSystemSettingsGroupBox = new QGroupBox(
+  InteractionSystemSettingsGroupBox = new QGroupBox(
       QString("Настройки системы взаимодействия с пользователем"));
-  SettingsMainSubLayout->addWidget(UserInteractionSystemSettingsGroupBox);
-  UserInteractionSystemSettingsLayout = new QGridLayout();
-  UserInteractionSystemSettingsGroupBox->setLayout(
-      UserInteractionSystemSettingsLayout);
+  SettingsMainSubLayout->addWidget(InteractionSystemSettingsGroupBox);
+  InteractionSystemSettingsLayout = new QGridLayout();
+  InteractionSystemSettingsGroupBox->setLayout(InteractionSystemSettingsLayout);
 
-  UserInteractionSystemLogEnableLabel = new QLabel("Логирование ");
-  UserInteractionSystemSettingsLayout->addWidget(
-      UserInteractionSystemLogEnableLabel, 0, 0, 1, 1);
-  UserInteractionSystemLogEnable = new QCheckBox();
-  UserInteractionSystemLogEnable->setCheckState(
+  InteractionSystemLogEnableLabel = new QLabel("Логирование ");
+  InteractionSystemSettingsLayout->addWidget(InteractionSystemLogEnableLabel, 0,
+                                             0, 1, 1);
+  InteractionSystemLogEnable = new QCheckBox();
+  InteractionSystemLogEnable->setCheckState(
       settings.value("user_interaction_system/log_enable").toBool()
           ? Qt::Checked
           : Qt::Unchecked);
-  UserInteractionSystemSettingsLayout->addWidget(UserInteractionSystemLogEnable,
-                                                 0, 1, 1, 1);
+  InteractionSystemSettingsLayout->addWidget(InteractionSystemLogEnable, 0, 1,
+                                             1, 1);
 
   // Настройки базы данных
   DatabaseSettingsGroupBox = new QGroupBox(QString("Настройки базы данных"));
@@ -780,51 +779,49 @@ void MasterGUI::createSettingsTab() {
   LogSystemSettingsLayout = new QGridLayout();
   LogSystemSettingsGroupBox->setLayout(LogSystemSettingsLayout);
 
-  LogSystemEnableLabel = new QLabel("Вкл/выкл системы логгирования");
-  LogSystemSettingsLayout->addWidget(LogSystemEnableLabel, 0, 0, 1, 1);
-  LogSystemEnableCheckBox = new QCheckBox();
-  LogSystemEnableCheckBox->setCheckState(
+  LogSystemGlobalEnableLabel = new QLabel("Глобальное включение");
+  LogSystemSettingsLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 1);
+  LogSystemGlobalEnableCheckBox = new QCheckBox();
+  LogSystemGlobalEnableCheckBox->setCheckState(
       settings.value("log_system/global_enable").toBool() ? Qt::Checked
                                                           : Qt::Unchecked);
-  LogSystemSettingsLayout->addWidget(LogSystemEnableCheckBox, 0, 1, 1, 1);
-  connect(LogSystemEnableCheckBox, &QCheckBox::stateChanged, this,
+  LogSystemSettingsLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 1);
+  connect(LogSystemGlobalEnableCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemEnableCheckBox_slot);
 
   LogSystemProxyWidget1 = new QWidget();
-  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 3, 0, 1, 2);
-  if (!LogSystemEnableCheckBox->isChecked()) {
+  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 1, 0, 1, 2);
+  if (!LogSystemGlobalEnableCheckBox->isChecked()) {
     LogSystemProxyWidget1->hide();
   }
   LogSystemProxyWidget1Layout = new QGridLayout();
   LogSystemProxyWidget1->setLayout(LogSystemProxyWidget1Layout);
 
-  LogSystemSavePathLabel = new QLabel("Директория для лог-файлов");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLabel, 1, 0, 1, 2);
-  LogSystemSavePathLineEdit =
-      new QLineEdit(settings.value("log_system/save_directory").toString());
-  LogSystemSavePathLineEdit->setMaxLength(300);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathLineEdit, 1, 1, 1, 1);
-  LogSystemSavePathExplorePushButton = new QPushButton("Обзор");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemSavePathExplorePushButton, 1,
-                                         2, 1, 1);
-  connect(LogSystemSavePathExplorePushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_LogSystemSavePathExplorePushButton_slot);
+  LogSystemDisplayEnableLabel = new QLabel("Вывод на дисплей вкл/выкл");
+  LogSystemProxyWidget1Layout->addWidget(LogSystemDisplayEnableLabel, 0, 0, 1,
+                                         1);
+  LogSystemDisplayEnableCheckBox = new QCheckBox();
+  LogSystemDisplayEnableCheckBox->setCheckState(
+      settings.value("log_system/display_log_enable").toBool() ? Qt::Checked
+                                                               : Qt::Unchecked);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemDisplayEnableCheckBox, 0, 1,
+                                         1, 1);
 
   LogSystemListenPersoServerLabel =
       new QLabel("Получение логов с сервера персонализации");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerLabel, 2, 0,
+  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerLabel, 1, 0,
                                          1, 1);
   LogSystemListenPersoServerCheckBox = new QCheckBox();
   LogSystemListenPersoServerCheckBox->setCheckState(
       settings.value("log_system/udp_log_enable").toBool() ? Qt::Checked
                                                            : Qt::Unchecked);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 2,
+  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 1,
                                          1, 1, 1);
   connect(LogSystemListenPersoServerCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemListenPersoServerCheckBox_slot);
 
   LogSystemProxyWidget2 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 3, 0, 1, 2);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 2, 0, 1, 2);
   if (!LogSystemListenPersoServerCheckBox->isChecked()) {
     LogSystemProxyWidget2->hide();
   }
@@ -834,16 +831,45 @@ void MasterGUI::createSettingsTab() {
   LogSystemListenIpLabel = new QLabel("Прослушиваемый IP");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLabel, 0, 0, 1, 1);
   LogSystemListenIpLineEdit =
-      new QLineEdit(settings.value("log_system/udp_bind_ip").toString());
+      new QLineEdit(settings.value("log_system/udp_listen_ip").toString());
   LogSystemListenIpLineEdit->setMaxLength(300);
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLineEdit, 0, 1, 1, 1);
 
   LogSystemListenPortLabel = new QLabel("Прослушиваемый порт");
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLabel, 1, 0, 1, 1);
   LogSystemListenPortLineEdit =
-      new QLineEdit(settings.value("log_system/udp_bind_port").toString());
+      new QLineEdit(settings.value("log_system/udp_listen_port").toString());
   LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLineEdit, 1, 1, 1,
                                          1);
+
+  LogSystemFileEnableLabel = new QLabel("Логгирование в файл");
+  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableLabel, 3, 0, 1, 1);
+  LogSystemFileEnableCheckBox = new QCheckBox();
+  LogSystemFileEnableCheckBox->setCheckState(
+      settings.value("log_system/file_log_enable").toBool() ? Qt::Checked
+                                                            : Qt::Unchecked);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableCheckBox, 3, 1, 1,
+                                         1);
+  connect(LogSystemFileEnableCheckBox, &QCheckBox::stateChanged, this,
+          &MasterGUI::on_LogSystemFileEnableCheckBox_slot);
+
+  LogSystemProxyWidget3 = new QWidget();
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3, 4, 0, 1, 2);
+  if (!LogSystemFileEnableCheckBox->isChecked()) {
+    LogSystemProxyWidget3->hide();
+  }
+  LogSystemProxyWidget3Layout = new QGridLayout();
+  LogSystemProxyWidget3->setLayout(LogSystemProxyWidget3Layout);
+
+  LogSystemFileMaxNumberLabel =
+      new QLabel("Максимальное количество лог-файлов");
+  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLabel, 0, 0, 1,
+                                         1);
+  LogSystemFileMaxNumberLineEdit = new QLineEdit(
+      settings.value("log_system/log_file_max_number").toString());
+  LogSystemFileMaxNumberLineEdit->setMaxLength(10);
+  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLineEdit, 0, 1,
+                                         1, 1);
 
   // Настройки принтера стикеров
   StickerPrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
@@ -931,14 +957,6 @@ void MasterGUI::on_RereleaseTransponderByComboBox_slot(const QString& text) {
   }
 }
 
-void MasterGUI::on_LogSystemSavePathExplorePushButton_slot() {
-  QString dir = QFileDialog::getExistingDirectory(
-      nullptr, "Выбрать директорию", "", QFileDialog::ShowDirsOnly);
-  if (!dir.isEmpty()) {
-    LogSystemSavePathLineEdit->setText(dir);
-  }
-}
-
 void MasterGUI::on_LogSystemEnableCheckBox_slot(int state) {
   if (state == Qt::Checked) {
     LogSystemProxyWidget1->show();
@@ -952,6 +970,14 @@ void MasterGUI::on_LogSystemListenPersoServerCheckBox_slot(int state) {
     LogSystemProxyWidget2->show();
   } else {
     LogSystemProxyWidget2->hide();
+  }
+}
+
+void MasterGUI::on_LogSystemFileEnableCheckBox_slot(int32_t state) {
+  if (state == Qt::Checked) {
+    LogSystemProxyWidget3->show();
+  } else {
+    LogSystemProxyWidget3->hide();
   }
 }
 

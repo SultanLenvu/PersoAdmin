@@ -377,22 +377,31 @@ void MainWindowKernel::saveSettings() const {
   // Настройки системы взаимодействия с пользователем
   settings.setValue(
       "user_interaction_system/log_enable",
-      gui->UserInteractionSystemLogEnable->checkState() == Qt::Checked);
+      gui->InteractionSystemLogEnable->checkState() == Qt::Checked);
 
   // Настройки системы логгирования
   settings.setValue(
       "log_system/global_enable",
-      gui->LogSystemEnableCheckBox->checkState() == Qt::Checked ? true : false);
-  settings.setValue("log_system/save_directory",
-                    gui->LogSystemSavePathLineEdit->text());
+      gui->LogSystemGlobalEnableCheckBox->checkState() == Qt::Checked ? true
+                                                                      : false);
   settings.setValue(
-      "log_system/udp_log_enable",
+      "log_system/display_log_enable",
+      gui->LogSystemDisplayEnableCheckBox->checkState() == Qt::Checked ? true
+                                                                       : false);
+  settings.setValue(
+      "log_system/file_log_enable",
+      gui->LogSystemFileEnableCheckBox->checkState() == Qt::Checked ? true
+                                                                    : false);
+  settings.setValue("log_system/log_file_max_number",
+                    gui->LogSystemFileMaxNumberLineEdit->text());
+  settings.setValue(
+      "log_system/udp_listen_enable",
       gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked
           ? true
           : false);
-  settings.setValue("log_system/udp_bind_ip",
+  settings.setValue("log_system/udp_listen_ip",
                     gui->LogSystemListenIpLineEdit->text());
-  settings.setValue("log_system/udp_bind_port",
+  settings.setValue("log_system/udp_listen_port",
                     gui->LogSystemListenPortLineEdit->text().toInt());
 
   // Настройки контроллера базы данных
@@ -436,15 +445,23 @@ bool MainWindowKernel::checkAuthorizationData() const {
 bool MainWindowKernel::checkNewSettings() const {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QFileInfo info;
+  QHostAddress ip;
+  int32_t port;
 
-  QHostAddress ip = QHostAddress(gui->LogSystemListenIpLineEdit->text());
-  if (ip.isNull()) {
-    return false;
+  if (gui->LogSystemGlobalEnableCheckBox->checkState() == Qt::Unchecked) {
+    return true;
   }
 
-  int32_t port = gui->LogSystemListenPortLineEdit->text().toInt();
-  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-    return false;
+  if (gui->LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked) {
+    ip = QHostAddress(gui->LogSystemListenIpLineEdit->text());
+    if (ip.isNull()) {
+      return false;
+    }
+
+    port = gui->LogSystemListenPortLineEdit->text().toInt();
+    if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
+      return false;
+    }
   }
 
   ip = QHostAddress(gui->DatabaseIpLineEdit->text());
@@ -452,14 +469,15 @@ bool MainWindowKernel::checkNewSettings() const {
     return false;
   }
 
-  port = gui->DatabasePortLineEdit->text().toInt();
-  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-    return false;
-  }
+  if (gui->LogSystemFileEnableCheckBox->checkState() == Qt::Checked) {
+    port = gui->DatabasePortLineEdit->text().toInt();
+    if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
+      return false;
+    }
 
-  info.setFile(gui->LogSystemSavePathLineEdit->text());
-  if (!info.isDir()) {
-    return false;
+    if (gui->LogSystemFileMaxNumberLineEdit->text().toInt() == 0) {
+      return false;
+    }
   }
 
   info.setFile(gui->StickerPrinterLibPathLineEdit->text());
@@ -831,9 +849,10 @@ void MainWindowKernel::connectMasterGui() {
           &MainWindowKernel::on_ApplySettingsPushButton_slot);
 
   // Подключаем логгер
-  connect(Logger, &LogSystem::requestDisplayLog, gui, &MasterGUI::displayLog);
-  connect(Logger, &LogSystem::requestClearDisplayLog, gui,
-          &MasterGUI::clearLogDisplay);
+  connect(Logger->getWidgetLogger(), &WidgetLogBackend::displayLog_signal, gui,
+          &MasterGUI::displayLog);
+  connect(Logger->getWidgetLogger(), &WidgetLogBackend::clearLogDisplay_signal,
+          gui, &MasterGUI::clearLogDisplay);
 
   // Соединяем модели и представления
   gui->DatabaseRandomModelView->setModel(RandomModel);
@@ -846,18 +865,18 @@ void MainWindowKernel::connectMasterGui() {
 }
 
 void MainWindowKernel::createLoggerInstance() {
-  Logger = new LogSystem(nullptr);
+  Logger = LogSystem::instance();
   connect(this, &MainWindowKernel::applySettings_signal, Logger,
           &LogSystem::applySettings);
   connect(this, &MainWindowKernel::loggerClear_signal, Logger,
           &LogSystem::clear);
-  connect(this, &MainWindowKernel::loggerGenerate_signal, Logger,
-          &LogSystem::generate);
+  connect(this, &MainWindowKernel::logging, Logger, &LogSystem::generate);
 
   LoggerThread = new QThread(this);
   connect(LoggerThread, &QThread::finished, LoggerThread,
           &QThread::deleteLater);
-  connect(LoggerThread, &QThread::finished, Logger, &LogSystem::deleteLater);
+  connect(LoggerThread, &QThread::started, Logger,
+          &LogSystem::instanceThreadStarted);
 
   Logger->moveToThread(LoggerThread);
   LoggerThread->start();
@@ -867,13 +886,13 @@ void MainWindowKernel::createManagerInstance() {
   Manager = new AdminManager(nullptr);
   connect(Manager, &AdminManager::logging, Logger, &LogSystem::generate);
   connect(Manager, &AdminManager::notifyUser, Interactor,
-          &UserInteractionSystem::generateMessage);
+          &InteractionSystem::generateMessage);
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
-          &UserInteractionSystem::generateErrorMessage);
+          &InteractionSystem::generateErrorMessage);
   connect(Manager, &AdminManager::operationPerfomingStarted, Interactor,
-          &UserInteractionSystem::startOperationProgressDialog);
+          &InteractionSystem::startOperationProgressDialog);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
-          &UserInteractionSystem::finishOperationProgressDialog);
+          &InteractionSystem::finishOperationProgressDialog);
 
   // Подключаем функционал
   connect(this, &MainWindowKernel::applySettings_signal, Manager,
@@ -938,11 +957,11 @@ void MainWindowKernel::createManagerInstance() {
 }
 
 void MainWindowKernel::createInteractorInstance() {
-  Interactor = new UserInteractionSystem(CurrentGUI);
-  connect(Interactor, &UserInteractionSystem::logging, Logger,
+  Interactor = InteractionSystem::instance();
+  connect(Interactor, &InteractionSystem::logging, Logger,
           &LogSystem::generate);
   connect(this, &MainWindowKernel::applySettings_signal, Interactor,
-          &UserInteractionSystem::applySettings);
+          &InteractionSystem::applySettings);
 }
 
 void MainWindowKernel::createModels() {

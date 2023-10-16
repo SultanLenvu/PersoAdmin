@@ -1,8 +1,7 @@
-#include "user_interaction_system.h"
+#include "interaction_system.h"
 
-UserInteractionSystem::UserInteractionSystem(QWidget* parent)
-    : QWidget(parent) {
-  setObjectName("UserInteractionSystem");
+InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
+  setObjectName("InteractionSystem");
   loadSettings();
 
   ProgressDialog = nullptr;
@@ -12,20 +11,25 @@ UserInteractionSystem::UserInteractionSystem(QWidget* parent)
   createTimers();
 }
 
-void UserInteractionSystem::generateMessage(const QString& data) {
+InteractionSystem* InteractionSystem::instance() {
+  static InteractionSystem interactor(nullptr);
+  return &interactor;
+}
+
+void InteractionSystem::generateMessage(const QString& data) {
   QMessageBox::information(this, "Сообщение", data, QMessageBox::Ok);
 }
 
-void UserInteractionSystem::getMasterPassword(QString& pass) {
+void InteractionSystem::getMasterPassword(QString& pass) {
   pass = QInputDialog::getText(
       this, "Мастер доступ", "Введите пароль:", QLineEdit::Normal, "", nullptr);
 }
 
-void UserInteractionSystem::generateErrorMessage(const QString& text) {
+void InteractionSystem::generateErrorMessage(const QString& text) {
   QMessageBox::critical(this, "Ошибка", text, QMessageBox::Ok);
 }
 
-void UserInteractionSystem::startOperationProgressDialog(
+void InteractionSystem::startOperationProgressDialog(
     const QString& operationName) {
   QSettings settings;
 
@@ -51,7 +55,7 @@ void UserInteractionSystem::startOperationProgressDialog(
   ODMeter->start();
 }
 
-void UserInteractionSystem::finishOperationProgressDialog(
+void InteractionSystem::finishOperationProgressDialog(
     const QString& operationName) {
   QSettings settings;
 
@@ -71,7 +75,7 @@ void UserInteractionSystem::finishOperationProgressDialog(
   destroyProgressDialog();
 }
 
-void UserInteractionSystem::applySettings() {
+void InteractionSystem::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
 }
@@ -80,19 +84,19 @@ void UserInteractionSystem::applySettings() {
  * Приватные методы
  */
 
-void UserInteractionSystem::loadSettings() {
+void InteractionSystem::loadSettings() {
   QSettings settings;
 
   LogEnable = settings.value("user_interaction_system/log_enable").toBool();
 }
 
-void UserInteractionSystem::sendLog(const QString& log) {
+void InteractionSystem::sendLog(const QString& log) {
   if (LogEnable) {
-    emit logging("UserInteractionSystem - " + log);
+    emit logging("InteractionSystem - " + log);
   }
 }
 
-void UserInteractionSystem::createProgressDialog() {
+void InteractionSystem::createProgressDialog() {
   ProgressDialog =
       new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
@@ -100,7 +104,7 @@ void UserInteractionSystem::createProgressDialog() {
   ProgressDialog->show();
 }
 
-void UserInteractionSystem::destroyProgressDialog() {
+void InteractionSystem::destroyProgressDialog() {
   if (!ProgressDialog)
     return;
 
@@ -110,12 +114,12 @@ void UserInteractionSystem::destroyProgressDialog() {
   CurrentOperationStep = 0;
 }
 
-void UserInteractionSystem::createTimers() {
+void InteractionSystem::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = new QTimer(this);
   ODTimer->setInterval(SERVER_MANAGER_OPERATION_MAX_DURATION);
   connect(ODTimer, &QTimer::timeout, this,
-          &UserInteractionSystem::on_ODTimerTimeout_slot);
+          &InteractionSystem::on_ODTimerTimeout_slot);
   connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
 
   // Таймер для измерения длительности операции
@@ -124,21 +128,21 @@ void UserInteractionSystem::createTimers() {
   // Таймер, отслеживающий квант длительности операции
   ODQTimer = new QTimer(this);
   connect(ODQTimer, &QTimer::timeout, this,
-          &UserInteractionSystem::on_ODQTimerTimeout_slot);
+          &InteractionSystem::on_ODQTimerTimeout_slot);
 }
 
-void UserInteractionSystem::on_ProgressDialogCanceled_slot() {
+void InteractionSystem::on_ProgressDialogCanceled_slot() {
   destroyProgressDialog();
 
   emit abortCurrentOperation();
 }
 
-void UserInteractionSystem::on_ODTimerTimeout_slot() {
+void InteractionSystem::on_ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
   generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
-void UserInteractionSystem::on_ODQTimerTimeout_slot() {
+void InteractionSystem::on_ODQTimerTimeout_slot() {
   if (!ProgressDialog) {
     return;
   }

@@ -17,7 +17,7 @@
 #include "gui.h"
 #include "gui_authorization.h"
 #include "gui_master.h"
-#include "user_interaction_system.h"
+#include "interaction_system.h"
 
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
@@ -31,7 +31,7 @@ class MainWindowKernel : public QMainWindow {
   QAction* AboutProgramAct;
   QAction* RequestAuthorizationGuiAct;
 
-  UserInteractionSystem* Interactor;
+  InteractionSystem* Interactor;
 
   QThread* ManagerThread;
   AdminManager* Manager;
@@ -127,7 +127,7 @@ class MainWindowKernel : public QMainWindow {
 
   // Сигналы для логгера
   void loggerClear_signal(void);
-  void loggerGenerate_signal(const QString& log);
+  void logging(const QString& log);
 
   // Сигналы для менеджера
   void connectDatabase_signal(void);

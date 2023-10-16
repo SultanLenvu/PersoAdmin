@@ -37,6 +37,7 @@ void AuthorizationGUI::createAuthorizationMenu() {
   AuthorizationMenuLayout->addWidget(PasswordLabel, 1, 0, 1, 1);
   PasswordLineEdit = new QLineEdit();
   PasswordLineEdit->setMaxLength(AUTH_USER_INPUT_MAX_LENGTH);
+  PasswordLineEdit->setText("12345");
   PasswordLineEdit->setEchoMode(QLineEdit::Password);
   AuthorizationMenuLayout->addWidget(PasswordLineEdit, 1, 1, 1, 1);
 

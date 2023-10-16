@@ -2,11 +2,17 @@
 #define LOGSYSTEM_H
 
 #include <QHostAddress>
+#include <QList>
+#include <QMutex>
 #include <QObject>
 #include <QSettings>
 #include <QThread>
 #include <QTime>
 #include <QUdpSocket>
+
+#include "Log/file_log_backend.h"
+#include "Log/log_backend.h"
+#include "Log/widget_log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -15,36 +21,35 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  bool GlobalEnableOption;
+  QString SavePath;
+  QList<LogBackend*> Backends;
+  WidgetLogBackend* WidgetLogger;
+  FileLogBackend* FileLogger;
 
-  bool PersoServerLogEnable;
-  QString SaveDir;
-  uint32_t PersoServerLogPort;
-  QHostAddress PersoServerLogAddress;
-  QUdpSocket* PersoServerLogSocket;
+  bool UdpListenEnable;
+  QUdpSocket* UdpSocket;
+  QHostAddress UdpListenIp;
+  uint32_t UdpListenPort;
 
  public:
-  LogSystem(QObject* parent);
   ~LogSystem();
+  WidgetLogBackend* getWidgetLogger();
+  static LogSystem* instance(void);
 
  public slots:
+  void instanceThreadStarted(void);
   void clear(void);
   void generate(const QString& log);
 
   void applySettings(void);
 
  private:
+  LogSystem(QObject* parent);
   Q_DISABLE_COPY(LogSystem)
   void loadSettings(void);
-  void startListeningPersoServerLog(void);
-  void stopListeningPersoServerLog(void);
 
  private slots:
-  void on_PersoServerLogSocketReadyRead_slot(void);
-
- signals:
-  void requestDisplayLog(const QString& logData);
-  void requestClearDisplayLog(void);
+  void on_UdpSocketReadyRead_slot();
 };
 
 //==================================================================================
