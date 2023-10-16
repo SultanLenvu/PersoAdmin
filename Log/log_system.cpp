@@ -1,33 +1,9 @@
-#include <QDateTime>
-#include <QDir>
-#include <QList>
-#include <QObject>
-#include <QString>
-#include <QStringList>
-
 #include "log_system.h"
-
-#include "Log/file_log_backend.h"
-#include "Log/log_backend.h"
-#include "Log/widget_log_backend.h"
 
 LogSystem::LogSystem(QObject* parent) : QObject(parent) {
   setObjectName("LogSystem");
   loadSettings();
-}
 
-LogSystem::~LogSystem() {}
-
-WidgetLogBackend* LogSystem::getWidgetLogger() {
-  return WidgetLogger;
-}
-
-LogSystem* LogSystem::instance() {
-  static LogSystem Logger(nullptr);
-  return &Logger;
-}
-
-void LogSystem::instanceThreadStarted() {
   WidgetLogger = new WidgetLogBackend(this);
   Backends << WidgetLogger;
 
@@ -40,6 +16,17 @@ void LogSystem::instanceThreadStarted() {
   }
   connect(UdpSocket, &QUdpSocket::readyRead, this,
           &LogSystem::on_UdpSocketReadyRead_slot);
+}
+
+LogSystem::~LogSystem() {}
+
+WidgetLogBackend* LogSystem::getWidgetLogger() {
+  return WidgetLogger;
+}
+
+LogSystem* LogSystem::instance() {
+  static LogSystem Logger(nullptr);
+  return &Logger;
 }
 
 void LogSystem::clear() {

@@ -875,8 +875,6 @@ void MainWindowKernel::createLoggerInstance() {
   LoggerThread = new QThread(this);
   connect(LoggerThread, &QThread::finished, LoggerThread,
           &QThread::deleteLater);
-  connect(LoggerThread, &QThread::started, Logger,
-          &LogSystem::instanceThreadStarted);
 
   Logger->moveToThread(LoggerThread);
   LoggerThread->start();

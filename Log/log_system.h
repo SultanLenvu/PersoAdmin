@@ -37,7 +37,6 @@ class LogSystem : public QObject {
   static LogSystem* instance(void);
 
  public slots:
-  void instanceThreadStarted(void);
   void clear(void);
   void generate(const QString& log);
 
