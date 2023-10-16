@@ -1,7 +1,9 @@
 #include "te310_printer.h"
 
-TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
+TE310Printer::TE310Printer(QObject* parent, const QString& name)
+    : IStickerPrinter(parent, TE310) {
   setObjectName("TE310Printer");
+  Name = name;
   loadSetting();
 
   TscLib = new QLibrary(TscLibPath, this);
@@ -198,6 +200,29 @@ void TE310Printer::applySetting() {
   loadTscLib();
 }
 
+void TE310Printer::loadSetting() {
+  QSettings settings;
+
+  TscLibPath = settings.value("sticker_printer/library_path").toString();
+}
+
+void TE310Printer::loadTscLib() {
+  if (TscLib->load()) {
+    emit logging("Библиотека загружена.");
+    about = (TscAbout)TscLib->resolve("about");
+    openPort = (TscOpenPort)TscLib->resolve("openport");
+    sendCommand = (TscSendCommand)TscLib->resolve("sendcommand");
+    closePort = (TscClosePort)TscLib->resolve("closeport");
+  } else {
+    emit logging("Не удалось загрузить библиотеку.");
+
+    about = nullptr;
+    openPort = nullptr;
+    sendCommand = nullptr;
+    closePort = nullptr;
+  }
+}
+
 void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
   openPort(Name.toUtf8().data());
   sendCommand("SIZE 27 mm, 27 mm");
@@ -245,28 +270,4 @@ void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
                   .data());
   sendCommand("PRINT 1");
   closePort();
-}
-
-void TE310Printer::loadSetting() {
-  QSettings settings;
-
-  TscLibPath = settings.value("sticker_printer/library_path").toString();
-  Name = settings.value("sticker_printer/name").toString();
-}
-
-void TE310Printer::loadTscLib() {
-  if (TscLib->load()) {
-    emit logging("Библиотека загружена.");
-    about = (TscAbout)TscLib->resolve("about");
-    openPort = (TscOpenPort)TscLib->resolve("openport");
-    sendCommand = (TscSendCommand)TscLib->resolve("sendcommand");
-    closePort = (TscClosePort)TscLib->resolve("closeport");
-  } else {
-    emit logging("Не удалось загрузить библиотеку.");
-
-    about = nullptr;
-    openPort = nullptr;
-    sendCommand = nullptr;
-    closePort = nullptr;
-  }
 }

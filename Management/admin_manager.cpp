@@ -5,8 +5,6 @@
 AdminManager::AdminManager(QObject* parent) : QObject(parent) {
   setObjectName("AdminManager");
   loadSettings();
-
-  // Готовы к выполнению операций
 }
 
 AdminManager::~AdminManager() {
