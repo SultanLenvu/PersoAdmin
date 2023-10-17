@@ -906,10 +906,6 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
   QString modelTemp = transponderData.value("transponder_model");
   data->insert("transponder_model", modelTemp.remove(' '));
 
-  // Добавляем полную дату сборки
-  data->insert("assembling_date",
-               QDate::currentDate().toString(BOX_STICKER_DATE_TEMPLATE));
-
   return Completed;
 }
 
