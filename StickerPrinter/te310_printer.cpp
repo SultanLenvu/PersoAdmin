@@ -41,7 +41,7 @@ bool TE310Printer::checkConfiguration() {
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printTransponderSticker(
-    const QMap<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters) {
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -87,7 +87,7 @@ IStickerPrinter::ReturnStatus TE310Printer::printLastTransponderSticker() {
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
-    const QMap<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters) {
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -155,7 +155,7 @@ IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
-    const QMap<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters) {
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -271,12 +271,6 @@ void TE310Printer::loadSetting() {
   TscLibPath = settings.value("te310_printer/library_path").toString();
 }
 
-void TE310Printer::sendLog(const QString& log) {
-  if (LogEnable) {
-    emit logging("TE310Printer - " + log);
-  }
-}
-
 bool TE310Printer::loadTscLib() {
   if (!TscLib->load()) {
     LibError = true;
@@ -299,7 +293,7 @@ bool TE310Printer::loadTscLib() {
   return true;
 }
 
-void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
+void TE310Printer::printNkdSticker(const QHash<QString, QString>* parameters) {
   openPort(Name.toUtf8().data());
   sendCommand("SIZE 27 mm, 27 mm");
   sendCommand("GAP 2 mm,2 mm");
@@ -328,7 +322,7 @@ void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
   closePort();
 }
 
-void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
+void TE310Printer::printZsdSticker(const QHash<QString, QString>* parameters) {
   openPort(Name.toUtf8().data());
   sendCommand("SIZE 30 mm, 20 mm");
   sendCommand("GAP 2 mm, 1 mm");

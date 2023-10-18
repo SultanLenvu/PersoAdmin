@@ -32,8 +32,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::disconnectDatabase() {
 
 void AdministrationSystem::createDatabaseController() {
   Database = new PostgresController(this, "AdministratorConnection");
-  connect(Database, &IDatabaseController::logging, this,
-          &AdministrationSystem::proxyLogging);
+  connect(Database, &IDatabaseController::logging, LogSystem::instance(),
+          &LogSystem::generate);
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::clearDatabaseTable(
@@ -103,7 +103,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getCustomResponse(
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
-    const QSharedPointer<QMap<QString, QString> > orderParameters) {
+    const QSharedPointer<QHash<QString, QString> > orderParameters) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
     return DatabaseTransactionError;
@@ -147,8 +147,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
     const QString& orderId) {
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> productionLineRecord;
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> productionLineRecord;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -214,8 +214,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::stopOrderAssembling(
     const QString& orderId) {
-  QMap<QString, QString> conditions;
-  QMap<QString, QString> newValues;
+  QHash<QString, QString> conditions;
+  QHash<QString, QString> newValues;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -277,7 +277,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::stopOrderAssembling(
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::deleteLastOrder() {
-  QMap<QString, QString> conditions;
+  QHash<QString, QString> conditions;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -299,7 +299,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::deleteLastOrder() {
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::createNewProductionLine(
-    const QMap<QString, QString>* productionLineParameters) {
+    const QHash<QString, QString>* productionLineParameters) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
     return DatabaseTransactionError;
@@ -344,10 +344,10 @@ AdministrationSystem::deleteLastProductionLine() {
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::linkProductionLineWithBox(
-    const QMap<QString, QString>* linkParameters) {
-  QMap<QString, QString> productionLineRecord;
-  QMap<QString, QString> newBoxRecord;
-  QMap<QString, QString> transponderRecord;
+    const QHash<QString, QString>* linkParameters) {
+  QHash<QString, QString> productionLineRecord;
+  QHash<QString, QString> newBoxRecord;
+  QHash<QString, QString> transponderRecord;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -448,8 +448,8 @@ AdministrationSystem::linkProductionLineWithBox(
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::shutdownAllProductionLines() {
-  QMap<QString, QString> conditions;
-  QMap<QString, QString> newValues;
+  QHash<QString, QString> conditions;
+  QHash<QString, QString> newValues;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -512,8 +512,8 @@ AdministrationSystem::shutdownAllProductionLines() {
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::allocateInactiveProductionLines(const QString& orderId) {
-  QMap<QString, QString> productionLineRecord;
-  QMap<QString, QString> mergedRecord;
+  QHash<QString, QString> productionLineRecord;
+  QHash<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
 
@@ -606,7 +606,7 @@ AdministrationSystem::allocateInactiveProductionLines(const QString& orderId) {
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::initIssuerTable() {
-  QMap<QString, QString> record;
+  QHash<QString, QString> record;
   int32_t lastId = 0;
 
   if (!Database->openTransaction()) {
@@ -684,7 +684,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::initIssuerTable() {
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::initTransportMasterKeysTable() {
-  QMap<QString, QString> transportKeysRecord;
+  QHash<QString, QString> transportKeysRecord;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -730,8 +730,8 @@ AdministrationSystem::initTransportMasterKeysTable() {
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::linkIssuerWithMasterKeys(
-    const QMap<QString, QString>* linkParameters) {
-  QMap<QString, QString> issuerRecord;
+    const QHash<QString, QString>* linkParameters) {
+  QHash<QString, QString> issuerRecord;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -768,8 +768,8 @@ AdministrationSystem::linkIssuerWithMasterKeys(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
     const QString& id,
-    QMap<QString, QString>* data) {
-  QMap<QString, QString> mergedRecord;
+    QHash<QString, QString>* data) {
+  QHash<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
 
@@ -808,7 +808,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
   data->insert("box_id", mergedRecord.value("box_id"));
   data->insert("pallet_id", mergedRecord.value("pallet_id"));
   data->insert("order_id", mergedRecord.value("order_id"));
-  data->insert("transponder_model", mergedRecord.value("transponder_model"));
+
+  // Удаляем пробелы из названия модели
+  QString tempModel = mergedRecord.value("transponder_model");
+  data->insert("transponder_model", tempModel.remove(" "));
 
   // Преобразуем в десятичный формат
   QString manufacturerId =
@@ -842,10 +845,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
     const QString& id,
-    QMap<QString, QString>* data) {
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> transponderRecord;
-  QMap<QString, QString> transponderData;
+    QHash<QString, QString>* data) {
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> transponderRecord;
+  QHash<QString, QString> transponderData;
 
   boxRecord.insert("id", id);
   boxRecord.insert("assembled_units", "");
@@ -911,10 +914,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getBoxData(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
     const QString& id,
-    QMap<QString, QString>* data) {
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> palletRecord;
-  QMap<QString, QString> orderRecord;
+    QHash<QString, QString>* data) {
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> palletRecord;
+  QHash<QString, QString> orderRecord;
 
   palletRecord.insert("id", id);
   palletRecord.insert("assembled_units", "");
@@ -980,19 +983,19 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getPalletData(
 void AdministrationSystem::loadSettings() {
   QSettings settings;
 
-  LogEnable = settings.value("administration_system/log_enable").toBool();
+  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
 void AdministrationSystem::sendLog(const QString& log) const {
   if (LogEnable) {
-    emit logging(log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
 bool AdministrationSystem::addOrder(
-    const QSharedPointer<QMap<QString, QString> > orderParameters) const {
-  QMap<QString, QString> issuerRecord;
-  QMap<QString, QString> orderRecord;
+    const QSharedPointer<QHash<QString, QString> > orderParameters) const {
+  QHash<QString, QString> issuerRecord;
+  QHash<QString, QString> orderRecord;
   int32_t lastId = 0;
 
   issuerRecord.insert("id", "");
@@ -1033,14 +1036,14 @@ bool AdministrationSystem::addOrder(
 }
 
 bool AdministrationSystem::addPallets(
-    const QSharedPointer<QMap<QString, QString> > orderParameters) const {
+    const QSharedPointer<QHash<QString, QString> > orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
-  QMap<QString, QString> orderRecord;
-  QMap<QString, QString> palletRecord;
+  QHash<QString, QString> orderRecord;
+  QHash<QString, QString> palletRecord;
   int32_t lastId = 0;
 
   // Поиск идентификатора незаполненного заказа
@@ -1085,14 +1088,14 @@ bool AdministrationSystem::addPallets(
 }
 
 bool AdministrationSystem::addBoxes(
-    const QSharedPointer<QMap<QString, QString> > orderParameters) const {
+    const QSharedPointer<QHash<QString, QString> > orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t palletCount = transponderCount / (palletCapacity * boxCapacity);
-  QMap<QString, QString> palletRecord;
-  QMap<QString, QString> boxRecord;
+  QHash<QString, QString> palletRecord;
+  QHash<QString, QString> boxRecord;
   int32_t lastId = 0;
 
   for (uint32_t i = 0; i < palletCount; i++) {
@@ -1139,13 +1142,13 @@ bool AdministrationSystem::addBoxes(
 }
 
 bool AdministrationSystem::addTransponders(
-    const QSharedPointer<QMap<QString, QString> > orderParameters) const {
+    const QSharedPointer<QHash<QString, QString> > orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t boxCount = transponderCount / boxCapacity;
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> transponderRecord;
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> transponderRecord;
   int32_t lastId = 0;
 
   QFile panFile(orderParameters->value("pan_file_path"));
@@ -1203,9 +1206,9 @@ bool AdministrationSystem::addTransponders(
 }
 
 bool AdministrationSystem::addProductionLine(
-    const QMap<QString, QString>* productionLineParameters) const {
-  QMap<QString, QString> productionLineRecord;
-  QMap<QString, QString> mergedRecord;
+    const QHash<QString, QString>* productionLineParameters) const {
+  QHash<QString, QString> productionLineRecord;
+  QHash<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
   int32_t lastId = 0;
@@ -1249,9 +1252,9 @@ bool AdministrationSystem::addProductionLine(
 bool AdministrationSystem::startBoxProcessing(
     const QString& id,
     const QString& productionLineId) const {
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> productionLineRecord;
-  QMap<QString, QString> transponderRecord;
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> productionLineRecord;
+  QHash<QString, QString> transponderRecord;
 
   // Получаем данные о боксе
   boxRecord.insert("id", id);
@@ -1289,6 +1292,8 @@ bool AdministrationSystem::startBoxProcessing(
   // Связываем бокс с производственной линией и обновляем время начала сборки
   if (boxRecord.value("in_process") != "true") {
     boxRecord.insert("in_process", "true");
+    boxRecord.insert("assembling_start", QDateTime::currentDateTime().toString(
+                                             POSTGRES_TIMESTAMP_TEMPLATE));
     boxRecord.insert("production_line_id", productionLineId);
     if (!Database->updateRecordById("boxes", boxRecord)) {
       sendLog(
@@ -1312,7 +1317,7 @@ bool AdministrationSystem::startBoxProcessing(
 }
 
 bool AdministrationSystem::startPalletProcessing(const QString& id) const {
-  QMap<QString, QString> palletRecord;
+  QHash<QString, QString> palletRecord;
 
   palletRecord.insert("id", id);
   palletRecord.insert("order_id", "");
@@ -1324,6 +1329,9 @@ bool AdministrationSystem::startPalletProcessing(const QString& id) const {
 
   if (palletRecord.value("in_process") != "true") {
     palletRecord.insert("in_process", "true");
+    palletRecord.insert(
+        "assembling_start",
+        QDateTime::currentDateTime().toString(POSTGRES_TIMESTAMP_TEMPLATE));
     if (!Database->updateRecordById("pallets", palletRecord)) {
       sendLog("Получена ошибка при запуске сборки палеты. ");
       return false;
@@ -1344,7 +1352,7 @@ bool AdministrationSystem::startPalletProcessing(const QString& id) const {
 }
 
 bool AdministrationSystem::startOrderProcessing(const QString& id) const {
-  QMap<QString, QString> orderRecord;
+  QHash<QString, QString> orderRecord;
 
   orderRecord.insert("id", id);
   if (!Database->getRecordById("orders", orderRecord)) {
@@ -1356,7 +1364,7 @@ bool AdministrationSystem::startOrderProcessing(const QString& id) const {
     orderRecord.insert("in_process", "true");
     orderRecord.insert(
         "assembling_start",
-        QDateTime::currentDateTime().toString(TIMESTAMP_TEMPLATE));
+        QDateTime::currentDateTime().toString(POSTGRES_TIMESTAMP_TEMPLATE));
     if (!Database->updateRecordById("orders", orderRecord)) {
       sendLog("Получена ошибка при запуске сборки заказа. ");
       return false;
@@ -1370,8 +1378,8 @@ bool AdministrationSystem::startOrderProcessing(const QString& id) const {
 }
 
 bool AdministrationSystem::removeLastProductionLine() const {
-  QMap<QString, QString> productionLineRecord;
-  QMap<QString, QString> boxRecord;
+  QHash<QString, QString> productionLineRecord;
+  QHash<QString, QString> boxRecord;
 
   // Получение последней добавленной линии производства
   productionLineRecord.insert("id", "");
@@ -1408,9 +1416,9 @@ bool AdministrationSystem::removeLastProductionLine() const {
 }
 
 bool AdministrationSystem::stopBoxProcessing(const QString& id) const {
-  QMap<QString, QString> boxRecord;
-  QMap<QString, QString> mergedRecord;
-  QMap<QString, QString> productionLineRecord;
+  QHash<QString, QString> boxRecord;
+  QHash<QString, QString> mergedRecord;
+  QHash<QString, QString> productionLineRecord;
   QStringList tables;
   QStringList foreignKeys;
 
@@ -1470,8 +1478,8 @@ bool AdministrationSystem::stopBoxProcessing(const QString& id) const {
 }
 
 bool AdministrationSystem::stopPalletProcessing(const QString& id) const {
-  QMap<QString, QString> palletRecord;
-  QMap<QString, QString> mergedRecord;
+  QHash<QString, QString> palletRecord;
+  QHash<QString, QString> mergedRecord;
   QStringList tables;
   QStringList foreignKeys;
 
@@ -1520,7 +1528,7 @@ bool AdministrationSystem::stopPalletProcessing(const QString& id) const {
 }
 
 bool AdministrationSystem::stopOrderProcessing(const QString& id) const {
-  QMap<QString, QString> orderRecord;
+  QHash<QString, QString> orderRecord;
 
   orderRecord.insert("id", id);
   if (!Database->getRecordById("orders", orderRecord)) {
@@ -1545,7 +1553,7 @@ bool AdministrationSystem::stopOrderProcessing(const QString& id) const {
 bool AdministrationSystem::searchBoxForProductionLine(
     const QString& orderId,
     const QString& productionLineId,
-    QMap<QString, QString>& boxRecord) const {
+    QHash<QString, QString>& boxRecord) const {
   QStringList tables;
   QStringList foreignKeys;
 
@@ -1584,12 +1592,4 @@ bool AdministrationSystem::searchBoxForProductionLine(
   }
 
   return true;
-}
-
-void AdministrationSystem::proxyLogging(const QString& log) const {
-  if (sender()->objectName() == "PostgresController") {
-    sendLog("Postgres controller - " + log);
-  } else {
-    sendLog("Unknown - " + log);
-  }
 }

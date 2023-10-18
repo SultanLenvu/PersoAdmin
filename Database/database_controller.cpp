@@ -7,6 +7,6 @@ IDatabaseController::IDatabaseController(QObject* parent) : QObject(parent) {
 
 void IDatabaseController::sendLog(const QString& log) const {
   if (LogEnable) {
-    emit logging(log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }

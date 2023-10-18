@@ -11,8 +11,6 @@
 #define MASTER_ACCESS_LOGIN "admin"
 #define MASTER_ACCESS_PASSWORD "12345"
 
-#define TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
-
 #define IP_PORT_MAX_VALUE 65535
 #define IP_PORT_MIN_VALUE 0
 //===============================================================
@@ -20,6 +18,24 @@
 /* Определения менеджера */
 //===============================================================
 #define SERVER_MANAGER_OPERATION_MAX_DURATION 60000
+//===============================================================
+
+/* Определения клиента */
+//===============================================================
+#define PERSO_SERVER_CONNECTION_WAITING_TIME 100
+#define PERSO_SERVER_DEFAULT_IP "127.0.0.1"
+#define PERSO_SERVER_DEFAULT_PORT 6666
+#define IP_PORT_MAX_VALUE 65535
+#define IP_PORT_MIN_VALUE 0
+
+#define DATA_BLOCK_PART_WAIT_TIME 100
+#define ONETIME_TRANSMIT_DATA_SIZE 10240
+#define DATA_BLOCK_MAX_SIZE (FIRMWARE_SIZE * 2)
+
+#define PRODUCTION_LINE_DEFAULT_LOGIN "1"
+#define PRODUCTION_LINE_LOGIN_MAX_LENGTH 20
+#define PRODUCTION_LINE_DEFAULT_PASSWORD "1"
+#define PRODUCTION_LINE_PASSWORD_MAX_LENGTH 20
 //===============================================================
 
 /* Определения для базы данных Postgres */
@@ -33,6 +49,7 @@
 #define POSTGRES_DATABASE_DEFAULT_NAME "TransponderSeedbase"
 
 #define TIMESTAMP_DEFAULT_VALUE "2000-01-01 00:00:00"
+#define POSTGRES_TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
 //===============================================================
 
 /* Определения для генератора прошивок */

@@ -87,12 +87,12 @@ void InteractionSystem::applySettings() {
 void InteractionSystem::loadSettings() {
   QSettings settings;
 
-  LogEnable = settings.value("user_interaction_system/log_enable").toBool();
+  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
 void InteractionSystem::sendLog(const QString& log) {
   if (LogEnable) {
-    emit logging("InteractionSystem - " + log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 

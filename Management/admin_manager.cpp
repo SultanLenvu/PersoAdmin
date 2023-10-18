@@ -10,16 +10,12 @@ AdminManager::AdminManager(QObject* parent) : QObject(parent) {
 AdminManager::~AdminManager() {
 }
 
-void AdminManager::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-
-  Administrator->applySettings();
-}
-
 void AdminManager::on_InsctanceThreadStarted_slot() {
   // Создаем администратора
   createAdministrator();
+
+  // Создаем клиента
+  createClient();
 
   // Создаем стикер принтер
   createStickerPrinter();
@@ -119,7 +115,7 @@ void AdminManager::performCustomRequest(const QString& req,
 }
 
 void AdminManager::createNewOrder(
-    const QSharedPointer<QMap<QString, QString> > orderParameters,
+    const QSharedPointer<QHash<QString, QString>> orderParameters,
     DatabaseTableModel* model) {
   startOperationPerforming("createNewOrder");
 
@@ -219,7 +215,7 @@ void AdminManager::showOrderTable(DatabaseTableModel* model) {
 }
 
 void AdminManager::createNewProductionLine(
-    const QMap<QString, QString>* productionLineParameters,
+    const QHash<QString, QString>* productionLineParameters,
     DatabaseTableModel* model) {
   startOperationPerforming("createNewProductionLine");
 
@@ -319,7 +315,7 @@ void AdminManager::showProductionLineTable(DatabaseTableModel* model) {
 }
 
 void AdminManager::linkProductionLineWithBox(
-    const QMap<QString, QString>* parameters,
+    const QHash<QString, QString>* parameters,
     DatabaseTableModel* model) {
   startOperationPerforming("linkProductionLineWithBoxManually");
 
@@ -391,7 +387,7 @@ void AdminManager::initTransportMasterKeys(DatabaseTableModel* model) {
 
 void AdminManager::linkIssuerWithMasterKeys(
     DatabaseTableModel* model,
-    const QMap<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters) {
   startOperationPerforming("linkIssuerWithMasterKeys");
 
   AdministrationSystem::ReturnStatus status;
@@ -416,6 +412,136 @@ void AdminManager::linkIssuerWithMasterKeys(
   finishOperationPerforming("linkIssuerWithMasterKeys");
 }
 
+void AdminManager::releaseTransponder(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("releaseTransponder");
+  sendLog("Выпуск транспондера. ");
+
+  QSharedPointer<QFile> firmware(new QFile("temp.bin"));
+  PersoClient::ReturnStatus status =
+      Client->requestTransponderRelease(param.get(), firmware.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "releaseTransponder");
+    return;
+  }
+
+  sendLog("Запрос на отображение полученой прошивки транспондера. ");
+  emit displayFirmware_signal(firmware);
+
+  finishOperationPerforming("releaseTransponder");
+}
+
+void AdminManager::confirmTransponderRelease(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("confirmTransponderRelease");
+  sendLog("Подтверждение выпуска транспондера. ");
+
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
+  PersoClient::ReturnStatus status = Client->requestTransponderReleaseConfirm(
+      param.get(), transponderData.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "confirmTransponderRelease");
+    return;
+  }
+
+  sendLog("Запрос на отображение данных транспондера. ");
+  emit displayTransponderData_signal(transponderData);
+
+  finishOperationPerforming("confirmTransponderRelease");
+}
+
+void AdminManager::rereleaseTransponder(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("rereleaseTransponder");
+  sendLog("Перевыпуск транспондера. ");
+
+  QSharedPointer<QFile> firmware(new QFile("temp.bin"));
+  PersoClient::ReturnStatus status =
+      Client->requestTransponderRerelease(param.get(), firmware.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "releaseTransponder");
+    return;
+  }
+
+  sendLog("Запрос на отображение полученой прошивки транспондера. ");
+  emit displayFirmware_signal(firmware);
+
+  finishOperationPerforming("rereleaseTransponder");
+}
+
+void AdminManager::confirmTransponderRerelease(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("confirmTransponderRerelease");
+  sendLog("Подтверждение перевыпуска транспондера. ");
+
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
+  PersoClient::ReturnStatus status = Client->requestTransponderRereleaseConfirm(
+      param.get(), transponderData.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "confirmTransponderRelease");
+    return;
+  }
+
+  sendLog("Запрос на отображение данных транспондера. ");
+  emit displayTransponderData_signal(transponderData);
+
+  finishOperationPerforming("confirmTransponderRerelease");
+}
+
+void AdminManager::printBoxStickerOnServer() {
+  startOperationPerforming("printBoxStickerOnServer");
+  sendLog("Печать стикера для бокса на сервере. ");
+
+  PersoClient::ReturnStatus status = Client->requestBoxStickerPrint();
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printBoxStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printBoxStickerOnServer");
+}
+
+void AdminManager::printLastBoxStickerOnServer() {
+  startOperationPerforming("printLastBoxStickerOnServer");
+  sendLog("Повторная печать последнего стикера для бокса на сервере. ");
+
+  PersoClient::ReturnStatus status = Client->requestBoxStickerReprint();
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printLastBoxStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printLastBoxStickerOnServer");
+}
+
+void AdminManager::printPalletStickerOnServer() {
+  startOperationPerforming("printPalletStickerOnServer");
+  sendLog("Печать стикера для паллеты на сервере. ");
+
+  PersoClient::ReturnStatus status = Client->requestPalletStickerPrint();
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printPalletStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printPalletStickerOnServer");
+}
+
+void AdminManager::printLastPalletStickerOnServer() {
+  startOperationPerforming("printLastPalletStickerOnServer");
+  sendLog("Повторная печать последнего стикера для паллеты на сервере. ");
+
+  PersoClient::ReturnStatus status = Client->requestPalletStickerReprint();
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printLastPalletStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printLastPalletStickerOnServer");
+}
+
 void AdminManager::printTransponderSticker(const QString& id,
                                            DatabaseTableModel* model) {
   startOperationPerforming("printTransponderSticker");
@@ -423,7 +549,7 @@ void AdminManager::printTransponderSticker(const QString& id,
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   AdministrationSystem::ReturnStatus administratorStatus;
 
-  QMap<QString, QString> transponderData;
+  QHash<QString, QString> transponderData;
   sendLog("Запрос данных транспондера. ");
   administratorStatus = Administrator->getTransponderData(id, &transponderData);
   if (administratorStatus != AdministrationSystem::Completed) {
@@ -449,7 +575,7 @@ void AdminManager::printBoxSticker(const QString& id,
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   AdministrationSystem::ReturnStatus administratorStatus;
 
-  QMap<QString, QString> boxData;
+  QHash<QString, QString> boxData;
   sendLog("Запрос данных бокса. ");
   administratorStatus = Administrator->getBoxData(id, &boxData);
   if (administratorStatus != AdministrationSystem::Completed) {
@@ -474,7 +600,7 @@ void AdminManager::printPalletSticker(const QString& id,
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   AdministrationSystem::ReturnStatus administratorStatus;
 
-  QMap<QString, QString> palletData;
+  QHash<QString, QString> palletData;
   sendLog("Запрос данных паллеты. ");
   administratorStatus = Administrator->getPalletData(id, &palletData);
   if (administratorStatus != AdministrationSystem::Completed) {
@@ -509,6 +635,15 @@ void AdminManager::execPrinterStickerCommandScript(
   finishOperationPerforming("execPrinterStickerCommandScript");
 }
 
+void AdminManager::applySettings() {
+  sendLog("Применение новых настроек. ");
+  loadSettings();
+
+  Administrator->applySettings();
+  Client->applySettings();
+  StickerPrinter->applySetting();
+}
+
 void AdminManager::loadSettings() {
   QSettings settings;
 
@@ -517,14 +652,14 @@ void AdminManager::loadSettings() {
 
 void AdminManager::sendLog(const QString& log) const {
   if (LogEnable) {
-    emit logging(log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
 void AdminManager::createAdministrator() {
   Administrator = new AdministrationSystem(this);
-  connect(Administrator, &AdministrationSystem::logging, this,
-          &AdminManager::proxyLogging);
+  connect(Administrator, &AdministrationSystem::logging, LogSystem::instance(),
+          &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
   AdministratorReturnStatusMatch.insert(AdministrationSystem::NotExecuted,
@@ -545,10 +680,41 @@ void AdminManager::createAdministrator() {
                                         "Выполнено. ");
 }
 
+void AdminManager::createClient() {
+  Client = new PersoClient(this);
+  connect(Client, &PersoClient::logging, LogSystem::instance(),
+          &LogSystem::generate);
+
+  // Заполняем таблицу соответствий статусов возврата
+  ClientReturnStatusMatch.insert(PersoClient::NotExecuted,
+                                 "Выполнение операции не началось.");
+  ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
+                                 "Не удалось обработать параметры запроса. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
+                                 "Не удалось подключиться к серверу. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerNotResponding,
+                                 "Сервер не отвечает.");
+  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
+                                 "Оборвалось соединение с сервером.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
+                                 "Производственная линия не существует.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
+                                 "Ошибка доступа к производственной линии.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
+                                 "Производственная линия не активна. ");
+  ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
+                                 "Синтаксическая ошибка в ответе на запрос. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerError,
+                                 "Серверная ошибка. ");
+  ClientReturnStatusMatch.insert(PersoClient::UnknownError,
+                                 "Неизвествная ошибка. ");
+  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
+}
+
 void AdminManager::createStickerPrinter() {
-  StickerPrinter = new TE310Printer(this);
-  connect(StickerPrinter, &IStickerPrinter::logging, this,
-          &AdminManager::proxyLogging);
+  StickerPrinter = new TE310Printer(this, "RandomPrinter");
+  connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
+          &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
   StickerPrinterReturnStatusMatch.insert(
@@ -557,7 +723,7 @@ void AdminManager::createStickerPrinter() {
   StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
                                          "Не удалось распечать стикер.");
   StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::LibraryMissing,
+      IStickerPrinter::LibraryMissed,
       "Отсутствует библиотека для работы с принтером стикеров.");
   StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
                                          "Не удалось подключиться к принтеру.");
@@ -585,31 +751,27 @@ void AdminManager::finishOperationPerforming(const QString& operationName) {
 void AdminManager::processAdministratorError(
     AdministrationSystem::ReturnStatus status,
     const QString& operationName) {
+  sendLog(AdministratorReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(AdministratorReturnStatusMatch.value(status));
+  Mutex.unlock();
+}
+
+void AdminManager::processClientError(PersoClient::ReturnStatus status,
+                                      const QString& operationName) {
+  sendLog(ClientReturnStatusMatch.value(status));
+  emit operationPerformingFinished(operationName);
+  emit notifyUserAboutError(ClientReturnStatusMatch.value(status));
   Mutex.unlock();
 }
 
 void AdminManager::processStickerPrinterError(
     IStickerPrinter::ReturnStatus status,
     const QString& operationName) {
+  sendLog(StickerPrinterReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
   Mutex.unlock();
-}
-
-/*
- * Приватные слоты
- */
-
-void AdminManager::proxyLogging(const QString& log) {
-  if (sender()->objectName() == QString("AdministrationSystem")) {
-    sendLog(QString("Administrator - ") + log);
-  } else if (sender()->objectName() == QString("TE310Printer")) {
-    sendLog(QString("TE310 - ") + log);
-  } else {
-    sendLog(QString("Unknown - ") + log);
-  }
 }
 
 //==================================================================================

@@ -1,19 +1,22 @@
 #ifndef ADMIN_MANAGER_H
 #define ADMIN_MANAGER_H
 
+#include <QHash>
 #include <QList>
-#include <QMap>
 #include <QObject>
+#include <QPlainTextEdit>
 #include <QSettings>
 #include <QThread>
 
 #include "Database/database_controller.h"
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
+#include "Log/log_system.h"
 #include "StickerPrinter/isticker_printer.h"
 #include "StickerPrinter/te310_printer.h"
 #include "Transponder/transponder_seed_model.h"
 #include "administration_system.h"
+#include "perso_client.h"
 
 class AdminManager : public QObject {
   Q_OBJECT
@@ -22,11 +25,14 @@ class AdminManager : public QObject {
   bool LogEnable;
 
   AdministrationSystem* Administrator;
-  QMap<AdministrationSystem::ReturnStatus, QString>
+  QHash<AdministrationSystem::ReturnStatus, QString>
       AdministratorReturnStatusMatch;
 
+  PersoClient* Client;
+  QHash<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
+
   IStickerPrinter* StickerPrinter;
-  QMap<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
+  QHash<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
 
   QMutex Mutex;
 
@@ -35,7 +41,6 @@ class AdminManager : public QObject {
   ~AdminManager();
 
  public slots:
-  void applySettings();
   void on_InsctanceThreadStarted_slot(void);
 
   void connectDatabase(void);
@@ -44,16 +49,18 @@ class AdminManager : public QObject {
   void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
   void performCustomRequest(const QString& req, DatabaseTableModel* model);
 
+  // Заказы
   void createNewOrder(
-      const QSharedPointer<QMap<QString, QString> > orderParameterseters,
+      const QSharedPointer<QHash<QString, QString>> orderParameterseters,
       DatabaseTableModel* model);
   void deleteLastOrder(DatabaseTableModel* model);
   void startOrderAssembling(const QString& orderId, DatabaseTableModel* model);
   void stopOrderAssembling(const QString& orderId, DatabaseTableModel* model);
   void showOrderTable(DatabaseTableModel* model);
 
+  // Производственные линии
   void createNewProductionLine(
-      const QMap<QString, QString>* productionLineParameterseters,
+      const QHash<QString, QString>* productionLineParameterseters,
       DatabaseTableModel* model);
   void allocateInactiveProductionLines(const QString& orderId,
                                        DatabaseTableModel* model);
@@ -61,19 +68,36 @@ class AdminManager : public QObject {
   void deleteLastProductionLine(DatabaseTableModel* model);
   void showProductionLineTable(DatabaseTableModel* model);
   void linkProductionLineWithBox(
-      const QMap<QString, QString>* linkParameterseters,
+      const QHash<QString, QString>* linkParameterseters,
       DatabaseTableModel* model);
 
+  // Заказчики
   void initIssuers(DatabaseTableModel* model);
   void initTransportMasterKeys(DatabaseTableModel* model);
   void linkIssuerWithMasterKeys(DatabaseTableModel* model,
-                                const QMap<QString, QString>* Parameterseters);
+                                const QHash<QString, QString>* Parameterseters);
 
+  // Клиент
+  void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
+  void confirmTransponderRelease(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void rereleaseTransponder(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void confirmTransponderRerelease(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void printBoxStickerOnServer();
+  void printLastBoxStickerOnServer();
+  void printPalletStickerOnServer();
+  void printLastPalletStickerOnServer();
+
+  // Принтеры
   void printTransponderSticker(const QString& id, DatabaseTableModel* model);
   void printBoxSticker(const QString& id, DatabaseTableModel* model);
   void printPalletSticker(const QString& id, DatabaseTableModel* model);
   void execPrinterStickerCommandScript(
       const QSharedPointer<QStringList> commandScript);
+
+  void applySettings();
 
  private:
   Q_DISABLE_COPY(AdminManager)
@@ -81,6 +105,7 @@ class AdminManager : public QObject {
   void sendLog(const QString& log) const;
 
   void createAdministrator(void);
+  void createClient(void);
   void createStickerPrinter(void);
 
   void startOperationPerforming(const QString& operationName);
@@ -88,11 +113,10 @@ class AdminManager : public QObject {
 
   void processAdministratorError(AdministrationSystem::ReturnStatus status,
                                  const QString& operationName);
+  void processClientError(PersoClient::ReturnStatus status,
+                          const QString& operationName);
   void processStickerPrinterError(IStickerPrinter::ReturnStatus status,
                                   const QString& operationName);
-
- private slots:
-  void proxyLogging(const QString& log);
 
  signals:
   void logging(const QString& log) const;
@@ -100,6 +124,10 @@ class AdminManager : public QObject {
   void notifyUserAboutError(const QString& data);
   void operationPerfomingStarted(const QString& operationName);
   void operationPerformingFinished(const QString& operationName);
+
+  void displayFirmware_signal(QSharedPointer<QFile> firmware);
+  void displayTransponderData_signal(
+      QSharedPointer<QHash<QString, QString>> transponderData);
 };
 
 //==================================================================================

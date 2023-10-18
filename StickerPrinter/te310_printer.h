@@ -17,14 +17,13 @@ class TE310Printer : public IStickerPrinter {
   typedef int (*TscClosePort)(void);
 
  private:
-  bool LogEnable;
   QString Name;
 
   bool LibError;
   QString TscLibPath;
   QLibrary* TscLib;
 
-  QMap<QString, QString> LastTransponderSticker;
+  QHash<QString, QString> LastTransponderSticker;
 
   // Библиотечные функции
   TscAbout about;
@@ -37,12 +36,12 @@ class TE310Printer : public IStickerPrinter {
 
   virtual bool checkConfiguration(void) override;
   virtual ReturnStatus printTransponderSticker(
-      const QMap<QString, QString>* parameters) override;
+      const QHash<QString, QString>* parameters) override;
   virtual ReturnStatus printLastTransponderSticker(void) override;
   virtual ReturnStatus printBoxSticker(
-      const QMap<QString, QString>* parameters) override;
+      const QHash<QString, QString>* parameters) override;
   virtual ReturnStatus printPalletSticker(
-      const QMap<QString, QString>* parameters) override;
+      const QHash<QString, QString>* parameters) override;
 
   virtual ReturnStatus exec(const QStringList* commandScript) override;
 
@@ -51,10 +50,9 @@ class TE310Printer : public IStickerPrinter {
  private:
   Q_DISABLE_COPY(TE310Printer);
   void loadSetting(void);
-  void sendLog(const QString& log);
   bool loadTscLib(void);
-  void printNkdSticker(const QMap<QString, QString>* parameters);
-  void printZsdSticker(const QMap<QString, QString>* parameters);
+  void printNkdSticker(const QHash<QString, QString>* parameters);
+  void printZsdSticker(const QHash<QString, QString>* parameters);
 };
 
 #endif  // TE310PRINTER_H

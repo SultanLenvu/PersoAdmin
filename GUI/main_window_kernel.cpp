@@ -28,9 +28,8 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Создаем графический интерфейс окна авторизации
   createAuthorazationGui();
 
-  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
-      "QSharedPointer<QMap<QString, QString> >");
-  qRegisterMetaType<QSharedPointer<QStringList>>("QSharedPointer<QStringList>");
+  // Регистрируем пользовательские типы в мета-объеткной системе
+  registerMetaType();
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -103,8 +102,8 @@ void MainWindowKernel::on_CreateNewOrderPushButton_slot() {
     return;
   }
 
-  QSharedPointer<QMap<QString, QString>> orderParameters(
-      new QMap<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> orderParameters(
+      new QHash<QString, QString>);
   orderParameters->insert("issuer_name",
                           gui->IssuerNameComboBox->currentText());
   orderParameters->insert("transponder_quantity",
@@ -176,7 +175,7 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
     return;
   }
 
-  QMap<QString, QString> productionLineParameters;
+  QHash<QString, QString> productionLineParameters;
   productionLineParameters.insert("login", gui->LoginLineEdit1->text());
   productionLineParameters.insert("password", gui->PasswordLineEdit1->text());
   emit createNewProductionLine_signal(&productionLineParameters,
@@ -210,7 +209,7 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
     return;
   }
 
-  QMap<QString, QString> linkParameters;
+  QHash<QString, QString> linkParameters;
   linkParameters.insert("login", gui->LoginLineEdit1->text());
   linkParameters.insert("password", gui->PasswordLineEdit1->text());
   linkParameters.insert("box_id", gui->BoxIdLineEdit1->text());
@@ -257,7 +256,7 @@ void MainWindowKernel::on_InitIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
-  QMap<QString, QString> linkParameters;
+  QHash<QString, QString> linkParameters;
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QString issuerId = gui->IssuerIdLineEdit1->text();
   QString masterKeysId = gui->MasterKeysLineEdit1->text();
@@ -279,6 +278,62 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
                         MatchingTable->value(masterKeysType));
 
   emit linkIssuerWithMasterKeys_signal(IssuerModel, &linkParameters);
+}
+
+void MainWindowKernel::on_ReleaseTransponderPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("login", gui->LoginLineEdit2->text());
+  param->insert("password", gui->PasswordLineEdit2->text());
+
+  emit releaseTransponder_signal(param);
+}
+
+void MainWindowKernel::on_ConfirmTransponderPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("login", gui->LoginLineEdit2->text());
+  param->insert("password", gui->PasswordLineEdit2->text());
+  param->insert("ucid", gui->UcidLineEdit->text());
+
+  emit confirmTransponderRelease_signal(param);
+}
+
+void MainWindowKernel::on_RereleaseTransponderPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("login", gui->LoginLineEdit2->text());
+  param->insert("password", gui->PasswordLineEdit2->text());
+  param->insert("pan", gui->RereleaseKeyLineEdit->text());
+
+  emit rereleaseTransponder_signal(param);
+}
+
+void MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("login", gui->LoginLineEdit2->text());
+  param->insert("password", gui->PasswordLineEdit2->text());
+  param->insert("pan", gui->RereleaseKeyLineEdit->text());
+  param->insert("ucid", gui->UcidLineEdit->text());
+
+  emit confirmTransponderRerelease_signal(param);
+}
+
+void MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot() {
+  emit printBoxStickerOnServer_signal();
+}
+
+void MainWindowKernel::on_PrintLastBoxStickerOnServerPushButton_slot() {
+  emit printLastBoxStickerOnServer_signal();
+}
+
+void MainWindowKernel::on_PrintPalletStickerOnServerPushButton_slot() {
+  emit printPalletStickerOnServer_signal();
+}
+
+void MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot() {
+  emit printLastPalletStickerOnServer_signal();
 }
 
 void MainWindowKernel::on_PrintTransponderStickerPushButton_slot() {
@@ -351,6 +406,23 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
+void MainWindowKernel::displayFirmware_slot(QSharedPointer<QFile> firmware) {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  if (!firmware.get()->open(QIODevice::ReadOnly)) {
+    Interactor->generateErrorMessage(
+        "Не удалось открыть файл прошивки для отображения.");
+  }
+  gui->AssembledFirmwareView->setPlainText(firmware.get()->readAll().toHex());
+  firmware.get()->close();
+}
+
+void MainWindowKernel::displayTransponderData_slot(
+    QSharedPointer<QHash<QString, QString>> transponderData) {
+  TransponderData->buildTransponderData(transponderData.get());
+  CurrentGUI->update();
+}
+
 /*
  * Приватные методы
  */
@@ -369,21 +441,16 @@ void MainWindowKernel::saveSettings() const {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QSettings settings;
 
-  // Настройки системы администрирования
-  settings.setValue(
-      "administration_system/log_enable",
-      gui->AdministrationSystemLogEnable->checkState() == Qt::Checked);
-
-  // Настройки системы взаимодействия с пользователем
-  settings.setValue(
-      "user_interaction_system/log_enable",
-      gui->InteractionSystemLogEnable->checkState() == Qt::Checked);
-
   // Настройки системы логгирования
   settings.setValue(
       "log_system/global_enable",
       gui->LogSystemGlobalEnableCheckBox->checkState() == Qt::Checked ? true
                                                                       : false);
+  settings.setValue(
+      "log_system/extended_enable",
+      gui->LogSystemExtendedEnableCheckBox->checkState() == Qt::Checked
+          ? true
+          : false);
   settings.setValue(
       "log_system/display_log_enable",
       gui->LogSystemDisplayEnableCheckBox->checkState() == Qt::Checked ? true
@@ -403,6 +470,12 @@ void MainWindowKernel::saveSettings() const {
                     gui->LogSystemListenIpLineEdit->text());
   settings.setValue("log_system/udp_listen_port",
                     gui->LogSystemListenPortLineEdit->text().toInt());
+
+  // Настройки клиента
+  settings.setValue("perso_client/server_ip",
+                    gui->PersoClientServerIpLineEdit->text());
+  settings.setValue("perso_client/server_port",
+                    gui->PersoClientServerPortLineEdit->text());
 
   // Настройки контроллера базы данных
   settings.setValue("postgres_controller/server_ip",
@@ -466,6 +539,16 @@ bool MainWindowKernel::checkNewSettings() const {
 
   ip = QHostAddress(gui->DatabaseIpLineEdit->text());
   if (ip.isNull()) {
+    return false;
+  }
+
+  ip = QHostAddress(gui->PersoClientServerIpLineEdit->text());
+  if (ip.isNull()) {
+    return false;
+  }
+
+  port = gui->PersoClientServerPortLineEdit->text().toInt();
+  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
   }
 
@@ -608,52 +691,15 @@ bool MainWindowKernel::checkReleaseTransponderInput() const {
   return true;
 }
 
-bool MainWindowKernel::checkSearchTransponderInput() const {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  QRegularExpression ucidRegex("[A-Fa-f0-9]+");
-  QRegularExpression panRegex("[0-9]+");
-  QString choice = gui->SearchTransponderByComboBox->currentText();
-  QString input = gui->SearchTransponderLineEdit->text();
-
-  if (choice == "UCID") {
-    if (input.size() != UCID_CHAR_LENGTH) {
-      return false;
-    }
-
-    QRegularExpressionMatch match = ucidRegex.match(input);
-    if ((!match.hasMatch()) || (match.captured(0) != input)) {
-      return false;
-    }
-  } else if (choice == "SN") {
-    if (input.toInt() == 0) {
-      return false;
-    }
-  } else if (choice == "PAN") {
-    if (input.length() != PAN_CHAR_LENGTH) {
-      return false;
-    }
-
-    QRegularExpressionMatch match =
-        panRegex.match(gui->SearchTransponderLineEdit->text());
-    if ((!match.hasMatch()) || (match.captured(0) != input)) {
-      return false;
-    }
-  } else {
-    return false;
-  }
-
-  return true;
-}
-
 bool MainWindowKernel::checkConfirmRereleaseTransponderInput() const {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QRegularExpression ucidRegex("[A-Fa-f0-9]+");
   QRegularExpression panRegex("[0-9]+");
-  QString choice = gui->RereleaseTransponderByComboBox->currentText();
-  QString input = gui->RereleaseTransponderLineEdit->text();
-  QString ucid = gui->NewUcidLineEdit->text();
-  QString login = gui->LoginLineEdit3->text();
-  QString pass = gui->PasswordLineEdit3->text();
+  QString choice = gui->RereleaseKeyComboBox->currentText();
+  QString input = gui->RereleaseKeyLineEdit->text();
+  QString ucid = gui->UcidLineEdit->text();
+  QString login = gui->LoginLineEdit2->text();
+  QString pass = gui->PasswordLineEdit2->text();
 
   if ((login.size() == 0) || (login.size() > 20)) {
     return false;
@@ -833,6 +879,29 @@ void MainWindowKernel::connectMasterGui() {
   connect(gui->LinkIssuerWithKeysPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot);
 
+  // Тест сервера
+  connect(gui->ReleaseTransponderPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_ReleaseTransponderPushButton_slot);
+  connect(gui->ConfirmTransponderPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_ConfirmTransponderPushButton_slot);
+  connect(gui->RereleaseTransponderPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_RereleaseTransponderPushButton_slot);
+  connect(gui->ConfirmRereleaseTransponderPushButton, &QPushButton::clicked,
+          this,
+          &MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot);
+
+  connect(gui->PrintBoxStickerOnServerPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot);
+  connect(gui->PrintLastBoxStickerOnServerPushButton, &QPushButton::clicked,
+          this,
+          &MainWindowKernel::on_PrintLastBoxStickerOnServerPushButton_slot);
+  connect(gui->PrintPalletStickerOnServerPushButton, &QPushButton::clicked,
+          this,
+          &MainWindowKernel::on_PrintPalletStickerOnServerPushButton_slot);
+  connect(gui->PrintLastPalletStickerOnServerPushButton, &QPushButton::clicked,
+          this,
+          &MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot);
+
   // Стикеры
   connect(gui->PrintTransponderStickerPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintTransponderStickerPushButton_slot);
@@ -860,6 +929,7 @@ void MainWindowKernel::connectMasterGui() {
   gui->ProductionLineTableView->setModel(ProductionLineModel);
   gui->IssuerTableView->setModel(IssuerModel);
   gui->StickerDataTableView->setModel(StickerModel);
+  gui->TransponderDataTableView->setModel(TransponderData);
 
   // Связываем отображения графиков с логикой их формирования
 }
@@ -895,6 +965,7 @@ void MainWindowKernel::createManagerInstance() {
   // Подключаем функционал
   connect(this, &MainWindowKernel::applySettings_signal, Manager,
           &AdminManager::applySettings);
+
   connect(this, &MainWindowKernel::connectDatabase_signal, Manager,
           &AdminManager::connectDatabase);
   connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager,
@@ -905,6 +976,7 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::clearDatabaseTable);
   connect(this, &MainWindowKernel::performCustomRequest_signal, Manager,
           &AdminManager::performCustomRequest);
+
   connect(this, &MainWindowKernel::createNewOrder_signal, Manager,
           &AdminManager::createNewOrder);
   connect(this, &MainWindowKernel::startOrderAssembling_signal, Manager,
@@ -915,6 +987,7 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::deleteLastOrder);
   connect(this, &MainWindowKernel::showOrderTable_signal, Manager,
           &AdminManager::showOrderTable);
+
   connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
           &AdminManager::createNewProductionLine);
   connect(this, &MainWindowKernel::allocateInactiveProductionLines_signal,
@@ -927,12 +1000,31 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::showProductionLineTable);
   connect(this, &MainWindowKernel::linkProductionLineWithBox_signal, Manager,
           &AdminManager::linkProductionLineWithBox);
+
+  connect(this, &MainWindowKernel::releaseTransponder_signal, Manager,
+          &AdminManager::releaseTransponder);
+  connect(this, &MainWindowKernel::confirmTransponderRelease_signal, Manager,
+          &AdminManager::confirmTransponderRelease);
+  connect(this, &MainWindowKernel::rereleaseTransponder_signal, Manager,
+          &AdminManager::rereleaseTransponder);
+  connect(this, &MainWindowKernel::confirmTransponderRerelease_signal, Manager,
+          &AdminManager::confirmTransponderRerelease);
+  connect(this, &MainWindowKernel::printBoxStickerOnServer_signal, Manager,
+          &AdminManager::printBoxStickerOnServer);
+  connect(this, &MainWindowKernel::printLastBoxStickerOnServer_signal, Manager,
+          &AdminManager::printLastBoxStickerOnServer);
+  connect(this, &MainWindowKernel::printPalletStickerOnServer_signal, Manager,
+          &AdminManager::printPalletStickerOnServer);
+  connect(this, &MainWindowKernel::printLastPalletStickerOnServer_signal,
+          Manager, &AdminManager::printLastPalletStickerOnServer);
+
   connect(this, &MainWindowKernel::initIssuers_signal, Manager,
           &AdminManager::initIssuers);
   connect(this, &MainWindowKernel::initTransportMasterKeys_signal, Manager,
           &AdminManager::initTransportMasterKeys);
   connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal, Manager,
           &AdminManager::linkIssuerWithMasterKeys);
+
   connect(this, &MainWindowKernel::printTransponderSticker_signal, Manager,
           &AdminManager::printTransponderSticker);
   connect(this, &MainWindowKernel::printBoxSticker_signal, Manager,
@@ -942,6 +1034,13 @@ void MainWindowKernel::createManagerInstance() {
   connect(this, &MainWindowKernel::execPrinterStickerCommandScript_signal,
           Manager, &AdminManager::execPrinterStickerCommandScript);
 
+  // Запросы на отображение
+  connect(Manager, &AdminManager::displayFirmware_signal, this,
+          &MainWindowKernel::displayFirmware_slot);
+  connect(Manager, &AdminManager::displayTransponderData_signal, this,
+          &MainWindowKernel::displayTransponderData_slot);
+
+  // Поток
   ManagerThread = new QThread(this);
   connect(ManagerThread, &QThread::finished, ManagerThread,
           &QThread::deleteLater);
@@ -968,11 +1067,22 @@ void MainWindowKernel::createModels() {
   ProductionLineModel = new DatabaseTableModel(this);
   IssuerModel = new DatabaseTableModel(this);
   StickerModel = new DatabaseTableModel(this);
+
+  TransponderData = new HashModel(this);
 }
 
 void MainWindowKernel::createMatchingTable() {
-  MatchingTable = new QMap<QString, QString>;
+  MatchingTable = new QHash<QString, QString>;
   MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
   MatchingTable->insert("Эмитенты", "issuers");
+}
+
+void MainWindowKernel::registerMetaType() {
+  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
+      "QSharedPointer<QHash<QString, QString> >");
+  qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
+      "QSharedPointer<QHash<QString, QString> >");
+  qRegisterMetaType<QSharedPointer<QStringList>>("QSharedPointer<QStringList>");
+  qRegisterMetaType<QSharedPointer<QFile>>("QSharedPointer<QFile>");
 }

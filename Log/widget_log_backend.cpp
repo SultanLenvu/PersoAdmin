@@ -2,6 +2,7 @@
 
 WidgetLogBackend::WidgetLogBackend(QObject* parent) : LogBackend(parent) {
   setObjectName("WidgetLogBackend");
+  loadSettings();
 }
 
 void WidgetLogBackend::writeLogLine(const QString& str) {

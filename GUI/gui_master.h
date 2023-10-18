@@ -22,25 +22,6 @@ class MasterGUI : public GUI {
   QPlainTextEdit* LogDisplay;
   //============================================================
 
-  /* Интерфейс сервера */
-  //============================================================
-  QWidget* ServerTab;
-  QHBoxLayout* ServerMainLayout;
-
-  // Панель упралвения БД
-  QGroupBox* ServerControlPanelGroup;
-  QVBoxLayout* ServerControlPanelLayout;
-
-  QPushButton* GetStatisticPushButton;
-  QPushButton* SendSetupPushButton;
-  QSpacerItem* ServerControlPanelVS;
-
-  // Отображение записей в БД
-  QGroupBox* ServerChartGroup;
-  QVBoxLayout* ServerChartLayout;
-  QChartView* ServerChartView;
-  //============================================================
-
   /* Интерфейс базы данных */
   //============================================================
   QWidget* DatabaseTab;
@@ -161,7 +142,7 @@ class MasterGUI : public GUI {
   QTableView* ProductionLineTableView;
   //============================================================
 
-  /* Интерфейс для управления транспондерами */
+  /* Интерфейс для теста сервера */
   //============================================================
   QWidget* TransponderTab;
   QHBoxLayout* TransponderTabMainLayout;
@@ -181,32 +162,21 @@ class MasterGUI : public GUI {
   QPushButton* ReleaseTransponderPushButton;
   QPushButton* ConfirmTransponderPushButton;
 
-  QSpacerItem* TransponderControlPanelVS;
-
-  QHBoxLayout* SearchTransponderByLayout;
-  QComboBox* SearchTransponderByComboBox;
-  QLineEdit* SearchTransponderLineEdit;
-  QPushButton* SearchTransponderPushButton;
-  QPushButton* RefundTransponderPushButton;
-
-  QHBoxLayout* LoginLayout3;
-  QLabel* LoginLabel3;
-  QLineEdit* LoginLineEdit3;
-  QHBoxLayout* PasswordLayout3;
-  QLabel* PasswordLabel3;
-  QLineEdit* PasswordLineEdit3;
-  QHBoxLayout* RereleaseTransponderLayout;
-  QComboBox* RereleaseTransponderByComboBox;
-  QLineEdit* RereleaseTransponderLineEdit;
-  QHBoxLayout* NewUcidLayout;
-  QLabel* NewUcidLabel;
-  QLineEdit* NewUcidLineEdit;
+  QHBoxLayout* RereleaseKeyLayout;
+  QComboBox* RereleaseKeyComboBox;
+  QLineEdit* RereleaseKeyLineEdit;
   QPushButton* RereleaseTransponderPushButton;
   QPushButton* ConfirmRereleaseTransponderPushButton;
+  QSpacerItem* TransponderControlPanelVS;
+
+  QPushButton* PrintBoxStickerOnServerPushButton;
+  QPushButton* PrintLastBoxStickerOnServerPushButton;
+  QPushButton* PrintPalletStickerOnServerPushButton;
+  QPushButton* PrintLastPalletStickerOnServerPushButton;
 
   QGroupBox* TransponderDisplayPanel;
   QVBoxLayout* TransponderDisplayLayout;
-  QTableView* TransponderSeedTableView;
+  QTableView* TransponderDataTableView;
   QPlainTextEdit* AssembledFirmwareView;
   //============================================================
 
@@ -271,18 +241,6 @@ class MasterGUI : public GUI {
   QSpacerItem* SettingsHorizontalSpacer1;
   QSpacerItem* SettingsVerticalSpacer1;
 
-  // Настройки системы адиминистрирования
-  QGroupBox* AdministrationSystemSettingsGroupBox;
-  QGridLayout* AdministrationSystemSettingsLayout;
-  QLabel* AdministrationSystemLogEnableLabel;
-  QCheckBox* AdministrationSystemLogEnable;
-
-  // Настройки системы взаимодействия с пользователем
-  QGroupBox* InteractionSystemSettingsGroupBox;
-  QGridLayout* InteractionSystemSettingsLayout;
-  QLabel* InteractionSystemLogEnableLabel;
-  QCheckBox* InteractionSystemLogEnable;
-
   // Настройки базы данных
   QGroupBox* DatabaseSettingsGroupBox;
   QGridLayout* DatabaseSettingsLayout;
@@ -299,11 +257,22 @@ class MasterGUI : public GUI {
   QLabel* IDatabaseControllerLogEnableLabel;
   QCheckBox* IDatabaseControllerLogEnable;
 
+  // Настройки клиента
+  QGroupBox* PersoClientSettingsGroupBox;
+  QGridLayout* PersoClientSettingsMainLayout;
+  QLabel* PersoClientServerIdLabel;
+  QLineEdit* PersoClientServerIpLineEdit;
+  QLabel* PersoClientServerPortLabel;
+  QLineEdit* PersoClientServerPortLineEdit;
+
   // Настройки системы логгирования
   QGroupBox* LogSystemSettingsGroupBox;
   QGridLayout* LogSystemSettingsLayout;
   QLabel* LogSystemGlobalEnableLabel;
   QCheckBox* LogSystemGlobalEnableCheckBox;
+
+  QLabel* LogSystemExtendedEnableLabel;
+  QCheckBox* LogSystemExtendedEnableCheckBox;
 
   QWidget* LogSystemProxyWidget1;
   QGridLayout* LogSystemProxyWidget1Layout;
@@ -352,11 +321,10 @@ class MasterGUI : public GUI {
   Q_DISABLE_COPY(MasterGUI)
   void createTabs(void);
 
-  void createServerTab(void);
   void createDatabaseTab(void);
   void createOrderTab(void);
   void createProductionLineTab(void);
-  void createTransponderTab(void);
+  void createServerTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
   void createSettingsTab(void);
@@ -366,8 +334,7 @@ class MasterGUI : public GUI {
  private slots:
   void on_PanFileExplorePushButton_slot(void);
 
-  void on_SearchTransponderByComboBox_slot(const QString& text);
-  void on_RereleaseTransponderByComboBox_slot(const QString& text);
+  void on_RereleaseKeyComboBox_slot(const QString& text);
 
   void on_LogSystemEnableCheckBox_slot(int32_t state);
   void on_LogSystemListenPersoServerCheckBox_slot(int32_t state);

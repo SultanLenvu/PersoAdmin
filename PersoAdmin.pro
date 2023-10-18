@@ -1,4 +1,4 @@
-QT += core gui sql charts network
+QT += core gui sql charts network printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,12 +18,14 @@ SOURCES += \
     GUI/gui_delegates.cpp \
     GUI/interaction_system.cpp \
     GUI/main_window_kernel.cpp \
+    General/hash_model.cpp \
     Log/file_log_backend.cpp \
     Log/widget_log_backend.cpp \
     Log/log_backend.cpp \
     Log/log_system.cpp \
     Management/admin_manager.cpp \
     Management/administration_system.cpp \
+    Management/perso_client.cpp \
     StickerPrinter/isticker_printer.cpp \
     StickerPrinter/te310_printer.cpp \
     main.cpp
@@ -31,6 +33,7 @@ SOURCES += \
 HEADERS += \
     GUI/interaction_system.h \
     GUI/main_window_kernel.h \
+    General/hash_model.h \
     Log/file_log_backend.h \
     Log/widget_log_backend.h \
     Log/log_backend.h \
@@ -45,6 +48,7 @@ HEADERS += \
     GUI/gui_delegates.h \
     Management/admin_manager.h \
     Management/administration_system.h \
+    Management/perso_client.h \
     StickerPrinter/isticker_printer.h \
     StickerPrinter/te310_printer.h
 

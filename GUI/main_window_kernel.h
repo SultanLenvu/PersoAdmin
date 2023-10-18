@@ -2,8 +2,8 @@
 #define MAINWINDOWKERNEL_H
 
 #include <QDebug>
+#include <QHash>
 #include <QMainWindow>
-#include <QMap>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QSharedPointer>
@@ -11,6 +11,7 @@
 
 #include "Database/database_table_model.h"
 #include "General/definitions.h"
+#include "General/hash_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
 #include "Transponder/transponder_seed_model.h"
@@ -45,7 +46,9 @@ class MainWindowKernel : public QMainWindow {
   DatabaseTableModel* IssuerModel;
   DatabaseTableModel* StickerModel;
 
-  QMap<QString, QString>* MatchingTable;
+  HashModel* TransponderData;
+
+  QHash<QString, QString>* MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
@@ -85,6 +88,17 @@ class MainWindowKernel : public QMainWindow {
   void on_InitIssuerTablePushButton_slot(void);
   void on_LinkIssuerWithKeysPushButton_slot(void);
 
+  // Функционал для взаимодействия с сервером функционала
+  void on_ReleaseTransponderPushButton_slot(void);
+  void on_ConfirmTransponderPushButton_slot(void);
+  void on_RereleaseTransponderPushButton_slot(void);
+  void on_ConfirmRereleaseTransponderPushButton_slot(void);
+
+  void on_PrintBoxStickerOnServerPushButton_slot(void);
+  void on_PrintLastBoxStickerOnServerPushButton_slot(void);
+  void on_PrintPalletStickerOnServerPushButton_slot(void);
+  void on_PrintLastPalletStickerOnServerPushButton_slot(void);
+
   // Функционал для работы с принтером стикеров
   void on_PrintTransponderStickerPushButton_slot(void);
   void on_PrintBoxStickerPushButton_slot(void);
@@ -93,6 +107,11 @@ class MainWindowKernel : public QMainWindow {
 
   // Функционал для настройки сервера
   void on_ApplySettingsPushButton_slot(void);
+
+  // Отображение данных
+  void displayFirmware_slot(QSharedPointer<QFile> firmware);
+  void displayTransponderData_slot(
+      QSharedPointer<QHash<QString, QString>> transponderData);
 
  private:
   Q_DISABLE_COPY(MainWindowKernel)
@@ -103,7 +122,6 @@ class MainWindowKernel : public QMainWindow {
   bool checkNewOrderInput(void) const;
   bool checkNewProductionLineInput(void) const;
   bool checkReleaseTransponderInput(void) const;
-  bool checkSearchTransponderInput(void) const;
   bool checkConfirmRereleaseTransponderInput(void) const;
   bool checkLinkIssuerInput(void) const;
 
@@ -122,14 +140,16 @@ class MainWindowKernel : public QMainWindow {
   void createModels(void);
   void createMatchingTable(void);
 
+  void registerMetaType(void);
+
  signals:
   void applySettings_signal();
 
-  // Сигналы для логгера
+  // Логгер
   void loggerClear_signal(void);
   void logging(const QString& log);
 
-  // Сигналы для менеджера
+  // База данных
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
   void showDatabaseTable_signal(const QString& name, DatabaseTableModel* model);
@@ -139,8 +159,9 @@ class MainWindowKernel : public QMainWindow {
   void performCustomRequest_signal(const QString& req,
                                    DatabaseTableModel* model);
 
+  // Заказы
   void createNewOrder_signal(
-      const QSharedPointer<QMap<QString, QString> > orderParameterseters,
+      const QSharedPointer<QHash<QString, QString>> orderParameterseters,
       DatabaseTableModel* model);
   void startOrderAssembling_signal(const QString& orderId,
                                    DatabaseTableModel* model);
@@ -149,8 +170,9 @@ class MainWindowKernel : public QMainWindow {
   void deleteLastOrder_signal(DatabaseTableModel* model);
   void showOrderTable_signal(DatabaseTableModel* model);
 
+  // Производственные линии
   void createNewProductionLine_signal(
-      const QMap<QString, QString>* productionLineParameterseters,
+      const QHash<QString, QString>* productionLineParameterseters,
       DatabaseTableModel* model);
   void allocateInactiveProductionLines_signal(const QString& orderId,
                                               DatabaseTableModel* model);
@@ -158,15 +180,31 @@ class MainWindowKernel : public QMainWindow {
   void deleteLastProductionLine_signal(DatabaseTableModel* model);
   void showProductionLineTable_signal(DatabaseTableModel* model);
   void linkProductionLineWithBox_signal(
-      const QMap<QString, QString>* linkParameterseters,
+      const QHash<QString, QString>* linkParameterseters,
       DatabaseTableModel* model);
 
+  // Тест сервера
+  void releaseTransponder_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void confirmTransponderRelease_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void rereleaseTransponder_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void confirmTransponderRerelease_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void printBoxStickerOnServer_signal();
+  void printLastBoxStickerOnServer_signal();
+  void printPalletStickerOnServer_signal();
+  void printLastPalletStickerOnServer_signal();
+
+  // Заказчики
   void initIssuers_signal(DatabaseTableModel* model);
   void initTransportMasterKeys_signal(DatabaseTableModel* model);
   void linkIssuerWithMasterKeys_signal(
       DatabaseTableModel* model,
-      const QMap<QString, QString>* Parameterseters);
+      const QHash<QString, QString>* Parameterseters);
 
+  // Принтер
   void printTransponderSticker_signal(const QString& id,
                                       DatabaseTableModel* model);
   void printBoxSticker_signal(const QString& id, DatabaseTableModel* model);

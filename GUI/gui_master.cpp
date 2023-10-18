@@ -12,8 +12,8 @@ void MasterGUI::create() {
   createLog();
 
   // Настраиваем пропорции отображаемых элементов
-  MainLayout->setStretch(0, 1);
-  MainLayout->setStretch(1, 1);
+  MainLayout->setStretch(0, 3);
+  MainLayout->setStretch(1, 2);
 }
 
 void MasterGUI::update() {
@@ -26,8 +26,8 @@ void MasterGUI::update() {
   ProductionLineTableView->resizeColumnsToContents();
   ProductionLineTableView->update();
 
-  TransponderSeedTableView->resizeColumnsToContents();
-  TransponderSeedTableView->update();
+  TransponderDataTableView->resizeColumnsToContents();
+  TransponderDataTableView->update();
 
   IssuerTableView->resizeColumnsToContents();
   IssuerTableView->update();
@@ -58,57 +58,13 @@ void MasterGUI::createTabs() {
   // Задаем стартовую страницу
   Tabs->setCurrentIndex(0);
 
-  createServerTab();
   createDatabaseTab();
   createOrderTab();
   createProductionLineTab();
-  createTransponderTab();
+  createServerTab();
   createIssuerTab();
   createStickerTab();
   createSettingsTab();
-}
-
-void MasterGUI::createServerTab() {
-  ServerTab = new QWidget();
-  Tabs->addTab(ServerTab, "Сервер");
-
-  // Основной макет
-  ServerMainLayout = new QHBoxLayout();
-  ServerTab->setLayout(ServerMainLayout);
-
-  // Панель управления
-  ServerControlPanelGroup = new QGroupBox(QString("Панель управления"));
-  ServerControlPanelGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  ServerMainLayout->addWidget(ServerControlPanelGroup);
-
-  ServerControlPanelLayout = new QVBoxLayout();
-  ServerControlPanelGroup->setLayout(ServerControlPanelLayout);
-
-  // Кнопки
-  GetStatisticPushButton = new QPushButton("Запрос статистики");
-  ServerControlPanelLayout->addWidget(GetStatisticPushButton);
-
-  SendSetupPushButton = new QPushButton("Отправить настройки");
-  ServerControlPanelLayout->addWidget(SendSetupPushButton);
-
-  ServerControlPanelVS =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  ServerControlPanelLayout->addItem(ServerControlPanelVS);
-
-  // Отображение графика нагрузки на сервер
-  ServerChartGroup = new QGroupBox(QString("Нагрузка на сервер"));
-  ServerChartGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  ServerMainLayout->addWidget(ServerChartGroup);
-
-  ServerChartLayout = new QVBoxLayout();
-  ServerChartGroup->setLayout(ServerChartLayout);
-
-  ServerChartView = new QChartView();
-  ServerChartLayout->addWidget(ServerChartView);
-
-  // Настройка пропорции между объектами на макете
-  ServerMainLayout->setStretch(0, 1);
-  ServerMainLayout->setStretch(1, 3);
 }
 
 void MasterGUI::createDatabaseTab() {
@@ -332,12 +288,14 @@ void MasterGUI::createProductionLineTab() {
   LoginLabel1 = new QLabel("Логин: ");
   LoginLayout1->addWidget(LoginLabel1);
   LoginLineEdit1 = new QLineEdit();
+  LoginLineEdit1->setMaxLength(PRODUCTION_LINE_LOGIN_MAX_LENGTH);
   LoginLayout1->addWidget(LoginLineEdit1);
   PasswordLayout1 = new QHBoxLayout();
   ProductionLinesControlPanelLayout->addLayout(PasswordLayout1);
   PasswordLabel1 = new QLabel("Пароль: ");
   PasswordLayout1->addWidget(PasswordLabel1);
   PasswordLineEdit1 = new QLineEdit();
+  PasswordLineEdit1->setMaxLength(PRODUCTION_LINE_PASSWORD_MAX_LENGTH);
   PasswordLayout1->addWidget(PasswordLineEdit1);
   CreateNewProductionLinePushButton =
       new QPushButton("Создать новую производственную линию");
@@ -406,9 +364,9 @@ void MasterGUI::createProductionLineTab() {
   ProductionLinesTabMainLayout->setStretch(1, 3);
 }
 
-void MasterGUI::createTransponderTab() {
+void MasterGUI::createServerTab() {
   TransponderTab = new QWidget();
-  Tabs->addTab(TransponderTab, "Выпуск транспондеров");
+  Tabs->addTab(TransponderTab, "Cервер");
 
   TransponderTabMainLayout = new QHBoxLayout();
   TransponderTab->setLayout(TransponderTabMainLayout);
@@ -426,6 +384,7 @@ void MasterGUI::createTransponderTab() {
   LoginLayout2->addWidget(LoginLabel2);
   LoginLineEdit2 = new QLineEdit();
   LoginLineEdit2->setText("1");
+  LoginLineEdit2->setMaxLength(PRODUCTION_LINE_LOGIN_MAX_LENGTH);
   LoginLayout2->addWidget(LoginLineEdit2);
 
   PasswordLayout2 = new QHBoxLayout();
@@ -434,6 +393,7 @@ void MasterGUI::createTransponderTab() {
   PasswordLayout2->addWidget(PasswordLabel2);
   PasswordLineEdit2 = new QLineEdit();
   PasswordLineEdit2->setText("1");
+  PasswordLineEdit2->setMaxLength(PRODUCTION_LINE_PASSWORD_MAX_LENGTH);
   PasswordLayout2->addWidget(PasswordLineEdit2);
 
   UcidLayout = new QHBoxLayout();
@@ -450,67 +410,18 @@ void MasterGUI::createTransponderTab() {
   ConfirmTransponderPushButton = new QPushButton("Подтвердить");
   TransponderControlPanelLayout->addWidget(ConfirmTransponderPushButton);
 
-  TransponderControlPanelVS =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  TransponderControlPanelLayout->addItem(TransponderControlPanelVS);
-
-  SearchTransponderByLayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(SearchTransponderByLayout);
-  SearchTransponderByComboBox = new QComboBox();
-  SearchTransponderByComboBox->addItem("SN");
-  SearchTransponderByComboBox->addItem("UCID");
-  SearchTransponderByComboBox->addItem("PAN");
-  SearchTransponderByComboBox->setCurrentIndex(0);
-  SearchTransponderByLayout->addWidget(SearchTransponderByComboBox);
-  connect(SearchTransponderByComboBox, &QComboBox::currentTextChanged, this,
-          &MasterGUI::on_SearchTransponderByComboBox_slot);
-  SearchTransponderLineEdit = new QLineEdit();
-  SearchTransponderLineEdit->setMaxLength(
-      TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH);
-  SearchTransponderByLayout->addWidget(SearchTransponderLineEdit);
-
-  SearchTransponderPushButton = new QPushButton("Найти");
-  TransponderControlPanelLayout->addWidget(SearchTransponderPushButton);
-  RefundTransponderPushButton = new QPushButton("Отозвать");
-  TransponderControlPanelLayout->addWidget(RefundTransponderPushButton);
-
-  LoginLayout3 = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(LoginLayout3);
-  LoginLabel3 = new QLabel("Логин: ");
-  LoginLayout3->addWidget(LoginLabel3);
-  LoginLineEdit3 = new QLineEdit();
-  LoginLineEdit3->setText("1");
-  LoginLayout3->addWidget(LoginLineEdit3);
-
-  PasswordLayout3 = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(PasswordLayout3);
-  PasswordLabel3 = new QLabel("Пароль: ");
-  PasswordLayout3->addWidget(PasswordLabel3);
-  PasswordLineEdit3 = new QLineEdit();
-  PasswordLineEdit3->setText("1");
-  PasswordLayout3->addWidget(PasswordLineEdit3);
-
-  RereleaseTransponderLayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(RereleaseTransponderLayout);
-  RereleaseTransponderByComboBox = new QComboBox();
-  RereleaseTransponderByComboBox->addItem("SN");
-  RereleaseTransponderByComboBox->addItem("PAN");
-  RereleaseTransponderByComboBox->setCurrentIndex(0);
-  RereleaseTransponderLayout->addWidget(RereleaseTransponderByComboBox);
-  connect(RereleaseTransponderByComboBox, &QComboBox::currentTextChanged, this,
-          &MasterGUI::on_RereleaseTransponderByComboBox_slot);
-  RereleaseTransponderLineEdit = new QLineEdit();
-  RereleaseTransponderLineEdit->setMaxLength(
-      TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH);
-  RereleaseTransponderLayout->addWidget(RereleaseTransponderLineEdit);
-
-  NewUcidLayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(NewUcidLayout);
-  NewUcidLabel = new QLabel("UCID:");
-  NewUcidLayout->addWidget(NewUcidLabel);
-  NewUcidLineEdit = new QLineEdit();
-  NewUcidLineEdit->setMaxLength(UCID_CHAR_LENGTH);
-  NewUcidLayout->addWidget(NewUcidLineEdit);
+  RereleaseKeyLayout = new QHBoxLayout();
+  TransponderControlPanelLayout->addLayout(RereleaseKeyLayout);
+  RereleaseKeyComboBox = new QComboBox();
+  RereleaseKeyComboBox->addItem("PAN");
+  RereleaseKeyComboBox->addItem("SN");
+  RereleaseKeyComboBox->setCurrentIndex(0);
+  RereleaseKeyLayout->addWidget(RereleaseKeyComboBox);
+  connect(RereleaseKeyComboBox, &QComboBox::currentTextChanged, this,
+          &MasterGUI::on_RereleaseKeyComboBox_slot);
+  RereleaseKeyLineEdit = new QLineEdit();
+  RereleaseKeyLineEdit->setMaxLength(PAN_CHAR_LENGTH);
+  RereleaseKeyLayout->addWidget(RereleaseKeyLineEdit);
 
   RereleaseTransponderPushButton = new QPushButton("Перевыпустить");
   TransponderControlPanelLayout->addWidget(RereleaseTransponderPushButton);
@@ -519,6 +430,26 @@ void MasterGUI::createTransponderTab() {
   TransponderControlPanelLayout->addWidget(
       ConfirmRereleaseTransponderPushButton);
 
+  TransponderControlPanelVS =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  TransponderControlPanelLayout->addItem(TransponderControlPanelVS);
+
+  PrintBoxStickerOnServerPushButton =
+      new QPushButton("Распечатать стикер для бокса");
+  TransponderControlPanelLayout->addWidget(PrintBoxStickerOnServerPushButton);
+  PrintLastBoxStickerOnServerPushButton =
+      new QPushButton("Повторить последний стикера для бокса");
+  TransponderControlPanelLayout->addWidget(
+      PrintLastBoxStickerOnServerPushButton);
+  PrintPalletStickerOnServerPushButton =
+      new QPushButton("Распечатать стикер для паллет");
+  TransponderControlPanelLayout->addWidget(
+      PrintPalletStickerOnServerPushButton);
+  PrintLastPalletStickerOnServerPushButton =
+      new QPushButton("Повторить последний стикера для паллеты");
+  TransponderControlPanelLayout->addWidget(
+      PrintLastPalletStickerOnServerPushButton);
+
   // Панель отображения
   TransponderDisplayPanel = new QGroupBox("Данные транспондера");
   TransponderTabMainLayout->addWidget(TransponderDisplayPanel);
@@ -526,8 +457,8 @@ void MasterGUI::createTransponderTab() {
   TransponderDisplayLayout = new QVBoxLayout();
   TransponderDisplayPanel->setLayout(TransponderDisplayLayout);
 
-  TransponderSeedTableView = new QTableView();
-  TransponderDisplayLayout->addWidget(TransponderSeedTableView);
+  TransponderDataTableView = new QTableView();
+  TransponderDisplayLayout->addWidget(TransponderDataTableView);
 
   AssembledFirmwareView = new QPlainTextEdit();
   TransponderDisplayLayout->addWidget(AssembledFirmwareView);
@@ -554,7 +485,7 @@ void MasterGUI::createIssuerTab() {
   IssuerControlPanelGroup->setLayout(IssuerControlPanelLayout);
 
   IssuerTableChoice = new QComboBox();
-  IssuerTableChoice->addItem("Заказчики");
+  IssuerTableChoice->addItem("Эмитенты");
   IssuerTableChoice->addItem("Транспортные мастер ключи");
   IssuerTableChoice->addItem("Коммерческие мастер ключи");
   IssuerTableChoice->setCurrentIndex(0);
@@ -682,43 +613,6 @@ void MasterGUI::createSettingsTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
   SettingsMainLayout->addItem(SettingsHorizontalSpacer1);
 
-  // Настройки системы адиминистрирования
-  AdministrationSystemSettingsGroupBox =
-      new QGroupBox(QString("Настройки системы администрирования"));
-  SettingsMainSubLayout->addWidget(AdministrationSystemSettingsGroupBox);
-  AdministrationSystemSettingsLayout = new QGridLayout();
-  AdministrationSystemSettingsGroupBox->setLayout(
-      AdministrationSystemSettingsLayout);
-
-  AdministrationSystemLogEnableLabel = new QLabel("Логирование ");
-  AdministrationSystemSettingsLayout->addWidget(
-      AdministrationSystemLogEnableLabel, 0, 0, 1, 1);
-  AdministrationSystemLogEnable = new QCheckBox();
-  AdministrationSystemLogEnable->setCheckState(
-      settings.value("administration_system/log_enable").toBool()
-          ? Qt::Checked
-          : Qt::Unchecked);
-  AdministrationSystemSettingsLayout->addWidget(AdministrationSystemLogEnable,
-                                                0, 1, 1, 1);
-
-  // Настройки системы взаимодействия с пользователем
-  InteractionSystemSettingsGroupBox = new QGroupBox(
-      QString("Настройки системы взаимодействия с пользователем"));
-  SettingsMainSubLayout->addWidget(InteractionSystemSettingsGroupBox);
-  InteractionSystemSettingsLayout = new QGridLayout();
-  InteractionSystemSettingsGroupBox->setLayout(InteractionSystemSettingsLayout);
-
-  InteractionSystemLogEnableLabel = new QLabel("Логирование ");
-  InteractionSystemSettingsLayout->addWidget(InteractionSystemLogEnableLabel, 0,
-                                             0, 1, 1);
-  InteractionSystemLogEnable = new QCheckBox();
-  InteractionSystemLogEnable->setCheckState(
-      settings.value("user_interaction_system/log_enable").toBool()
-          ? Qt::Checked
-          : Qt::Unchecked);
-  InteractionSystemSettingsLayout->addWidget(InteractionSystemLogEnable, 0, 1,
-                                             1, 1);
-
   // Настройки базы данных
   DatabaseSettingsGroupBox = new QGroupBox(QString("Настройки базы данных"));
   SettingsMainSubLayout->addWidget(DatabaseSettingsGroupBox);
@@ -772,6 +666,29 @@ void MasterGUI::createSettingsTab() {
           : Qt::Unchecked);
   DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnable, 5, 1, 1, 1);
 
+  // Настройки клиента
+  PersoClientSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
+  SettingsMainSubLayout->addWidget(PersoClientSettingsGroupBox);
+
+  PersoClientSettingsMainLayout = new QGridLayout();
+  PersoClientSettingsGroupBox->setLayout(PersoClientSettingsMainLayout);
+
+  PersoClientServerIdLabel =
+      new QLabel("IP адрес или URL сервера персонализации");
+  PersoClientSettingsMainLayout->addWidget(PersoClientServerIdLabel, 0, 0, 1,
+                                           1);
+  PersoClientServerIpLineEdit =
+      new QLineEdit(settings.value("perso_client/server_ip").toString());
+  PersoClientSettingsMainLayout->addWidget(PersoClientServerIpLineEdit, 0, 1, 1,
+                                           1);
+  PersoClientServerPortLabel = new QLabel("Порт сервера персонализации");
+  PersoClientSettingsMainLayout->addWidget(PersoClientServerPortLabel, 1, 0, 1,
+                                           1);
+  PersoClientServerPortLineEdit =
+      new QLineEdit(settings.value("perso_client/server_port").toString());
+  PersoClientSettingsMainLayout->addWidget(PersoClientServerPortLineEdit, 1, 1,
+                                           1, 1);
+
   // Настройки логгера
   LogSystemSettingsGroupBox = new QGroupBox("Настройки системы логгирования");
   SettingsMainSubLayout->addWidget(LogSystemSettingsGroupBox);
@@ -789,8 +706,17 @@ void MasterGUI::createSettingsTab() {
   connect(LogSystemGlobalEnableCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemEnableCheckBox_slot);
 
+  LogSystemExtendedEnableLabel = new QLabel("Расширенное логгирование");
+  LogSystemSettingsLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1, 1);
+  LogSystemExtendedEnableCheckBox = new QCheckBox();
+  LogSystemExtendedEnableCheckBox->setCheckState(
+      settings.value("log_system/extended_enable").toBool() ? Qt::Checked
+                                                            : Qt::Unchecked);
+  LogSystemSettingsLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1, 1,
+                                     1);
+
   LogSystemProxyWidget1 = new QWidget();
-  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 1, 0, 1, 2);
+  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 2, 0, 1, 2);
   if (!LogSystemGlobalEnableCheckBox->isChecked()) {
     LogSystemProxyWidget1->hide();
   }
@@ -813,15 +739,15 @@ void MasterGUI::createSettingsTab() {
                                          1, 1);
   LogSystemListenPersoServerCheckBox = new QCheckBox();
   LogSystemListenPersoServerCheckBox->setCheckState(
-      settings.value("log_system/udp_log_enable").toBool() ? Qt::Checked
-                                                           : Qt::Unchecked);
+      settings.value("log_system/udp_listen_enable").toBool() ? Qt::Checked
+                                                              : Qt::Unchecked);
   LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 1,
                                          1, 1, 1);
   connect(LogSystemListenPersoServerCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemListenPersoServerCheckBox_slot);
 
   LogSystemProxyWidget2 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 2, 0, 1, 2);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 3, 0, 1, 2);
   if (!LogSystemListenPersoServerCheckBox->isChecked()) {
     LogSystemProxyWidget2->hide();
   }
@@ -843,18 +769,18 @@ void MasterGUI::createSettingsTab() {
                                          1);
 
   LogSystemFileEnableLabel = new QLabel("Логгирование в файл");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableLabel, 3, 0, 1, 1);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableLabel, 4, 0, 1, 1);
   LogSystemFileEnableCheckBox = new QCheckBox();
   LogSystemFileEnableCheckBox->setCheckState(
       settings.value("log_system/file_log_enable").toBool() ? Qt::Checked
                                                             : Qt::Unchecked);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableCheckBox, 3, 1, 1,
+  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableCheckBox, 4, 1, 1,
                                          1);
   connect(LogSystemFileEnableCheckBox, &QCheckBox::stateChanged, this,
           &MasterGUI::on_LogSystemFileEnableCheckBox_slot);
 
   LogSystemProxyWidget3 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3, 4, 0, 1, 2);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3, 5, 0, 1, 2);
   if (!LogSystemFileEnableCheckBox->isChecked()) {
     LogSystemProxyWidget3->hide();
   }
@@ -933,27 +859,13 @@ void MasterGUI::on_PanFileExplorePushButton_slot() {
   }
 }
 
-void MasterGUI::on_SearchTransponderByComboBox_slot(const QString& text) {
-  if (text == "UCID") {
-    SearchTransponderLineEdit->setMaxLength(UCID_CHAR_LENGTH);
-  } else if (text == "PAN") {
-    SearchTransponderLineEdit->setMaxLength(PAN_CHAR_LENGTH);
-  } else if (text == "SN") {
-    SearchTransponderLineEdit->setMaxLength(
-        TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH);
-  } else {
-    SearchTransponderLineEdit->setMaxLength(0);
-  }
-}
-
-void MasterGUI::on_RereleaseTransponderByComboBox_slot(const QString& text) {
+void MasterGUI::on_RereleaseKeyComboBox_slot(const QString& text) {
   if (text == "PAN") {
-    RereleaseTransponderLineEdit->setMaxLength(PAN_CHAR_LENGTH);
+    RereleaseKeyLineEdit->setMaxLength(PAN_CHAR_LENGTH);
   } else if (text == "SN") {
-    RereleaseTransponderLineEdit->setMaxLength(
-        TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH);
+    RereleaseKeyLineEdit->setMaxLength(TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH);
   } else {
-    RereleaseTransponderLineEdit->setMaxLength(0);
+    RereleaseKeyLineEdit->setMaxLength(0);
   }
 }
 

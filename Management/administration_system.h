@@ -8,6 +8,7 @@
 #include "Database/database_controller.h"
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
+#include "Log/log_system.h"
 #include "Transponder/transponder_seed_model.h"
 
 class AdministrationSystem : public QObject {
@@ -43,28 +44,28 @@ class AdministrationSystem : public QObject {
                                  DatabaseTableModel* buffer);
 
   ReturnStatus createNewOrder(
-      const QSharedPointer<QMap<QString, QString> > orderParameters);
+      const QSharedPointer<QHash<QString, QString> > orderParameters);
   ReturnStatus startOrderAssembling(const QString& orderId);
   ReturnStatus stopOrderAssembling(const QString& orderId);
   ReturnStatus deleteLastOrder(void);
 
   ReturnStatus createNewProductionLine(
-      const QMap<QString, QString>* productionLineParameters);
+      const QHash<QString, QString>* productionLineParameters);
   ReturnStatus allocateInactiveProductionLines(const QString& orderId);
   ReturnStatus linkProductionLineWithBox(
-      const QMap<QString, QString>* linkParameters);
+      const QHash<QString, QString>* linkParameters);
   ReturnStatus shutdownAllProductionLines(void);
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
   ReturnStatus initTransportMasterKeysTable(void);
   ReturnStatus linkIssuerWithMasterKeys(
-      const QMap<QString, QString>* linkParameters);
+      const QHash<QString, QString>* linkParameters);
 
   ReturnStatus getTransponderData(const QString& id,
-                                  QMap<QString, QString>* data);
-  ReturnStatus getBoxData(const QString& id, QMap<QString, QString>* data);
-  ReturnStatus getPalletData(const QString& id, QMap<QString, QString>* data);
+                                  QHash<QString, QString>* data);
+  ReturnStatus getBoxData(const QString& id, QHash<QString, QString>* data);
+  ReturnStatus getPalletData(const QString& id, QHash<QString, QString>* data);
 
  private:
   Q_DISABLE_COPY(AdministrationSystem)
@@ -73,15 +74,15 @@ class AdministrationSystem : public QObject {
   void sendLog(const QString& log) const;
 
   bool addOrder(
-      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addPallets(
-      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addBoxes(
-      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addTransponders(
-      const QSharedPointer<QMap<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addProductionLine(
-      const QMap<QString, QString>* productionLineParameters) const;
+      const QHash<QString, QString>* productionLineParameters) const;
 
   bool startBoxProcessing(const QString& id,
                           const QString& productionLineId) const;
@@ -95,10 +96,7 @@ class AdministrationSystem : public QObject {
 
   bool searchBoxForProductionLine(const QString& orderId,
                                   const QString& productionLineId,
-                                  QMap<QString, QString>& boxRecord) const;
-
- private slots:
-  void proxyLogging(const QString& log) const;
+                                  QHash<QString, QString>& boxRecord) const;
 
  signals:
   void logging(const QString& log) const;
