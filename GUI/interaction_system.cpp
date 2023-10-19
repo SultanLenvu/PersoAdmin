@@ -9,6 +9,8 @@ InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
 
   // Создаем таймеры
   createTimers();
+
+  DialogDesigner = new UnifiedDialogDesigner(this);
 }
 
 InteractionSystem* InteractionSystem::instance() {
@@ -73,6 +75,15 @@ void InteractionSystem::finishOperationProgressDialog(
 
   // Закрываем окно
   destroyProgressDialog();
+}
+
+void InteractionSystem::getPalletShipingParameters(
+    QHash<QString, QString>* params) {
+  DialogDesigner->createPalletShippingDialog();
+
+  DialogDesigner->exec();
+
+  *params = *DialogDesigner->getInputData();
 }
 
 void InteractionSystem::applySettings() {

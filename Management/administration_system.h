@@ -16,6 +16,7 @@ class AdministrationSystem : public QObject {
  public:
   enum ReturnStatus {
     NotExecuted,
+    ParameterError,
     DatabaseConnectionError,
     DatabaseTransactionError,
     DatabaseQueryError,
@@ -67,6 +68,11 @@ class AdministrationSystem : public QObject {
   ReturnStatus getBoxData(const QString& id, QHash<QString, QString>* data);
   ReturnStatus getPalletData(const QString& id, QHash<QString, QString>* data);
 
+  ReturnStatus releaseTranspondersManually(const QString& table,
+                                           const QString& id);
+  ReturnStatus refundTranspondersManually(const QString& table,
+                                          const QString& id);
+
  private:
   Q_DISABLE_COPY(AdministrationSystem)
   void createDatabaseController(void);
@@ -97,6 +103,16 @@ class AdministrationSystem : public QObject {
   bool searchBoxForProductionLine(const QString& orderId,
                                   const QString& productionLineId,
                                   QHash<QString, QString>& boxRecord) const;
+
+  bool releaseTransponderManually(const QString& id);
+  bool releaseBoxManually(const QString& id);
+  bool releasePalletManually(const QString& id);
+  bool releaseOrderManually(const QString& id);
+
+  bool refundTransponderManually(const QString& id);
+  bool refundBoxManually(const QString& id);
+  bool refundPalletManually(const QString& id);
+  bool refundOrderManually(const QString& id);
 
  signals:
   void logging(const QString& log) const;

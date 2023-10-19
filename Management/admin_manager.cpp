@@ -412,6 +412,70 @@ void AdminManager::linkIssuerWithMasterKeys(
   finishOperationPerforming("linkIssuerWithMasterKeys");
 }
 
+void AdminManager::releaseTranspondersManually(
+    const QSharedPointer<QHash<QString, QString>> param,
+    DatabaseTableModel* model) {
+  startOperationPerforming("releaseTranspondersManually");
+  sendLog("Принудительный выпуск транспондеров. ");
+
+  AdministrationSystem::ReturnStatus status;
+
+  status = Administrator->releaseTranspondersManually(param->value("table"),
+                                                      param->value("id"));
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "releaseTranspondersManually");
+    return;
+  }
+
+  status = Administrator->getDatabaseTable(param->value("table"), model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "releaseTranspondersManually");
+    return;
+  }
+
+  finishOperationPerforming("releaseTranspondersManually");
+}
+
+void AdminManager::refundTranspondersManually(
+    const QSharedPointer<QHash<QString, QString>> param,
+    DatabaseTableModel* model) {
+  startOperationPerforming("refundTranspondersManually");
+  sendLog("Возврат транспондеров. ");
+
+  AdministrationSystem::ReturnStatus status;
+
+  status = Administrator->refundTranspondersManually(param->value("table"),
+                                                     param->value("id"));
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "refundTranspondersManually");
+    return;
+  }
+
+  status = Administrator->getDatabaseTable(param->value("table"), model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "refundTranspondersManually");
+    return;
+  }
+
+  finishOperationPerforming("refundTranspondersManually");
+}
+
+void AdminManager::shipPallets(
+    const QSharedPointer<QHash<QString, QString>> param,
+    DatabaseTableModel* model) {
+  startOperationPerforming("shipPallets");
+  sendLog("Повторная печать последнего стикера для паллеты на сервере. ");
+
+  AdministrationSystem::ReturnStatus status;
+  status = Administrator->getDatabaseTable("pallets", model);
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "linkIssuerWithMasterKeys");
+    return;
+  }
+
+  finishOperationPerforming("shipPallets");
+}
+
 void AdminManager::releaseTransponder(
     const QSharedPointer<QHash<QString, QString>> param) {
   startOperationPerforming("releaseTransponder");
@@ -664,6 +728,8 @@ void AdminManager::createAdministrator() {
   // Заполняем таблицу соответствий статусов возврата
   AdministratorReturnStatusMatch.insert(AdministrationSystem::NotExecuted,
                                         "Выполнение операции не началось.");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::ParameterError,
+                                        "Получены некорректные параметры.");
   AdministratorReturnStatusMatch.insert(
       AdministrationSystem::DatabaseConnectionError,
       "Не удалось подключиться к базе данных. ");

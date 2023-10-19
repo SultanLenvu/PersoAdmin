@@ -2,7 +2,7 @@ QT += core gui sql charts network printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -18,6 +18,7 @@ SOURCES += \
     GUI/gui_delegates.cpp \
     GUI/interaction_system.cpp \
     GUI/main_window_kernel.cpp \
+    GUI/unified_dialog_designer.cpp \
     General/hash_model.cpp \
     Log/file_log_backend.cpp \
     Log/widget_log_backend.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
 HEADERS += \
     GUI/interaction_system.h \
     GUI/main_window_kernel.h \
+    GUI/unified_dialog_designer.h \
     General/hash_model.h \
     Log/file_log_backend.h \
     Log/widget_log_backend.h \

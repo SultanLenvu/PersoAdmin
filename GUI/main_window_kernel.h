@@ -44,6 +44,7 @@ class MainWindowKernel : public QMainWindow {
   DatabaseTableModel* OrderModel;
   DatabaseTableModel* ProductionLineModel;
   DatabaseTableModel* IssuerModel;
+  DatabaseTableModel* TransponderModel;
   DatabaseTableModel* StickerModel;
 
   HashModel* TransponderData;
@@ -88,7 +89,7 @@ class MainWindowKernel : public QMainWindow {
   void on_InitIssuerTablePushButton_slot(void);
   void on_LinkIssuerWithKeysPushButton_slot(void);
 
-  // Функционал для взаимодействия с сервером функционала
+  // Функционал для взаимодействия с сервером
   void on_ReleaseTransponderPushButton_slot(void);
   void on_ConfirmTransponderPushButton_slot(void);
   void on_RereleaseTransponderPushButton_slot(void);
@@ -98,6 +99,11 @@ class MainWindowKernel : public QMainWindow {
   void on_PrintLastBoxStickerOnServerPushButton_slot(void);
   void on_PrintPalletStickerOnServerPushButton_slot(void);
   void on_PrintLastPalletStickerOnServerPushButton_slot(void);
+
+  // Функционал для выпуска, возврата и отгрузки транспондеров
+  void on_TransponderManualReleasePushButton_slot(void);
+  void on_TransponderManualRefundPushButton_slot(void);
+  void on_PalletShipmentPushButton_slot(void);
 
   // Функционал для работы с принтером стикеров
   void on_PrintTransponderStickerPushButton_slot(void);
@@ -196,6 +202,16 @@ class MainWindowKernel : public QMainWindow {
   void printLastBoxStickerOnServer_signal();
   void printPalletStickerOnServer_signal();
   void printLastPalletStickerOnServer_signal();
+
+  // Транспондеры
+  void releaseTranspondersManually_signal(
+      const QSharedPointer<QHash<QString, QString>> param,
+      DatabaseTableModel* model);
+  void refundTranspondersManually_signal(
+      const QSharedPointer<QHash<QString, QString>> param,
+      DatabaseTableModel* model);
+  void shipPallets_signal(const QSharedPointer<QHash<QString, QString>> param,
+                          DatabaseTableModel* model);
 
   // Заказчики
   void initIssuers_signal(DatabaseTableModel* model);

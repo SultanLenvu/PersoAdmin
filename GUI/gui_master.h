@@ -144,11 +144,11 @@ class MasterGUI : public GUI {
 
   /* Интерфейс для теста сервера */
   //============================================================
-  QWidget* TransponderTab;
-  QHBoxLayout* TransponderTabMainLayout;
+  QWidget* ServerTab;
+  QHBoxLayout* ServerTabMainLayout;
 
-  QGroupBox* TransponderControlPanel;
-  QVBoxLayout* TransponderControlPanelLayout;
+  QGroupBox* ServerTabControlPanel;
+  QVBoxLayout* ServerTabControlPanelLayout;
 
   QHBoxLayout* LoginLayout2;
   QLabel* LoginLabel2;
@@ -167,7 +167,7 @@ class MasterGUI : public GUI {
   QLineEdit* RereleaseKeyLineEdit;
   QPushButton* RereleaseTransponderPushButton;
   QPushButton* ConfirmRereleaseTransponderPushButton;
-  QSpacerItem* TransponderControlPanelVS;
+  QSpacerItem* ServerTabControlPanelVS;
 
   QPushButton* PrintBoxStickerOnServerPushButton;
   QPushButton* PrintLastBoxStickerOnServerPushButton;
@@ -178,6 +178,27 @@ class MasterGUI : public GUI {
   QVBoxLayout* TransponderDisplayLayout;
   QTableView* TransponderDataTableView;
   QPlainTextEdit* AssembledFirmwareView;
+  //============================================================
+
+  /* Интерфейс для управления транспондерами */
+  //============================================================
+  QWidget* TransponderTab;
+  QHBoxLayout* TransponderTabMainLayout;
+
+  QGroupBox* TransponderControlPanel;
+  QVBoxLayout* TransponderControlPanelLayout;
+  QHBoxLayout* TransponderControlPanelSublayout;
+  QComboBox* ChoiceAnyIdComboBox;
+  QLineEdit* AnyIdLineEdit;
+  QPushButton* TransponderManualReleasePushButton;
+  QPushButton* TransponderManualRefundPushButton;
+  QSpacerItem* TransponderControlPanelLayoutVS;
+
+  QPushButton* PalletShipmentPushButton;
+
+  QGroupBox* TransponderViewGroup;
+  QVBoxLayout* TransponderViewGroupLayout;
+  QTableView* TransponderTableView;
   //============================================================
 
   /* Интерфейс для управления эмитентами */
@@ -325,6 +346,7 @@ class MasterGUI : public GUI {
   void createOrderTab(void);
   void createProductionLineTab(void);
   void createServerTab(void);
+  void createTransponderTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
   void createSettingsTab(void);

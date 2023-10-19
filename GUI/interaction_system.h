@@ -1,7 +1,6 @@
 #ifndef INTERACTION_SYSTEM_H
 #define INTERACTION_SYSTEM_H
 
-#include <QDebug>
 #include <QElapsedTimer>
 #include <QInputDialog>
 #include <QLineEdit>
@@ -13,6 +12,7 @@
 #include <QTimer>
 
 #include "General/definitions.h"
+#include "unified_dialog_designer.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
@@ -21,6 +21,8 @@ class InteractionSystem : public QWidget {
   bool LogEnable;
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
+
+  UnifiedDialogDesigner* DialogDesigner;
 
   QTimer* ODTimer;
   QTimer* ODQTimer;
@@ -36,6 +38,8 @@ class InteractionSystem : public QWidget {
 
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
+
+  void getPalletShipingParameters(QHash<QString, QString>* params);
 
   void applySettings(void);
 

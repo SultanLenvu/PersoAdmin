@@ -77,6 +77,16 @@ class AdminManager : public QObject {
   void linkIssuerWithMasterKeys(DatabaseTableModel* model,
                                 const QHash<QString, QString>* Parameterseters);
 
+  // Транспондеры
+  void releaseTranspondersManually(
+      const QSharedPointer<QHash<QString, QString>> param,
+      DatabaseTableModel* model);
+  void refundTranspondersManually(
+      const QSharedPointer<QHash<QString, QString>> param,
+      DatabaseTableModel* model);
+  void shipPallets(const QSharedPointer<QHash<QString, QString>> param,
+                   DatabaseTableModel* model);
+
   // Клиент
   void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
   void confirmTransponderRelease(

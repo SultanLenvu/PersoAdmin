@@ -62,6 +62,7 @@ void MasterGUI::createTabs() {
   createOrderTab();
   createProductionLineTab();
   createServerTab();
+  createTransponderTab();
   createIssuerTab();
   createStickerTab();
   createSettingsTab();
@@ -365,21 +366,21 @@ void MasterGUI::createProductionLineTab() {
 }
 
 void MasterGUI::createServerTab() {
-  TransponderTab = new QWidget();
-  Tabs->addTab(TransponderTab, "Cервер");
+  ServerTab = new QWidget();
+  Tabs->addTab(ServerTab, "Cервер");
 
-  TransponderTabMainLayout = new QHBoxLayout();
-  TransponderTab->setLayout(TransponderTabMainLayout);
+  ServerTabMainLayout = new QHBoxLayout();
+  ServerTab->setLayout(ServerTabMainLayout);
 
   // Панель управления
-  TransponderControlPanel = new QGroupBox("Панель управления");
-  TransponderTabMainLayout->addWidget(TransponderControlPanel);
+  ServerTabControlPanel = new QGroupBox("Панель управления");
+  ServerTabMainLayout->addWidget(ServerTabControlPanel);
 
-  TransponderControlPanelLayout = new QVBoxLayout();
-  TransponderControlPanel->setLayout(TransponderControlPanelLayout);
+  ServerTabControlPanelLayout = new QVBoxLayout();
+  ServerTabControlPanel->setLayout(ServerTabControlPanelLayout);
 
   LoginLayout2 = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(LoginLayout2);
+  ServerTabControlPanelLayout->addLayout(LoginLayout2);
   LoginLabel2 = new QLabel("Логин: ");
   LoginLayout2->addWidget(LoginLabel2);
   LoginLineEdit2 = new QLineEdit();
@@ -388,7 +389,7 @@ void MasterGUI::createServerTab() {
   LoginLayout2->addWidget(LoginLineEdit2);
 
   PasswordLayout2 = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(PasswordLayout2);
+  ServerTabControlPanelLayout->addLayout(PasswordLayout2);
   PasswordLabel2 = new QLabel("Пароль: ");
   PasswordLayout2->addWidget(PasswordLabel2);
   PasswordLineEdit2 = new QLineEdit();
@@ -397,7 +398,7 @@ void MasterGUI::createServerTab() {
   PasswordLayout2->addWidget(PasswordLineEdit2);
 
   UcidLayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(UcidLayout);
+  ServerTabControlPanelLayout->addLayout(UcidLayout);
   UcidLabel = new QLabel("UCID: ");
   UcidLayout->addWidget(UcidLabel);
   UcidLineEdit = new QLineEdit();
@@ -406,12 +407,12 @@ void MasterGUI::createServerTab() {
   UcidLayout->addWidget(UcidLineEdit);
 
   ReleaseTransponderPushButton = new QPushButton("Выпустить");
-  TransponderControlPanelLayout->addWidget(ReleaseTransponderPushButton);
+  ServerTabControlPanelLayout->addWidget(ReleaseTransponderPushButton);
   ConfirmTransponderPushButton = new QPushButton("Подтвердить");
-  TransponderControlPanelLayout->addWidget(ConfirmTransponderPushButton);
+  ServerTabControlPanelLayout->addWidget(ConfirmTransponderPushButton);
 
   RereleaseKeyLayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(RereleaseKeyLayout);
+  ServerTabControlPanelLayout->addLayout(RereleaseKeyLayout);
   RereleaseKeyComboBox = new QComboBox();
   RereleaseKeyComboBox->addItem("PAN");
   RereleaseKeyComboBox->addItem("SN");
@@ -424,35 +425,32 @@ void MasterGUI::createServerTab() {
   RereleaseKeyLayout->addWidget(RereleaseKeyLineEdit);
 
   RereleaseTransponderPushButton = new QPushButton("Перевыпустить");
-  TransponderControlPanelLayout->addWidget(RereleaseTransponderPushButton);
+  ServerTabControlPanelLayout->addWidget(RereleaseTransponderPushButton);
   ConfirmRereleaseTransponderPushButton =
       new QPushButton("Подтвердить перевыпуск");
-  TransponderControlPanelLayout->addWidget(
-      ConfirmRereleaseTransponderPushButton);
+  ServerTabControlPanelLayout->addWidget(ConfirmRereleaseTransponderPushButton);
 
-  TransponderControlPanelVS =
+  ServerTabControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  TransponderControlPanelLayout->addItem(TransponderControlPanelVS);
+  ServerTabControlPanelLayout->addItem(ServerTabControlPanelVS);
 
   PrintBoxStickerOnServerPushButton =
       new QPushButton("Распечатать стикер для бокса");
-  TransponderControlPanelLayout->addWidget(PrintBoxStickerOnServerPushButton);
+  ServerTabControlPanelLayout->addWidget(PrintBoxStickerOnServerPushButton);
   PrintLastBoxStickerOnServerPushButton =
       new QPushButton("Повторить последний стикера для бокса");
-  TransponderControlPanelLayout->addWidget(
-      PrintLastBoxStickerOnServerPushButton);
+  ServerTabControlPanelLayout->addWidget(PrintLastBoxStickerOnServerPushButton);
   PrintPalletStickerOnServerPushButton =
       new QPushButton("Распечатать стикер для паллет");
-  TransponderControlPanelLayout->addWidget(
-      PrintPalletStickerOnServerPushButton);
+  ServerTabControlPanelLayout->addWidget(PrintPalletStickerOnServerPushButton);
   PrintLastPalletStickerOnServerPushButton =
       new QPushButton("Повторить последний стикера для паллеты");
-  TransponderControlPanelLayout->addWidget(
+  ServerTabControlPanelLayout->addWidget(
       PrintLastPalletStickerOnServerPushButton);
 
   // Панель отображения
   TransponderDisplayPanel = new QGroupBox("Данные транспондера");
-  TransponderTabMainLayout->addWidget(TransponderDisplayPanel);
+  ServerTabMainLayout->addWidget(TransponderDisplayPanel);
 
   TransponderDisplayLayout = new QVBoxLayout();
   TransponderDisplayPanel->setLayout(TransponderDisplayLayout);
@@ -464,6 +462,62 @@ void MasterGUI::createServerTab() {
   TransponderDisplayLayout->addWidget(AssembledFirmwareView);
 
   // Настройка пропорции между объектами на основном макете
+  ServerTabMainLayout->setStretch(0, 1);
+  ServerTabMainLayout->setStretch(1, 3);
+}
+
+void MasterGUI::createTransponderTab() {
+  TransponderTab = new QWidget();
+  Tabs->addTab(TransponderTab, "Транспондеры");
+
+  // Основной макет
+  TransponderTabMainLayout = new QHBoxLayout();
+  TransponderTab->setLayout(TransponderTabMainLayout);
+
+  // Панель управления
+  TransponderControlPanel = new QGroupBox(QString("Панель управления"));
+  TransponderControlPanel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  TransponderTabMainLayout->addWidget(TransponderControlPanel);
+
+  TransponderControlPanelLayout = new QVBoxLayout();
+  TransponderControlPanel->setLayout(TransponderControlPanelLayout);
+
+  TransponderControlPanelSublayout = new QHBoxLayout();
+  TransponderControlPanelLayout->addLayout(TransponderControlPanelSublayout);
+
+  ChoiceAnyIdComboBox = new QComboBox();
+  ChoiceAnyIdComboBox->addItem("ID транспондера");
+  ChoiceAnyIdComboBox->addItem("ID бокса");
+  ChoiceAnyIdComboBox->addItem("ID паллеты");
+  ChoiceAnyIdComboBox->addItem("ID заказа");
+  ChoiceAnyIdComboBox->setCurrentIndex(0);
+  TransponderControlPanelSublayout->addWidget(ChoiceAnyIdComboBox);
+  AnyIdLineEdit = new QLineEdit();
+  TransponderControlPanelSublayout->addWidget(AnyIdLineEdit);
+
+  TransponderManualReleasePushButton = new QPushButton("Принудительный выпуск");
+  TransponderControlPanelLayout->addWidget(TransponderManualReleasePushButton);
+  TransponderManualRefundPushButton = new QPushButton("Произвести возврат");
+  TransponderControlPanelLayout->addWidget(TransponderManualRefundPushButton);
+  TransponderControlPanelLayoutVS =
+      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  TransponderControlPanelLayout->addItem(TransponderControlPanelLayoutVS);
+
+  PalletShipmentPushButton = new QPushButton("Отгрузка паллет");
+  TransponderControlPanelLayout->addWidget(PalletShipmentPushButton);
+
+  // Отображение буфера считанных данных из БД
+  TransponderViewGroup = new QGroupBox(QString("Транспондеры"));
+  TransponderViewGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  TransponderTabMainLayout->addWidget(TransponderViewGroup);
+
+  TransponderViewGroupLayout = new QVBoxLayout();
+  TransponderViewGroup->setLayout(TransponderViewGroupLayout);
+
+  TransponderTableView = new QTableView();
+  TransponderViewGroupLayout->addWidget(TransponderTableView);
+
+  // Настройка пропорции между объектами на макете
   TransponderTabMainLayout->setStretch(0, 1);
   TransponderTabMainLayout->setStretch(1, 3);
 }

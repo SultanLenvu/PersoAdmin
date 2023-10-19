@@ -336,6 +336,42 @@ void MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot() {
   emit printLastPalletStickerOnServer_signal();
 }
 
+void MainWindowKernel::on_TransponderManualReleasePushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  if (gui->AnyIdLineEdit->text().toInt() == 0) {
+    Interactor->generateErrorMessage("Некорректный ввод данных.");
+    return;
+  }
+
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("table",
+                MatchingTable->value(gui->ChoiceAnyIdComboBox->currentText()));
+  param->insert("id", gui->AnyIdLineEdit->text());
+  emit releaseTranspondersManually_signal(param, TransponderModel);
+}
+
+void MainWindowKernel::on_TransponderManualRefundPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  if (gui->AnyIdLineEdit->text().toInt() == 0) {
+    Interactor->generateErrorMessage("Некорректный ввод данных.");
+    return;
+  }
+
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("table",
+                MatchingTable->value(gui->ChoiceAnyIdComboBox->currentText()));
+  param->insert("id", gui->AnyIdLineEdit->text());
+  emit refundTranspondersManually_signal(param, TransponderModel);
+}
+
+void MainWindowKernel::on_PalletShipmentPushButton_slot() {
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  Interactor->getPalletShipingParameters(param.get());
+  emit shipPallets_signal(param, TransponderModel);
+}
+
 void MainWindowKernel::on_PrintTransponderStickerPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   emit loggerClear_signal();
@@ -902,6 +938,14 @@ void MainWindowKernel::connectMasterGui() {
           this,
           &MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot);
 
+  // Транспондеры
+  connect(gui->TransponderManualReleasePushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_TransponderManualReleasePushButton_slot);
+  connect(gui->TransponderManualRefundPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_TransponderManualRefundPushButton_slot);
+  connect(gui->PalletShipmentPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PalletShipmentPushButton_slot);
+
   // Стикеры
   connect(gui->PrintTransponderStickerPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintTransponderStickerPushButton_slot);
@@ -929,6 +973,8 @@ void MainWindowKernel::connectMasterGui() {
   gui->ProductionLineTableView->setModel(ProductionLineModel);
   gui->IssuerTableView->setModel(IssuerModel);
   gui->StickerDataTableView->setModel(StickerModel);
+  gui->TransponderTableView->setModel(TransponderModel);
+
   gui->TransponderDataTableView->setModel(TransponderData);
 
   // Связываем отображения графиков с логикой их формирования
@@ -1018,6 +1064,13 @@ void MainWindowKernel::createManagerInstance() {
   connect(this, &MainWindowKernel::printLastPalletStickerOnServer_signal,
           Manager, &AdminManager::printLastPalletStickerOnServer);
 
+  connect(this, &MainWindowKernel::releaseTranspondersManually_signal, Manager,
+          &AdminManager::releaseTranspondersManually);
+  connect(this, &MainWindowKernel::refundTranspondersManually_signal, Manager,
+          &AdminManager::refundTranspondersManually);
+  connect(this, &MainWindowKernel::shipPallets_signal, Manager,
+          &AdminManager::shipPallets);
+
   connect(this, &MainWindowKernel::initIssuers_signal, Manager,
           &AdminManager::initIssuers);
   connect(this, &MainWindowKernel::initTransportMasterKeys_signal, Manager,
@@ -1067,6 +1120,7 @@ void MainWindowKernel::createModels() {
   ProductionLineModel = new DatabaseTableModel(this);
   IssuerModel = new DatabaseTableModel(this);
   StickerModel = new DatabaseTableModel(this);
+  TransponderModel = new DatabaseTableModel(this);
 
   TransponderData = new HashModel(this);
 }
@@ -1076,6 +1130,10 @@ void MainWindowKernel::createMatchingTable() {
   MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
   MatchingTable->insert("Эмитенты", "issuers");
+  MatchingTable->insert("ID транспондера", "transponders");
+  MatchingTable->insert("ID бокса", "boxes");
+  MatchingTable->insert("ID паллеты", "pallets");
+  MatchingTable->insert("ID заказа", "orders");
 }
 
 void MainWindowKernel::registerMetaType() {
