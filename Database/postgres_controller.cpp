@@ -259,7 +259,20 @@ bool PostgresController::getRecordByPart(const QString& tableName,
        it != record.constEnd(); it++) {
     if (it.value().size() > 0) {
       flag = true;
-      requestText += QString("%1 = '%2' AND ").arg(it.key(), it.value());
+      QString temp = it.value();
+      if ((temp.contains(">")) && !(temp.contains(">="))) {
+        requestText += QString("%1 > %2 AND ").arg(it.key(), temp.remove(">"));
+      } else if (temp.contains(">=")) {
+        requestText +=
+            QString("%1 >= %2 AND ").arg(it.key(), temp.remove(">="));
+      } else if (temp.contains("<") && !(temp.contains("<="))) {
+        requestText += QString("%1 < %2 AND ").arg(it.key(), temp.remove("<"));
+      } else if (temp.contains("<=")) {
+        requestText +=
+            QString("%1 <= %2 AND ").arg(it.key(), temp.remove("<="));
+      } else {
+        requestText += QString("%1 = %2 AND ").arg(it.key(), temp);
+      }
     }
   }
 

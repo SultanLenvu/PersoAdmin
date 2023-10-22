@@ -68,6 +68,8 @@ class AdministrationSystem : public QObject {
   ReturnStatus getBoxData(const QString& id, QHash<QString, QString>* data);
   ReturnStatus getPalletData(const QString& id, QHash<QString, QString>* data);
 
+  ReturnStatus rollbackProductionLine(const QString& id);
+
   ReturnStatus releaseTranspondersManually(const QString& table,
                                            const QString& id);
   ReturnStatus refundTranspondersManually(const QString& table,
@@ -104,15 +106,15 @@ class AdministrationSystem : public QObject {
                                   const QString& productionLineId,
                                   QHash<QString, QString>& boxRecord) const;
 
-  bool releaseTransponderManually(const QString& id);
-  bool releaseBoxManually(const QString& id);
-  bool releasePalletManually(const QString& id);
-  bool releaseOrderManually(const QString& id);
+  ReturnStatus releaseTransponderManually(const QString& id);
+  ReturnStatus releaseBoxManually(const QString& id);
+  ReturnStatus releasePalletManually(const QString& id);
+  ReturnStatus releaseOrderManually(const QString& id);
 
-  bool refundTransponderManually(const QString& id);
-  bool refundBoxManually(const QString& id);
-  bool refundPalletManually(const QString& id);
-  bool refundOrderManually(const QString& id);
+  ReturnStatus refundTransponderManually(const QString& id);
+  ReturnStatus refundBoxManually(const QString& id);
+  ReturnStatus refundPalletManually(const QString& id);
+  ReturnStatus refundOrderManually(const QString& id);
 
  signals:
   void logging(const QString& log) const;
