@@ -129,6 +129,7 @@ void MainWindowKernel::on_CreateNewOrderPushButton_slot() {
 
 void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
@@ -142,6 +143,7 @@ void MainWindowKernel::on_StartOrderAssemblingPushButton_slot() {
 
 void MainWindowKernel::on_StopOrderAssemblingPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit1->text().toInt() == 0) {
@@ -167,6 +169,7 @@ void MainWindowKernel::on_DeleteLastOrderPushButton_slot() {
 
 void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
   emit loggerClear_signal();
 
   if (!checkNewProductionLineInput()) {
@@ -186,6 +189,7 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
 
 void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
   emit loggerClear_signal();
 
   if (gui->OrderIdLineEdit2->text().toInt() == 0) {
@@ -200,6 +204,7 @@ void MainWindowKernel::on_AllocateInactiveProductionLinesPushButton_slot() {
 
 void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
   emit loggerClear_signal();
 
   if ((!checkNewProductionLineInput()) ||
@@ -282,6 +287,9 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
 
 void MainWindowKernel::on_ReleaseTransponderPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", gui->LoginLineEdit2->text());
   param->insert("password", gui->PasswordLineEdit2->text());
@@ -291,6 +299,9 @@ void MainWindowKernel::on_ReleaseTransponderPushButton_slot() {
 
 void MainWindowKernel::on_ConfirmTransponderPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", gui->LoginLineEdit2->text());
   param->insert("password", gui->PasswordLineEdit2->text());
@@ -301,6 +312,9 @@ void MainWindowKernel::on_ConfirmTransponderPushButton_slot() {
 
 void MainWindowKernel::on_RereleaseTransponderPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", gui->LoginLineEdit2->text());
   param->insert("password", gui->PasswordLineEdit2->text());
@@ -311,6 +325,9 @@ void MainWindowKernel::on_RereleaseTransponderPushButton_slot() {
 
 void MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", gui->LoginLineEdit2->text());
   param->insert("password", gui->PasswordLineEdit2->text());
@@ -321,14 +338,20 @@ void MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot() {
 }
 
 void MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot() {
+  emit loggerClear_signal();
+
   emit printBoxStickerOnServer_signal();
 }
 
 void MainWindowKernel::on_PrintLastBoxStickerOnServerPushButton_slot() {
+  emit loggerClear_signal();
+
   emit printLastBoxStickerOnServer_signal();
 }
 
 void MainWindowKernel::on_PrintPalletStickerOnServerPushButton_slot() {
+  emit loggerClear_signal();
+
   emit printPalletStickerOnServer_signal();
 }
 
@@ -338,6 +361,8 @@ void MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot() {
 
 void MainWindowKernel::on_TransponderManualReleasePushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
 
   if (gui->AnyIdLineEdit->text().toInt() == 0) {
     Interactor->generateErrorMessage("Некорректный ввод данных.");
@@ -354,6 +379,8 @@ void MainWindowKernel::on_TransponderManualReleasePushButton_slot() {
 void MainWindowKernel::on_TransponderManualRefundPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
+  emit loggerClear_signal();
+
   if (gui->AnyIdLineEdit->text().toInt() == 0) {
     Interactor->generateErrorMessage("Некорректный ввод данных.");
     return;
@@ -367,9 +394,19 @@ void MainWindowKernel::on_TransponderManualRefundPushButton_slot() {
 }
 
 void MainWindowKernel::on_PalletShipmentPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
-  Interactor->getPalletShipingParameters(param.get());
-  emit shipPallets_signal(param, TransponderModel);
+  emit loggerClear_signal();
+
+  QSharedPointer<QHash<QString, QString>> params(new QHash<QString, QString>());
+  if (!Interactor->getPalletShipingParameters(params.get())) {
+    return;
+  }
+
+  if (params->isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных");
+    return;
+  }
+
+  emit shipPallets_signal(params, TransponderModel);
 }
 
 void MainWindowKernel::on_PrintTransponderStickerPushButton_slot() {

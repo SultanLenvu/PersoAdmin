@@ -10,7 +10,7 @@ InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   // Создаем таймеры
   createTimers();
 
-  DialogDesigner = new UnifiedDialogDesigner(this);
+  CurrentDialog = nullptr;
 }
 
 InteractionSystem* InteractionSystem::instance() {
@@ -40,8 +40,7 @@ void InteractionSystem::startOperationProgressDialog(
 
   //  Настраиваем и запускаем таймер для измерения квантов времени
   uint64_t operationDuration =
-      settings
-          .value(QString("Operations/") + operationName + QString("/Duration"))
+      settings.value(QString("duration_of_operations/") + operationName)
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
   operationQuantDuration += 1;
@@ -77,13 +76,14 @@ void InteractionSystem::finishOperationProgressDialog(
   destroyProgressDialog();
 }
 
-void InteractionSystem::getPalletShipingParameters(
+bool InteractionSystem::getPalletShipingParameters(
     QHash<QString, QString>* params) {
-  DialogDesigner->createPalletShippingDialog();
+  CurrentDialog = new PalletShippingDialog(this);
 
-  DialogDesigner->exec();
+  bool ret = CurrentDialog->exec();
+  CurrentDialog->getData(params);
 
-  *params = *DialogDesigner->getInputData();
+  return ret;
 }
 
 void InteractionSystem::applySettings() {

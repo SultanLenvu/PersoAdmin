@@ -202,7 +202,7 @@ void MasterGUI::createOrderTab() {
   OrderControlPanelLayout->addLayout(OrderPanelSublayout5);
   TransponderModelLabel = new QLabel("Модель транспондера");
   OrderPanelSublayout5->addWidget(TransponderModelLabel);
-  TransponderModelLineEdit = new QLineEdit(" TC1001");
+  TransponderModelLineEdit = new QLineEdit("PS1001");
   OrderPanelSublayout5->addWidget(TransponderModelLineEdit);
 
   OrderPanelSubLayout6 = new QHBoxLayout();
@@ -503,7 +503,7 @@ void MasterGUI::createTransponderTab() {
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   TransponderControlPanelLayout->addItem(TransponderControlPanelLayoutVS);
 
-  PalletShipmentPushButton = new QPushButton("Отгрузка паллет");
+  PalletShipmentPushButton = new QPushButton("Генерация реестра для отгрузки");
   TransponderControlPanelLayout->addWidget(PalletShipmentPushButton);
 
   // Отображение буфера считанных данных из БД

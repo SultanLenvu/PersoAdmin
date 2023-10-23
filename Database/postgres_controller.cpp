@@ -221,7 +221,7 @@ bool PostgresController::getRecordById(const QString& tableName,
     sendLog(QString("Запрос выполнен. "));
     if (request.next()) {
       sendLog("Ответные данные получены. ");
-      convertResponseToMap(request, record);
+      convertResponseToHash(request, record);
     } else {
       record.clear();
       sendLog("Ответные данные не получены. ");
@@ -261,17 +261,19 @@ bool PostgresController::getRecordByPart(const QString& tableName,
       flag = true;
       QString temp = it.value();
       if ((temp.contains(">")) && !(temp.contains(">="))) {
-        requestText += QString("%1 > %2 AND ").arg(it.key(), temp.remove(">"));
+        requestText +=
+            QString("%1 > '%2' AND ").arg(it.key(), temp.remove(">"));
       } else if (temp.contains(">=")) {
         requestText +=
-            QString("%1 >= %2 AND ").arg(it.key(), temp.remove(">="));
+            QString("%1 >= '%2' AND ").arg(it.key(), temp.remove(">="));
       } else if (temp.contains("<") && !(temp.contains("<="))) {
-        requestText += QString("%1 < %2 AND ").arg(it.key(), temp.remove("<"));
+        requestText +=
+            QString("%1 < '%2' AND ").arg(it.key(), temp.remove("<"));
       } else if (temp.contains("<=")) {
         requestText +=
-            QString("%1 <= %2 AND ").arg(it.key(), temp.remove("<="));
+            QString("%1 <= '%2' AND ").arg(it.key(), temp.remove("<="));
       } else {
-        requestText += QString("%1 = %2 AND ").arg(it.key(), temp);
+        requestText += QString("%1 = '%2' AND ").arg(it.key(), temp);
       }
     }
   }
@@ -291,7 +293,7 @@ bool PostgresController::getRecordByPart(const QString& tableName,
     sendLog("Запрос выполнен. ");
     if (request.next()) {
       sendLog("Ответные данные получены. ");
-      convertResponseToMap(request, record);
+      convertResponseToHash(request, record);
     } else {
       record.clear();
       sendLog("Ответные данные не получены. ");
@@ -332,7 +334,7 @@ bool PostgresController::getLastRecord(const QString& tableName,
     sendLog("Запрос выполнен. ");
     if (request.next()) {
       sendLog("Ответные данные получены. ");
-      convertResponseToMap(request, record);
+      convertResponseToHash(request, record);
     } else {
       record.clear();
       sendLog("Ответные данные не получены. ");
@@ -352,6 +354,10 @@ bool PostgresController::getLastRecord(const QString& tableName,
               QString("Таблица пустая. Возвращаем нулевой идентификатор. "));
           if (tableName == "transponders") {
             record.insert("id", QString::number(TRANSPONDER_ID_START_SHIFT));
+          } else if (tableName == "boxes") {
+            record.insert("id", QString::number(BOX_ID_START_SHIFT));
+          } else if (tableName == "pallets") {
+            record.insert("id", QString::number(PALLET_ID_START_SHIFT));
           } else {
             record.insert("id", "0");
           }
@@ -409,7 +415,7 @@ bool PostgresController::getMergedRecordById(
     sendLog("Запрос выполнен. ");
     if (request.next()) {
       sendLog("Ответные данные получены. ");
-      convertResponseToMap(request, record);
+      convertResponseToHash(request, record);
     } else {
       record.clear();
       sendLog("Ответные данные не получены. ");
@@ -468,7 +474,7 @@ bool PostgresController::getMergedRecordByPart(
     sendLog("Запрос выполнен. ");
     if (request.next()) {
       sendLog("Ответные данные получены. ");
-      convertResponseToMap(request, record);
+      convertResponseToHash(request, record);
     } else {
       record.clear();
       sendLog("Ответные данные не получены. ");
@@ -731,7 +737,7 @@ void PostgresController::convertResponseToBuffer(
   buffer->build(headers, data);
 }
 
-void PostgresController::convertResponseToMap(
+void PostgresController::convertResponseToHash(
     QSqlQuery& request,
     QHash<QString, QString>& record) const {
   record.clear();

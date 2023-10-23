@@ -12,13 +12,14 @@ SOURCES += \
     Database/database_controller.cpp \
     Database/postgres_controller.cpp \
     Database/database_table_model.cpp \
+    GUI/custom_input_dialog.cpp \
     GUI/gui_authorization.cpp \
     GUI/gui_master.cpp \
     GUI/gui.cpp \
     GUI/gui_delegates.cpp \
     GUI/interaction_system.cpp \
     GUI/main_window_kernel.cpp \
-    GUI/unified_dialog_designer.cpp \
+    GUI/pallet_shiping_dialog.cpp \
     General/hash_model.cpp \
     Log/file_log_backend.cpp \
     Log/widget_log_backend.cpp \
@@ -32,9 +33,10 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    GUI/custom_input_dialog.h \
     GUI/interaction_system.h \
     GUI/main_window_kernel.h \
-    GUI/unified_dialog_designer.h \
+    GUI/pallet_shiping_dialog.h \
     General/hash_model.h \
     Log/file_log_backend.h \
     Log/widget_log_backend.h \

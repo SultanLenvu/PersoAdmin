@@ -464,12 +464,18 @@ void AdminManager::shipPallets(
     const QSharedPointer<QHash<QString, QString>> param,
     DatabaseTableModel* model) {
   startOperationPerforming("shipPallets");
-  sendLog("Повторная печать последнего стикера для паллеты на сервере. ");
+  sendLog("Отгрузка паллет. ");
 
   AdministrationSystem::ReturnStatus status;
+  status = Administrator->shipPallets(param.get());
+  if (status != AdministrationSystem::Completed) {
+    processAdministratorError(status, "shipPallets");
+    return;
+  }
+
   status = Administrator->getDatabaseTable("pallets", model);
   if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "linkIssuerWithMasterKeys");
+    processAdministratorError(status, "shipPallets");
     return;
   }
 
@@ -738,6 +744,9 @@ void AdminManager::createAdministrator() {
   AdministratorReturnStatusMatch.insert(
       AdministrationSystem::DatabaseQueryError,
       "Получена ошибка при выполнении запроса к базе данных.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::ShipmentRegisterError,
+      "Не удалось открыть файл-реестр для отгрузки.");
   AdministratorReturnStatusMatch.insert(AdministrationSystem::LogicError,
                                         "Логическая ошибка.");
   AdministratorReturnStatusMatch.insert(AdministrationSystem::UnknownError,

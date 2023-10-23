@@ -20,6 +20,7 @@ class AdministrationSystem : public QObject {
     DatabaseConnectionError,
     DatabaseTransactionError,
     DatabaseQueryError,
+    ShipmentRegisterError,
     LogicError,
     UnknownError,
     Completed
@@ -28,6 +29,13 @@ class AdministrationSystem : public QObject {
 
  private:
   bool LogEnable;
+  QString ShipmentRegisterDir;
+
+  QHash<QString, QString> CurrentTransponder;
+  QHash<QString, QString> CurrentBox;
+  QHash<QString, QString> CurrentPallet;
+  QHash<QString, QString> CurrentOrder;
+  QHash<QString, QString> CurrentIssuer;
 
   PostgresController* Database;
 
@@ -74,12 +82,14 @@ class AdministrationSystem : public QObject {
                                            const QString& id);
   ReturnStatus refundTranspondersManually(const QString& table,
                                           const QString& id);
+  ReturnStatus shipPallets(const QHash<QString, QString>* param);
 
  private:
-  Q_DISABLE_COPY(AdministrationSystem)
-  void createDatabaseController(void);
+  Q_DISABLE_COPY(AdministrationSystem) void createDatabaseController(void);
   void loadSettings(void);
   void sendLog(const QString& log) const;
+
+  bool getTransponderContext(const QString& id);
 
   bool addOrder(
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;
@@ -115,6 +125,9 @@ class AdministrationSystem : public QObject {
   ReturnStatus refundBoxManually(const QString& id);
   ReturnStatus refundPalletManually(const QString& id);
   ReturnStatus refundOrderManually(const QString& id);
+
+  ReturnStatus shipTransponder(const QString& id, QFile* reg);
+  ReturnStatus shipPallet(const QString& id, QFile* reg);
 
  signals:
   void logging(const QString& log) const;

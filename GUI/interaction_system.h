@@ -12,7 +12,8 @@
 #include <QTimer>
 
 #include "General/definitions.h"
-#include "unified_dialog_designer.h"
+#include "custom_input_dialog.h"
+#include "pallet_shiping_dialog.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
@@ -22,7 +23,7 @@ class InteractionSystem : public QWidget {
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
 
-  UnifiedDialogDesigner* DialogDesigner;
+  CustomInputDialog* CurrentDialog;
 
   QTimer* ODTimer;
   QTimer* ODQTimer;
@@ -39,7 +40,7 @@ class InteractionSystem : public QWidget {
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
 
-  void getPalletShipingParameters(QHash<QString, QString>* params);
+  bool getPalletShipingParameters(QHash<QString, QString>* params);
 
   void applySettings(void);
 
