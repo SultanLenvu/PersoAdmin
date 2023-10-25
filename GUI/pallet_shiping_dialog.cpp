@@ -14,7 +14,7 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(QHash<QString, QString>* data) {
+void PalletShippingDialog::getData(QHash<QString, QString>* data) const {
   if (checkInput()) {
     data->insert("first_pallet_id", FirstPalletId->text());
     data->insert("last_pallet_id", LastPalletId->text());
@@ -39,16 +39,19 @@ void PalletShippingDialog::create() {
   LastPalletId = new QLineEdit();
   MainLayout->addWidget(LastPalletId, 0, 3, 1, 1);
 
+  ButtonLayout = new QHBoxLayout();
+  MainLayout->addLayout(ButtonLayout, 1, 0, 1, 4);
+
   AcceptButton = new QPushButton("Отгрузить");
-  MainLayout->addWidget(AcceptButton, 1, 0, 1, 2);
+  ButtonLayout->addWidget(AcceptButton);
   connect(AcceptButton, &QPushButton::clicked, this, &QDialog::accept);
 
   RejectButton = new QPushButton("Отмена");
-  MainLayout->addWidget(RejectButton, 1, 2, 1, 2);
+  ButtonLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PalletShippingDialog::checkInput() {
+bool PalletShippingDialog::checkInput() const {
   if ((FirstPalletId->text().toUInt() == 0) ||
       (LastPalletId->text().toUInt() == 0)) {
     return false;

@@ -771,7 +771,7 @@ AdministrationSystem::linkIssuerWithMasterKeys(
 AdministrationSystem::ReturnStatus AdministrationSystem::getTransponderData(
     const QString& id,
     QHash<QString, QString>* data) {
-  if (!getTransponderContext(id)) {
+  if (!getCurrentContext(id)) {
     sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
                 .arg(id));
     return DatabaseQueryError;
@@ -1200,7 +1200,7 @@ void AdministrationSystem::sendLog(const QString& log) const {
   }
 }
 
-bool AdministrationSystem::getTransponderContext(const QString& id) {
+bool AdministrationSystem::getCurrentContext(const QString& id) {
   CurrentTransponder.insert("id", id);
   CurrentTransponder.insert("release_counter", "");
   CurrentTransponder.insert("personal_account_number", "");
@@ -1884,7 +1884,7 @@ bool AdministrationSystem::searchBoxForProductionLine(
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::releaseTransponderManually(const QString& id) {
-  if (!getTransponderContext(id)) {
+  if (!getCurrentContext(id)) {
     sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
                 .arg(id));
     return DatabaseQueryError;
@@ -2070,7 +2070,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::releaseOrderManually(
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::refundTransponderManually(const QString& id) {
-  if (!getTransponderContext(id)) {
+  if (!getCurrentContext(id)) {
     sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
                 .arg(id));
     return DatabaseQueryError;
@@ -2275,7 +2275,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::shipPallet(
     return DatabaseQueryError;
   }
 
-  if (!getTransponderContext(mergedRecord.value("id"))) {
+  if (!getCurrentContext(mergedRecord.value("id"))) {
     sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
                 .arg(mergedRecord.value("id")));
     return DatabaseQueryError;

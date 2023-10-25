@@ -89,7 +89,7 @@ class AdministrationSystem : public QObject {
   void loadSettings(void);
   void sendLog(const QString& log) const;
 
-  bool getTransponderContext(const QString& id);
+  bool getCurrentContext(const QString& id);
 
   bool addOrder(
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;

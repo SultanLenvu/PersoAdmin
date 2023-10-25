@@ -86,6 +86,15 @@ bool InteractionSystem::getPalletShipingParameters(
   return ret;
 }
 
+bool InteractionSystem::getPan(QHash<QString, QString>* params) {
+  CurrentDialog = new PanInputDialog(this);
+
+  bool ret = CurrentDialog->exec();
+  CurrentDialog->getData(params);
+
+  return ret;
+}
+
 void InteractionSystem::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();

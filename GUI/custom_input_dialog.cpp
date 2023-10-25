@@ -6,3 +6,7 @@ CustomInputDialog::CustomInputDialog(QWidget* parent, DialogType type)
 }
 
 CustomInputDialog::~CustomInputDialog() {}
+
+CustomInputDialog::DialogType CustomInputDialog::type() const {
+  return Type;
+}

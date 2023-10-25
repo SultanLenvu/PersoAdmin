@@ -1,38 +1,38 @@
-#ifndef PalletShippingDialog_H
-#define PalletShippingDialog_H
+#ifndef PANINPUTDIALOG_H
+#define PANINPUTDIALOG_H
 
 #include <QDialog>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QtWidgets>
 
+#include "General/definitions.h"
 #include "custom_input_dialog.h"
 
-class PalletShippingDialog : public CustomInputDialog {
+class PanInputDialog : public CustomInputDialog {
   Q_OBJECT
  private:
   QRect DesktopGeometry;
 
   QGridLayout* MainLayout;
 
-  QLabel* PalletLabel1;
-  QLineEdit* FirstPalletId;
-
-  QLabel* PalletLabel2;
-  QLineEdit* LastPalletId;
+  QLabel* PanLabel;
+  QLineEdit* PanLineEdit;
 
   QHBoxLayout* ButtonLayout;
   QPushButton* AcceptButton;
   QPushButton* RejectButton;
 
  public:
-  explicit PalletShippingDialog(QWidget* parent);
-  ~PalletShippingDialog();
+  explicit PanInputDialog(QWidget* parent);
+  ~PanInputDialog();
 
   virtual void getData(QHash<QString, QString>* data) const override;
 
  private:
-  Q_DISABLE_COPY(PalletShippingDialog);
+  Q_DISABLE_COPY(PanInputDialog);
   void create(void);
   bool checkInput(void) const;
 };
 
-#endif  // PalletShippingDialog_H
+#endif // PANINPUTDIALOG_H

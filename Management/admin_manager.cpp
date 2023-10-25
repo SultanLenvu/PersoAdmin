@@ -560,11 +560,13 @@ void AdminManager::confirmTransponderRerelease(
   finishOperationPerforming("confirmTransponderRerelease");
 }
 
-void AdminManager::printBoxStickerOnServer() {
+void AdminManager::printBoxStickerOnServer(
+    QSharedPointer<QHash<QString, QString>> param) {
   startOperationPerforming("printBoxStickerOnServer");
   sendLog("Печать стикера для бокса на сервере. ");
 
-  PersoClient::ReturnStatus status = Client->requestBoxStickerPrint();
+  PersoClient::ReturnStatus status =
+      Client->requestBoxStickerPrint(param.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "printBoxStickerOnServer");
     return;
@@ -586,11 +588,13 @@ void AdminManager::printLastBoxStickerOnServer() {
   finishOperationPerforming("printLastBoxStickerOnServer");
 }
 
-void AdminManager::printPalletStickerOnServer() {
+void AdminManager::printPalletStickerOnServer(
+    QSharedPointer<QHash<QString, QString>> param) {
   startOperationPerforming("printPalletStickerOnServer");
   sendLog("Печать стикера для паллеты на сервере. ");
 
-  PersoClient::ReturnStatus status = Client->requestPalletStickerPrint();
+  PersoClient::ReturnStatus status =
+      Client->requestPalletStickerPrint(param.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "printPalletStickerOnServer");
     return;
@@ -761,7 +765,7 @@ void AdminManager::createClient() {
           &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
-  ClientReturnStatusMatch.insert(PersoClient::NotExecuted,
+  ClientReturnStatusMatch.insert(PersoClient::Undefined,
                                  "Выполнение операции не началось.");
   ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
                                  "Не удалось обработать параметры запроса. ");

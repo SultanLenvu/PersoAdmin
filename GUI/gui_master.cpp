@@ -438,13 +438,13 @@ void MasterGUI::createServerTab() {
       new QPushButton("Распечатать стикер для бокса");
   ServerTabControlPanelLayout->addWidget(PrintBoxStickerOnServerPushButton);
   PrintLastBoxStickerOnServerPushButton =
-      new QPushButton("Повторить последний стикера для бокса");
+      new QPushButton("Повторить последний стикер для бокса");
   ServerTabControlPanelLayout->addWidget(PrintLastBoxStickerOnServerPushButton);
   PrintPalletStickerOnServerPushButton =
       new QPushButton("Распечатать стикер для паллет");
   ServerTabControlPanelLayout->addWidget(PrintPalletStickerOnServerPushButton);
   PrintLastPalletStickerOnServerPushButton =
-      new QPushButton("Повторить последний стикера для паллеты");
+      new QPushButton("Повторить последний стикер для паллеты");
   ServerTabControlPanelLayout->addWidget(
       PrintLastPalletStickerOnServerPushButton);
 

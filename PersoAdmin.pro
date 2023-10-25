@@ -20,6 +20,7 @@ SOURCES += \
     GUI/interaction_system.cpp \
     GUI/main_window_kernel.cpp \
     GUI/pallet_shiping_dialog.cpp \
+    GUI/pan_input_dialog.cpp \
     General/hash_model.cpp \
     Log/file_log_backend.cpp \
     Log/widget_log_backend.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     GUI/interaction_system.h \
     GUI/main_window_kernel.h \
     GUI/pallet_shiping_dialog.h \
+    GUI/pan_input_dialog.h \
     General/hash_model.h \
     Log/file_log_backend.h \
     Log/widget_log_backend.h \

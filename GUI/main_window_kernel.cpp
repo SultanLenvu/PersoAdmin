@@ -340,7 +340,17 @@ void MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot() {
 void MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot() {
   emit loggerClear_signal();
 
-  emit printBoxStickerOnServer_signal();
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  if (!Interactor->getPan(param.get())) {
+    return;
+  }
+
+  if (param->isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных");
+    return;
+  }
+
+  emit printBoxStickerOnServer_signal(param);
 }
 
 void MainWindowKernel::on_PrintLastBoxStickerOnServerPushButton_slot() {
@@ -352,7 +362,17 @@ void MainWindowKernel::on_PrintLastBoxStickerOnServerPushButton_slot() {
 void MainWindowKernel::on_PrintPalletStickerOnServerPushButton_slot() {
   emit loggerClear_signal();
 
-  emit printPalletStickerOnServer_signal();
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  if (!Interactor->getPan(param.get())) {
+    return;
+  }
+
+  if (param->isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных");
+    return;
+  }
+
+  emit printPalletStickerOnServer_signal(param);
 }
 
 void MainWindowKernel::on_PrintLastPalletStickerOnServerPushButton_slot() {

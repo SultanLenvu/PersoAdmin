@@ -14,6 +14,7 @@
 #include "General/definitions.h"
 #include "custom_input_dialog.h"
 #include "pallet_shiping_dialog.h"
+#include "pan_input_dialog.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
@@ -41,6 +42,7 @@ class InteractionSystem : public QWidget {
   void finishOperationProgressDialog(const QString& operationName);
 
   bool getPalletShipingParameters(QHash<QString, QString>* params);
+  bool getPan(QHash<QString, QString>* params);
 
   void applySettings(void);
 

@@ -9,6 +9,7 @@ class CustomInputDialog : public QDialog {
  public:
   enum DialogType {
     PalletShipping,
+    PanInput,
   };
   Q_ENUM(DialogType);
 
@@ -19,7 +20,9 @@ class CustomInputDialog : public QDialog {
   explicit CustomInputDialog(QWidget* parent, DialogType type);
   virtual ~CustomInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data) = 0;
+  virtual void getData(QHash<QString, QString>* data) const = 0;
+
+  DialogType type(void) const;
 
  private:
   Q_DISABLE_COPY(CustomInputDialog);

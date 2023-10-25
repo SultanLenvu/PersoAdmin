@@ -198,9 +198,11 @@ class MainWindowKernel : public QMainWindow {
       const QSharedPointer<QHash<QString, QString>> param);
   void confirmTransponderRerelease_signal(
       const QSharedPointer<QHash<QString, QString>> param);
-  void printBoxStickerOnServer_signal();
+  void printBoxStickerOnServer_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
   void printLastBoxStickerOnServer_signal();
-  void printPalletStickerOnServer_signal();
+  void printPalletStickerOnServer_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
   void printLastPalletStickerOnServer_signal();
 
   // Транспондеры
