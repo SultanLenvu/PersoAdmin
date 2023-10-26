@@ -488,8 +488,10 @@ void AdminManager::releaseTransponder(
   sendLog("Выпуск транспондера. ");
 
   QSharedPointer<QFile> firmware(new QFile("temp.bin"));
-  PersoClient::ReturnStatus status =
-      Client->requestTransponderRelease(param.get(), firmware.get());
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
+  PersoClient::ReturnStatus status = Client->requestTransponderRelease(
+      param.get(), firmware.get(), transponderData.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "releaseTransponder");
     return;
@@ -497,6 +499,9 @@ void AdminManager::releaseTransponder(
 
   sendLog("Запрос на отображение полученой прошивки транспондера. ");
   emit displayFirmware_signal(firmware);
+
+  sendLog("Запрос на отображение данных транспондера. ");
+  emit displayTransponderData_signal(transponderData);
 
   finishOperationPerforming("releaseTransponder");
 }
@@ -506,17 +511,12 @@ void AdminManager::confirmTransponderRelease(
   startOperationPerforming("confirmTransponderRelease");
   sendLog("Подтверждение выпуска транспондера. ");
 
-  QSharedPointer<QHash<QString, QString>> transponderData(
-      new QHash<QString, QString>());
-  PersoClient::ReturnStatus status = Client->requestTransponderReleaseConfirm(
-      param.get(), transponderData.get());
+  PersoClient::ReturnStatus status =
+      Client->requestTransponderReleaseConfirm(param.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "confirmTransponderRelease");
     return;
   }
-
-  sendLog("Запрос на отображение данных транспондера. ");
-  emit displayTransponderData_signal(transponderData);
 
   finishOperationPerforming("confirmTransponderRelease");
 }
@@ -527,8 +527,10 @@ void AdminManager::rereleaseTransponder(
   sendLog("Перевыпуск транспондера. ");
 
   QSharedPointer<QFile> firmware(new QFile("temp.bin"));
-  PersoClient::ReturnStatus status =
-      Client->requestTransponderRerelease(param.get(), firmware.get());
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
+  PersoClient::ReturnStatus status = Client->requestTransponderRerelease(
+      param.get(), firmware.get(), transponderData.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "releaseTransponder");
     return;
@@ -536,6 +538,8 @@ void AdminManager::rereleaseTransponder(
 
   sendLog("Запрос на отображение полученой прошивки транспондера. ");
   emit displayFirmware_signal(firmware);
+  sendLog("Запрос на отображение данных транспондера. ");
+  emit displayTransponderData_signal(transponderData);
 
   finishOperationPerforming("rereleaseTransponder");
 }
@@ -545,17 +549,12 @@ void AdminManager::confirmTransponderRerelease(
   startOperationPerforming("confirmTransponderRerelease");
   sendLog("Подтверждение перевыпуска транспондера. ");
 
-  QSharedPointer<QHash<QString, QString>> transponderData(
-      new QHash<QString, QString>());
-  PersoClient::ReturnStatus status = Client->requestTransponderRereleaseConfirm(
-      param.get(), transponderData.get());
+  PersoClient::ReturnStatus status =
+      Client->requestTransponderRereleaseConfirm(param.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "confirmTransponderRelease");
     return;
   }
-
-  sendLog("Запрос на отображение данных транспондера. ");
-  emit displayTransponderData_signal(transponderData);
 
   finishOperationPerforming("confirmTransponderRerelease");
 }

@@ -70,13 +70,15 @@ PersoClient::ReturnStatus PersoClient::requestAuthorize(
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
     const QHash<QString, QString>* requestData,
-    QFile* firmware) {
+    QFile* firmware,
+    QHash<QString, QString>* responseData) {
   // Проверка на существование
-  if ((!requestData) || (!firmware)) {
+  if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
   Firmware = firmware;
+  ResponseData = responseData;
 
   // Создаем запрос
   CurrentState = CreatingRequest;
@@ -87,22 +89,16 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData,
-    QHash<QString, QString>* responseData) {
+    const QHash<QString, QString>* requestData) {
   // Проверка на существование
-  if ((!requestData) || (!responseData)) {
+  if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
-  ResponseData = responseData;
 
   // Создаем запрос
   CurrentState = CreatingRequest;
   createTransponderReleaseConfirm(requestData);
-
-  // Отправляем сформированный блок данных
-  CurrentState = WaitingResponse;
-  transmitDataBlock();
 
   // Отправляем сформированный блок данных
   return transmitDataBlock();
@@ -110,37 +106,31 @@ PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
     const QHash<QString, QString>* requestData,
-    QFile* firmware) {
+    QFile* firmware,
+    QHash<QString, QString>* responseData) {
   // Проверка на существование
-  if ((!requestData) || (!firmware)) {
+  if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
   Firmware = firmware;
+  ResponseData = responseData;
 
   // Создаем запрос
   CurrentState = CreatingRequest;
   createTransponderRerelease(requestData);
-
-  // Подключаемся к серверу персонализации
-  CurrentState = WaitingServerConnection;
-  if (!processingServerConnection()) {
-    return ServerConnectionError;
-  }
 
   // Отправляем сформированный блок данных
   return transmitDataBlock();
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData,
-    QHash<QString, QString>* responseData) {
+    const QHash<QString, QString>* requestData) {
   // Проверка на существование
-  if ((!requestData) || (!responseData)) {
+  if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
-  ResponseData = responseData;
 
   // Создаем запрос
   CurrentState = CreatingRequest;
@@ -296,6 +286,9 @@ PersoClient::ReturnStatus PersoClient::transmitDataBlock() {
   // Ответный блок данных еще не получен
   ReceivedDataBlockSize = 0;
 
+  // Создаем блок данных для команды
+  createTransmittedDataBlock();
+
   // Подключаемся к серверу персонализации
   CurrentState = WaitingServerConnection;
   if (!processingServerConnection()) {
@@ -381,9 +374,6 @@ void PersoClient::createEcho(void) {
 
   // Тело команды
   CurrentCommand["data"] = "Test";
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createAuthorization(
@@ -396,9 +386,6 @@ void PersoClient::createAuthorization(
   // Тело команды
   CurrentCommand["login"] = requestData->value("login");
   CurrentCommand["password"] = requestData->value("password");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRelease(
@@ -411,9 +398,6 @@ void PersoClient::createTransponderRelease(
   // Тело команды
   CurrentCommand["login"] = requestData->value("login");
   CurrentCommand["password"] = requestData->value("password");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderReleaseConfirm(
@@ -427,9 +411,6 @@ void PersoClient::createTransponderReleaseConfirm(
   CurrentCommand["login"] = requestData->value("login");
   CurrentCommand["password"] = requestData->value("password");
   CurrentCommand["ucid"] = requestData->value("ucid");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRerelease(
@@ -443,9 +424,6 @@ void PersoClient::createTransponderRerelease(
   CurrentCommand["login"] = requestData->value("login");
   CurrentCommand["password"] = requestData->value("password");
   CurrentCommand["pan"] = requestData->value("pan");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRereleaseConfirm(
@@ -460,9 +438,6 @@ void PersoClient::createTransponderRereleaseConfirm(
   CurrentCommand["password"] = requestData->value("password");
   CurrentCommand["pan"] = requestData->value("pan");
   CurrentCommand["ucid"] = requestData->value("ucid");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createProductionLineRollback(
@@ -475,9 +450,6 @@ void PersoClient::createProductionLineRollback(
   // Тело команды
   CurrentCommand["login"] = requestData->value("login");
   CurrentCommand["password"] = requestData->value("password");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createBoxStickerPrint(
@@ -489,9 +461,6 @@ void PersoClient::createBoxStickerPrint(
 
   // Тело команды
   CurrentCommand["pan"] = requestData->value("pan");
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createBoxStickerReprint() {
@@ -499,9 +468,6 @@ void PersoClient::createBoxStickerReprint() {
 
   // Заголовок команды
   CurrentCommand["command_name"] = "print_last_box_sticker";
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 void PersoClient::createPalletStickerPrint(
@@ -523,9 +489,6 @@ void PersoClient::createPalletStickerReprint() {
 
   // Заголовок команды
   CurrentCommand["command_name"] = "print_last_pallet_sticker";
-
-  // Создаем блок данных для команды
-  createTransmittedDataBlock();
 }
 
 PersoClient::ReturnStatus PersoClient::processEcho(void) {
@@ -587,6 +550,19 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
       CurrentResponse.value("firmware").toString().toUtf8()));
   Firmware->close();
 
+  // Данные транспондера
+  ResponseData->insert("sn", CurrentResponse.value("sn").toString());
+  ResponseData->insert("pan", CurrentResponse.value("pan").toString());
+  ResponseData->insert("box_id", CurrentResponse.value("box_id").toString());
+  ResponseData->insert("pallet_id",
+                       CurrentResponse.value("pallet_id").toString());
+  ResponseData->insert("order_id",
+                       CurrentResponse.value("order_id").toString());
+  ResponseData->insert("issuer_name",
+                       CurrentResponse.value("issuer_name").toString());
+  ResponseData->insert("transponder_model",
+                       CurrentResponse.value("transponder_model").toString());
+
   sendLog("Команда TransponderRelease успешно выполнена. ");
   return Completed;
 }
@@ -600,18 +576,6 @@ PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
                 .arg(CurrentResponse["return_status"].toString()));
     return ServerError;
   }
-
-  ResponseData->insert("sn", CurrentResponse.value("sn").toString());
-  ResponseData->insert("pan", CurrentResponse.value("pan").toString());
-  ResponseData->insert("box_id", CurrentResponse.value("box_id").toString());
-  ResponseData->insert("pallet_id",
-                       CurrentResponse.value("pallet_id").toString());
-  ResponseData->insert("order_id",
-                       CurrentResponse.value("order_id").toString());
-  ResponseData->insert("issuer_name",
-                       CurrentResponse.value("issuer_name").toString());
-  ResponseData->insert("transponder_model",
-                       CurrentResponse.value("transponder_model").toString());
 
   return Completed;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
@@ -638,6 +602,19 @@ PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
       CurrentResponse.value("firmware").toString().toUtf8()));
   Firmware->close();
 
+  // Данные транспондера
+  ResponseData->insert("sn", CurrentResponse.value("sn").toString());
+  ResponseData->insert("pan", CurrentResponse.value("pan").toString());
+  ResponseData->insert("box_id", CurrentResponse.value("box_id").toString());
+  ResponseData->insert("pallet_id",
+                       CurrentResponse.value("pallet_id").toString());
+  ResponseData->insert("order_id",
+                       CurrentResponse.value("order_id").toString());
+  ResponseData->insert("issuer_name",
+                       CurrentResponse.value("issuer_name").toString());
+  ResponseData->insert("transponder_model",
+                       CurrentResponse.value("transponder_model").toString());
+
   sendLog("Команда transponder_rerelease успешно выполнена. ");
   return Completed;
 }
@@ -651,18 +628,6 @@ PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm() {
                 .arg(CurrentResponse["return_status"].toString()));
     return ServerError;
   }
-
-  ResponseData->insert("sn", CurrentResponse.value("sn").toString());
-  ResponseData->insert("pan", CurrentResponse.value("pan").toString());
-  ResponseData->insert("box_id", CurrentResponse.value("box_id").toString());
-  ResponseData->insert("pallet_id",
-                       CurrentResponse.value("pallet_id").toString());
-  ResponseData->insert("order_id",
-                       CurrentResponse.value("order_id").toString());
-  ResponseData->insert("issuer_name",
-                       CurrentResponse.value("issuer_name").toString());
-  ResponseData->insert("transponder_model",
-                       CurrentResponse.value("transponder_model").toString());
 
   sendLog("Команда transponder_rerelease_confirm успешно выполнена. ");
   return Completed;

@@ -83,16 +83,16 @@ class PersoClient : public QObject {
 
   ReturnStatus requestTransponderRelease(
       const QHash<QString, QString>* requestData,
-      QFile* firmware);
-  ReturnStatus requestTransponderReleaseConfirm(
-      const QHash<QString, QString>* requestData,
+      QFile* firmware,
       QHash<QString, QString>* responseData);
+  ReturnStatus requestTransponderReleaseConfirm(
+      const QHash<QString, QString>* requestData);
   ReturnStatus requestTransponderRerelease(
       const QHash<QString, QString>* requestData,
-      QFile* firmware);
-  ReturnStatus requestTransponderRereleaseConfirm(
-      const QHash<QString, QString>* requestData,
+      QFile* firmware,
       QHash<QString, QString>* responseData);
+  ReturnStatus requestTransponderRereleaseConfirm(
+      const QHash<QString, QString>* requestData);
 
   ReturnStatus requestBoxStickerPrint(
       const QHash<QString, QString>* requestData);
