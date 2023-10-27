@@ -140,6 +140,22 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
   return transmitDataBlock();
 }
 
+PersoClient::ReturnStatus PersoClient::requestProductionLineRollback(
+    const QHash<QString, QString>* requestData) {
+  // Проверка на существование
+  if (!requestData) {
+    sendLog("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+  createProductionLineRollback(requestData);
+
+  // Отправляем сформированный блок данных
+  return transmitDataBlock();
+}
+
 PersoClient::ReturnStatus PersoClient::requestBoxStickerPrint(
     const QHash<QString, QString>* requestData) {
   // Проверка на существование
@@ -633,7 +649,19 @@ PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm() {
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {}
+PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {
+  sendLog("Обработка ответа на команду production_line_rollback. ");
+
+  // Проверка статуса возврата
+  if (CurrentResponse["return_status"] != "no_error") {
+    sendLog(QString("Получена серверная ошибка: %1")
+                .arg(CurrentResponse["return_status"].toString()));
+    return ServerError;
+  }
+
+  sendLog("Команда production_line_rollback успешно выполнена. ");
+  return Completed;
+}
 
 PersoClient::ReturnStatus PersoClient::processPrintBoxSticker() {
   sendLog("Обработка ответа на команду print_box_sticker. ");

@@ -1053,8 +1053,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::rollbackProductionLine(
 
   productionLineRecord.insert("transponder_id", transponderRecord.value("id"));
   if (!Database->updateRecordById("production_lines", productionLineRecord)) {
-    sendLog(QString("Получена ошибка при поиске производственной линии '%1'. ")
-                .arg(productionLineRecord.value("id")));
+    sendLog(QString("Получена ошибка при связывании производственной линии %1 "
+                    "с транспондером %2. ")
+                .arg(productionLineRecord.value("id"),
+                     transponderRecord.value("id")));
     Database->abortTransaction();
     return DatabaseQueryError;
   }

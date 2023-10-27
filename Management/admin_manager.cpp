@@ -559,6 +559,21 @@ void AdminManager::confirmTransponderRerelease(
   finishOperationPerforming("confirmTransponderRerelease");
 }
 
+void AdminManager::rollbackProductionLine(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("rollbackProductionLine");
+  sendLog("Подтверждение перевыпуска транспондера. ");
+
+  PersoClient::ReturnStatus status =
+      Client->requestProductionLineRollback(param.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "rollbackProductionLine");
+    return;
+  }
+
+  finishOperationPerforming("rollbackProductionLine");
+}
+
 void AdminManager::printBoxStickerOnServer(
     QSharedPointer<QHash<QString, QString>> param) {
   startOperationPerforming("printBoxStickerOnServer");

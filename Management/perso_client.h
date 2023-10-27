@@ -93,6 +93,8 @@ class PersoClient : public QObject {
       QHash<QString, QString>* responseData);
   ReturnStatus requestTransponderRereleaseConfirm(
       const QHash<QString, QString>* requestData);
+  ReturnStatus requestProductionLineRollback(
+      const QHash<QString, QString>* requestData);
 
   ReturnStatus requestBoxStickerPrint(
       const QHash<QString, QString>* requestData);

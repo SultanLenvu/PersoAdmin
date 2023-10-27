@@ -45,6 +45,11 @@ void PostgresController::disconnect(void) {
   }
 }
 
+bool PostgresController::isConnected() {
+  bool ok = QSqlDatabase::database(ConnectionName).open();
+  return ok;
+}
+
 bool PostgresController::openTransaction() const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");

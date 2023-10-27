@@ -429,6 +429,9 @@ void MasterGUI::createServerTab() {
   ConfirmRereleaseTransponderPushButton =
       new QPushButton("Подтвердить перевыпуск");
   ServerTabControlPanelLayout->addWidget(ConfirmRereleaseTransponderPushButton);
+  ProductionLineRollbackPushButton =
+      new QPushButton("Откат производственной линии");
+  ServerTabControlPanelLayout->addWidget(ProductionLineRollbackPushButton);
 
   ServerTabControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);

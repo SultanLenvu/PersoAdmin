@@ -95,6 +95,8 @@ class AdminManager : public QObject {
       const QSharedPointer<QHash<QString, QString>> param);
   void confirmTransponderRerelease(
       const QSharedPointer<QHash<QString, QString>> param);
+  void rollbackProductionLine(
+      const QSharedPointer<QHash<QString, QString>> param);
   void printBoxStickerOnServer(QSharedPointer<QHash<QString, QString>> param);
   void printLastBoxStickerOnServer();
   void printPalletStickerOnServer(

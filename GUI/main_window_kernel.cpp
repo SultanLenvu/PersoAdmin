@@ -337,6 +337,18 @@ void MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot() {
   emit confirmTransponderRerelease_signal(param);
 }
 
+void MainWindowKernel::on_ProductionLineRollbackPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  emit loggerClear_signal();
+
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  param->insert("login", gui->LoginLineEdit2->text());
+  param->insert("password", gui->PasswordLineEdit2->text());
+
+  emit rollbackProductionLine_signal(param);
+}
+
 void MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot() {
   emit loggerClear_signal();
 
@@ -982,6 +994,8 @@ void MainWindowKernel::connectMasterGui() {
   connect(gui->ConfirmRereleaseTransponderPushButton, &QPushButton::clicked,
           this,
           &MainWindowKernel::on_ConfirmRereleaseTransponderPushButton_slot);
+  connect(gui->ProductionLineRollbackPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_ProductionLineRollbackPushButton_slot);
 
   connect(gui->PrintBoxStickerOnServerPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintBoxStickerOnServerPushButton_slot);
@@ -1112,6 +1126,8 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::rereleaseTransponder);
   connect(this, &MainWindowKernel::confirmTransponderRerelease_signal, Manager,
           &AdminManager::confirmTransponderRerelease);
+  connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager,
+          &AdminManager::rollbackProductionLine);
   connect(this, &MainWindowKernel::printBoxStickerOnServer_signal, Manager,
           &AdminManager::printBoxStickerOnServer);
   connect(this, &MainWindowKernel::printLastBoxStickerOnServer_signal, Manager,

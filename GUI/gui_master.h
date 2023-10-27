@@ -167,6 +167,7 @@ class MasterGUI : public GUI {
   QLineEdit* RereleaseKeyLineEdit;
   QPushButton* RereleaseTransponderPushButton;
   QPushButton* ConfirmRereleaseTransponderPushButton;
+  QPushButton* ProductionLineRollbackPushButton;
   QSpacerItem* ServerTabControlPanelVS;
 
   QPushButton* PrintBoxStickerOnServerPushButton;

@@ -94,6 +94,7 @@ class MainWindowKernel : public QMainWindow {
   void on_ConfirmTransponderPushButton_slot(void);
   void on_RereleaseTransponderPushButton_slot(void);
   void on_ConfirmRereleaseTransponderPushButton_slot(void);
+  void on_ProductionLineRollbackPushButton_slot(void);
 
   void on_PrintBoxStickerOnServerPushButton_slot(void);
   void on_PrintLastBoxStickerOnServerPushButton_slot(void);
@@ -197,6 +198,8 @@ class MainWindowKernel : public QMainWindow {
   void rereleaseTransponder_signal(
       const QSharedPointer<QHash<QString, QString>> param);
   void confirmTransponderRerelease_signal(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void rollbackProductionLine_signal(
       const QSharedPointer<QHash<QString, QString>> param);
   void printBoxStickerOnServer_signal(
       const QSharedPointer<QHash<QString, QString>> param);
