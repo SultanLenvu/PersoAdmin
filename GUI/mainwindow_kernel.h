@@ -23,7 +23,7 @@ class MainWindowKernel : public QMainWindow {
   Q_OBJECT
  private:
   QRect DesktopGeometry;
-  AbstractGUI* CurrentAbstractGUI;
+  AbstractGUI* CurrentGUI;
 
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
@@ -134,8 +134,8 @@ class MainWindowKernel : public QMainWindow {
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню
 
-  void createAuthorazationAbstractGUI(void);
-  void connectAuthorizationAbstractGUI(void);
+  void createAuthorazationGUI(void);
+  void connectAuthorizationGUI(void);
 
   void createMainWindowGUI(void);
   void connectMainWindowGUI(void);
