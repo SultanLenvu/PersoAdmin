@@ -1,4 +1,4 @@
-#include "GUI/main_window_kernel.h"
+#include "GUI/mainwindow_kernel.h"
 
 #include <QApplication>
 #include <QTextCodec>

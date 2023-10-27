@@ -14,23 +14,22 @@
 #include "General/hash_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
-#include "Transponder/transponder_seed_model.h"
-#include "gui.h"
-#include "gui_authorization.h"
-#include "gui_master.h"
+#include "abstract_gui.h"
+#include "authorization_gui.h"
 #include "interaction_system.h"
+#include "mainwindow_gui.h"
 
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
  private:
   QRect DesktopGeometry;
-  GUI* CurrentGUI;
+  AbstractGUI* CurrentAbstractGUI;
 
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
   QAction* AboutProgramAct;
-  QAction* RequestAuthorizationGuiAct;
+  QAction* RequestAuthorizationAbstractGUIAct;
 
   InteractionSystem* Interactor;
 
@@ -56,7 +55,7 @@ class MainWindowKernel : public QMainWindow {
   ~MainWindowKernel();
 
  public slots:
-  void on_RequestAuthorizationGuiAct_slot(void);
+  void on_RequestAuthorizationAbstractGUIAct_slot(void);
 
   // Авторизация
   void on_AuthorizePushButton_slot(void);
@@ -135,11 +134,11 @@ class MainWindowKernel : public QMainWindow {
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню
 
-  void createAuthorazationGui(void);
-  void connectAuthorizationGui(void);
+  void createAuthorazationAbstractGUI(void);
+  void connectAuthorizationAbstractGUI(void);
 
-  void createMasterGui(void);
-  void connectMasterGui(void);
+  void createMainWindowGUI(void);
+  void connectMainWindowGUI(void);
 
   void createLoggerInstance(void);
   void createManagerInstance(void);

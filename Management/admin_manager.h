@@ -14,7 +14,6 @@
 #include "Log/log_system.h"
 #include "StickerPrinter/isticker_printer.h"
 #include "StickerPrinter/te310_printer.h"
-#include "Transponder/transponder_seed_model.h"
 #include "administration_system.h"
 #include "perso_client.h"
 

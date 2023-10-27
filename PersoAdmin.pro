@@ -12,13 +12,12 @@ SOURCES += \
     Database/database_controller.cpp \
     Database/postgres_controller.cpp \
     Database/database_table_model.cpp \
+    GUI/abstract_gui.cpp \
+    GUI/authorization_gui.cpp \
     GUI/custom_input_dialog.cpp \
-    GUI/gui_authorization.cpp \
-    GUI/gui_master.cpp \
-    GUI/gui.cpp \
-    GUI/gui_delegates.cpp \
     GUI/interaction_system.cpp \
-    GUI/main_window_kernel.cpp \
+    GUI/mainwindow_gui.cpp \
+    GUI/mainwindow_kernel.cpp \
     GUI/pallet_shiping_dialog.cpp \
     GUI/pan_input_dialog.cpp \
     General/hash_model.cpp \
@@ -34,24 +33,23 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
-    GUI/custom_input_dialog.h \
-    GUI/interaction_system.h \
-    GUI/main_window_kernel.h \
-    GUI/pallet_shiping_dialog.h \
-    GUI/pan_input_dialog.h \
+    GUI/abstract_gui.h \
+    GUI/authorization_gui.h \
+    GUI/mainwindow_gui.h \
+    GUI/mainwindow_kernel.h \
+    General/definitions.h \
     General/hash_model.h \
     Log/file_log_backend.h \
     Log/widget_log_backend.h \
     Log/log_backend.h \
     Log/log_system.h \
-    General/definitions.h \
     Database/database_controller.h \
     Database/postgres_controller.h \
     Database/database_table_model.h \
-    GUI/gui_authorization.h \
-    GUI/gui_master.h \
-    GUI/gui.h \
-    GUI/gui_delegates.h \
+    GUI/custom_input_dialog.h \
+    GUI/interaction_system.h \
+    GUI/pallet_shiping_dialog.h \
+    GUI/pan_input_dialog.h \
     Management/admin_manager.h \
     Management/administration_system.h \
     Management/perso_client.h \

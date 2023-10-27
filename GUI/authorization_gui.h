@@ -1,14 +1,14 @@
-#ifndef GUI_AUTHORIZATION_H
-#define GUI_AUTHORIZATION_H
+#ifndef AbstractGUI_AUTHORIZATION_H
+#define AbstractGUI_AUTHORIZATION_H
 
 #include <QObject>
 #include <QSettings>
 #include <QtWidgets>
 
 #include "General/definitions.h"
-#include "gui.h"
+#include "abstract_gui.h"
 
-class AuthorizationGUI : public GUI {
+class AuthorizationAbstractGUI : public AbstractGUI {
   Q_OBJECT
  public:
   QGroupBox* AuthorizationMenuGroup;
@@ -25,16 +25,16 @@ class AuthorizationGUI : public GUI {
   QSpacerItem* ConnectButtonSpacer;
 
  public:
-  explicit AuthorizationGUI(QWidget* parent);
+  explicit AuthorizationAbstractGUI(QWidget* parent);
 
   virtual void create(void) override;
   virtual void update(void) override;
 
  private:
-  Q_DISABLE_COPY(AuthorizationGUI)
+  Q_DISABLE_COPY(AuthorizationAbstractGUI)
   void createAuthorizationMenu(void);
 
  private slots:
 };
 
-#endif  // GUI_AUTHORIZATION_H
+#endif  // AbstractGUI_AUTHORIZATION_H

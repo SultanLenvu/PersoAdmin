@@ -9,7 +9,6 @@
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
 #include "Log/log_system.h"
-#include "Transponder/transponder_seed_model.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT

@@ -1,272 +1,370 @@
 #ifndef MAINWINDOW_GUI_H
 #define MAINWINDOW_GUI_H
 
+#include <QObject>
 #include <QtCharts>
-#include <QtCore/QVariant>
-#include <QtWidgets>
 
-#include "../Control/manager.h"
-#include "delegates_gui.h"
+#include "abstract_gui.h"
 
-class MainWindow_GUI : public QObject {
-public:
-  enum DtrType { TC278, MD5859 };
+#include "General/definitions.h"
 
-  enum OperatingMode { Initial, Master, Production };
+class MainWindowGUI : public AbstractGUI {
+  Q_OBJECT
 
-public:
-  /* Главное окно приложения */
-  //=========================================================================================
-  QMainWindow *MainWindow;
-  QRect DesktopGeometry;
+ public:
+  QTabWidget* Tabs;
 
-  // Поключенный в данный момент DTR
-  DtrType CurrentDtr;
-  // Текущий режим
-  OperatingMode CurrentMode;
-
-  /* Виджеты верхней панели меню */
-  //==================================================
-  QMenu *ServiceMenu;
-  QMenu *HelpMenu;
-
-  QAction *MasterInterfaceRequestAct;
-  QAction *ProductionInterfaceRequestAct;
-  QAction *AboutProgramAct;
-  //==================================================
-  //=========================================================================================
-
-  /* Корневые виджет всех реализуемых графических интерфейсов */
-  //=========================================================================================
-  QWidget *CurrentInterface;
-  //=========================================================================================
-
-  /* Виджеты стартового интерфейса */
-  //=========================================================================================
-  QHBoxLayout *II_MainLayout;
-
-  QGroupBox *II_ConnectButtonGroup;
-  QVBoxLayout *II_ConnectButtonLayout;
-  QPushButton *PushButtonConnectMD5859;
-  QPushButton *PushButtonConnectTC278;
-  QSpacerItem *II_ConnectButtonSpacer;
-  //=========================================================================================
-
-  /* Виджеты производственного интерфейса */
-  //=========================================================================================
-  QHBoxLayout *PI_MainLayout;
-
-  QGroupBox *PI_ButtonGroup;
-  QVBoxLayout *PI_ButtonLayout;
-  QPushButton *PI_PushButtonPersonalize;
-  QSpacerItem *PI_ButtonSpacer;
-  QPushButton *PI_PushButtonHardReset;
-
-  QGroupBox *PI_ObuData;
-  QHBoxLayout *PI_ObuDataLayout;
-  QTableView *PI_MI_SystemElementView;
-  QTableView *PI_EfcElementView;
-  //=========================================================================================
-
-  /* Виджеты мастер интерфейса */
-  //=========================================================================================
-  QHBoxLayout *MI_MainLayout;
-  QTabWidget *MI_Tabs;
-
-  /* Виджеты интерфейса настройки DTR */
+  /* Отображение логов */
   //============================================================
-  QGroupBox *GroupLog;
-  QHBoxLayout *LogLayout;
-  QPlainTextEdit *GeneralLogs;
+  QGroupBox* LogGroup;
+  QVBoxLayout* LogLayout;
+  QPlainTextEdit* LogDisplay;
   //============================================================
 
-  /* Виджеты интерфейса настройки DTR */
+  /* Интерфейс базы данных */
   //============================================================
-  QWidget *DtrTab;
-  QHBoxLayout *DtrMainLayout;
-  QGroupBox *DtrControlPanelGroupBox;
-  QVBoxLayout *DtrControlPanelLayout;
+  QWidget* DatabaseTab;
+  QHBoxLayout* DatabaseMainLayout;
 
-  // Виджеты, общие для всех DTR
-  QPushButton *PushButtonConnect;
-  QPushButton *PushButtonDisconnect;
-  QPushButton *PushButtonReboot;
-  QPushButton *PushButtonStatus;
-  QPushButton *PushButtonTransmitCustomData;
-  QLineEdit *LineEditCustomData;
-  QSpacerItem *DtrButtonLayoutVS;
+  // Панель упралвения БД
+  QGroupBox* DatabaseControlPanelGroup;
+  QVBoxLayout* DatabaseControlPanelLayout;
 
-  // Представление для отображения параметров DTR
-  QTableView *DtrParametersView;
+  QPushButton* ConnectDatabasePushButton;
+  QPushButton* DisconnectDatabasePushButton;
+  QSpacerItem* DatabaseControlPanelVS;
 
-  // Виджеты, специфичные для TC278
-  QPushButton *PushButtonEnableSynchronization;
-  QPushButton *PushButtonDisableSynchronization;
-  QPushButton *PushButtonSetAttenuation;
-  QPushButton *PushButtonGetAttenuation;
+  QComboBox* DatabaseTableChoice;
+  QPushButton* ShowDatabaseTablePushButton;
+  QPushButton* ClearDatabaseTablePushButton;
+  QSpacerItem* DatabaseControlPanelVS1;
 
-  // Виджеты, специфичные для MD5859
-  QPushButton *PushButtonEnableCommunication;
-  QPushButton *PushButtonDisableCommunication;
-  QPushButton *PushButtonConfigure;
+  QPushButton* TransmitCustomRequestPushButton;
+  QLineEdit* CustomRequestLineEdit;
+
+  // Отображение записей в БД
+  QGroupBox* DatabaseBufferGroup;
+  QVBoxLayout* DatabaseBufferLayout;
+  QTableView* DatabaseRandomModelView;
   //============================================================
 
-  /* Виджеты интерфейса персонализации */
+  /* Интерфейс для управления заказами */
   //============================================================
-  QWidget *PersonalizationTab;
-  QHBoxLayout *PersonalizationMainLayout;
-  QVBoxLayout *PersonalizationMainSubLayout;
+  QWidget* OrderTab;
+  QHBoxLayout* OrderTabMainLayout;
 
-  QGroupBox *PersonalizationControlPanelGroupBox;
-  QHBoxLayout *PersonalizationButtonMainLayout;
-  QVBoxLayout *PersonalizationButtonSubLayout1;
-  QVBoxLayout *PersonalizationButtonSubLayout2;
-  QVBoxLayout *PersonalizationButtonSubLayout3;
+  QGroupBox* OrderControlPanel;
+  QVBoxLayout* OrderControlPanelLayout;
 
-  QGroupBox *MI_ObuDataGroupBox;
-  QHBoxLayout *MI_ObuDataViewLayout;
-  QTableView *MI_SystemElementView;
-  QTableView *MI_EfcElementView;
+  QCheckBox* FullPersonalizationCheckBox;
+  QHBoxLayout* OrderPanelSubLayout;
+  QLabel* PanFilePathLabel;
+  QLineEdit* PanFilePathLineEdit;
+  QPushButton* PanFileExplorePushButton;
+  QHBoxLayout* OrderPanelSubLayout1;
+  QLabel* IssuerNameComboLabel;
+  QComboBox* IssuerNameComboBox;
+  QHBoxLayout* OrderPanelSubLayout2;
+  QLabel* TransponderQuantityLabel;
+  QLineEdit* TransponderQuantityLineEdit;
+  QHBoxLayout* OrderPanelSubLayout3;
+  QLabel* BoxCapacityLabel;
+  QLineEdit* BoxCapacityLineEdit;
+  QHBoxLayout* OrderPanelSublayout4;
+  QLabel* PalletCapacityLabel;
+  QLineEdit* PalletCapacityLineEdit;
+  QHBoxLayout* OrderPanelSublayout5;
+  QLabel* TransponderModelLabel;
+  QLineEdit* TransponderModelLineEdit;
+  QHBoxLayout* OrderPanelSubLayout6;
+  QLabel* AccrReferenceLabel;
+  QLineEdit* AccrReferenceLineEdit;
+  QHBoxLayout* OrderPanelSubLayout7;
+  QLabel* EquipmentClassLabel;
+  QLineEdit* EquipmentClassLineEdit;
+  QHBoxLayout* OrderPanelSubLayout8;
+  QLabel* ManufacturerIdLabel;
+  QLineEdit* ManufacturerIdLineEdit;
+  QPushButton* CreateNewOrderPushButton;
+  QSpacerItem* OrderControlPanelVS1;
 
-  QPushButton *PushButtonRead;
-  QPushButton *MI_PushButtonPersonalize;
-  QSpacerItem *PersonalizationVerticalSpacer1;
+  QHBoxLayout* OrderIdLayout1;
+  QLabel* OrderIdLabel1;
+  QLineEdit* OrderIdLineEdit1;
+  QPushButton* StartOrderAssemblingPushButton;
+  QPushButton* StopOrderAssemblingPushButton;
+  QSpacerItem* OrderControlPanelVS2;
 
-  QPushButton *PushButtonClear;
-  QPushButton *MI_PushButtonHardReset;
-  QSpacerItem *PersonalizationVerticalSpacer2;
+  QPushButton* UpdateOrderViewPushButton;
+  QPushButton* DeleteLastOrderPushButton;
 
-  QComboBox *ElementChoice;
-  QComboBox *AttributeChoice;
-  QLineEdit *AttributeNewValue;
-  QPushButton *PushButtonOverwriteAttribute;
-  QSpacerItem *PersonalizationVerticalSpacer3;
-  //============================================================
-
-  /* Виджеты интерфейса тестирования */
-  //============================================================
-  QWidget *TestingTab;
-  QHBoxLayout *TestingMainLayout;
-
-  QGroupBox *TestingControlPanelGroupBox;
-  QVBoxLayout *TestingControlPanelLayout;
-  QPushButton *PushButtonFullTesting;
-  QPushButton *PushButtonAppIKTest;
-  QPushButton *PushButtonAppTKTest;
-  QPushButton *PushButtonEfcTest;
-  QPushButton *PushButtonSystemTest;
-  QPushButton *PushButtonSingleTest;
-  QLineEdit *LineEditTestName;
-  QSpacerItem *VerticalSpacer1;
-  QPushButton *PushButtonDsrcTransaction;
-
-  QGroupBox *TestResultsGroupBox;
-  QGridLayout *TestGridLayout;
-  QLabel *AppIKTestsLabel;
-  QLabel *AppTKTestsLabel;
-  QLabel *EfcTestsLabel;
-  QLabel *SystemTestsLabel;
-  QTableView *AppIKTestsView;
-  QTableView *AppTKTestsView;
-  QTableView *EfcTestsView;
-  QTableView *SystemTestsView;
+  QGroupBox* OrderTablePanel;
+  QVBoxLayout* OrderTablePanelLayout;
+  QTableView* OrderTableView;
   //============================================================
 
-  /* Виджеты интерфейса напряжения питания */
+  /* Интерфейс для управления линиями производства */
   //============================================================
-  QWidget *SupplyVoltageTab;
-  QHBoxLayout *SVMainLayout;
+  QWidget* ProductionLinesTab;
+  QHBoxLayout* ProductionLinesTabMainLayout;
 
-  QGroupBox *SVControlPanelGroupBox;
-  QVBoxLayout *SVControlPanelLayout;
-  QPushButton *PushButtonStartEndlessMeasuring;
-  QPushButton *PushButtonStopEndlessMeasuring;
-  QPushButton *PushButtonMeasureCountableTimes;
-  QLineEdit *LineEditMeasureCount;
-  QSpacerItem *VerticalSpacer2;
+  QGroupBox* ProductionLinesControlPanel;
+  QVBoxLayout* ProductionLinesControlPanelLayout;
 
-  QChartView *BatteryVoltageChartView;
+  QHBoxLayout* LoginLayout1;
+  QLabel* LoginLabel1;
+  QLineEdit* LoginLineEdit1;
+  QHBoxLayout* PasswordLayout1;
+  QLabel* PasswordLabel1;
+  QLineEdit* PasswordLineEdit1;
+  QPushButton* CreateNewProductionLinePushButton;
+  QSpacerItem* ProductionLinesControlPanelVS1;
+
+  QHBoxLayout* OrderIdLayout2;
+  QLabel* OrderIdLabel2;
+  QLineEdit* OrderIdLineEdit2;
+  QPushButton* AllocateInactiveProductionLinesPushButton;
+  QSpacerItem* ProductionLinesControlPanelVS2;
+
+  QHBoxLayout* BoxIdLayout;
+  QLabel* BoxIdLabel;
+  QLineEdit* BoxIdLineEdit1;
+  QPushButton* LinkProductionLinePushButton;
+  QSpacerItem* ProductionLinesControlPanelVS3;
+
+  QPushButton* DeactivateAllProductionLinesPushButton;
+  QPushButton* UpdateProductionLineViewPushButton;
+  QPushButton* DeleteLastProductionLinePushButton;
+
+  QGroupBox* ProductionLineTablePanel;
+  QVBoxLayout* ProductionLineTableLayout;
+  QTableView* ProductionLineTableView;
   //============================================================
 
-  /* Виджеты интерфейса данных безопасности */
+  /* Интерфейс для теста сервера */
   //============================================================
-  QWidget *SecurityTab;
-  QGridLayout *SecurityLayout;
+  QWidget* ServerTab;
+  QHBoxLayout* ServerTabMainLayout;
 
-  QLabel *TMasterKeysLabel;
-  QLabel *CMasterKeysLabel;
-  QLabel *CommonKeysLabel;
-  QTableView *TMasterKeysView;
-  QTableView *CMasterKeysView;
-  QTableView *CommonKeysView;
+  QGroupBox* ServerTabControlPanel;
+  QVBoxLayout* ServerTabControlPanelLayout;
+
+  QHBoxLayout* LoginLayout2;
+  QLabel* LoginLabel2;
+  QLineEdit* LoginLineEdit2;
+  QHBoxLayout* PasswordLayout2;
+  QLabel* PasswordLabel2;
+  QLineEdit* PasswordLineEdit2;
+  QHBoxLayout* UcidLayout;
+  QLabel* UcidLabel;
+  QLineEdit* UcidLineEdit;
+  QPushButton* ReleaseTransponderPushButton;
+  QPushButton* ConfirmTransponderPushButton;
+
+  QHBoxLayout* RereleaseKeyLayout;
+  QComboBox* RereleaseKeyComboBox;
+  QLineEdit* RereleaseKeyLineEdit;
+  QPushButton* RereleaseTransponderPushButton;
+  QPushButton* ConfirmRereleaseTransponderPushButton;
+  QPushButton* ProductionLineRollbackPushButton;
+  QSpacerItem* ServerTabControlPanelVS;
+
+  QPushButton* PrintBoxStickerOnServerPushButton;
+  QPushButton* PrintLastBoxStickerOnServerPushButton;
+  QPushButton* PrintPalletStickerOnServerPushButton;
+  QPushButton* PrintLastPalletStickerOnServerPushButton;
+
+  QGroupBox* TransponderDisplayPanel;
+  QVBoxLayout* TransponderDisplayLayout;
+  QTableView* TransponderDataTableView;
+  QPlainTextEdit* AssembledFirmwareView;
   //============================================================
 
-  /* Виджеты общей настройки программы */
+  /* Интерфейс для управления транспондерами */
   //============================================================
-  QWidget *SettingsTab;
-  QHBoxLayout *SettingsMainLayout;
-  QVBoxLayout *SettingsMainSubLayout;
-  QPushButton *PushButtonSaveSettings;
+  QWidget* TransponderTab;
+  QHBoxLayout* TransponderTabMainLayout;
 
-  QSpacerItem *SettingsHorizontalSpacer1;
-  QSpacerItem *SettingsVerticalSpacer1;
+  QGroupBox* TransponderControlPanel;
+  QVBoxLayout* TransponderControlPanelLayout;
+  QHBoxLayout* TransponderControlPanelSublayout;
+  QComboBox* ChoiceAnyIdComboBox;
+  QLineEdit* AnyIdLineEdit;
+  QPushButton* TransponderManualReleasePushButton;
+  QPushButton* TransponderManualRefundPushButton;
+  QSpacerItem* TransponderControlPanelLayoutVS;
 
-  // Настройки для персонализации
-  QGroupBox *PersoSettingsGroupBox;
-  QGridLayout *PersoSettingsMainLayout;
-  QLabel *UseServerPersoLabel;
-  QCheckBox *UseServerPersoCheckBox;
-  QLabel *ServerCommonKeyGenerationLabel;
-  QCheckBox *ServerCommonKeyGenerationCheckBox;
-  QLabel *ipAddressPersoServerLabel;
-  QLineEdit *ipAddressPersoServerLineEdit;
-  QLabel *localMasterKeyPathLabel;
-  QLineEdit *localMasterKeyPathLineEdit;
+  QPushButton* PalletShipmentPushButton;
+
+  QGroupBox* TransponderViewGroup;
+  QVBoxLayout* TransponderViewGroupLayout;
+  QTableView* TransponderTableView;
   //============================================================
-  //=========================================================================================
 
-public:
-  explicit MainWindow_GUI(QObject *parent, QMainWindow *mainWindow);
-  ~MainWindow_GUI();
+  /* Интерфейс для управления эмитентами */
+  //============================================================
+  QWidget* IssuerTab;
+  QHBoxLayout* IssuerTabMainLayout;
 
-  void setCurrentDtr(DtrType dtr);
+  // Панель управления
+  QGroupBox* IssuerControlPanelGroup;
+  QVBoxLayout* IssuerControlPanelLayout;
 
-  void createInterface(OperatingMode mode); // Создание основного интерфейса
-  void destroyInterface(void); // Уничтожение основного интерфейса
+  QComboBox* IssuerTableChoice;
+  QPushButton* ShowIssuerTablePushButton;
+  QPushButton* InitTransportMasterKeysPushButton;
+  QPushButton* InitIssuerTablePushButton;
+  QSpacerItem* TransportKeyVS1;
 
-  void updateTestTableViews(void); // Обновление представлений
-  void updateObuDataViews(void);
-  void updateObuKeysViews(void);
+  QHBoxLayout* IssuerIdLayout1;
+  QLabel* IssuerIdLabel1;
+  QLineEdit* IssuerIdLineEdit1;
+  QHBoxLayout* MasterKeysIdLayout1;
+  QComboBox* MasterKeysChoice;
+  QLineEdit* MasterKeysLineEdit1;
+  QPushButton* LinkIssuerWithKeysPushButton;
 
-private:
-  void createInitialInterface(void); // Создание инициирующего интерфейса
-  void createProductionInterface(void); // Создание производственного интерфейса
-  void createMasterInterface(void); // Создание мастер интерфейса
+  // Отображение записей
+  QGroupBox* IssuerViewGroup;
+  QVBoxLayout* IssuerTableViewLayout;
+  QTableView* IssuerTableView;
+  //============================================================
 
-  void createTopMenu(void); // Создание верхнего меню
-  void createTopMenuActions(void); // Создание функционала для верхнего меню
+  /* Принтер стикеров */
+  //============================================================
+  QWidget* StickerTab;
+  QHBoxLayout* StickerMainLayout;
 
-  void create_II_Buttons(void); // Создание кнопкок для подключения к DTR
+  QGroupBox* StickerControlPanel;
+  QVBoxLayout* StickerControlPanelLayout;
+  QLineEdit* TransponderIdLineEdit;
+  QPushButton* PrintTransponderStickerPushButton;
+  QLineEdit* BoxIdLineEdit2;
+  QPushButton* PrintBoxStickerPushButton;
+  QLineEdit* PalletIdLineEdit;
+  QPushButton* PrintPalletStickerPushButton;
+  QSpacerItem* StickerControlPanelVS;
+  QPushButton* ExecStickerPrinterCommandScriptPushButton;
 
-  void create_PI_Buttons(void); // Создание кнопкок для производства
-  void
-  create_PI_ObuDataView(void); // Создание отображений для данных транспондераы
+  QGroupBox* StickerDataViewGroup;
+  QVBoxLayout* StickerDataViewLayout;
+  QTableView* StickerDataTableView;
+  QPlainTextEdit* StickerPrinterCommandScriptInput;
+  //============================================================
 
-  void create_MI_Tabs(void); // Настройка вкладок функциональности
+  /* Настройки админпанели */
+  //============================================================
+  QWidget* SettingsTab;
+  QHBoxLayout* SettingsMainLayout;
+  QVBoxLayout* SettingsMainSubLayout;
+  QPushButton* ApplySettingsPushButton;
 
-  void createDtrTab(void);
-  void
-  createTC278SpecificWidgets(void); // Создание виджетов, специфичных для TC278
-  void createMD5859SpecificWidgets(
-      void); // Создание виджетов, специфичных для MD5859
-  void createPersonalizationTab(void); // Создание интерфейса персонализации
-  void createTestingTab(void); // Создание интерфейса тестирования
-  void createPowerConsumptionTab(
-      void); // Создание интерфейса для замеров потребления
-  void createSecurityTab(void); // Создание интерфейса данных безопасности
-  void createSettingsTab(void); // Создание интерфейса для настройки программы
+  QSpacerItem* SettingsHorizontalSpacer1;
+  QSpacerItem* SettingsVerticalSpacer1;
 
-  void create_MI_LogWidgets(void); // Создание виджетов для отображения логов
+  // Настройки базы данных
+  QGroupBox* DatabaseSettingsGroupBox;
+  QGridLayout* DatabaseSettingsLayout;
+  QLabel* DatabaseIpLabel;
+  QLineEdit* DatabaseIpLineEdit;
+  QLabel* DatabasePortLabel;
+  QLineEdit* DatabasePortLineEdit;
+  QLabel* DatabaseNameLabel;
+  QLineEdit* DatabaseNameLineEdit;
+  QLabel* DatabaseUserNameLabel;
+  QLineEdit* DatabaseUserNameLineEdit;
+  QLabel* DatabaseUserPasswordLabel;
+  QLineEdit* DatabaseUserPasswordLineEdit;
+  QLabel* IDatabaseControllerLogEnableLabel;
+  QCheckBox* IDatabaseControllerLogEnable;
+
+  // Настройки клиента
+  QGroupBox* PersoClientSettingsGroupBox;
+  QGridLayout* PersoClientSettingsMainLayout;
+  QLabel* PersoClientServerIdLabel;
+  QLineEdit* PersoClientServerIpLineEdit;
+  QLabel* PersoClientServerPortLabel;
+  QLineEdit* PersoClientServerPortLineEdit;
+
+  // Настройки системы логгирования
+  QGroupBox* LogSystemSettingsGroupBox;
+  QGridLayout* LogSystemSettingsLayout;
+  QLabel* LogSystemGlobalEnableLabel;
+  QCheckBox* LogSystemGlobalEnableCheckBox;
+
+  QLabel* LogSystemExtendedEnableLabel;
+  QCheckBox* LogSystemExtendedEnableCheckBox;
+
+  QWidget* LogSystemProxyWidget1;
+  QGridLayout* LogSystemProxyWidget1Layout;
+
+  QLabel* LogSystemDisplayEnableLabel;
+  QCheckBox* LogSystemDisplayEnableCheckBox;
+
+  QLabel* LogSystemListenPersoServerLabel;
+  QCheckBox* LogSystemListenPersoServerCheckBox;
+
+  QWidget* LogSystemProxyWidget2;
+  QGridLayout* LogSystemProxyWidget2Layout;
+  QLabel* LogSystemListenIpLabel;
+  QLineEdit* LogSystemListenIpLineEdit;
+  QLabel* LogSystemListenPortLabel;
+  QLineEdit* LogSystemListenPortLineEdit;
+
+  QLabel* LogSystemFileEnableLabel;
+  QCheckBox* LogSystemFileEnableCheckBox;
+
+  QWidget* LogSystemProxyWidget3;
+  QGridLayout* LogSystemProxyWidget3Layout;
+  QLabel* LogSystemFileMaxNumberLabel;
+  QLineEdit* LogSystemFileMaxNumberLineEdit;
+
+  // Настройки принтера
+  QGroupBox* StickerPrinterSettingsGroupBox;
+  QGridLayout* StickerPrinterSettingsMainLayout;
+  QLabel* StickerPrinterLibPathLabel;
+  QLineEdit* StickerPrinterLibPathLineEdit;
+  QPushButton* StickerPrinterLibPathPushButton;
+  QLabel* StickerPrinterNameLabel;
+  QLineEdit* StickerPrinterNameLineEdit;
+
+ public:
+  explicit MainWindowGUI(QWidget* parent);
+
+  virtual void create(void) override;
+  virtual void update(void) override;
+
+ public slots:
+  void displayLog(const QString& data);
+  void clearLogDisplay(void);
+
+ private:
+  Q_DISABLE_COPY(MainWindowGUI)
+  void createTabs(void);
+
+  void createDatabaseTab(void);
+  void createOrderTab(void);
+  void createProductionLineTab(void);
+  void createServerTab(void);
+  void createTransponderTab(void);
+  void createIssuerTab(void);
+  void createStickerTab(void);
+  void createSettingsTab(void);
+
+  void createLog(void);
+
+ private slots:
+  void on_PanFileExplorePushButton_slot(void);
+
+  void on_RereleaseKeyComboBox_slot(const QString& text);
+
+  void on_LogSystemEnableCheckBox_slot(int32_t state);
+  void on_LogSystemListenPersoServerCheckBox_slot(int32_t state);
+  void on_LogSystemFileEnableCheckBox_slot(int32_t state);
+
+  void on_StickerPrinterLibPathPushButton_slot(void);
+
+ signals:
 };
 
-#endif // MAINWINDOW_GUI_H
+#endif  // MAINWINDOW_GUI_H
