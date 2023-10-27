@@ -29,7 +29,7 @@ class MainWindowKernel : public QMainWindow {
   QMenu* HelpMenu;
 
   QAction* AboutProgramAct;
-  QAction* RequestAuthorizationAbstractGUIAct;
+  QAction* RequestAuthorizationGUIAct;
 
   InteractionSystem* Interactor;
 
@@ -55,7 +55,7 @@ class MainWindowKernel : public QMainWindow {
   ~MainWindowKernel();
 
  public slots:
-  void on_RequestAuthorizationAbstractGUIAct_slot(void);
+  void on_RequestAuthorizationGUIAct_slot(void);
 
   // Авторизация
   void on_AuthorizePushButton_slot(void);
