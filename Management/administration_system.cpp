@@ -2128,16 +2128,16 @@ AdministrationSystem::refundTransponderManually(const QString& id) {
     CurrentBox.insert(
         "assembled_units",
         QString::number(CurrentBox.value("assembled_units").toInt() - 1));
-    CurrentBox.insert("ready_indicator", "false");
-    CurrentBox.insert("assembling_start", "NULL");
-    CurrentBox.insert("assembling_end", "NULL");
-    CurrentBox.insert("production_line_id", "NULL");
-    if (!Database->updateRecordById("boxes", CurrentBox)) {
-      sendLog(QString("Получена ошибка при уменьшении количества собранных "
-                      "транспондеров в боксе %1. ")
-                  .arg(CurrentBox.value("id")));
-      return DatabaseQueryError;
-    }
+  }
+  CurrentBox.insert("ready_indicator", "false");
+  CurrentBox.insert("assembling_start", "NULL");
+  CurrentBox.insert("assembling_end", "NULL");
+  CurrentBox.insert("production_line_id", "NULL");
+  if (!Database->updateRecordById("boxes", CurrentBox)) {
+    sendLog(QString("Получена ошибка при уменьшении количества собранных "
+                    "транспондеров в боксе %1. ")
+                .arg(CurrentBox.value("id")));
+    return DatabaseQueryError;
   }
 
   return Completed;
@@ -2187,7 +2187,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundPalletManually(
     }
 
     if (boxRecord.isEmpty()) {
-      sendLog(QString("Все боксы из паллеты %1 были возвращены. ").arg(id));
+      sendLog(QString("Все боксы из паллеты %1 были возвращены. ")
+                  .arg(boxRecord.value("pallet_id")));
       break;
     }
 

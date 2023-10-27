@@ -184,7 +184,7 @@ PersoClient::ReturnStatus PersoClient::requestPalletStickerPrint(
 PersoClient::ReturnStatus PersoClient::requestPalletStickerReprint() {
   // Создаем запрос
   CurrentState = CreatingRequest;
-  processPrintLastPalletSticker();
+  createPalletStickerReprint();
 
   // Отправляем сформированный блок данных
   return transmitDataBlock();
