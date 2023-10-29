@@ -12,7 +12,7 @@
 #include <QTimer>
 
 #include "General/definitions.h"
-#include "custom_input_dialog.h"
+#include "input_dialog.h"
 #include "pallet_shiping_dialog.h"
 #include "pan_input_dialog.h"
 
@@ -24,7 +24,7 @@ class InteractionSystem : public QWidget {
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
 
-  CustomInputDialog* CurrentDialog;
+  InputDialog* CurrentDialog;
 
   QTimer* ODTimer;
   QTimer* ODQTimer;

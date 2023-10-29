@@ -1,13 +1,16 @@
 #include "pan_input_dialog.h"
 
 PanInputDialog::PanInputDialog(QWidget* parent)
-    : CustomInputDialog(parent, PanInput) {
+    : InputDialog(parent, PanInput) {
   setObjectName("PanInputDialog");
-  setWindowTitle("Введите PAN");
 
+  // Считываем размеры дисплея
   DesktopGeometry = QApplication::desktop()->screenGeometry();
+
+  // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.05);
+              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
+  setWindowTitle("Сканирование стикера");
 
   create();
 }
@@ -15,42 +18,53 @@ PanInputDialog::PanInputDialog(QWidget* parent)
 PanInputDialog::~PanInputDialog() {}
 
 void PanInputDialog::getData(QHash<QString, QString>* data) const {
-  if (checkInput()) {
-    data->insert("pan", PanLineEdit->text());
+  if (!data) {
+    return;
+  }
+
+  QString pan;
+  if (checkInput(pan)) {
+    data->insert("pan", pan);
   } else {
     data->clear();
   }
 }
 
 void PanInputDialog::create() {
-  MainLayout = new QGridLayout();
+  MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
 
-  PanLabel = new QLabel("PAN:");
-  MainLayout->addWidget(PanLabel, 0, 0, 1, 1);
+  MainLabel = new QLabel("Данные стикера");
+  MainLayout->addWidget(MainLabel);
 
-  PanLineEdit = new QLineEdit();
-  PanLineEdit->setMaxLength(PAN_CHAR_LENGTH);
-  MainLayout->addWidget(PanLineEdit, 0, 1, 1, 1);
+  StickerData = new QPlainTextEdit();
+  MainLayout->addWidget(StickerData);
 
-  ButtonLayout = new QHBoxLayout();
-  MainLayout->addLayout(ButtonLayout, 1, 0, 1, 2);
-
-  AcceptButton = new QPushButton("Ок");
-  ButtonLayout->addWidget(AcceptButton);
+  AcceptButton = new QPushButton("Начать");
+  MainLayout->addWidget(AcceptButton);
   connect(AcceptButton, &QPushButton::clicked, this, &QDialog::accept);
 
   RejectButton = new QPushButton("Отмена");
-  ButtonLayout->addWidget(RejectButton);
+  MainLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PanInputDialog::checkInput() const {
-  if (PanLineEdit->text().length() != PAN_CHAR_LENGTH) {
+bool PanInputDialog::checkInput(QString& pan) const {
+  QStringList input = StickerData->toPlainText().split("\n");
+
+  if (input.size() == 2) {
+    pan = input.at(1);
+  } else if (input.size() == 1) {
+    pan = input.at(0);
+  } else {
+    return false;
+  }
+
+  if (pan.length() != PAN_CHAR_LENGTH) {
     return false;
   }
 
   QRegularExpression regex("^[0-9]+$");
-  QRegularExpressionMatch match = regex.match(PanLineEdit->text());
+  QRegularExpressionMatch match = regex.match(pan);
   return match.hasMatch();
 }

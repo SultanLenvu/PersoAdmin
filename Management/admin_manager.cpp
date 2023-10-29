@@ -562,7 +562,7 @@ void AdminManager::confirmTransponderRerelease(
 void AdminManager::rollbackProductionLine(
     const QSharedPointer<QHash<QString, QString>> param) {
   startOperationPerforming("rollbackProductionLine");
-  sendLog("Подтверждение перевыпуска транспондера. ");
+  sendLog("Откат производственной линии. ");
 
   PersoClient::ReturnStatus status =
       Client->requestProductionLineRollback(param.get());

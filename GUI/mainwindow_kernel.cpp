@@ -605,8 +605,8 @@ void MainWindowKernel::saveSettings() const {
 }
 
 bool MainWindowKernel::checkAuthorizationData() const {
-  AuthorizationAbstractGUI* AbstractGUI =
-      dynamic_cast<AuthorizationAbstractGUI*>(CurrentGUI);
+  AuthorizationGUI* AbstractGUI =
+      dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   QString login = AbstractGUI->LoginLineEdit->text();
   QString password = AbstractGUI->PasswordLineEdit->text();
@@ -890,7 +890,7 @@ void MainWindowKernel::createAuthorazationGUI() {
   }
 
   // Создаем виджеты
-  CurrentGUI = new AuthorizationAbstractGUI(this);
+  CurrentGUI = new AuthorizationGUI(this);
   setCentralWidget(CurrentGUI);
   CurrentGUI->create();
 
@@ -903,8 +903,8 @@ void MainWindowKernel::createAuthorazationGUI() {
 }
 
 void MainWindowKernel::connectAuthorizationGUI() {
-  AuthorizationAbstractGUI* AbstractGUI =
-      dynamic_cast<AuthorizationAbstractGUI*>(CurrentGUI);
+  AuthorizationGUI* AbstractGUI =
+      dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   connect(AbstractGUI->AuthorizePushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_AuthorizePushButton_slot);

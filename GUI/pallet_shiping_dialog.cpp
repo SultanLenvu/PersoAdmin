@@ -1,7 +1,7 @@
 #include "pallet_shiping_dialog.h"
 
 PalletShippingDialog::PalletShippingDialog(QWidget* parent)
-    : CustomInputDialog(parent, PalletShipping) {
+    : InputDialog(parent, PalletShipping) {
   setObjectName("PalletShippingDialog");
   setWindowTitle("Отгрузка");
 

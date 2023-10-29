@@ -7,17 +7,17 @@
 #include <QtWidgets>
 
 #include "General/definitions.h"
-#include "custom_input_dialog.h"
+#include "input_dialog.h"
 
-class PanInputDialog : public CustomInputDialog {
+class PanInputDialog : public InputDialog {
   Q_OBJECT
  private:
   QRect DesktopGeometry;
 
-  QGridLayout* MainLayout;
-
-  QLabel* PanLabel;
-  QLineEdit* PanLineEdit;
+  QVBoxLayout* MainLayout;
+  QLabel* MainLabel;
+  QPlainTextEdit* StickerData;
+  QString pan;
 
   QHBoxLayout* ButtonLayout;
   QPushButton* AcceptButton;
@@ -32,7 +32,7 @@ class PanInputDialog : public CustomInputDialog {
  private:
   Q_DISABLE_COPY(PanInputDialog);
   void create(void);
-  bool checkInput(void) const;
+  bool checkInput(QString& pan) const;
 };
 
 #endif // PANINPUTDIALOG_H

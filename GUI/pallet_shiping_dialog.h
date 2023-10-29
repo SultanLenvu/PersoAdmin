@@ -4,9 +4,9 @@
 #include <QDialog>
 #include <QtWidgets>
 
-#include "custom_input_dialog.h"
+#include "input_dialog.h"
 
-class PalletShippingDialog : public CustomInputDialog {
+class PalletShippingDialog : public InputDialog {
   Q_OBJECT
  private:
   QRect DesktopGeometry;

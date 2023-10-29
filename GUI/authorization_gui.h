@@ -8,7 +8,7 @@
 #include "General/definitions.h"
 #include "abstract_gui.h"
 
-class AuthorizationAbstractGUI : public AbstractGUI {
+class AuthorizationGUI : public AbstractGUI {
   Q_OBJECT
  public:
   QGroupBox* AuthorizationMenuGroup;
@@ -25,13 +25,13 @@ class AuthorizationAbstractGUI : public AbstractGUI {
   QSpacerItem* ConnectButtonSpacer;
 
  public:
-  explicit AuthorizationAbstractGUI(QWidget* parent);
+  explicit AuthorizationGUI(QWidget* parent);
 
   virtual void create(void) override;
   virtual void update(void) override;
 
  private:
-  Q_DISABLE_COPY(AuthorizationAbstractGUI)
+  Q_DISABLE_COPY(AuthorizationGUI)
   void createAuthorizationMenu(void);
 
  private slots:

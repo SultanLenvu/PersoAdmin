@@ -1,11 +1,11 @@
 #include "authorization_gui.h"
 
-AuthorizationAbstractGUI::AuthorizationAbstractGUI(QWidget* parent)
+AuthorizationGUI::AuthorizationGUI(QWidget* parent)
     : AbstractGUI(parent, InitialConfiguration) {
-  setObjectName("AuthorizationAbstractGUI");
+  setObjectName("AuthorizationGUI");
 }
 
-void AuthorizationAbstractGUI::create() {
+void AuthorizationGUI::create() {
   // Создаем панель управления
   createAuthorizationMenu();
 
@@ -14,9 +14,9 @@ void AuthorizationAbstractGUI::create() {
   MainLayout->setStretch(1, 3);
 }
 
-void AuthorizationAbstractGUI::update() {}
+void AuthorizationGUI::update() {}
 
-void AuthorizationAbstractGUI::createAuthorizationMenu() {
+void AuthorizationGUI::createAuthorizationMenu() {
   QSettings settings;
 
   AuthorizationMenuGroup = new QGroupBox("Авторизация");

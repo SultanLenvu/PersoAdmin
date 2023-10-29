@@ -14,7 +14,7 @@ SOURCES += \
     Database/database_table_model.cpp \
     GUI/abstract_gui.cpp \
     GUI/authorization_gui.cpp \
-    GUI/custom_input_dialog.cpp \
+    GUI/input_dialog.cpp \
     GUI/interaction_system.cpp \
     GUI/mainwindow_gui.cpp \
     GUI/mainwindow_kernel.cpp \
@@ -35,6 +35,7 @@ SOURCES += \
 HEADERS += \
     GUI/abstract_gui.h \
     GUI/authorization_gui.h \
+    GUI/input_dialog.h \
     GUI/mainwindow_gui.h \
     GUI/mainwindow_kernel.h \
     General/definitions.h \
@@ -46,7 +47,6 @@ HEADERS += \
     Database/database_controller.h \
     Database/postgres_controller.h \
     Database/database_table_model.h \
-    GUI/custom_input_dialog.h \
     GUI/interaction_system.h \
     GUI/pallet_shiping_dialog.h \
     GUI/pan_input_dialog.h \
