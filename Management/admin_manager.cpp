@@ -779,8 +779,7 @@ void AdminManager::createClient() {
           &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
-  ClientReturnStatusMatch.insert(PersoClient::Undefined,
-                                 "Выполнение операции не началось.");
+  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
   ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
                                  "Не удалось обработать параметры запроса. ");
   ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
@@ -790,18 +789,54 @@ void AdminManager::createClient() {
   ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
                                  "Оборвалось соединение с сервером.");
   ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
-                                 "Производственная линия не существует.");
+                                 "Производственная линия не найдена. ");
   ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
                                  "Ошибка доступа к производственной линии.");
   ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
                                  "Производственная линия не активна. ");
   ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
                                  "Синтаксическая ошибка в ответе на запрос. ");
-  ClientReturnStatusMatch.insert(PersoClient::ServerError,
-                                 "Серверная ошибка. ");
-  ClientReturnStatusMatch.insert(PersoClient::UnknownError,
-                                 "Неизвествная ошибка. ");
-  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::CommandSyntaxError,
+      "В серверном запросе допущена синтаксическая ошибка. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::DatabaseError,
+      "Получена ошибка при выполнении запроса в базу данных. ");
+  ClientReturnStatusMatch.insert(PersoClient::TransponderNotFound,
+                                 "Транспондер не найден.");
+  ClientReturnStatusMatch.insert(
+      PersoClient::TransponderNotReleasedEarlier,
+      "Транспондер не был выпущен ранее, перевыпуск невозможен. ");
+  ClientReturnStatusMatch.insert(PersoClient::AwaitingConfirmationError,
+                                 "Транспондер не ожидает подтверждения. ");
+  ClientReturnStatusMatch.insert(PersoClient::IdenticalUcidError,
+                                 "Используется одна и та же печатная плата. "
+                                 "Перевыпуск транспондера невозможен. ");
+  ClientReturnStatusMatch.insert(PersoClient::ProductionLineMissed,
+                                 "Производственная линия не найдена. ");
+  ClientReturnStatusMatch.insert(PersoClient::ProductionLineNotActive,
+                                 "Производственная линия не активна. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::CurrentOrderRunOut,
+      "В текущем заказе отсутствуют свободные транспондеры . ");
+  ClientReturnStatusMatch.insert(PersoClient::CurrentOrderAssembled,
+                                 "Текущий заказ собран. ");
+  ClientReturnStatusMatch.insert(PersoClient::ProductionLineRollbackLimitError,
+                                 "Производственная линия связана с первым "
+                                 "транспондером в боксе. Откат невозможен. ");
+  ClientReturnStatusMatch.insert(PersoClient::BoxStickerPrintError,
+                                 "Не удалось распечатать стикер для бокса. ");
+  ClientReturnStatusMatch.insert(PersoClient::PalletStickerPrintError,
+                                 "Не удалось распечатать стикер для паллеты. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::NextTransponderNotFound,
+      "Получена ошибка при поиске очередного транспондера. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::StartBoxAssemblingError,
+      "Получена ошибка при запуске сборки очередного бокса. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::StartPalletAssemblingError,
+      "Получена ошибка при запуске сборки очередной паллеты. ");
 }
 
 void AdminManager::createStickerPrinter() {

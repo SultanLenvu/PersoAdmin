@@ -1,7 +1,6 @@
 #include "perso_client.h"
 
-PersoClient::PersoClient(QObject *parent) : QObject(parent)
-{
+PersoClient::PersoClient(QObject* parent) : QObject(parent) {
   setObjectName("PersoClient");
   loadSettings();
 
@@ -16,6 +15,7 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
 
   createResponseHandlers();
   createResponseTemplates();
+  createServerStatusMatchTable();
 }
 
 PersoClient::~PersoClient() {
@@ -211,7 +211,6 @@ void PersoClient::applySettings() {
   loadSettings();
 }
 
-
 /*
  * Приватные  методы
  */
@@ -352,6 +351,19 @@ PersoClient::ReturnStatus PersoClient::transmitDataBlock() {
     return ResponseSyntaxError;
   }
 
+  // Проверка наличия статуса
+  if (CurrentResponse.value("return_status").isUndefined()) {
+    sendLog(QString("В ответа на команду %1 отсутствует статус возврата. ")
+                .arg(CurrentResponse.value("response_name").toString()));
+    return ResponseSyntaxError;
+  }
+
+  // Проверка статуса
+  if (CurrentResponse.value("return_status").toString() != "0") {
+    return ServerStatusMatchTable.value(
+        CurrentResponse.value("return_status").toString());
+  }
+
   // Синтаксическая проверка ответа
   QVector<QString>* currentTemplate =
       ResponseTemplates.value(CurrentResponse.value("response_name").toString())
@@ -389,7 +401,7 @@ void PersoClient::createEcho(void) {
   CurrentCommand["command_name"] = "echo";
 
   // Тело команды
-  CurrentCommand["data"] = "Test";
+  CurrentCommand["data"] = "test";
 }
 
 void PersoClient::createAuthorization(
@@ -510,36 +522,12 @@ void PersoClient::createPalletStickerReprint() {
 PersoClient::ReturnStatus PersoClient::processEcho(void) {
   sendLog("Обработка ответа на команду Echo. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   sendLog("Команда Echo успешно выполнена. ");
   return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processAuthorization(void) {
   sendLog("Обработка ответа на команду TransponderRelease. ");
-
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
-  if (CurrentResponse.value("access").toString() == "allowed") {
-    return Completed;
-  } else if (CurrentResponse.value("access").toString() == "not_exist") {
-    return AuthorizationNotExist;
-  } else if (CurrentResponse.value("access").toString() == "not_active") {
-    return AuthorizationNotActive;
-  } else {
-    return AuthorizationAccessDenied;
-  }
 
   sendLog("Команда Authorization успешно выполнена. ");
   return Completed;
@@ -548,17 +536,10 @@ PersoClient::ReturnStatus PersoClient::processAuthorization(void) {
 PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
   sendLog("Обработка ответа на команду transponder_release. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   // Сохраняем присланный файл прошивки
   if (!Firmware->open(QIODevice::WriteOnly)) {
     sendLog("Не удалось сохранить файл прошивки. ");
-    return ServerError;
+    return FirmwareFileSavingError;
   }
 
   // Сохраняем прошивку в файл
@@ -586,26 +567,12 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
 PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   return Completed;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
   sendLog("Обработка ответа на команду transponder_rerelease. ");
-
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
 
   // Сохраняем присланный файл прошивки
   if (!Firmware->open(QIODevice::WriteOnly)) {
@@ -638,26 +605,12 @@ PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
 PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_rerelease_confirm. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   sendLog("Команда transponder_rerelease_confirm успешно выполнена. ");
   return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {
   sendLog("Обработка ответа на команду production_line_rollback. ");
-
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
 
   sendLog("Команда production_line_rollback успешно выполнена. ");
   return Completed;
@@ -666,26 +619,12 @@ PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {
 PersoClient::ReturnStatus PersoClient::processPrintBoxSticker() {
   sendLog("Обработка ответа на команду print_box_sticker. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   sendLog("Команда print_box_sticker успешно выполнена. ");
   return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintLastBoxSticker() {
   sendLog("Обработка ответа на команду print_last_box_sticker. ");
-
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
 
   sendLog("Команда print_last_box_sticker успешно выполнена. ");
   return Completed;
@@ -694,26 +633,12 @@ PersoClient::ReturnStatus PersoClient::processPrintLastBoxSticker() {
 PersoClient::ReturnStatus PersoClient::processPrintPalletSticker() {
   sendLog("Обработка ответа на команду print_pallet_sticker. ");
 
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
-
   sendLog("Команда print_pallet_sticker успешно выполнена. ");
   return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintLastPalletSticker() {
   sendLog("Обработка ответа на команду print_last_pallet_sticker. ");
-
-  // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "no_error") {
-    sendLog(QString("Получена серверная ошибка: %1")
-                .arg(CurrentResponse["return_status"].toString()));
-    return ServerError;
-  }
 
   sendLog("Команда print_last_pallet_sticker успешно выполнена. ");
   return Completed;
@@ -854,6 +779,25 @@ void PersoClient::createResponseTemplates() {
   printLastPalletStickerSyntax->append("return_status");
   ResponseTemplates.insert("print_last_pallet_sticker",
                            printLastPalletStickerSyntax);
+}
+
+void PersoClient::createServerStatusMatchTable() {
+  ServerStatusMatchTable.insert("1", CommandSyntaxError);
+  ServerStatusMatchTable.insert("2", DatabaseError);
+  ServerStatusMatchTable.insert("3", TransponderNotFound);
+  ServerStatusMatchTable.insert("4", TransponderNotReleasedEarlier);
+  ServerStatusMatchTable.insert("5", AwaitingConfirmationError);
+  ServerStatusMatchTable.insert("6", IdenticalUcidError);
+  ServerStatusMatchTable.insert("7", ProductionLineMissed);
+  ServerStatusMatchTable.insert("8", ProductionLineNotActive);
+  ServerStatusMatchTable.insert("9", CurrentOrderRunOut);
+  ServerStatusMatchTable.insert("10", CurrentOrderAssembled);
+  ServerStatusMatchTable.insert("11", ProductionLineRollbackLimitError);
+  ServerStatusMatchTable.insert("12", BoxStickerPrintError);
+  ServerStatusMatchTable.insert("13", PalletStickerPrintError);
+  ServerStatusMatchTable.insert("14", NextTransponderNotFound);
+  ServerStatusMatchTable.insert("15", StartBoxAssemblingError);
+  ServerStatusMatchTable.insert("16", StartPalletAssemblingError);
 }
 
 void PersoClient::on_SocketConnected_slot() {

@@ -21,19 +21,34 @@ class PersoClient : public QObject {
   Q_OBJECT
  public:
   enum ReturnStatus {
-    Undefined,
+    Completed,
+    FirmwareFileSavingError,
     RequestParameterError,
     ServerConnectionError,
     ServerNotResponding,
     ServerConnectionTerminated,
+    ResponseParsingError,
+    ResponseSyntaxError,
     AuthorizationNotExist,
     AuthorizationAccessDenied,
     AuthorizationNotActive,
-    ResponseParsingError,
-    ResponseSyntaxError,
-    ServerError,
-    UnknownError,
-    Completed
+    // Статусы возврата от сервера
+    CommandSyntaxError,
+    DatabaseError,
+    TransponderNotFound,
+    TransponderNotReleasedEarlier,
+    AwaitingConfirmationError,
+    IdenticalUcidError,
+    ProductionLineMissed,
+    ProductionLineNotActive,
+    CurrentOrderRunOut,
+    CurrentOrderAssembled,
+    ProductionLineRollbackLimitError,
+    BoxStickerPrintError,
+    PalletStickerPrintError,
+    NextTransponderNotFound,
+    StartBoxAssemblingError,
+    StartPalletAssemblingError,
   };
   Q_ENUM(ReturnStatus);
 
@@ -70,6 +85,8 @@ class PersoClient : public QObject {
 
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
+
+  QHash<QString, ReturnStatus> ServerStatusMatchTable;
 
  public:
   explicit PersoClient(QObject* parent);
@@ -147,6 +164,7 @@ class PersoClient : public QObject {
   void createSocket(void);
   void createResponseHandlers(void);
   void createResponseTemplates(void);
+  void createServerStatusMatchTable(void);
 
  private slots:
   void on_SocketConnected_slot(void);
