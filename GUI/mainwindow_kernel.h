@@ -178,7 +178,8 @@ class MainWindowKernel : public QMainWindow {
 
   // Производственные линии
   void createNewProductionLine_signal(
-      const QHash<QString, QString>* productionLineParameterseters,
+      const QSharedPointer<QHash<QString, QString>>
+          productionLineParameterseters,
       DatabaseTableModel* model);
   void allocateInactiveProductionLines_signal(const QString& orderId,
                                               DatabaseTableModel* model);
@@ -186,7 +187,7 @@ class MainWindowKernel : public QMainWindow {
   void deleteLastProductionLine_signal(DatabaseTableModel* model);
   void showProductionLineTable_signal(DatabaseTableModel* model);
   void linkProductionLineWithBox_signal(
-      const QHash<QString, QString>* linkParameterseters,
+      const QSharedPointer<QHash<QString, QString>> linkParameters,
       DatabaseTableModel* model);
 
   // Тест сервера
@@ -222,7 +223,7 @@ class MainWindowKernel : public QMainWindow {
   void initTransportMasterKeys_signal(DatabaseTableModel* model);
   void linkIssuerWithMasterKeys_signal(
       DatabaseTableModel* model,
-      const QHash<QString, QString>* Parameterseters);
+      const QSharedPointer<QHash<QString, QString>> Parameterseters);
 
   // Принтер
   void printTransponderSticker_signal(const QString& id,

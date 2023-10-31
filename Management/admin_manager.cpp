@@ -215,14 +215,15 @@ void AdminManager::showOrderTable(DatabaseTableModel* model) {
 }
 
 void AdminManager::createNewProductionLine(
-    const QHash<QString, QString>* productionLineParameters,
+    const QSharedPointer<QHash<QString, QString>> productionLineParameters,
     DatabaseTableModel* model) {
   startOperationPerforming("createNewProductionLine");
 
   AdministrationSystem::ReturnStatus status;
 
   sendLog("Создание новой линии производства. ");
-  status = Administrator->createNewProductionLine(productionLineParameters);
+  status =
+      Administrator->createNewProductionLine(productionLineParameters.get());
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "createNewProductionLine");
     return;
@@ -315,14 +316,14 @@ void AdminManager::showProductionLineTable(DatabaseTableModel* model) {
 }
 
 void AdminManager::linkProductionLineWithBox(
-    const QHash<QString, QString>* parameters,
+    const QSharedPointer<QHash<QString, QString>> parameters,
     DatabaseTableModel* model) {
   startOperationPerforming("linkProductionLineWithBoxManually");
 
   AdministrationSystem::ReturnStatus status;
 
   sendLog("Связывание линии производства с определенным боксом. ");
-  status = Administrator->linkProductionLineWithBox(parameters);
+  status = Administrator->linkProductionLineWithBox(parameters.get());
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "linkProductionLineWithBox");
     return;
@@ -387,7 +388,7 @@ void AdminManager::initTransportMasterKeys(DatabaseTableModel* model) {
 
 void AdminManager::linkIssuerWithMasterKeys(
     DatabaseTableModel* model,
-    const QHash<QString, QString>* parameters) {
+    const QSharedPointer<QHash<QString, QString>> parameters) {
   startOperationPerforming("linkIssuerWithMasterKeys");
 
   AdministrationSystem::ReturnStatus status;
@@ -395,7 +396,7 @@ void AdminManager::linkIssuerWithMasterKeys(
   sendLog(QString("Связывание эмитента %1 с мастер ключами %2. ")
               .arg(parameters->value("issuer_id"),
                    parameters->value("master_keys_id")));
-  status = Administrator->linkIssuerWithMasterKeys(parameters);
+  status = Administrator->linkIssuerWithMasterKeys(parameters.get());
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;

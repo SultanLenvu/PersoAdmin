@@ -178,10 +178,13 @@ void MainWindowKernel::on_CreateNewProductionLinePushButton_slot() {
     return;
   }
 
-  QHash<QString, QString> productionLineParameters;
-  productionLineParameters.insert("login", AbstractGUI->LoginLineEdit1->text());
-  productionLineParameters.insert("password", AbstractGUI->PasswordLineEdit1->text());
-  emit createNewProductionLine_signal(&productionLineParameters,
+  QSharedPointer<QHash<QString, QString>> productionLineParameters(
+      new QHash<QString, QString>);
+  productionLineParameters->insert("login",
+                                   AbstractGUI->LoginLineEdit1->text());
+  productionLineParameters->insert("password",
+                                   AbstractGUI->PasswordLineEdit1->text());
+  emit createNewProductionLine_signal(productionLineParameters,
                                       ProductionLineModel);
 
   CurrentGUI->update();
@@ -214,12 +217,13 @@ void MainWindowKernel::on_LinkProductionLinePushButton_slot() {
     return;
   }
 
-  QHash<QString, QString> linkParameters;
-  linkParameters.insert("login", AbstractGUI->LoginLineEdit1->text());
-  linkParameters.insert("password", AbstractGUI->PasswordLineEdit1->text());
-  linkParameters.insert("box_id", AbstractGUI->BoxIdLineEdit1->text());
+  const QSharedPointer<QHash<QString, QString>> linkParameters(
+      new QHash<QString, QString>);
+  linkParameters->insert("login", AbstractGUI->LoginLineEdit1->text());
+  linkParameters->insert("password", AbstractGUI->PasswordLineEdit1->text());
+  linkParameters->insert("box_id", AbstractGUI->BoxIdLineEdit1->text());
 
-  emit linkProductionLineWithBox_signal(&linkParameters, ProductionLineModel);
+  emit linkProductionLineWithBox_signal(linkParameters, ProductionLineModel);
 }
 
 void MainWindowKernel::on_DeactivateAllProductionLinesPushButton_slot() {
@@ -261,7 +265,8 @@ void MainWindowKernel::on_InitIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
-  QHash<QString, QString> linkParameters;
+  QSharedPointer<QHash<QString, QString>> linkParameters(
+      new QHash<QString, QString>());
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   QString issuerId = AbstractGUI->IssuerIdLineEdit1->text();
   QString masterKeysId = AbstractGUI->MasterKeysLineEdit1->text();
@@ -277,12 +282,12 @@ void MainWindowKernel::on_LinkIssuerWithKeysPushButton_slot() {
   }
 
   // Собираем параметры
-  linkParameters.insert("issuer_id", issuerId);
-  linkParameters.insert("master_keys_id", masterKeysId);
-  linkParameters.insert("master_keys_type",
-                        MatchingTable->value(masterKeysType));
+  linkParameters->insert("issuer_id", issuerId);
+  linkParameters->insert("master_keys_id", masterKeysId);
+  linkParameters->insert("master_keys_type",
+                         MatchingTable->value(masterKeysType));
 
-  emit linkIssuerWithMasterKeys_signal(IssuerModel, &linkParameters);
+  emit linkIssuerWithMasterKeys_signal(IssuerModel, linkParameters);
 }
 
 void MainWindowKernel::on_ReleaseTransponderPushButton_slot() {
@@ -1075,7 +1080,7 @@ void MainWindowKernel::createManagerInstance() {
   connect(Manager, &AdminManager::notifyUser, Interactor,
           &InteractionSystem::generateMessage);
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
-          &InteractionSystem::generateErrorMessage);
+          &InteractionSystem::generateErrorMessage, Qt::QueuedConnection);
   connect(Manager, &AdminManager::operationPerfomingStarted, Interactor,
           &InteractionSystem::startOperationProgressDialog);
   connect(Manager, &AdminManager::operationPerformingFinished, Interactor,

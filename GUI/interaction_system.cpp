@@ -43,7 +43,7 @@ void InteractionSystem::startOperationProgressDialog(
       settings.value(QString("duration_of_operations/") + operationName)
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
-  operationQuantDuration += 1;
+  operationQuantDuration += 5;
   sendLog(QString("Длительность кванта операции: %1.")
               .arg(QString::number(operationQuantDuration)));
   ODQTimer->setInterval(operationQuantDuration);
@@ -121,7 +121,7 @@ void InteractionSystem::createProgressDialog() {
       new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->setAutoClose(false);
-  ProgressDialog->show();
+  //  ProgressDialog->show();
 }
 
 void InteractionSystem::destroyProgressDialog() {
@@ -163,12 +163,14 @@ void InteractionSystem::on_ODTimerTimeout_slot() {
 }
 
 void InteractionSystem::on_ODQTimerTimeout_slot() {
-  if (!ProgressDialog) {
+  if (ProgressDialog == nullptr) {
     return;
   }
 
   CurrentOperationStep++;
   if (CurrentOperationStep < 100) {
     ProgressDialog->setValue(CurrentOperationStep);
+  } else {
+    ODQTimer->stop();
   }
 }

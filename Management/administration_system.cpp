@@ -655,7 +655,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::initIssuerTable() {
   record.clear();
 
   record.insert("id", QString::number(++lastId));
-  record.insert("name", "Западный скоростной диаметр");
+  record.insert("name", "Магистраль северной столицы");
   record.insert("efc_context_mark", "570001FF0070");
   if (!Database->addRecord("issuers", record)) {
     sendLog("Получена ошибка при выполнении запроса в базу данных. ");
@@ -1673,6 +1673,7 @@ bool AdministrationSystem::removeLastProductionLine() const {
 
   // Получение последней добавленной линии производства
   productionLineRecord.insert("id", "");
+  productionLineRecord.insert("active", "");
   if (!Database->getLastRecord("production_lines", productionLineRecord)) {
     sendLog(
         "Получена ошибка при поиске последней добавленной производственной "
@@ -1680,25 +1681,15 @@ bool AdministrationSystem::removeLastProductionLine() const {
     return false;
   }
 
-  // Получение бокса, связанного с последней добавленной линией производства
-  boxRecord.insert("id", "");
-  boxRecord.insert("production_line_id", productionLineRecord.value("id"));
-  if (!Database->getRecordByPart("boxes", boxRecord)) {
-    sendLog(
-        "Получена ошибка при поиске бокса, связанного с последней "
-        "добавленной линией производства. ");
+  // Если производственная линия активна, то удаление невозможно
+  if (productionLineRecord.value("active") == "true") {
+    sendLog("Производственная линия активна, удаление невозможно. ");
     return false;
   }
 
   // Удаляем запись из таблицы линий производства
   if (!Database->removeLastRecordById("production_lines")) {
     sendLog("Получена ошибка при удалении последней линии производства. ");
-    return false;
-  }
-
-  if (!stopBoxProcessing(boxRecord.value("id"))) {
-    sendLog(QString("Получена ошибка при остановке сборки бокса %1. ")
-                .arg(boxRecord.value("id")));
     return false;
   }
 
@@ -2160,8 +2151,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundBoxManually(
     }
 
     if (transponderRecord.isEmpty()) {
-      sendLog(QString("Все транспондеры из бокса %1 были возвращены. ")
-                  .arg(transponderRecord.value("box_id")));
+      sendLog(
+          QString("Все транспондеры из бокса %1 были возвращены. ").arg(id));
       break;
     }
 
@@ -2189,8 +2180,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundPalletManually(
     }
 
     if (boxRecord.isEmpty()) {
-      sendLog(QString("Все боксы из паллеты %1 были возвращены. ")
-                  .arg(boxRecord.value("pallet_id")));
+      sendLog(QString("Все боксы из паллеты %1 были возвращены. ").arg(id));
       break;
     }
 
@@ -2218,8 +2208,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundOrderManually(
     }
 
     if (palletRecord.isEmpty()) {
-      sendLog(QString("Все паллеты из заказа %1 были возвращены. ")
-                  .arg(palletRecord.value("order_id")));
+      sendLog(QString("Все паллеты из заказа %1 были возвращены. ").arg(id));
       break;
     }
 

@@ -58,23 +58,24 @@ class AdminManager : public QObject {
   void showOrderTable(DatabaseTableModel* model);
 
   // Производственные линии
-  void createNewProductionLine(
-      const QHash<QString, QString>* productionLineParameterseters,
-      DatabaseTableModel* model);
+  void createNewProductionLine(const QSharedPointer<QHash<QString, QString>>
+                                   productionLineParameterseters,
+                               DatabaseTableModel* model);
   void allocateInactiveProductionLines(const QString& orderId,
                                        DatabaseTableModel* model);
   void shutdownAllProductionLines(DatabaseTableModel* model);
   void deleteLastProductionLine(DatabaseTableModel* model);
   void showProductionLineTable(DatabaseTableModel* model);
   void linkProductionLineWithBox(
-      const QHash<QString, QString>* linkParameterseters,
+      const QSharedPointer<QHash<QString, QString>> linkParameterseters,
       DatabaseTableModel* model);
 
   // Заказчики
   void initIssuers(DatabaseTableModel* model);
   void initTransportMasterKeys(DatabaseTableModel* model);
-  void linkIssuerWithMasterKeys(DatabaseTableModel* model,
-                                const QHash<QString, QString>* Parameterseters);
+  void linkIssuerWithMasterKeys(
+      DatabaseTableModel* model,
+      const QSharedPointer<QHash<QString, QString>> param);
 
   // Транспондеры
   void releaseTranspondersManually(
