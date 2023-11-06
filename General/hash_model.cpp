@@ -1,5 +1,3 @@
-#include <QDebug>
-
 #include "hash_model.h"
 
 const QString HashModel::FIELD_NAMES[] = {
@@ -74,7 +72,6 @@ int HashModel::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant HashModel::data(const QModelIndex& index, int role) const {
-  qDebug() << "HashModel::data called!\n";
   if (index.column() > 1) {
     return QVariant();
   }
