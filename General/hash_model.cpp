@@ -1,4 +1,16 @@
+#include <QDebug>
+
 #include "hash_model.h"
+
+const QString HashModel::FIELD_NAMES[] = {
+  "sn",
+  "pan",
+  "issuer_name",
+  "box_id",
+  "pallet_id",
+  "order_id",
+  "transponder_id",
+};
 
 HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
   setObjectName("HashModel");
@@ -62,6 +74,7 @@ int HashModel::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant HashModel::data(const QModelIndex& index, int role) const {
+  qDebug() << "HashModel::data called!\n";
   if (index.column() > 1) {
     return QVariant();
   }
