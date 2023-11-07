@@ -5,7 +5,7 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
   setObjectName("PalletShippingDialog");
   setWindowTitle("Отгрузка");
 
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  DesktopGeometry = QApplication::screens().first()->size();
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
               DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.05);
 

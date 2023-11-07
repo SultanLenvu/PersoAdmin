@@ -36,7 +36,6 @@ class MainWindowGUI : public AbstractGUI {
 
   QComboBox* DatabaseTableChoice;
   QPushButton* ShowDatabaseTablePushButton;
-  QPushButton* ClearDatabaseTablePushButton;
   QSpacerItem* DatabaseControlPanelVS1;
 
   QPushButton* TransmitCustomRequestPushButton;

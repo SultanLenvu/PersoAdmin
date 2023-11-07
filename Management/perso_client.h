@@ -17,9 +17,10 @@
 
 #include "General/definitions.h"
 
-class PersoClient : public QObject {
+class PersoClient : public QObject
+{
   Q_OBJECT
- public:
+public:
   enum ReturnStatus {
     Completed,
     FirmwareFileSavingError,
@@ -50,7 +51,7 @@ class PersoClient : public QObject {
     StartBoxAssemblingError,
     StartPalletAssemblingError,
   };
-  Q_ENUM(ReturnStatus);
+  Q_ENUM(ReturnStatus)
 
   enum InstanceState {
     Ready,
@@ -59,9 +60,9 @@ class PersoClient : public QObject {
     WaitingResponse,
     ProcessingResponse,
   };
-  Q_ENUM(InstanceState);
+  Q_ENUM(InstanceState)
 
- private:
+private:
   bool LogEnable;
   bool ExtendedLoggingEnable;
   QHostAddress PersoServerAddress;
@@ -88,7 +89,7 @@ class PersoClient : public QObject {
 
   QHash<QString, ReturnStatus> ServerStatusMatchTable;
 
- public:
+public:
   explicit PersoClient(QObject* parent);
   ~PersoClient();
 
@@ -98,32 +99,25 @@ class PersoClient : public QObject {
   ReturnStatus requestEcho(void);
   ReturnStatus requestAuthorize(const QHash<QString, QString>* requestData);
 
-  ReturnStatus requestTransponderRelease(
-      const QHash<QString, QString>* requestData,
-      QFile* firmware,
-      QHash<QString, QString>* responseData);
-  ReturnStatus requestTransponderReleaseConfirm(
-      const QHash<QString, QString>* requestData);
-  ReturnStatus requestTransponderRerelease(
-      const QHash<QString, QString>* requestData,
-      QFile* firmware,
-      QHash<QString, QString>* responseData);
-  ReturnStatus requestTransponderRereleaseConfirm(
-      const QHash<QString, QString>* requestData);
-  ReturnStatus requestProductionLineRollback(
-      const QHash<QString, QString>* requestData);
+  ReturnStatus requestTransponderRelease(const QHash<QString, QString>* requestData,
+					 QFile* firmware,
+					 QHash<QString, QString>* responseData);
+  ReturnStatus requestTransponderReleaseConfirm(const QHash<QString, QString>* requestData);
+  ReturnStatus requestTransponderRerelease(const QHash<QString, QString>* requestData,
+					   QFile* firmware,
+					   QHash<QString, QString>* responseData);
+  ReturnStatus requestTransponderRereleaseConfirm(const QHash<QString, QString>* requestData);
+  ReturnStatus requestProductionLineRollback(const QHash<QString, QString>* requestData);
 
-  ReturnStatus requestBoxStickerPrint(
-      const QHash<QString, QString>* requestData);
+  ReturnStatus requestBoxStickerPrint(const QHash<QString, QString>* requestData);
   ReturnStatus requestBoxStickerReprint();
-  ReturnStatus requestPalletStickerPrint(
-      const QHash<QString, QString>* requestData);
+  ReturnStatus requestPalletStickerPrint(const QHash<QString, QString>* requestData);
   ReturnStatus requestPalletStickerReprint(void);
 
   void applySettings(void);
 
- private:
-  Q_DISABLE_COPY(PersoClient);
+private:
+  Q_DISABLE_COPY(PersoClient)
   void loadSettings(void);
   void sendLog(const QString& log);
 
@@ -135,11 +129,9 @@ class PersoClient : public QObject {
   void createEcho(void);
   void createAuthorization(const QHash<QString, QString>* requestData);
   void createTransponderRelease(const QHash<QString, QString>* requestData);
-  void createTransponderReleaseConfirm(
-      const QHash<QString, QString>* requestData);
+  void createTransponderReleaseConfirm(const QHash<QString, QString>* requestData);
   void createTransponderRerelease(const QHash<QString, QString>* requestData);
-  void createTransponderRereleaseConfirm(
-      const QHash<QString, QString>* requestData);
+  void createTransponderRereleaseConfirm(const QHash<QString, QString>* requestData);
   void createProductionLineRollback(const QHash<QString, QString>* requestData);
   void createBoxStickerPrint(const QHash<QString, QString>* requestData);
   void createBoxStickerReprint(void);
@@ -166,7 +158,7 @@ class PersoClient : public QObject {
   void createResponseTemplates(void);
   void createServerStatusMatchTable(void);
 
- private slots:
+private slots:
   void on_SocketConnected_slot(void);
   void on_SocketDisconnected_slot(void);
 
@@ -175,9 +167,9 @@ class PersoClient : public QObject {
 
   void on_WaitTimerTimeout_slot(void);
 
- signals:
+signals:
   void logging(const QString& log);
   void stopResponseWaiting(void);
 };
 
-#endif  // PERSOCLIENT_H
+#endif // PERSOCLIENT_H

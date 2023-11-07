@@ -8,31 +8,31 @@
 
 class PalletShippingDialog : public InputDialog {
   Q_OBJECT
-private:
-  QSize DesktopGeometry;
+ private:
+   QSize DesktopGeometry;
 
-  QGridLayout* MainLayout;
+   QGridLayout* MainLayout;
 
-  QLabel* PalletLabel1;
-  QLineEdit* FirstPalletId;
+   QLabel* PalletLabel1;
+   QLineEdit* FirstPalletId;
 
-  QLabel* PalletLabel2;
-  QLineEdit* LastPalletId;
+   QLabel* PalletLabel2;
+   QLineEdit* LastPalletId;
 
-  QHBoxLayout* ButtonLayout;
-  QPushButton* AcceptButton;
-  QPushButton* RejectButton;
+   QHBoxLayout* ButtonLayout;
+   QPushButton* AcceptButton;
+   QPushButton* RejectButton;
 
-public:
+ public:
   explicit PalletShippingDialog(QWidget* parent);
   ~PalletShippingDialog();
 
   virtual void getData(QHash<QString, QString>* data) const override;
 
  private:
-   Q_DISABLE_COPY(PalletShippingDialog)
-   void create(void);
-   bool checkInput(void) const;
+  Q_DISABLE_COPY(PalletShippingDialog);
+  void create(void);
+  bool checkInput(void) const;
 };
 
 #endif  // PalletShippingDialog_H

@@ -12,16 +12,16 @@
 class PanInputDialog : public InputDialog {
   Q_OBJECT
  private:
-  QRect DesktopGeometry;
+   QSize DesktopGeometry;
 
-  QVBoxLayout* MainLayout;
-  QLabel* MainLabel;
-  QPlainTextEdit* StickerData;
-  QString pan;
+   QVBoxLayout* MainLayout;
+   QLabel* MainLabel;
+   QPlainTextEdit* StickerData;
+   QString pan;
 
-  QHBoxLayout* ButtonLayout;
-  QPushButton* AcceptButton;
-  QPushButton* RejectButton;
+   QHBoxLayout* ButtonLayout;
+   QPushButton* AcceptButton;
+   QPushButton* RejectButton;
 
  public:
   explicit PanInputDialog(QWidget* parent);

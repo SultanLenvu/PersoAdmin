@@ -40,77 +40,64 @@ class AdminManager : public QObject {
   ~AdminManager();
 
  public slots:
-  void on_InsctanceThreadStarted_slot(void);
+   void insctanceThreadStarted_slot(void);
 
-  void connectDatabase(void);
-  void disconnectDatabase(void);
-  void showDatabaseTable(const QString& name, DatabaseTableModel* model);
-  void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
-  void performCustomRequest(const QString& req, DatabaseTableModel* model);
+   void connectDatabase(void);
+   void disconnectDatabase(void);
+   void showDatabaseTable(const QString& name, DatabaseTableModel* model);
+   void clearDatabaseTable(const QString& name, DatabaseTableModel* model);
+   void performCustomRequest(const QString& req, DatabaseTableModel* model);
 
-  // Заказы
-  void createNewOrder(
-      const QSharedPointer<QHash<QString, QString>> orderParameterseters,
-      DatabaseTableModel* model);
-  void deleteLastOrder(DatabaseTableModel* model);
-  void startOrderAssembling(const QString& orderId, DatabaseTableModel* model);
-  void stopOrderAssembling(const QString& orderId, DatabaseTableModel* model);
-  void showOrderTable(DatabaseTableModel* model);
+   // Заказы
+   void createNewOrder(const QSharedPointer<QHash<QString, QString>> orderParameterseters,
+		       DatabaseTableModel* model);
+   void deleteLastOrder(DatabaseTableModel* model);
+   void startOrderAssembling(const QString& orderId, DatabaseTableModel* model);
+   void stopOrderAssembling(const QString& orderId, DatabaseTableModel* model);
+   void showOrderTable(DatabaseTableModel* model);
 
-  // Производственные линии
-  void createNewProductionLine(const QSharedPointer<QHash<QString, QString>>
-                                   productionLineParameterseters,
-                               DatabaseTableModel* model);
-  void allocateInactiveProductionLines(const QString& orderId,
-                                       DatabaseTableModel* model);
-  void shutdownAllProductionLines(DatabaseTableModel* model);
-  void deleteLastProductionLine(DatabaseTableModel* model);
-  void showProductionLineTable(DatabaseTableModel* model);
-  void linkProductionLineWithBox(
-      const QSharedPointer<QHash<QString, QString>> linkParameterseters,
-      DatabaseTableModel* model);
+   // Производственные линии
+   void createNewProductionLine(
+       const QSharedPointer<QHash<QString, QString>> productionLineParameterseters,
+       DatabaseTableModel* model);
+   void allocateInactiveProductionLines(const QString& orderId, DatabaseTableModel* model);
+   void shutdownAllProductionLines(DatabaseTableModel* model);
+   void deleteLastProductionLine(DatabaseTableModel* model);
+   void showProductionLineTable(DatabaseTableModel* model);
+   void linkProductionLineWithBox(const QSharedPointer<QHash<QString, QString>> linkParameterseters,
+				  DatabaseTableModel* model);
 
-  // Заказчики
-  void initIssuers(DatabaseTableModel* model);
-  void initTransportMasterKeys(DatabaseTableModel* model);
-  void linkIssuerWithMasterKeys(
-      DatabaseTableModel* model,
-      const QSharedPointer<QHash<QString, QString>> param);
+   // Заказчики
+   void initIssuers(DatabaseTableModel* model);
+   void initTransportMasterKeys(DatabaseTableModel* model);
+   void linkIssuerWithMasterKeys(DatabaseTableModel* model,
+				 const QSharedPointer<QHash<QString, QString>> param);
 
-  // Транспондеры
-  void releaseTranspondersManually(
-      const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
-  void refundTranspondersManually(
-      const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
-  void shipPallets(const QSharedPointer<QHash<QString, QString>> param,
-                   DatabaseTableModel* model);
+   // Транспондеры
+   void releaseTranspondersManually(const QSharedPointer<QHash<QString, QString>> param,
+				    DatabaseTableModel* model);
+   void refundTranspondersManually(const QSharedPointer<QHash<QString, QString>> param,
+				   DatabaseTableModel* model);
+   void shipPallets(const QSharedPointer<QHash<QString, QString>> param, DatabaseTableModel* model);
 
-  // Клиент
-  void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
-  void confirmTransponderRelease(
-      const QSharedPointer<QHash<QString, QString>> param);
-  void rereleaseTransponder(
-      const QSharedPointer<QHash<QString, QString>> param);
-  void confirmTransponderRerelease(
-      const QSharedPointer<QHash<QString, QString>> param);
-  void rollbackProductionLine(
-      const QSharedPointer<QHash<QString, QString>> param);
-  void printBoxStickerOnServer(QSharedPointer<QHash<QString, QString>> param);
-  void printLastBoxStickerOnServer();
-  void printPalletStickerOnServer(
-      QSharedPointer<QHash<QString, QString>> param);
-  void printLastPalletStickerOnServer();
+   // Клиент
+   void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
+   void confirmTransponderRelease(const QSharedPointer<QHash<QString, QString>> param);
+   void rereleaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
+   void confirmTransponderRerelease(const QSharedPointer<QHash<QString, QString>> param);
+   void rollbackProductionLine(const QSharedPointer<QHash<QString, QString>> param);
+   void printBoxStickerOnServer(QSharedPointer<QHash<QString, QString>> param);
+   void printLastBoxStickerOnServer();
+   void printPalletStickerOnServer(QSharedPointer<QHash<QString, QString>> param);
+   void printLastPalletStickerOnServer();
 
-  // Принтеры
-  void printTransponderSticker(const QString& id, DatabaseTableModel* model);
-  void printBoxSticker(const QString& id, DatabaseTableModel* model);
-  void printPalletSticker(const QString& id, DatabaseTableModel* model);
-  void execPrinterStickerCommandScript(
-      const QSharedPointer<QStringList> commandScript);
+   // Принтеры
+   void printTransponderSticker(const QString& id, DatabaseTableModel* model);
+   void printBoxSticker(const QString& id, DatabaseTableModel* model);
+   void printPalletSticker(const QString& id, DatabaseTableModel* model);
+   void execPrinterStickerCommandScript(const QSharedPointer<QStringList> commandScript);
 
-  void applySettings();
+   void applySettings();
 
  private:
   Q_DISABLE_COPY(AdminManager)

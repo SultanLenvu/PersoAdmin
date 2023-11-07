@@ -1,7 +1,5 @@
 #include "admin_manager.h"
 
-/* Диспетчер DSRC  */
-//==================================================================================
 AdminManager::AdminManager(QObject* parent) : QObject(parent) {
   setObjectName("AdminManager");
   loadSettings();
@@ -10,7 +8,8 @@ AdminManager::AdminManager(QObject* parent) : QObject(parent) {
 AdminManager::~AdminManager() {
 }
 
-void AdminManager::on_InsctanceThreadStarted_slot() {
+void AdminManager::insctanceThreadStarted_slot()
+{
   // Создаем администратора
   createAdministrator();
 

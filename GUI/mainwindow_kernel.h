@@ -22,102 +22,101 @@
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
  private:
-  QRect DesktopGeometry;
-  AbstractGUI* CurrentGUI;
+   QSize DesktopGeometry;
+   AbstractGUI* CurrentGUI;
 
-  QMenu* ServiceMenu;
-  QMenu* HelpMenu;
+   QMenu* ServiceMenu;
+   QMenu* HelpMenu;
 
-  QAction* AboutProgramAct;
-  QAction* RequestAuthorizationGUIAct;
+   QAction* AboutProgramAct;
+   QAction* RequestAuthorizationGUIAct;
 
-  InteractionSystem* Interactor;
+   InteractionSystem* Interactor;
 
-  QThread* ManagerThread;
-  AdminManager* Manager;
+   QThread* ManagerThread;
+   AdminManager* Manager;
 
-  QThread* LoggerThread;
-  LogSystem* Logger;
+   QThread* LoggerThread;
+   LogSystem* Logger;
 
-  DatabaseTableModel* RandomModel;
-  DatabaseTableModel* OrderModel;
-  DatabaseTableModel* ProductionLineModel;
-  DatabaseTableModel* IssuerModel;
-  DatabaseTableModel* TransponderModel;
-  DatabaseTableModel* StickerModel;
+   DatabaseTableModel* RandomModel;
+   DatabaseTableModel* OrderModel;
+   DatabaseTableModel* ProductionLineModel;
+   DatabaseTableModel* IssuerModel;
+   DatabaseTableModel* TransponderModel;
+   DatabaseTableModel* StickerModel;
 
-  HashModel* TransponderData;
+   HashModel* TransponderData;
 
-  QHash<QString, QString>* MatchingTable;
+   QHash<QString, QString>* MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
   ~MainWindowKernel();
 
  public slots:
-  void on_RequestAuthorizationGUIAct_slot(void);
+   void requestAuthorizationGUIAct_slot(void);
 
-  // Авторизация
-  void on_AuthorizePushButton_slot(void);
+   // Авторизация
+   void authorizePushButton_slot(void);
 
-  // Функционал для работы с базой данных
-  void on_ConnectDatabasePushButton_slot(void);
-  void on_DisconnectDatabasePushButton_slot(void);
-  void on_ShowDatabaseTablePushButton_slot(void);
-  void on_ClearDatabaseTablePushButton_slot(void);
-  void on_TransmitCustomRequestPushButton_slot(void);
+   // Функционал для работы с базой данных
+   void connectDatabasePushButton_slot(void);
+   void disconnectDatabasePushButton_slot(void);
+   void showDatabaseTablePushButton_slot(void);
+   void clearDatabaseTablePushButton_slot(void);
+   void transmitCustomRequestPushButton_slot(void);
 
-  // Функционал для работы с заказами
-  void on_CreateNewOrderPushButton_slot(void);
-  void on_StartOrderAssemblingPushButton_slot(void);
-  void on_StopOrderAssemblingPushButton_slot(void);
-  void on_UpdateOrderViewPushButton_slot(void);
-  void on_DeleteLastOrderPushButton_slot(void);
+   // Функционал для работы с заказами
+   void createNewOrderPushButton_slot(void);
+   void startOrderAssemblingPushButton_slot(void);
+   void stopOrderAssemblingPushButton_slot(void);
+   void updateOrderViewPushButton_slot(void);
+   void deleteLastOrderPushButton_slot(void);
 
-  // Функционал для работы с производственными линиями
-  void on_CreateNewProductionLinePushButton_slot(void);
-  void on_AllocateInactiveProductionLinesPushButton_slot(void);
-  void on_LinkProductionLinePushButton_slot(void);
-  void on_DeactivateAllProductionLinesPushButton_slot(void);
-  void on_UpdateProductionLineViewPushButton_slot(void);
-  void on_DeleteLastProductionLinePushButton_slot(void);
+   // Функционал для работы с производственными линиями
+   void createNewProductionLinePushButton_slot(void);
+   void allocateInactiveProductionLinesPushButton_slot(void);
+   void linkProductionLinePushButton_slot(void);
+   void deactivateAllProductionLinesPushButton_slot(void);
+   void updateProductionLineViewPushButton_slot(void);
+   void deleteLastProductionLinePushButton_slot(void);
 
-  // Функционал для работы с транспортными мастер ключами
-  void on_ShowIssuerTablePushButton_slot(void);
-  void on_InitTransportMasterKeysPushButton_slot(void);
-  void on_InitIssuerTablePushButton_slot(void);
-  void on_LinkIssuerWithKeysPushButton_slot(void);
+   // Функционал для работы с транспортными мастер ключами
+   void showIssuerTablePushButton_slot(void);
+   void initTransportMasterKeysPushButton_slot(void);
+   void initIssuerTablePushButton_slot(void);
+   void linkIssuerWithKeysPushButton_slot(void);
 
-  // Функционал для взаимодействия с сервером
-  void on_ReleaseTransponderPushButton_slot(void);
-  void on_ConfirmTransponderPushButton_slot(void);
-  void on_RereleaseTransponderPushButton_slot(void);
-  void on_ConfirmRereleaseTransponderPushButton_slot(void);
-  void on_ProductionLineRollbackPushButton_slot(void);
+   // Функционал для взаимодействия с сервером
+   void releaseTransponderPushButton_slot(void);
+   void confirmTransponderPushButton_slot(void);
+   void rereleaseTransponderPushButton_slot(void);
+   void confirmRereleaseTransponderPushButton_slot(void);
+   void productionLineRollbackPushButton_slot(void);
 
-  void on_PrintBoxStickerOnServerPushButton_slot(void);
-  void on_PrintLastBoxStickerOnServerPushButton_slot(void);
-  void on_PrintPalletStickerOnServerPushButton_slot(void);
-  void on_PrintLastPalletStickerOnServerPushButton_slot(void);
+   void printBoxStickerOnServerPushButton_slot(void);
+   void printLastBoxStickerOnServerPushButton_slot(void);
+   void printPalletStickerOnServerPushButton_slot(void);
+   void printLastPalletStickerOnServerPushButton_slot(void);
 
-  // Функционал для выпуска, возврата и отгрузки транспондеров
-  void on_TransponderManualReleasePushButton_slot(void);
-  void on_TransponderManualRefundPushButton_slot(void);
-  void on_PalletShipmentPushButton_slot(void);
+   // Функционал для выпуска, возврата и отгрузки транспондеров
+   void transponderManualReleasePushButton_slot(void);
+   void transponderManualRefundPushButton_slot(void);
+   void palletShipmentPushButton_slot(void);
 
-  // Функционал для работы с принтером стикеров
-  void on_PrintTransponderStickerPushButton_slot(void);
-  void on_PrintBoxStickerPushButton_slot(void);
-  void on_PrintPalletStickerPushButton_slot(void);
-  void on_ExecStickerPrinterCommandScriptPushButton_slot(void);
+   // Функционал для работы с принтером стикеров
+   void printTransponderStickerPushButton_slot(void);
+   void printBoxStickerPushButton_slot(void);
+   void printPalletStickerPushButton_slot(void);
+   void execStickerPrinterCommandScriptPushButton_slot(void);
 
-  // Функционал для настройки сервера
-  void on_ApplySettingsPushButton_slot(void);
+   // Функционал для настройки сервера
+   void applySettingsPushButton_slot(void);
 
-  // Отображение данных
-  void displayFirmware_slot(QSharedPointer<QFile> firmware);
-  void displayTransponderData_slot(
-      QSharedPointer<QHash<QString, QString>> transponderData);
+   // Отображение данных
+   void displayFirmware_slot(QSharedPointer<QFile> firmware);
+   void displayTransponderData_slot(QSharedPointer<QHash<QString, QString>> transponderData);
 
  private:
   Q_DISABLE_COPY(MainWindowKernel)

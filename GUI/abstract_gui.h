@@ -2,7 +2,6 @@
 #define ABSTRACT_GUI_H
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QObject>
 #include <QtWidgets>
 

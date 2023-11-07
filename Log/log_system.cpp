@@ -68,7 +68,7 @@ void LogSystem::loadSettings() {
   QSettings settings;
 
   UdpListenEnable = settings.value("log_system/udp_listen_enable").toBool();
-  UdpListenIp = settings.value("log_system/udp_listen_ip").toString();
+  UdpListenIp = QHostAddress(settings.value("log_system/udp_listen_ip").toString());
   UdpListenPort = settings.value("log_system/udp_listen_port").toUInt();
 }
 

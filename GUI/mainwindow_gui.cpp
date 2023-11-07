@@ -108,8 +108,6 @@ void MainWindowGUI::createDatabaseTab() {
 
   ShowDatabaseTablePushButton = new QPushButton("Открыть таблицу");
   DatabaseControlPanelLayout->addWidget(ShowDatabaseTablePushButton);
-  ClearDatabaseTablePushButton = new QPushButton("Очистить таблицу");
-  DatabaseControlPanelLayout->addWidget(ClearDatabaseTablePushButton);
 
   DatabaseControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
