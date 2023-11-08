@@ -11,6 +11,8 @@ class PostgresController : public IDatabaseController {
   Q_OBJECT
 
  private:
+  bool LogEnable;
+
   QString ConnectionName;
   QHostAddress HostAddress;
   uint32_t Port;
@@ -75,6 +77,7 @@ class PostgresController : public IDatabaseController {
 
  private:
   Q_DISABLE_COPY(PostgresController);
+  void sendLog(const QString& log) const;
   void loadSettings(void);
   void createDatabaseConnection(void);
   void convertResponseToBuffer(QSqlQuery& request,

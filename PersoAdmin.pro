@@ -9,9 +9,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Database/abstract_sql_database.cpp \
     Database/database_controller.cpp \
     Database/postgres_controller.cpp \
     Database/database_table_model.cpp \
+    Database/postre_sql_database.cpp \
+    Database/sql_table.cpp \
+    Database/sql_table_relation.cpp \
     GUI/abstract_gui.cpp \
     GUI/authorization_gui.cpp \
     GUI/input_dialog.cpp \
@@ -33,6 +37,10 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    Database/abstract_sql_database.h \
+    Database/postre_sql_database.h \
+    Database/sql_table.h \
+    Database/sql_table_relation.h \
     GUI/abstract_gui.h \
     GUI/authorization_gui.h \
     GUI/input_dialog.h \
