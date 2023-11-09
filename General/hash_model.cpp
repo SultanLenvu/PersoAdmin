@@ -1,5 +1,15 @@
 #include "hash_model.h"
 
+const QString HashModel::FIELD_NAMES[] = {
+  "sn",
+  "pan",
+  "issuer_name",
+  "box_id",
+  "pallet_id",
+  "order_id",
+  "transponder_id",
+};
+
 HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
   setObjectName("HashModel");
   createMatchTables();

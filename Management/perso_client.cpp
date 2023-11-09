@@ -221,7 +221,8 @@ void PersoClient::loadSettings() {
   LogEnable = settings.value("log_system/global_enable").toBool();
   ExtendedLoggingEnable = settings.value("log_system/extended_enable").toBool();
 
-  PersoServerAddress = QHostAddress(settings.value("perso_client/server_ip").toString());
+  PersoServerAddress = QHostAddress(
+      settings.value("perso_client/server_ip").toString());
   PersoServerPort = settings.value("perso_client/server_port").toInt();
 }
 
@@ -672,7 +673,8 @@ void PersoClient::createSocket() {
           &PersoClient::on_SocketDisconnected_slot);
   connect(Socket, &QTcpSocket::readyRead, this,
           &PersoClient::on_SocketReadyRead_slot);
-  connect(Socket, &QTcpSocket::errorOccurred, this, &PersoClient::on_SocketError_slot);
+  connect(Socket, &QTcpSocket::errorOccurred, this,
+          &PersoClient::on_SocketError_slot);
 }
 
 void PersoClient::createResponseHandlers() {
