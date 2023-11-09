@@ -14,17 +14,67 @@ PostreSqlDatabase::~PostreSqlDatabase() {
   QSqlDatabase::removeDatabase(ConnectionName);
 }
 
-void PostreSqlDatabase::applySettings() {}
+void PostreSqlDatabase::applySettings() {
+  sendLog("Применение новых настроек. ");
+  loadSettings();
 
-bool PostreSqlDatabase::connect() {}
+  if (QSqlDatabase::database(ConnectionName).isValid()) {
+    sendLog("Удаление предыущего подключения к базе данных. ");
+    QSqlDatabase::removeDatabase(ConnectionName);
 
-void PostreSqlDatabase::disconnect() {}
+    sendLog("Создание нового подключения к базе данных. ");
+    createDatabaseConnection();
+  }
+}
 
-bool PostreSqlDatabase::isConnected() {}
+bool PostreSqlDatabase::connect() {
+  if (QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres уже установлено. ");
+    return true;
+  }
 
-bool PostreSqlDatabase::openTransaction() const {}
+  // Создаем соединение
+  createDatabaseConnection();
 
-bool PostreSqlDatabase::closeTransaction() const {}
+  if (!QSqlDatabase::database(ConnectionName).open()) {
+    sendLog(
+        QString("Соединение с Postgres не может быть установлено. Ошибка: %1.")
+            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+  sendLog("Соединение с Postgres установлено. ");
+
+  return true;
+}
+
+void PostreSqlDatabase::disconnect() {
+  // Удаляем соединение
+  QSqlDatabase::removeDatabase(ConnectionName);
+
+  if (QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не отключено. ");
+  } else {
+    sendLog("Соединение с Postgres отключено. ");
+  }
+}
+
+bool PostreSqlDatabase::isConnected() {
+  bool ok = QSqlDatabase::database(ConnectionName).open();
+  return ok;
+}
+
+bool PostreSqlDatabase::openTransaction() const {
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return true;
+  }
+
+  return QSqlDatabase::database(ConnectionName).transaction();
+}
+
+bool PostreSqlDatabase::closeTransaction() const {
+  return QSqlDatabase::database(ConnectionName).commit();
+}
 
 bool PostreSqlDatabase::abortTransaction() const {}
 

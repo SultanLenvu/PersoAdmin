@@ -80,6 +80,7 @@ class PostreSqlDatabase : public AbstractSqlDatabase {
   void sendLog(const QString& log) const;
   void loadSettings(void);
   void createDatabaseConnection(void);
+
   void extractRecords(
       QSqlQuery& request,
       QVector<QSharedPointer<QHash<QString, QString>>>& records) const;
