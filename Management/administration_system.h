@@ -5,10 +5,9 @@
 #include <QDate>
 #include <QObject>
 
-#include "Database/database_controller.h"
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
-#include "Log/log_system.h"
+#include "Database/postre_sql_database.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
@@ -37,6 +36,7 @@ class AdministrationSystem : public QObject {
   QHash<QString, QString> CurrentIssuer;
 
   PostgresController* Database;
+  PostgreSqlDatabase* NewDatabase;
 
  public:
   explicit AdministrationSystem(QObject* parent);

@@ -18,14 +18,18 @@ class AbstractSqlDatabase : public QObject {
   virtual bool isConnected(void) = 0;
 
   virtual bool openTransaction(void) const = 0;
-  virtual bool closeTransaction(void) const = 0;
-  virtual bool abortTransaction(void) const = 0;
+  virtual bool commitTransaction(void) const = 0;
+  virtual bool rollbackTransaction(void) const = 0;
 
   virtual Qt::SortOrder getCurrentOrder() const = 0;
   virtual void setCurrentOrder(Qt::SortOrder order) = 0;
 
   virtual uint32_t getRecordMaxCount(void) const = 0;
-  virtual void setRecordMaxCount(uint32_t count) const = 0;
+  virtual void setRecordMaxCount(uint32_t count) = 0;
+
+  virtual bool execCustomRequest(
+      const QString& requestText,
+      QVector<QSharedPointer<QHash<QString, QString>>>& records) const = 0;
 
   // Create
   virtual bool createRecord(

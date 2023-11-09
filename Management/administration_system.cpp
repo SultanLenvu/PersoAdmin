@@ -1,4 +1,5 @@
 #include "administration_system.h"
+#include "Log/log_system.h"
 
 AdministrationSystem::AdministrationSystem(QObject* parent) : QObject(parent) {
   setObjectName("AdministrationSystem");
@@ -15,7 +16,7 @@ void AdministrationSystem::applySettings() {
 
 AdministrationSystem::ReturnStatus AdministrationSystem::connectDatabase() {
   sendLog("Подключение к базе данных. ");
-  if (!Database->connect()) {
+  if (!NewDatabase->connect()) {
     sendLog("Не удалось установить соединение с базой данных. ");
     return DatabaseConnectionError;
   }
@@ -33,6 +34,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::disconnectDatabase() {
 void AdministrationSystem::createDatabaseController() {
   Database = new PostgresController(this, "AdministratorConnection");
   connect(Database, &IDatabaseController::logging, LogSystem::instance(),
+          &LogSystem::generate);
+
+  NewDatabase = new PostgreSqlDatabase(this, "AdministratorNewConnection");
+  connect(NewDatabase, &AbstractSqlDatabase::logging, LogSystem::instance(),
           &LogSystem::generate);
 }
 

@@ -1,15 +1,15 @@
-#ifndef POSTRESQLDATABASE_H
-#define POSTRESQLDATABASE_H
+#ifndef PostgreSqlDatabase_H
+#define PostgreSqlDatabase_H
 
 #include <QHostAddress>
-#include <QScopedPointer>
+#include <QSharedPointer>
 #include <QVector>
 #include <QtSql>
 
 #include "abstract_sql_database.h"
 #include "sql_table.h"
 
-class PostreSqlDatabase : public AbstractSqlDatabase {
+class PostgreSqlDatabase : public AbstractSqlDatabase {
   Q_OBJECT
 
  private:
@@ -26,11 +26,11 @@ class PostreSqlDatabase : public AbstractSqlDatabase {
   QString UserName;
   QString UserPassword;
 
-  QVector<QScopedPointer<SqlTable>> Tables;
+  QHash<QString, QSharedPointer<SqlTable>> Tables;
 
  public:
-  explicit PostreSqlDatabase(QObject* parent, const QString& connectionName);
-  ~PostreSqlDatabase();
+  explicit PostgreSqlDatabase(QObject* parent, const QString& connectionName);
+  ~PostgreSqlDatabase();
 
   // AbstractSqlDatabase interface
   virtual void applySettings() override;
@@ -40,14 +40,18 @@ class PostreSqlDatabase : public AbstractSqlDatabase {
   virtual bool isConnected() override;
 
   virtual bool openTransaction() const override;
-  virtual bool closeTransaction() const override;
-  virtual bool abortTransaction() const override;
+  virtual bool commitTransaction() const override;
+  virtual bool rollbackTransaction() const override;
 
   virtual Qt::SortOrder getCurrentOrder() const override;
   virtual void setCurrentOrder(Qt::SortOrder order) override;
 
   virtual uint32_t getRecordMaxCount(void) const override;
-  virtual void setRecordMaxCount(uint32_t count) const override;
+  virtual void setRecordMaxCount(uint32_t count) override;
+
+  virtual bool execCustomRequest(
+      const QString& requestText,
+      QVector<QSharedPointer<QHash<QString, QString>>>& records) const override;
 
   // Create
   virtual bool createRecord(
@@ -76,14 +80,22 @@ class PostreSqlDatabase : public AbstractSqlDatabase {
   virtual bool clearTable(const QString& table) const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(PostreSqlDatabase)
+  Q_DISABLE_COPY_MOVE(PostgreSqlDatabase)
   void sendLog(const QString& log) const;
   void loadSettings(void);
+
   void createDatabaseConnection(void);
+  bool init(void);
+  bool createTable(void);
+
+  bool checkTableName(const QString& name);
+  bool checkTableField(const QString& field);
+
+  bool getTableComlumnNames(const QString& name);
 
   void extractRecords(
       QSqlQuery& request,
       QVector<QSharedPointer<QHash<QString, QString>>>& records) const;
 };
 
-#endif  // POSTRESQLDATABASE_H
+#endif  // PostgreSqlDatabase_H

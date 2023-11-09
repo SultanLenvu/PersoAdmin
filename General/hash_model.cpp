@@ -1,15 +1,5 @@
 #include "hash_model.h"
 
-const QString HashModel::FIELD_NAMES[] = {
-  "sn",
-  "pan",
-  "issuer_name",
-  "box_id",
-  "pallet_id",
-  "order_id",
-  "transponder_id",
-};
-
 HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
   setObjectName("HashModel");
   createMatchTables();
@@ -17,8 +7,7 @@ HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
 
 HashModel::~HashModel() {}
 
-void HashModel::buildTransponderData(const QHash<QString, QString>* data)
-{
+void HashModel::buildTransponderData(const QHash<QString, QString>* data) {
   // Проверка на существование
   if (!data) {
     return;
@@ -31,8 +20,8 @@ void HashModel::buildTransponderData(const QHash<QString, QString>* data)
   Headers.clear();
 
   // Устанавливаем новые данные
-  for (QHash<QString, QString>::const_iterator it1 = data->constBegin(); it1 != data->constEnd();
-       it1++) {
+  for (QHash<QString, QString>::const_iterator it1 = data->constBegin();
+       it1 != data->constEnd(); it1++) {
     Values.append(it1.value());
     Headers.append(TransponderDataMatchTable.value(it1.key()));
     HashTable.insert(TransponderDataMatchTable.value(it1.key()), it1.value());
@@ -54,8 +43,7 @@ bool HashModel::isEmpty() const {
   return HashTable.isEmpty();
 }
 
-const QHash<QString, QVariant>* HashModel::hash() const
-{
+const QHash<QString, QVariant>* HashModel::hash() const {
   return &HashTable;
 }
 

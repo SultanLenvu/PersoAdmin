@@ -13,6 +13,11 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/database_controller.cpp Database/database_controller.h
     Database/database_table_model.cpp Database/database_table_model.h
     Database/postgres_controller.cpp Database/postgres_controller.h
+    Database/abstract_sql_database.cpp Database/abstract_sql_database.h
+    Database/postre_sql_database.cpp Database/postre_sql_database.h
+    Database/sql_table.cpp Database/sql_table.h
+    Database/sql_table_relation.cpp Database/sql_table_relation.h
+
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
     GUI/input_dialog.cpp GUI/input_dialog.h
@@ -21,17 +26,21 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     GUI/mainwindow_kernel.cpp GUI/mainwindow_kernel.h
     GUI/pallet_shiping_dialog.cpp GUI/pallet_shiping_dialog.h
     GUI/pan_input_dialog.cpp GUI/pan_input_dialog.h
+
     General/definitions.h
     General/hash_model.cpp General/hash_model.h
+
     Log/file_log_backend.cpp Log/file_log_backend.h
     Log/log_backend.cpp Log/log_backend.h
     Log/log_system.cpp Log/log_system.h
     Log/widget_log_backend.cpp Log/widget_log_backend.h
+
     Management/admin_manager.cpp Management/admin_manager.h
     Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
     StickerPrinter/isticker_printer.cpp StickerPrinter/isticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
+
     main.cpp
 )
 target_compile_definitions(PersoAdmin PRIVATE
