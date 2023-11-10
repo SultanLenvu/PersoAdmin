@@ -7,7 +7,7 @@
 #include <QtSql>
 
 #include "abstract_sql_database.h"
-#include "sql_table.h"
+#include "postgre_sql_table.h"
 
 class PostgreSqlDatabase : public AbstractSqlDatabase {
   Q_OBJECT
@@ -26,7 +26,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   QString UserName;
   QString UserPassword;
 
-  QHash<QString, QSharedPointer<SqlTable>> Tables;
+  QHash<QString, QSharedPointer<PostgreSqlTable>> Tables;
 
  public:
   explicit PostgreSqlDatabase(QObject* parent, const QString& connectionName);
@@ -51,22 +51,22 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
   virtual bool execCustomRequest(
       const QString& requestText,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const override;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
 
   // Create
-  virtual bool createRecord(
+  virtual bool createRecords(
       const QString& table,
-      QVector<QHash<QString, QString>>& records) const override;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
 
   // Read
   virtual bool readRecords(
       const QString& table,
       const QHash<QString, QString>& searchValues,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const override;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
   virtual bool readMergedRecords(
       const QStringList& tables,
       const QHash<QString, QString>& searchValues,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const override;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
 
   // Update
   virtual bool updateRecords(const QString& table,
@@ -74,9 +74,8 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
                              QHash<QString, QString>& newValues) const override;
 
   // Delete
-  virtual bool deleteRecords(
-      const QString& table,
-      const QHash<QString, QString>& searchValues) const override;
+  virtual bool deleteRecords(const QString& table,
+                             const QString& condition) const override;
   virtual bool clearTable(const QString& table) const override;
 
  private:
@@ -95,7 +94,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
   void extractRecords(
       QSqlQuery& request,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const;
 };
 
 #endif  // PostgreSqlDatabase_H

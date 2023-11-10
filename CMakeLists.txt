@@ -14,9 +14,10 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/database_table_model.cpp Database/database_table_model.h
     Database/postgres_controller.cpp Database/postgres_controller.h
     Database/abstract_sql_database.cpp Database/abstract_sql_database.h
-    Database/postre_sql_database.cpp Database/postre_sql_database.h
-    Database/sql_table.cpp Database/sql_table.h
+    Database/postgre_sql_database.cpp Database/postgre_sql_database.h
+    Database/postgre_sql_table.cpp Database/postgre_sql_table.h
     Database/sql_table_relation.cpp Database/sql_table_relation.h
+    Database/abstract_sql_table.cpp Database/abstract_sql_table.h
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
@@ -38,6 +39,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Management/admin_manager.cpp Management/admin_manager.h
     Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
+
     StickerPrinter/isticker_printer.cpp StickerPrinter/isticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 

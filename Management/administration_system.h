@@ -7,7 +7,7 @@
 
 #include "Database/database_table_model.h"
 #include "Database/postgres_controller.h"
-#include "Database/postre_sql_database.h"
+#include "Database/postgre_sql_database.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT

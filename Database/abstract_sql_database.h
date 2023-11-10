@@ -29,22 +29,22 @@ class AbstractSqlDatabase : public QObject {
 
   virtual bool execCustomRequest(
       const QString& requestText,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const = 0;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
   // Create
-  virtual bool createRecord(
+  virtual bool createRecords(
       const QString& table,
-      QVector<QHash<QString, QString>>& records) const = 0;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
   // Read
   virtual bool readRecords(
       const QString& table,
       const QHash<QString, QString>& searchValues,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const = 0;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
   virtual bool readMergedRecords(
       const QStringList& tables,
       const QHash<QString, QString>& searchValues,
-      QVector<QSharedPointer<QHash<QString, QString>>>& records) const = 0;
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
   // Update
   virtual bool updateRecords(const QString& table,
@@ -52,9 +52,8 @@ class AbstractSqlDatabase : public QObject {
                              QHash<QString, QString>& newValues) const = 0;
 
   // Delete
-  virtual bool deleteRecords(
-      const QString& table,
-      const QHash<QString, QString>& searchValues) const = 0;
+  virtual bool deleteRecords(const QString& table,
+                             const QString& condition) const = 0;
   virtual bool clearTable(const QString& table) const = 0;
 
  private:
