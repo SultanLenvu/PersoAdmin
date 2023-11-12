@@ -14,7 +14,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
  private:
   bool LogEnable;
-  Qt::SortOrder CurrentOrder;
+  QString CurrentOrder;
   uint32_t RecordMaxCount;
 
   QString ConnectionName;
@@ -37,7 +37,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
   virtual bool connect() override;
   virtual void disconnect() override;
-  virtual bool isConnected() override;
+  virtual bool checkConnection() override;
 
   virtual bool openTransaction() const override;
   virtual bool commitTransaction() const override;
@@ -53,30 +53,33 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
       const QString& requestText,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
 
-  // Create
+  // Single table CRUD
   virtual bool createRecords(
       const QString& table,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-
-  // Read
   virtual bool readRecords(
       const QString& table,
-      const QHash<QString, QString>& searchValues,
+      const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool updateRecords(
+      const QString& table,
+      const QString& conditions,
+      const QHash<QString, QString>& newValues) const override;
+  virtual bool deleteRecords(const QString& table,
+                             const QString& conditions) const override;
+  virtual bool clearTable(const QString& table) const override;
+
+  // Multi table CRUD
   virtual bool readMergedRecords(
       const QStringList& tables,
-      const QHash<QString, QString>& searchValues,
+      const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-
-  // Update
-  virtual bool updateRecords(const QString& table,
-                             const QString& condition,
-                             QHash<QString, QString>& newValues) const override;
-
-  // Delete
-  virtual bool deleteRecords(const QString& table,
-                             const QString& condition) const override;
-  virtual bool clearTable(const QString& table) const override;
+  virtual bool updateMergedRecords(
+      const QStringList& tables,
+      const QString& conditions,
+      const QHash<QString, QString>& newValues) const override;
+  virtual bool deleteMergedRecords(const QStringList& tables,
+                                   const QString& conditions) const override;
 
  private:
   Q_DISABLE_COPY_MOVE(PostgreSqlDatabase)
@@ -87,11 +90,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   bool init(void);
   bool createTable(void);
 
-  bool checkTableName(const QString& name);
-  bool checkTableField(const QString& field);
-
-  bool getTableComlumnNames(const QString& name);
-
+  bool checkTableNames(const QStringList& names) const;
   void extractRecords(
       QSqlQuery& request,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const;

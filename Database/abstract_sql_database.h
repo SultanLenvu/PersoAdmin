@@ -15,7 +15,7 @@ class AbstractSqlDatabase : public QObject {
 
   virtual bool connect(void) = 0;
   virtual void disconnect(void) = 0;
-  virtual bool isConnected(void) = 0;
+  virtual bool checkConnection() = 0;
 
   virtual bool openTransaction(void) const = 0;
   virtual bool commitTransaction(void) const = 0;
@@ -31,30 +31,34 @@ class AbstractSqlDatabase : public QObject {
       const QString& requestText,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
-  // Create
+  // Single table CRUD
   virtual bool createRecords(
       const QString& table,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-
-  // Read
   virtual bool readRecords(
       const QString& table,
-      const QHash<QString, QString>& searchValues,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readMergedRecords(
-      const QStringList& tables,
-      const QHash<QString, QString>& searchValues,
+      const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
-  // Update
-  virtual bool updateRecords(const QString& table,
-                             const QString& condition,
-                             QHash<QString, QString>& newValues) const = 0;
-
-  // Delete
+  virtual bool updateRecords(
+      const QString& table,
+      const QString& condition,
+      const QHash<QString, QString>& newValues) const = 0;
   virtual bool deleteRecords(const QString& table,
                              const QString& condition) const = 0;
   virtual bool clearTable(const QString& table) const = 0;
+
+  // Multi table CRUD
+  virtual bool readMergedRecords(
+      const QStringList& tables,
+      const QString& conditions,
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool updateMergedRecords(
+      const QStringList& tables,
+      const QString& conditions,
+      const QHash<QString, QString>& newValues) const = 0;
+  virtual bool deleteMergedRecords(const QStringList& tables,
+                                   const QString& conditions) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractSqlDatabase)
