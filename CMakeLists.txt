@@ -18,6 +18,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/postgre_sql_table.cpp Database/postgre_sql_table.h
     Database/sql_table_relation.cpp Database/sql_table_relation.h
     Database/abstract_sql_table.cpp Database/abstract_sql_table.h
+    Database/database_response.h Database/database_response.cpp
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
