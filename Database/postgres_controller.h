@@ -76,8 +76,7 @@ class PostgresController : public IDatabaseController {
   virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY(PostgresController);
-  void sendLog(const QString& log) const;
+  Q_DISABLE_COPY(PostgresController)
   void loadSettings(void);
   void createDatabaseConnection(void);
   void convertResponseToBuffer(QSqlQuery& request,
