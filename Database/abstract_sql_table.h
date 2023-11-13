@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "database_response.h"
+
 class AbstractSqlTable : public QObject {
   Q_OBJECT
 
@@ -18,12 +20,10 @@ class AbstractSqlTable : public QObject {
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
 
   // Read
-  virtual bool readRecords(
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readRecords(
-      const QString& conditions,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readLastRecord(QHash<QString, QString>& record) const = 0;
+  virtual bool readRecords(DatabaseRecordTable& records) const = 0;
+  virtual bool readRecords(const QString& conditions,
+                           DatabaseRecordTable& records) const = 0;
+  virtual bool readLastRecord(DatabaseRecordTable& record) const = 0;
 
   // Update
   virtual bool updateRecords(

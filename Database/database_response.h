@@ -1,31 +1,35 @@
 #ifndef DATABASERESPONSE_H
 #define DATABASERESPONSE_H
 
+#include <QHash>
 #include <QObject>
 #include <QSharedPointer>
-#include <QStringList>
+#include <QVector>
 
-class DatabaseResponse : public QObject {
+class DatabaseRecordTable : public QObject {
   Q_OBJECT
 
  private:
-  typedef HashRecordTable QHash<QString, QSharedPointer<QStringList>>;
-
- private:
-  HashRecordTable Records;
+  QHash<QString, QSharedPointer<QVector<QString>>> Records;
   uint32_t RecordNumber;
 
  public:
-  explicit DatabaseResponse(QObject* parent);
-  ~DatabaseResponse();
+  explicit DatabaseRecordTable(QObject* parent);
+  ~DatabaseRecordTable();
 
-  void addField(const QString& name, const QSharedPointer<QStringList>);
+  void addField(const QString& name);
+  void addField(const QString& name, const QSharedPointer<QVector<QString>>);
+  void addField(const QString& name, uint32_t recordNumber);
 
-  void prepareMemoryForRecords(uint32_t num);
-  uint32_t getRecordNumber() const;
+  void addFieldValue(const QString& field, const QString& value);
 
-  bool isEmpty();
+  uint32_t getRecordNumber(void) const;
+  uint32_t getFieldNumber(void) const;
+
+  bool isEmpty(void);
   QString getValue(uint32_t record, const QString& field);
+
+  void clear(void);
 };
 
 #endif  // DATABASERESPONSE_H
