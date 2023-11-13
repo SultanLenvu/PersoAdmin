@@ -19,10 +19,11 @@ class AbstractSqlTable : public QObject {
 
   // Read
   virtual bool readRecords(
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool readRecords(
       const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readLastRecord(
-      QHash<QString, QSharedPointer<QVector<QString>>>& record) const = 0;
+  virtual bool readLastRecord(QHash<QString, QString>& record) const = 0;
 
   // Update
   virtual bool updateRecords(

@@ -3,24 +3,16 @@
 DatabaseTableModel::DatabaseTableModel(QObject* parent)
     : QAbstractTableModel(parent) {
   setObjectName("DatabaseTableModel");
-
-  Headers = nullptr;
-  Data = nullptr;
 }
 
 DatabaseTableModel::~DatabaseTableModel() {
   clear();
 }
 
-void DatabaseTableModel::build(QVector<QString>* headers,
-                               QVector<QVector<QString>*>* data) {
+void DatabaseTableModel::build(
+    const QHash<QString, QSharedPointer<QVector<QString>>>* records) {
   // Блокируем доступ
   QMutexLocker locker(&Mutex);
-
-  // Проверка на существование
-  if ((!headers) || (!data)) {
-    return;
-  }
 
   beginResetModel();
 
@@ -28,8 +20,12 @@ void DatabaseTableModel::build(QVector<QString>* headers,
   deleteAll();
 
   // Устанавливаем новые данные
-  Headers = headers;
-  Data = data;
+  for (QHash<QString, QSharedPointer<QVector<QString>>>::const_iterator it =
+           records->constBegin();
+       it != records->constEnd(); it++) {
+    Headers.append(it.key());
+    Data.append(it.value());
+  }
 
   endResetModel();
 }
@@ -46,32 +42,30 @@ void DatabaseTableModel::clear() {
 }
 
 bool DatabaseTableModel::isEmpty() const {
-  return ((!Headers) && (!Data)) ? true : false;
+  return ((!Headers.isEmpty())) && (!Data.isEmpty());
 }
 
 int DatabaseTableModel::rowCount(const QModelIndex& parent) const {
-  if (Data)
-    return Data->size();
-  else
+  if (Data.size() < 1) {
     return 0;
+  }
+
+  return Data.first()->size();
 }
 
 int DatabaseTableModel::columnCount(const QModelIndex& parent) const {
-  return (Headers) ? Headers->size() : 0;
+  return Data.size();
 }
 
 QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
-  if ((!Headers) || (!Data))
+  if (index.column() > Headers.size())
     return QVariant();
 
-  if (index.column() > Headers->size())
-    return QVariant();
-
-  if (index.row() > Data->size())
+  if (index.row() > Data.size())
     return QVariant();
 
   if (role == Qt::DisplayRole) {
-    return Data->at(index.row())->at(index.column());
+    return Data.at(index.column())->at(index.row());
   } else
     return QVariant();
 }
@@ -79,10 +73,7 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 QVariant DatabaseTableModel::headerData(int section,
                                         Qt::Orientation orientation,
                                         int role) const {
-  if (!Headers)
-    return QVariant();
-
-  if (section > Headers->size()) {
+  if (section > Headers.size()) {
     return QVariant();
   }
 
@@ -90,22 +81,13 @@ QVariant DatabaseTableModel::headerData(int section,
     return QVariant();
 
   if (orientation == Qt::Horizontal) {
-    return Headers->at(section);
+    return Headers.at(section);
   } else {
     return QVariant();
   }
 }
 
 void DatabaseTableModel::deleteAll() {
-  if ((!Headers) || (!Data))
-    return;
-
-  delete Headers;
-  Headers = nullptr;
-
-  for (int32_t i = 0; i < Data->size(); i++)
-    delete Data->at(i);
-
-  delete Data;
-  Data = nullptr;
+  Headers.clear();
+  Data.clear();
 }

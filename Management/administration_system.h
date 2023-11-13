@@ -6,8 +6,8 @@
 #include <QObject>
 
 #include "Database/database_table_model.h"
-#include "Database/postgres_controller.h"
 #include "Database/postgre_sql_database.h"
+#include "Database/postgres_controller.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
@@ -35,8 +35,7 @@ class AdministrationSystem : public QObject {
   QHash<QString, QString> CurrentOrder;
   QHash<QString, QString> CurrentIssuer;
 
-  PostgresController* Database;
-  PostgreSqlDatabase* NewDatabase;
+  PostgreSqlDatabase* Database;
 
  public:
   explicit AdministrationSystem(QObject* parent);
@@ -84,7 +83,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus shipPallets(const QHash<QString, QString>* param);
 
  private:
-  Q_DISABLE_COPY(AdministrationSystem) void createDatabaseController(void);
+  Q_DISABLE_COPY(AdministrationSystem) void createDatabase(void);
   void loadSettings(void);
   void sendLog(const QString& log) const;
 

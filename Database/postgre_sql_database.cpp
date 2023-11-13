@@ -184,6 +184,25 @@ bool PostgreSqlDatabase::createRecords(
 
 bool PostgreSqlDatabase::readRecords(
     const QString& table,
+    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+  // Проверка подключения
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog(
+        QString("Соединение с Postgres не установлено. %1.")
+            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+
+  if (!Tables.contains(table)) {
+    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
+    return false;
+  }
+
+  return Tables.value(table)->readRecords(records);
+}
+
+bool PostgreSqlDatabase::readRecords(
+    const QString& table,
     const QString& conditions,
     QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
   // Проверка подключения
@@ -200,6 +219,24 @@ bool PostgreSqlDatabase::readRecords(
   }
 
   return Tables.value(table)->readRecords(conditions, records);
+}
+
+bool PostgreSqlDatabase::readLastRecord(const QString& table,
+                                        QHash<QString, QString>& record) const {
+  // Проверка подключения
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog(
+        QString("Соединение с Postgres не установлено. %1.")
+            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+
+  if (!Tables.contains(table)) {
+    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
+    return false;
+  }
+
+  return Tables.value(table)->readLastRecord(record);
 }
 
 bool PostgreSqlDatabase::updateRecords(
@@ -326,7 +363,20 @@ bool PostgreSqlDatabase::updateMergedRecords(
   //      WHERE pallets.id = 1000001);
 
   // Создаем запрос
-  QString requestText = QString("UPDATE * public.%1 ").arg(tables.first());
+  QString requestText = QString("UPDATE * public.%1 SET ").arg(tables.first());
+  for (QHash<QString, QString>::const_iterator it = newValues.constBegin();
+       it != newValues.constEnd(); it++) {
+    if ((it.value() == "NULL") || (it.value().isEmpty())) {
+      requestText += QString("%1 = NULL, ").arg(it.key());
+    } else {
+      requestText += QString("%1 = '%2', ").arg(it.key(), it.value());
+    }
+  }
+
+  requestText.chop(2);
+  requestText +=
+      QString(" WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
+          .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
   for (int32_t i = 0; i < tables.size(); i++) {
     requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
                        .arg(tables.at(i + 1), tables.at(i),
@@ -335,9 +385,7 @@ bool PostgreSqlDatabase::updateMergedRecords(
                                 ->value(tables.at(i + 1)),
                             Tables.value(tables.at(i + 1))->getPrimaryKey());
   }
-
-  requestText += QString("WHERE %1 LIMIT %2;")
-                     .arg(conditions, QString::number(RecordMaxCount));
+  requestText += QString(" WHERE %1);").arg(conditions);
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -357,6 +405,42 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
     sendLog(
         QString("Соединение с Postgres не установлено. %1.")
             .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+
+  if (!checkTableNames(tables)) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  //  UPDATE transponders
+  //  SET awaiting_confirmation = true
+  //  WHERE transponders.id IN (
+  //      SELECT transponders.id FROM transponders
+  //      JOIN boxes ON transponders.box_id = boxes.id
+  //      JOIN pallets ON boxes.pallet_id = pallets.id
+  //      WHERE pallets.id = 1000001);
+
+  // Создаем запрос
+  QString requestText =
+      QString(
+          "DELETE FROM public.%1 WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
+          .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
+  for (int32_t i = 0; i < tables.size(); i++) {
+    requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
+                       .arg(tables.at(i + 1), tables.at(i),
+                            Tables.value(tables.at(i))
+                                ->relations()
+                                ->value(tables.at(i + 1)),
+                            Tables.value(tables.at(i + 1))->getPrimaryKey());
+  }
+  requestText += QString(" WHERE %1);").arg(conditions);
+
+  // Выполняем запрос
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec(requestText)) {
+    sendLog(request.lastError().text());
+    sendLog("Отправленный запрос: " + requestText);
     return false;
   }
 

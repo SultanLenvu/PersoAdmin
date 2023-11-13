@@ -741,7 +741,7 @@ void PostgresController::convertResponseToBuffer(
   }
 
   // Строим буффер для отображения
-  buffer->build(headers, data);
+  //  buffer->build(headers, data);
 }
 
 void PostgresController::convertResponseToHash(

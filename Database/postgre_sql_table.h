@@ -45,10 +45,11 @@ class PostgreSqlTable : public AbstractSqlTable {
   virtual bool createRecords(
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
   virtual bool readRecords(
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool readRecords(
       const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-  virtual bool readLastRecord(
-      QHash<QString, QSharedPointer<QVector<QString>>>& record) const override;
+  virtual bool readLastRecord(QHash<QString, QString>& record) const override;
   virtual bool updateRecords(
       const QString& condition,
       const QHash<QString, QString>& newValues) const override;
@@ -64,6 +65,7 @@ class PostgreSqlTable : public AbstractSqlTable {
       const QHash<QString, QSharedPointer<QVector<QString>>>& record) const;
   bool checkFieldNames(const QHash<QString, QString>& record) const;
 
+  void extractRecord(QSqlQuery& request, QHash<QString, QString>& record) const;
   void extractRecords(
       QSqlQuery& request,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const;

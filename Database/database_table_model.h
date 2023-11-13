@@ -9,8 +9,8 @@ class DatabaseTableModel : public QAbstractTableModel {
   Q_OBJECT
 
  private:
-  QVector<QString>* Headers;
-  QVector<QVector<QString>*>* Data;
+  QList<QString> Headers;
+  QList<QSharedPointer<QVector<QString>>> Data;
 
   QMutex Mutex;
 
@@ -18,7 +18,7 @@ class DatabaseTableModel : public QAbstractTableModel {
   explicit DatabaseTableModel(QObject* parent);
   ~DatabaseTableModel();
 
-  void build(QVector<QString>* headers, QVector<QVector<QString>*>* data);
+  void build(const QHash<QString, QSharedPointer<QVector<QString>>>* records);
   void clear(void);
   bool isEmpty(void) const;
 
@@ -35,4 +35,4 @@ class DatabaseTableModel : public QAbstractTableModel {
   void deleteAll(void);
 };
 
-#endif // DATABASBUFFER_H
+#endif  // DATABASBUFFER_H

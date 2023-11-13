@@ -37,9 +37,13 @@ class AbstractSqlDatabase : public QObject {
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
   virtual bool readRecords(
       const QString& table,
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool readRecords(
+      const QString& table,
       const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-
+  virtual bool readLastRecord(const QString& table,
+                              QHash<QString, QString>& record) const = 0;
   virtual bool updateRecords(
       const QString& table,
       const QString& condition,

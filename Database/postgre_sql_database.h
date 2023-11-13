@@ -59,8 +59,13 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
   virtual bool readRecords(
       const QString& table,
+      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool readRecords(
+      const QString& table,
       const QString& conditions,
       QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool readLastRecord(const QString& table,
+                              QHash<QString, QString>& record) const override;
   virtual bool updateRecords(
       const QString& table,
       const QString& conditions,

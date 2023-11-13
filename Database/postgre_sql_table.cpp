@@ -154,6 +154,26 @@ bool PostgreSqlTable::createRecords(
 }
 
 bool PostgreSqlTable::readRecords(
+    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+  // Создаем запрос
+  QString requestText =
+      QString("SELECT * FROM public.%1 ORDER BY %2 %3 LIMIT %4;")
+          .arg(objectName(), PrimaryKey, CurrentOrder,
+               QString::number(RecordMaxCount));
+
+  // Выполняем запрос
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec(requestText)) {
+    sendLog(request.lastError().text());
+    sendLog("Отправленный запрос: " + requestText);
+    return false;
+  }
+
+  extractRecords(request, records);
+  return true;
+}
+
+bool PostgreSqlTable::readRecords(
     const QString& conditions,
     QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
   // Создаем запрос
@@ -174,8 +194,7 @@ bool PostgreSqlTable::readRecords(
   return true;
 }
 
-bool PostgreSqlTable::readLastRecord(
-    QHash<QString, QSharedPointer<QVector<QString>>>& record) const {
+bool PostgreSqlTable::readLastRecord(QHash<QString, QString>& record) const {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 ORDER BY %2 ASC LIMIT 1;")
@@ -189,7 +208,7 @@ bool PostgreSqlTable::readLastRecord(
     return false;
   }
 
-  extractRecords(request, record);
+  extractRecord(request, record);
   return true;
 }
 
@@ -293,10 +312,20 @@ bool PostgreSqlTable::checkFieldNames(
   return true;
 }
 
+void PostgreSqlTable::extractRecord(QSqlQuery& request,
+                                    QHash<QString, QString>& record) const {
+  record.clear();
+
+  if (request.next()) {
+    for (int32_t i = 0; i < request.record().count(); i++) {
+      record.insert(request.record().fieldName(i), request.value(i).toString());
+    }
+  }
+}
+
 void PostgreSqlTable::extractRecords(
     QSqlQuery& request,
     QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
-  QSharedPointer<QVector<QString>> record;
   records.clear();
 
   for (int32_t i = 0; i < request.record().count(); i++) {
