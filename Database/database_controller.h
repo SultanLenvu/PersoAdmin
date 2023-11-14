@@ -7,8 +7,7 @@
 #include <QStringList>
 #include <QVector>
 
-#include "General/definitions.h"
-#include "database_table_model.h"
+#include "sql_response_model.h"
 
 class IDatabaseController : public QObject {
   Q_OBJECT
@@ -29,9 +28,9 @@ class IDatabaseController : public QObject {
 
   virtual bool getTable(const QString& tableName,
                         uint32_t rowCount,
-                        DatabaseTableModel* buffer) const = 0;
+                        SqlResponseModel* buffer) const = 0;
   virtual bool execCustomRequest(const QString& req,
-                                 DatabaseTableModel* buffer) const = 0;
+                                 SqlResponseModel* buffer) const = 0;
   virtual bool clearTable(const QString& tableName) const = 0;
 
   virtual bool addRecord(const QString& tableName,

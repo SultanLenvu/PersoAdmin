@@ -5,9 +5,8 @@
 #include <QDate>
 #include <QObject>
 
-#include "Database/database_table_model.h"
 #include "Database/postgre_sql_database.h"
-#include "Database/postgres_controller.h"
+#include "Database/sql_response_model.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
@@ -19,6 +18,7 @@ class AdministrationSystem : public QObject {
     DatabaseTransactionError,
     DatabaseQueryError,
     ShipmentRegisterError,
+    FreeProductionLineMissed,
     LogicError,
     UnknownError,
     Completed
@@ -29,11 +29,11 @@ class AdministrationSystem : public QObject {
   bool LogEnable;
   QString ShipmentRegisterDir;
 
-  QHash<QString, QString> CurrentTransponder;
-  QHash<QString, QString> CurrentBox;
-  QHash<QString, QString> CurrentPallet;
-  QHash<QString, QString> CurrentOrder;
-  QHash<QString, QString> CurrentIssuer;
+  SqlResponseModel CurrentTransponder;
+  SqlResponseModel CurrentBox;
+  SqlResponseModel CurrentPallet;
+  SqlResponseModel CurrentOrder;
+  SqlResponseModel CurrentIssuer;
 
   PostgreSqlDatabase* Database;
 
@@ -46,9 +46,9 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus clearDatabaseTable(const QString& tableName);
   ReturnStatus getDatabaseTable(const QString& tableName,
-                                DatabaseTableModel* buffer);
+                                SqlResponseModel* response);
   ReturnStatus getCustomResponse(const QString& req,
-                                 DatabaseTableModel* buffer);
+                                 SqlResponseModel* response);
 
   ReturnStatus createNewOrder(
       const QSharedPointer<QHash<QString, QString> > orderParameters);
@@ -92,10 +92,13 @@ class AdministrationSystem : public QObject {
   bool addOrder(
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addPallets(
+      const QString& orderId,
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addBoxes(
+      const QString& orderId,
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addTransponders(
+      const QString& orderId,
       const QSharedPointer<QHash<QString, QString> > orderParameters) const;
   bool addProductionLine(
       const QHash<QString, QString>* productionLineParameters) const;
@@ -112,7 +115,7 @@ class AdministrationSystem : public QObject {
 
   bool searchBoxForProductionLine(const QString& orderId,
                                   const QString& productionLineId,
-                                  QHash<QString, QString>& boxRecord) const;
+                                  SqlResponseModel& boxRecord) const;
 
   ReturnStatus releaseTransponderManually(const QString& id);
   ReturnStatus releaseBoxManually(const QString& id);

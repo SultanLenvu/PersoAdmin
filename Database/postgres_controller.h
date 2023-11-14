@@ -35,10 +35,10 @@ class PostgresController : public IDatabaseController {
   virtual bool abortTransaction(void) const override;
 
   virtual bool execCustomRequest(const QString& req,
-                                 DatabaseTableModel* buffer) const override;
+                                 SqlResponseModel* buffer) const override;
   virtual bool getTable(const QString& tableName,
                         uint32_t rowCount,
-                        DatabaseTableModel* buffer) const override;
+                        SqlResponseModel* buffer) const override;
   virtual bool clearTable(const QString& tableName) const override;
 
   virtual bool addRecord(const QString& tableName,
@@ -80,7 +80,7 @@ class PostgresController : public IDatabaseController {
   void loadSettings(void);
   void createDatabaseConnection(void);
   void convertResponseToBuffer(QSqlQuery& request,
-                               DatabaseTableModel* buffer) const;
+                               SqlResponseModel* buffer) const;
   void convertResponseToHash(QSqlQuery& request,
                              QHash<QString, QString>& record) const;
 };

@@ -1,15 +1,18 @@
 #include "admin_manager.h"
+#include "Database/database_controller.h"
+#include "Database/postgres_controller.h"
+#include "Database/sql_response_model.h"
+#include "Log/log_system.h"
+#include "StickerPrinter/te310_printer.h"
 
 AdminManager::AdminManager(QObject* parent) : QObject(parent) {
   setObjectName("AdminManager");
   loadSettings();
 }
 
-AdminManager::~AdminManager() {
-}
+AdminManager::~AdminManager() {}
 
-void AdminManager::insctanceThreadStarted_slot()
-{
+void AdminManager::insctanceThreadStarted_slot() {
   // Создаем администратора
   createAdministrator();
 
@@ -53,7 +56,7 @@ void AdminManager::disconnectDatabase() {
 }
 
 void AdminManager::showDatabaseTable(const QString& name,
-                                     DatabaseTableModel* model) {
+                                     SqlResponseModel* model) {
   // Начинаем выполнение операции
   startOperationPerforming("showDatabaseTable");
 
@@ -71,7 +74,7 @@ void AdminManager::showDatabaseTable(const QString& name,
 }
 
 void AdminManager::clearDatabaseTable(const QString& name,
-                                      DatabaseTableModel* model) {
+                                      SqlResponseModel* model) {
   // Начинаем выполнение операции
   startOperationPerforming("clearDatabaseTable");
 
@@ -96,7 +99,7 @@ void AdminManager::clearDatabaseTable(const QString& name,
 }
 
 void AdminManager::performCustomRequest(const QString& req,
-                                        DatabaseTableModel* model) {
+                                        SqlResponseModel* model) {
   // Начинаем выполнение операции
   startOperationPerforming("performCustomRequest");
 
@@ -115,7 +118,7 @@ void AdminManager::performCustomRequest(const QString& req,
 
 void AdminManager::createNewOrder(
     const QSharedPointer<QHash<QString, QString>> orderParameters,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("createNewOrder");
 
   AdministrationSystem::ReturnStatus status;
@@ -138,7 +141,7 @@ void AdminManager::createNewOrder(
   finishOperationPerforming("createNewOrder");
 }
 
-void AdminManager::deleteLastOrder(DatabaseTableModel* model) {
+void AdminManager::deleteLastOrder(SqlResponseModel* model) {
   startOperationPerforming("deleteLastOrder");
 
   AdministrationSystem::ReturnStatus status;
@@ -162,7 +165,7 @@ void AdminManager::deleteLastOrder(DatabaseTableModel* model) {
 }
 
 void AdminManager::startOrderAssembling(const QString& orderId,
-                                        DatabaseTableModel* model) {
+                                        SqlResponseModel* model) {
   startOperationPerforming("startOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
@@ -186,7 +189,7 @@ void AdminManager::startOrderAssembling(const QString& orderId,
 }
 
 void AdminManager::stopOrderAssembling(const QString& orderId,
-                                       DatabaseTableModel* model) {
+                                       SqlResponseModel* model) {
   startOperationPerforming("stopOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
@@ -209,13 +212,13 @@ void AdminManager::stopOrderAssembling(const QString& orderId,
   finishOperationPerforming("stopOrderAssembling");
 }
 
-void AdminManager::showOrderTable(DatabaseTableModel* model) {
+void AdminManager::showOrderTable(SqlResponseModel* model) {
   showDatabaseTable("orders", model);
 }
 
 void AdminManager::createNewProductionLine(
     const QSharedPointer<QHash<QString, QString>> productionLineParameters,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("createNewProductionLine");
 
   AdministrationSystem::ReturnStatus status;
@@ -240,7 +243,7 @@ void AdminManager::createNewProductionLine(
 }
 
 void AdminManager::allocateInactiveProductionLines(const QString& orderId,
-                                                   DatabaseTableModel* model) {
+                                                   SqlResponseModel* model) {
   startOperationPerforming("allocateInactiveProductionLines");
 
   AdministrationSystem::ReturnStatus status;
@@ -264,7 +267,7 @@ void AdminManager::allocateInactiveProductionLines(const QString& orderId,
   finishOperationPerforming("allocateInactiveProductionLines");
 }
 
-void AdminManager::shutdownAllProductionLines(DatabaseTableModel* model) {
+void AdminManager::shutdownAllProductionLines(SqlResponseModel* model) {
   startOperationPerforming("shutdownAllProductionLines");
 
   AdministrationSystem::ReturnStatus status;
@@ -287,7 +290,7 @@ void AdminManager::shutdownAllProductionLines(DatabaseTableModel* model) {
   finishOperationPerforming("shutdownAllProductionLines");
 }
 
-void AdminManager::deleteLastProductionLine(DatabaseTableModel* model) {
+void AdminManager::deleteLastProductionLine(SqlResponseModel* model) {
   startOperationPerforming("deleteLastProductionLine");
 
   AdministrationSystem::ReturnStatus status;
@@ -310,13 +313,13 @@ void AdminManager::deleteLastProductionLine(DatabaseTableModel* model) {
   finishOperationPerforming("deleteLastProductionLine");
 }
 
-void AdminManager::showProductionLineTable(DatabaseTableModel* model) {
+void AdminManager::showProductionLineTable(SqlResponseModel* model) {
   showDatabaseTable("orders", model);
 }
 
 void AdminManager::linkProductionLineWithBox(
     const QSharedPointer<QHash<QString, QString>> parameters,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("linkProductionLineWithBoxManually");
 
   AdministrationSystem::ReturnStatus status;
@@ -339,7 +342,7 @@ void AdminManager::linkProductionLineWithBox(
   finishOperationPerforming("linkProductionLineWithBox");
 }
 
-void AdminManager::initIssuers(DatabaseTableModel* model) {
+void AdminManager::initIssuers(SqlResponseModel* model) {
   startOperationPerforming("initIssuers");
 
   AdministrationSystem::ReturnStatus status;
@@ -362,7 +365,7 @@ void AdminManager::initIssuers(DatabaseTableModel* model) {
   finishOperationPerforming("initIssuers");
 }
 
-void AdminManager::initTransportMasterKeys(DatabaseTableModel* model) {
+void AdminManager::initTransportMasterKeys(SqlResponseModel* model) {
   startOperationPerforming("initTransportMasterKeys");
 
   AdministrationSystem::ReturnStatus status;
@@ -386,7 +389,7 @@ void AdminManager::initTransportMasterKeys(DatabaseTableModel* model) {
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
-    DatabaseTableModel* model,
+    SqlResponseModel* model,
     const QSharedPointer<QHash<QString, QString>> parameters) {
   startOperationPerforming("linkIssuerWithMasterKeys");
 
@@ -414,7 +417,7 @@ void AdminManager::linkIssuerWithMasterKeys(
 
 void AdminManager::releaseTranspondersManually(
     const QSharedPointer<QHash<QString, QString>> param,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("releaseTranspondersManually");
   sendLog("Принудительный выпуск транспондеров. ");
 
@@ -438,7 +441,7 @@ void AdminManager::releaseTranspondersManually(
 
 void AdminManager::refundTranspondersManually(
     const QSharedPointer<QHash<QString, QString>> param,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("refundTranspondersManually");
   sendLog("Возврат транспондеров. ");
 
@@ -462,7 +465,7 @@ void AdminManager::refundTranspondersManually(
 
 void AdminManager::shipPallets(
     const QSharedPointer<QHash<QString, QString>> param,
-    DatabaseTableModel* model) {
+    SqlResponseModel* model) {
   startOperationPerforming("shipPallets");
   sendLog("Отгрузка паллет. ");
 
@@ -631,7 +634,7 @@ void AdminManager::printLastPalletStickerOnServer() {
 }
 
 void AdminManager::printTransponderSticker(const QString& id,
-                                           DatabaseTableModel* model) {
+                                           SqlResponseModel* model) {
   startOperationPerforming("printTransponderSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -657,7 +660,7 @@ void AdminManager::printTransponderSticker(const QString& id,
 }
 
 void AdminManager::printBoxSticker(const QString& id,
-                                   DatabaseTableModel* model) {
+                                   SqlResponseModel* model) {
   startOperationPerforming("printBoxSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -682,7 +685,7 @@ void AdminManager::printBoxSticker(const QString& id,
 }
 
 void AdminManager::printPalletSticker(const QString& id,
-                                      DatabaseTableModel* model) {
+                                      SqlResponseModel* model) {
   startOperationPerforming("printPalletSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;

@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QSharedPointer>
 
+#include "sql_record_creation_form.h"
+#include "sql_response_model.h"
+
 class AbstractSqlDatabase : public QObject {
   Q_OBJECT
 
@@ -27,23 +30,19 @@ class AbstractSqlDatabase : public QObject {
   virtual uint32_t getRecordMaxCount(void) const = 0;
   virtual void setRecordMaxCount(uint32_t count) = 0;
 
-  virtual bool execCustomRequest(
-      const QString& requestText,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool execCustomRequest(const QString& requestText,
+                                 SqlResponseModel& records) const = 0;
 
   // Single table CRUD
-  virtual bool createRecords(
-      const QString& table,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readRecords(
-      const QString& table,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
-  virtual bool readRecords(
-      const QString& table,
-      const QString& conditions,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool createRecords(const QString& table,
+                             const SqlRecordCreationForm& records) const = 0;
+  virtual bool readRecords(const QString& table,
+                           SqlResponseModel& records) const = 0;
+  virtual bool readRecords(const QString& table,
+                           const QString& conditions,
+                           SqlResponseModel& records) const = 0;
   virtual bool readLastRecord(const QString& table,
-                              QHash<QString, QString>& record) const = 0;
+                              SqlResponseModel& record) const = 0;
   virtual bool updateRecords(
       const QString& table,
       const QString& condition,
@@ -53,10 +52,9 @@ class AbstractSqlDatabase : public QObject {
   virtual bool clearTable(const QString& table) const = 0;
 
   // Multi table CRUD
-  virtual bool readMergedRecords(
-      const QStringList& tables,
-      const QString& conditions,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool readMergedRecords(const QStringList& tables,
+                                 const QString& conditions,
+                                 SqlResponseModel& records) const = 0;
   virtual bool updateMergedRecords(
       const QStringList& tables,
       const QString& conditions,

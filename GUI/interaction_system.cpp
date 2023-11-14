@@ -1,4 +1,7 @@
 #include "interaction_system.h"
+#include "General/definitions.h"
+#include "pallet_shiping_dialog.h"
+#include "pan_input_dialog.h"
 
 InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   setObjectName("InteractionSystem");

@@ -49,23 +49,20 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual uint32_t getRecordMaxCount(void) const override;
   virtual void setRecordMaxCount(uint32_t count) override;
 
-  virtual bool execCustomRequest(
-      const QString& requestText,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool execCustomRequest(const QString& requestText,
+                                 SqlResponseModel& records) const override;
 
   // Single table CRUD
   virtual bool createRecords(
       const QString& table,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-  virtual bool readRecords(
-      const QString& table,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-  virtual bool readRecords(
-      const QString& table,
-      const QString& conditions,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+      const SqlRecordCreationForm& records) const override;
+  virtual bool readRecords(const QString& table,
+                           SqlResponseModel& records) const override;
+  virtual bool readRecords(const QString& table,
+                           const QString& conditions,
+                           SqlResponseModel& records) const override;
   virtual bool readLastRecord(const QString& table,
-                              QHash<QString, QString>& record) const override;
+                              SqlResponseModel& record) const override;
   virtual bool updateRecords(
       const QString& table,
       const QString& conditions,
@@ -75,10 +72,9 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual bool clearTable(const QString& table) const override;
 
   // Multi table CRUD
-  virtual bool readMergedRecords(
-      const QStringList& tables,
-      const QString& conditions,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
+  virtual bool readMergedRecords(const QStringList& tables,
+                                 const QString& conditions,
+                                 SqlResponseModel& records) const override;
   virtual bool updateMergedRecords(
       const QStringList& tables,
       const QString& conditions,
@@ -96,9 +92,6 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   bool createTable(void);
 
   bool checkTableNames(const QStringList& names) const;
-  void extractRecords(
-      QSqlQuery& request,
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const;
 };
 
 #endif  // PostgreSqlDatabase_H

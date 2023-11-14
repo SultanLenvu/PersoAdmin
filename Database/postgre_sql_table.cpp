@@ -7,7 +7,7 @@ PostgreSqlTable::PostgreSqlTable(const QString& name,
   loadSettings();
 
   ConnectionName = connectionName;
-  RecordMaxCount = 256;
+  RecordMaxCount = 1000;
   CurrentOrder = "ASC";
 }
 
@@ -112,35 +112,21 @@ void PostgreSqlTable::applySettings() {
 }
 
 bool PostgreSqlTable::createRecords(
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
-  if ((records.size() < 1) || (records.constBegin().value()->size() < 1)) {
-    return false;
-  }
-
+    const SqlRecordCreationForm& records) const {
   if (!checkFieldNames(records)) {
     return false;
   }
 
   // Создаем запрос
   QString requestText = QString("INSERT INTO public.%1 (").arg(objectName());
-  for (QVector<QString>::const_iterator it = Columns.constBegin();
-       it != Columns.constEnd(); it++) {
-    requestText += QString("%1, ").arg(*it);
+  for (int32_t i = 0; i < records.size(); i++) {
+    requestText += QString("%1, ").arg(records.getField(i));
   }
   requestText.chop(2);
-  requestText += ") VALUES (";
-  for (int32_t i = 0; i < records.constBegin().value()->size(); i++) {
-    for (QVector<QString>::const_iterator it = Columns.constBegin();
-         it != Columns.constEnd(); it++) {
-      if (records.contains(*it)) {
-        requestText += QString("'%1', ").arg(records.value(*it)->at(i));
-      } else {
-        requestText += QString("NULL, ");
-      }
-    }
-  }
-  requestText.chop(2);
-  requestText += ");";
+
+  QString valuesForm;
+  records.generate(valuesForm);
+  requestText += QString(") VALUES %1;").arg(valuesForm);
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -153,7 +139,7 @@ bool PostgreSqlTable::createRecords(
   return true;
 }
 
-bool PostgreSqlTable::readRecords(DatabaseRecordTable& records) const {
+bool PostgreSqlTable::readRecords(SqlResponseModel& response) const {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 ORDER BY %2 %3 LIMIT %4;")
@@ -168,12 +154,12 @@ bool PostgreSqlTable::readRecords(DatabaseRecordTable& records) const {
     return false;
   }
 
-  extractRecords(request, records);
+  response.extractRecords(request);
   return true;
 }
 
 bool PostgreSqlTable::readRecords(const QString& conditions,
-                                  DatabaseRecordTable& records) const {
+                                  SqlResponseModel& response) const {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 WHERE %2 ORDER BY %3 %4 LIMIT %5;")
@@ -188,11 +174,11 @@ bool PostgreSqlTable::readRecords(const QString& conditions,
     return false;
   }
 
-  extractRecords(request, records);
+  response.extractRecords(request);
   return true;
 }
 
-bool PostgreSqlTable::readLastRecord(DatabaseRecordTable& record) const {
+bool PostgreSqlTable::readLastRecord(SqlResponseModel& response) const {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 ORDER BY %2 ASC LIMIT 1;")
@@ -206,7 +192,7 @@ bool PostgreSqlTable::readLastRecord(DatabaseRecordTable& record) const {
     return false;
   }
 
-  extractRecord(request, record);
+  response.extractRecords(request);
   return true;
 }
 
@@ -286,11 +272,9 @@ void PostgreSqlTable::loadSettings() {
 }
 
 bool PostgreSqlTable::checkFieldNames(
-    const QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
-  for (QHash<QString, QSharedPointer<QVector<QString>>>::const_iterator it =
-           records.constBegin();
-       it != records.constEnd(); it++) {
-    if (!Columns.contains(it.key())) {
+    const SqlRecordCreationForm& records) const {
+  for (int32_t i = 0; i < records.size(); i++) {
+    if (!Columns.contains(records.getField(i))) {
       return false;
     }
   }
@@ -308,20 +292,4 @@ bool PostgreSqlTable::checkFieldNames(
   }
 
   return true;
-}
-
-void PostgreSqlTable::extractRecords(QSqlQuery& request,
-                                     DatabaseRecordTable& records) const {
-  response.clear();
-
-  for (int32_t i = 0; i < request.records().count(); i++) {
-    records.addField(request.record().fieldName(i), request.size(), false);
-  }
-
-  while (request.next()) {
-    for (int32_t i = 0; i < request.record().count(); i++) {
-      records.addValue(request.record().fieldName(i),
-                       request.value(i).toString());
-    }
-  }
 }

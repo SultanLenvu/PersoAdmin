@@ -43,6 +43,7 @@
 #define TRANSPONDER_ID_START_SHIFT 1000000
 #define BOX_ID_START_SHIFT 1000000
 #define PALLET_ID_START_SHIFT 1000000
+#define ORDER_ID_START_SHIFT 0
 
 #define POSTGRES_SERVER_DEFAULT_IP "127.0.0.1"
 #define POSTGRES_SERVER_DEFAULT_PORT 5432
@@ -145,4 +146,4 @@
 #define BOX_STICKER_DATE_TEMPLATE "dd.MM.yyyy"
 //===============================================================
 
-#endif // DEFINITIONS_H
+#endif  // DEFINITIONS_H

@@ -1,5 +1,4 @@
 #include "database_controller.h"
-#include "General/definitions.h"
 
 IDatabaseController::IDatabaseController(QObject* parent) : QObject(parent) {
   setObjectName("IDatabaseController");

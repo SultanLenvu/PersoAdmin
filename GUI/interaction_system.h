@@ -11,10 +11,7 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "General/definitions.h"
 #include "input_dialog.h"
-#include "pallet_shiping_dialog.h"
-#include "pan_input_dialog.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT

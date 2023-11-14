@@ -7,7 +7,6 @@
 #include <QtSql>
 
 #include "abstract_sql_table.h"
-#include "database_response.h"
 
 class PostgreSqlTable : public AbstractSqlTable {
  private:
@@ -44,11 +43,11 @@ class PostgreSqlTable : public AbstractSqlTable {
   virtual bool init() override;
   virtual void applySettings() override;
   virtual bool createRecords(
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const override;
-  virtual bool readRecords(DatabaseRecordTable& records) const override;
+      const SqlRecordCreationForm& response) const override;
+  virtual bool readRecords(SqlResponseModel& response) const override;
   virtual bool readRecords(const QString& conditions,
-                           DatabaseRecordTable& records) const override;
-  virtual bool readLastRecord(DatabaseRecordTable& record) const override;
+                           SqlResponseModel& response) const override;
+  virtual bool readLastRecord(SqlResponseModel& response) const override;
   virtual bool updateRecords(
       const QString& condition,
       const QHash<QString, QString>& newValues) const override;
@@ -60,11 +59,8 @@ class PostgreSqlTable : public AbstractSqlTable {
   void sendLog(const QString& log) const;
   void loadSettings(void);
 
-  bool checkFieldNames(
-      const QHash<QString, QSharedPointer<QVector<QString>>>& record) const;
+  bool checkFieldNames(const SqlRecordCreationForm& record) const;
   bool checkFieldNames(const QHash<QString, QString>& record) const;
-
-  void extractRecords(QSqlQuery& request, DatabaseRecordTable& records) const;
 
  signals:
 };

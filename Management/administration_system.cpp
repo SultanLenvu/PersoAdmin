@@ -1,4 +1,6 @@
 #include "administration_system.h"
+#include "Database/sql_record_creation_form.h"
+#include "General/definitions.h"
 #include "Log/log_system.h"
 
 AdministrationSystem::AdministrationSystem(QObject* parent) : QObject(parent) {
@@ -61,21 +63,18 @@ AdministrationSystem::ReturnStatus AdministrationSystem::clearDatabaseTable(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getDatabaseTable(
     const QString& tableName,
-    DatabaseTableModel* model) {
+    SqlResponseModel* response) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
     return DatabaseTransactionError;
   }
 
-  QHash<QString, QSharedPointer<QVector<QString>>> records;
-  if (!Database->readRecords(tableName, records)) {
+  if (!Database->readRecords(tableName, *response)) {
     sendLog(QString("Получена ошибка при получении данных из таблицы %1. ")
                 .arg(tableName));
     Database->rollbackTransaction();
     return DatabaseQueryError;
   }
-
-  model->build(&records);
 
   sendLog(QString("Данные из таблицы %1 успешно получены. ").arg(tableName));
   if (!Database->commitTransaction()) {
@@ -87,14 +86,13 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getDatabaseTable(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::getCustomResponse(
     const QString& req,
-    DatabaseTableModel* buffer) {
+    SqlResponseModel* response) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
     return DatabaseTransactionError;
   }
 
-  QHash<QString, QSharedPointer<QVector<QString>>> records;
-  if (!Database->execCustomRequest(req, records)) {
+  if (!Database->execCustomRequest(req, *response)) {
     sendLog("Получена ошибка при выполнении кастомного запроса. ");
     Database->rollbackTransaction();
     return DatabaseQueryError;
@@ -154,7 +152,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
 AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
     const QString& orderId) {
   QHash<QString, QString> boxRecord;
-  QHash<QString, QSharedPointer<QVector<QString>>> freeProductionLines;
+  SqlResponseModel freeProductionLines;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытиеи транзакции. ");
@@ -164,41 +162,42 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
   // Ищем все неактивные производственные линии
   if (!Database->readRecords("production_lines", "active = false",
                              freeProductionLines)) {
-    sendLog(QString("Получена ошибка при поиске неактивной "
-                    "производственной линии '%1'. ")
-                .arg(productionLineRecord.value("login")));
+    sendLog(QString(
+        "Получена ошибка при поиске неактивной производственной линии."));
     Database->rollbackTransaction();
     return DatabaseQueryError;
   }
 
   // Если незадействованная линия не найдена
-  if (productionLineRecord.isEmpty()) {
+  if (freeProductionLines.isEmpty()) {
     sendLog(QString("Все свободные производственные линии задействованы. "));
-    break;
+    return FreeProductionLineMissed;
   }
 
-  // Ищем бокс для производственной линии
-  if (!searchBoxForProductionLine(orderId, productionLineRecord.value("id"),
-                                  boxRecord)) {
-    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
-                .arg(boxRecord.value("id")));
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
+  // Ищем боксы для производственных линий
+  for (int32_t i = 0; i < freeProductionLines.getRecordNumber(); i++) {
+    if (!searchBoxForProductionLine(
+            orderId, freeProductionLines.getValue(i, "id"), boxRecord)) {
+      sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
+                  .arg(boxRecord.value("id")));
+      Database->rollbackTransaction();
+      return DatabaseQueryError;
+    }
 
-  // Если свободных боксов не найдено
-  if (boxRecord.isEmpty()) {
-    sendLog(QString("В заказе %1 все боксы заняты. ").arg(orderId));
-    break;
-  }
+    // Если свободных боксов не найдено
+    if (boxRecord.isEmpty()) {
+      sendLog(QString("В заказе %1 все боксы заняты. ").arg(orderId));
+      break;
+    }
 
-  // Запускаем сборку бокса
-  if (!startBoxProcessing(boxRecord.value("id"),
-                          productionLineRecord.value("id"))) {
-    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
-                .arg(boxRecord.value("id")));
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
+    // Запускаем сборку бокса
+    if (!startBoxProcessing(boxRecord.value("id"),
+                            productionLineRecord.value("id"))) {
+      sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
+                  .arg(boxRecord.value("id")));
+      Database->rollbackTransaction();
+      return DatabaseQueryError;
+    }
   }
 
   boxRecord.clear();
@@ -1204,77 +1203,46 @@ void AdministrationSystem::sendLog(const QString& log) const {
 }
 
 bool AdministrationSystem::getCurrentContext(const QString& id) {
-  CurrentTransponder.insert("id", id);
-  CurrentTransponder.insert("release_counter", "");
-  CurrentTransponder.insert("personal_account_number", "");
-  CurrentTransponder.insert("ucid", "");
-  CurrentTransponder.insert("awaiting_confirmation", "");
-  CurrentTransponder.insert("box_id", "");
-  if (!Database->getRecordById("transponders", CurrentTransponder)) {
+  if (!Database->readRecords("transponders", QString("id = %1").arg(id),
+                             CurrentTransponder)) {
     sendLog(QString("Получена ошибка при получении данных транспондера %1. ")
                 .arg(id));
     return false;
   }
 
-  CurrentBox.insert("id", CurrentTransponder.value("box_id"));
-  CurrentBox.insert("quantity", "");
-  CurrentBox.insert("ready_indicator", "");
-  CurrentBox.insert("in_process", "");
-  CurrentBox.insert("assembled_units", "");
-  CurrentBox.insert("assembling_start", "");
-  CurrentBox.insert("assembling_end", "");
-  CurrentBox.insert("pallet_id", "");
-  CurrentBox.insert("production_line_id", "");
-  if (!Database->getRecordById("boxes", CurrentBox)) {
+  if (!Database->readRecords(
+          "boxes",
+          QString("id = %1").arg(CurrentTransponder.getFirstValue("box_id")),
+          CurrentBox)) {
     sendLog(QString("Получена ошибка при получении данных бокса %1. ")
-                .arg(CurrentTransponder.value("box_id")));
+                .arg(CurrentTransponder.getFirstValue("box_id")));
     return false;
   }
 
-  CurrentPallet.insert("id", CurrentBox.value("pallet_id"));
-  CurrentPallet.insert("quantity", "");
-  CurrentPallet.insert("ready_indicator", "");
-  CurrentPallet.insert("in_process", "");
-  CurrentPallet.insert("assembled_units", "");
-  CurrentPallet.insert("assembling_start", "");
-  CurrentPallet.insert("assembling_end", "");
-  CurrentPallet.insert("shipped_indicator", "");
-  CurrentPallet.insert("order_id", "");
-  if (!Database->getRecordById("pallets", CurrentPallet)) {
+  if (!Database->readRecords(
+          "pallets",
+          QString("id = %1").arg(CurrentBox.getFirstValue("pallet_id")),
+          CurrentPallet)) {
     sendLog(QString("Получена ошибка при получении данных паллеты %1. ")
-                .arg(CurrentBox.value("pallet_id")));
+                .arg(CurrentBox.getFirstValue("pallet_id")));
     return false;
   }
 
-  CurrentOrder.insert("id", CurrentPallet.value("order_id"));
-  CurrentOrder.insert("quantity", "");
-  CurrentOrder.insert("full_personalization", "");
-  CurrentOrder.insert("ready_indicator", "");
-  CurrentOrder.insert("in_process", "");
-  CurrentOrder.insert("assembled_units", "");
-  CurrentOrder.insert("assembling_start", "");
-  CurrentOrder.insert("assembling_end", "");
-  CurrentOrder.insert("transponder_model", "");
-  CurrentOrder.insert("accr_reference", "");
-  CurrentOrder.insert("manufacturer_id", "");
-  CurrentOrder.insert("equipment_class", "");
-  CurrentOrder.insert("shipped_units", "");
-  CurrentOrder.insert("fully_shipped", "");
-  CurrentOrder.insert("issuer_id", "");
-  if (!Database->getRecordById("orders", CurrentOrder)) {
+  if (!Database->readRecords(
+          "orders",
+          QString("id = %1").arg(CurrentPallet.getFirstValue("order_id")),
+          CurrentOrder)) {
     sendLog(QString("Получена ошибка при получении данных заказа %1. ")
-                .arg(CurrentPallet.value("order_id")));
+                .arg(CurrentPallet.getFirstValue("order_id")));
     return false;
   }
 
-  CurrentIssuer.insert("id", CurrentOrder.value("issuer_id"));
-  CurrentIssuer.insert("name", "");
-  CurrentIssuer.insert("efc_context_mark", "");
-  CurrentIssuer.insert("transport_master_keys_id", "");
-  CurrentIssuer.insert("commercial_master_keys_id", "");
-  if (!Database->getRecordById("issuers", CurrentIssuer)) {
+  if (!Database->readRecords(
+          "issuers",
+          QString("id = %1").arg(CurrentOrder.getFirstValue("issuer_id")),
+          CurrentIssuer)) {
     sendLog(QString("Получена ошибка при получении данных заказчика %1. ")
-                .arg(CurrentOrder.value("issuer_id")));
+                .arg(CurrentOrder.getFirstValue("issuer_id")));
     return false;
   }
 
@@ -1283,95 +1251,95 @@ bool AdministrationSystem::getCurrentContext(const QString& id) {
 
 bool AdministrationSystem::addOrder(
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
-  QHash<QString, QString> issuerRecord;
-  QHash<QString, QString> orderRecord;
+  uint32_t transponderCount =
+      orderParameters->value("transponder_quantity").toInt();
+  uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
+  uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
+  uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
+  SqlResponseModel issuerRecord;
+  SqlResponseModel orderRecord;
+  SqlRecordCreationForm newOrderRecord;
   int32_t lastId = 0;
 
-  issuerRecord.insert("id", "");
-  issuerRecord.insert("name", orderParameters->value("issuer_name"));
-  if (!Database->getRecordByPart("issuers", issuerRecord)) {
-    sendLog(QString("Не найден идентифкатор эмитента \"%1\".")
+  if (!Database->readRecords("issuers",
+                             "name = " + orderParameters->value("issuer_name"),
+                             issuerRecord)) {
+    sendLog(QString("Получена ошибка при поиске эмитента \"%1\".")
                 .arg(orderParameters->value("IssuerName")));
     return false;
   }
 
-  orderRecord.insert("id", "");
-  if (!Database->getLastRecord("orders", orderRecord)) {
-    sendLog("Получена ошибка при поиске последнего заказа. ");
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords("orders", orderRecord)) {
+    sendLog("Получена ошибка при поиске последнего добавленного заказа. ");
     return false;
   }
-  lastId = orderRecord.value("id").toInt();
+  if (orderRecord.isEmpty()) {
+    lastId = ORDER_ID_START_SHIFT;
+  } else {
+    lastId = orderRecord.getFirstValue("id").toInt();
+  }
 
   // Формируем новую запись
-  orderRecord.insert("id", QString::number(lastId + 1));
-  orderRecord.insert("issuer_id", issuerRecord.value("id"));
-  orderRecord.insert("quantity", "0");
-  orderRecord.insert("full_personalization",
-                     orderParameters->value("full_personalization"));
-  orderRecord.insert(
+  newOrderRecord.addFieldValue("id", QString::number(lastId + 1));
+  newOrderRecord.addFieldValue("issuer_id", issuerRecord.getFirstValue("id"));
+  newOrderRecord.addFieldValue("quantity", QString::number(orderCapacity));
+  newOrderRecord.addFieldValue("full_personalization",
+                               orderParameters->value("full_personalization"));
+  newOrderRecord.addFieldValue(
       "transponder_model",
       orderParameters->value("transponder_model")
           .rightJustified(TRANSPONDER_MODEL_CHAR_LENGTH, QChar(' ')));
-  orderRecord.insert("accr_reference",
-                     orderParameters->value("accr_reference"));
-  orderRecord.insert("equipment_class",
-                     orderParameters->value("equipment_class"));
-  orderRecord.insert("manufacturer_id",
-                     orderParameters->value("manufacturer_id"));
-  if (!Database->addRecord("orders", orderRecord)) {
+  newOrderRecord.addFieldValue("accr_reference",
+                               orderParameters->value("accr_reference"));
+  newOrderRecord.addFieldValue("equipment_class",
+                               orderParameters->value("equipment_class"));
+  newOrderRecord.addFieldValue("manufacturer_id",
+                               orderParameters->value("manufacturer_id"));
+  if (!Database->createRecords("orders", newOrderRecord)) {
     sendLog("Получена ошибка при добавлении заказа. ");
     return false;
   }
 
-  return true;
+  // Добавляем паллеты в заказ
+  return addPallets(newOrderRecord.getValue(0, "id"), orderParameters);
 }
 
 bool AdministrationSystem::addPallets(
+    const QString& orderId,
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
-  QHash<QString, QString> orderRecord;
-  QHash<QString, QString> palletRecord;
+  SqlResponseModel orderRecord;
+  SqlResponseModel palletRecord;
+  SqlRecordCreationForm newPalletRecords;
   int32_t lastId = 0;
 
-  // Поиск идентификатора незаполненного заказа
-  orderRecord.insert("id", "");
-  orderRecord.insert("quantity", "0");
-  if (!Database->getRecordByPart("orders", orderRecord)) {
-    sendLog(
-        "Получена ошибка при поиске идентификатора незаполненного заказа. ");
+  // Получаем идентификатор последней палеты
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords("pallets", palletRecord)) {
+    sendLog(QString("Получена ошибка при поиске последней палеты в заказе %1. ")
+                .arg(orderId));
     return false;
   }
+  lastId = palletRecord.getFirstValue("id").toInt();
 
-  // Заполняем заказ
-  for (uint32_t i = 0; i < orderCapacity; i++) {
-    // Получаем идентификатор последней палеты
-    palletRecord.insert("id", "");
-    if (!Database->getLastRecord("pallets", palletRecord)) {
-      sendLog("Получена ошибка при поиске последней палеты. ");
-      return false;
-    }
-    lastId = palletRecord.value("id").toInt();
-
-    // Формируем новую запись
-    palletRecord.insert("id", QString::number(lastId + 1));
-    palletRecord.insert("quantity", "0");
-    palletRecord.insert("order_id", orderRecord.value("id"));
-    // Добавляем новую запись
-    if (!Database->addRecord("pallets", palletRecord)) {
-      sendLog("Получена ошибка при добавлении палеты. ");
-      return false;
-    }
+  // Формируем новые записи
+  for (uint32_t i = 1; i <= orderCapacity; i++) {
+    newPalletRecords.addFieldValue("id", QString::number(lastId + i));
+    newPalletRecords.addFieldValue("quantity", "0");
+    newPalletRecords.addFieldValue("order_id", orderId);
   }
 
-  // Заполнение заказа
-  orderRecord.insert("quantity", QString::number(orderCapacity));
-  if (!Database->updateRecordById("orders", orderRecord)) {
-    sendLog(QString("Получена ошибка при заполнении заказа %1. ")
-                .arg(orderRecord.value("id")));
+  // Добавляем новые палеты
+  if (!Database->createRecords("pallets", newPalletRecords)) {
+    sendLog(QString("Получена ошибка при добавлении палет в заказ %1. ")
+                .arg(orderId));
     return false;
   }
 
@@ -1379,26 +1347,28 @@ bool AdministrationSystem::addPallets(
 }
 
 bool AdministrationSystem::addBoxes(
+    const QString& orderId,
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t palletCount = transponderCount / (palletCapacity * boxCapacity);
-  QHash<QString, QString> palletRecord;
-  QHash<QString, QString> boxRecord;
+  SqlResponseModel palletRecord;
+  SqlResponseModel boxRecord;
   int32_t lastId = 0;
 
-  for (uint32_t i = 0; i < palletCount; i++) {
-    // Получаем идентификатор незаполненной палеты
-    palletRecord.insert("id", "");
-    palletRecord.insert("quantity", "0");
-    if (!Database->getRecordByPart("pallets", palletRecord)) {
-      sendLog(
-          "Получена ошибка при поиске идентификатора незаполненной палеты. ");
-      return false;
-    }
+  // Получаем паллеты в заказе
+  Database->setRecordMaxCount(palletCount);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords("pallets", "order_id = " + orderId,
+                             palletRecord)) {
+    sendLog(QString("Получена ошибка при поиске палет, входящих в заказ %1. ")
+                .arg(orderId));
+    return false;
+  }
 
+  for (uint32_t i = 0; i < palletCount; i++) {
     // Создаем боксы
     for (uint32_t i = 0; i < palletCapacity; i++) {
       // Получаем идентификатор последнего добавленного бокса
@@ -1835,23 +1805,17 @@ bool AdministrationSystem::stopOrderProcessing(const QString& id) const {
 bool AdministrationSystem::searchBoxForProductionLine(
     const QString& orderId,
     const QString& productionLineId,
-    QHash<QString, QString>& boxRecord) const {
-  QStringList tables;
-  QStringList foreignKeys;
+    SqlResponseModel& boxRecord) const {
+  QStringList tables{"boxes", "pallets"};
 
   // Ищем незавершенные боксы
-  tables.append("boxes");
-  tables.append("pallets");
-  tables.append("orders");
-  foreignKeys.append("pallet_id");
-  foreignKeys.append("order_id");
-
-  boxRecord.insert("boxes.id", "");
-  boxRecord.insert("boxes.ready_indicator", "false");
-  boxRecord.insert("boxes.production_line_id", productionLineId);
-  boxRecord.insert("boxes.in_process", "false");
-  boxRecord.insert("pallets.order_id", orderId);
-  if (!Database->getMergedRecordByPart(tables, foreignKeys, boxRecord)) {
+  if (!Database->readMergedRecords(
+          tables,
+          QString("boxes.assembled_units < boxes.quantity AND "
+                  "boxes.production_line_id = %1 "
+                  "AND pallets.order_id = %2")
+              .arg(productionLineId, orderId),
+          boxRecord)) {
     sendLog(
         QString("Получена ошибка при поиске незавершенного бокса в заказе %1. ")
             .arg(orderId));
@@ -1860,12 +1824,11 @@ bool AdministrationSystem::searchBoxForProductionLine(
 
   // Если незавершенных боксов нет, то ищем свободные боксы
   if (boxRecord.isEmpty()) {
-    boxRecord.insert("boxes.id", "");
-    boxRecord.insert("boxes.ready_indicator", "false");
-    boxRecord.insert("boxes.production_line_id", "");
-    boxRecord.insert("boxes.in_process", "false");
-    boxRecord.insert("pallets.order_id", orderId);
-    if (!Database->getMergedRecordByPart(tables, foreignKeys, boxRecord)) {
+    if (!Database->readMergedRecords(
+            tables,
+            QString("boxes.assembled_units = 0 AND pallets.order_id = %2")
+                .arg(orderId),
+            boxRecord)) {
       sendLog(
           QString("Получена ошибка при поиске свободного бокса в заказе %1. ")
               .arg(orderId));

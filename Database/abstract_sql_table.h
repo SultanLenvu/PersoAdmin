@@ -3,7 +3,8 @@
 
 #include <QObject>
 
-#include "database_response.h"
+#include "sql_record_creation_form.h"
+#include "sql_response_model.h"
 
 class AbstractSqlTable : public QObject {
   Q_OBJECT
@@ -16,14 +17,13 @@ class AbstractSqlTable : public QObject {
   virtual void applySettings() = 0;
 
   // Create
-  virtual bool createRecords(
-      QHash<QString, QSharedPointer<QVector<QString>>>& records) const = 0;
+  virtual bool createRecords(const SqlRecordCreationForm& records) const = 0;
 
   // Read
-  virtual bool readRecords(DatabaseRecordTable& records) const = 0;
+  virtual bool readRecords(SqlResponseModel& records) const = 0;
   virtual bool readRecords(const QString& conditions,
-                           DatabaseRecordTable& records) const = 0;
-  virtual bool readLastRecord(DatabaseRecordTable& record) const = 0;
+                           SqlResponseModel& records) const = 0;
+  virtual bool readLastRecord(SqlResponseModel& record) const = 0;
 
   // Update
   virtual bool updateRecords(

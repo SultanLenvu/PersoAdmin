@@ -9,114 +9,112 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "Database/database_table_model.h"
-#include "General/definitions.h"
+#include "Database/sql_response_model.h"
 #include "General/hash_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
 #include "abstract_gui.h"
-#include "authorization_gui.h"
 #include "interaction_system.h"
-#include "mainwindow_gui.h"
 
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
  private:
-   QSize DesktopGeometry;
-   AbstractGUI* CurrentGUI;
+  QSize DesktopGeometry;
+  AbstractGUI* CurrentGUI;
 
-   QMenu* ServiceMenu;
-   QMenu* HelpMenu;
+  QMenu* ServiceMenu;
+  QMenu* HelpMenu;
 
-   QAction* AboutProgramAct;
-   QAction* RequestAuthorizationGUIAct;
+  QAction* AboutProgramAct;
+  QAction* RequestAuthorizationGUIAct;
 
-   InteractionSystem* Interactor;
+  InteractionSystem* Interactor;
 
-   QThread* ManagerThread;
-   AdminManager* Manager;
+  QThread* ManagerThread;
+  AdminManager* Manager;
 
-   QThread* LoggerThread;
-   LogSystem* Logger;
+  QThread* LoggerThread;
+  LogSystem* Logger;
 
-   DatabaseTableModel* RandomModel;
-   DatabaseTableModel* OrderModel;
-   DatabaseTableModel* ProductionLineModel;
-   DatabaseTableModel* IssuerModel;
-   DatabaseTableModel* TransponderModel;
-   DatabaseTableModel* StickerModel;
+  SqlResponseModel* RandomModel;
+  SqlResponseModel* OrderModel;
+  SqlResponseModel* ProductionLineModel;
+  SqlResponseModel* IssuerModel;
+  SqlResponseModel* TransponderModel;
+  SqlResponseModel* StickerModel;
 
-   HashModel* TransponderData;
+  HashModel* TransponderData;
 
-   QHash<QString, QString>* MatchingTable;
+  QHash<QString, QString>* MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
   ~MainWindowKernel();
 
  public slots:
-   void requestAuthorizationGUIAct_slot(void);
+  void requestAuthorizationGUIAct_slot(void);
 
-   // Авторизация
-   void authorizePushButton_slot(void);
+  // Авторизация
+  void authorizePushButton_slot(void);
 
-   // Функционал для работы с базой данных
-   void connectDatabasePushButton_slot(void);
-   void disconnectDatabasePushButton_slot(void);
-   void showDatabaseTablePushButton_slot(void);
-   void clearDatabaseTablePushButton_slot(void);
-   void transmitCustomRequestPushButton_slot(void);
+  // Функционал для работы с базой данных
+  void connectDatabasePushButton_slot(void);
+  void disconnectDatabasePushButton_slot(void);
+  void showDatabaseTablePushButton_slot(void);
+  void clearDatabaseTablePushButton_slot(void);
+  void transmitCustomRequestPushButton_slot(void);
 
-   // Функционал для работы с заказами
-   void createNewOrderPushButton_slot(void);
-   void startOrderAssemblingPushButton_slot(void);
-   void stopOrderAssemblingPushButton_slot(void);
-   void updateOrderViewPushButton_slot(void);
-   void deleteLastOrderPushButton_slot(void);
+  // Функционал для работы с заказами
+  void createNewOrderPushButton_slot(void);
+  void startOrderAssemblingPushButton_slot(void);
+  void stopOrderAssemblingPushButton_slot(void);
+  void updateOrderViewPushButton_slot(void);
+  void deleteLastOrderPushButton_slot(void);
 
-   // Функционал для работы с производственными линиями
-   void createNewProductionLinePushButton_slot(void);
-   void allocateInactiveProductionLinesPushButton_slot(void);
-   void linkProductionLinePushButton_slot(void);
-   void deactivateAllProductionLinesPushButton_slot(void);
-   void updateProductionLineViewPushButton_slot(void);
-   void deleteLastProductionLinePushButton_slot(void);
+  // Функционал для работы с производственными линиями
+  void createNewProductionLinePushButton_slot(void);
+  void allocateInactiveProductionLinesPushButton_slot(void);
+  void linkProductionLinePushButton_slot(void);
+  void deactivateAllProductionLinesPushButton_slot(void);
+  void updateProductionLineViewPushButton_slot(void);
+  void deleteLastProductionLinePushButton_slot(void);
 
-   // Функционал для работы с транспортными мастер ключами
-   void showIssuerTablePushButton_slot(void);
-   void initTransportMasterKeysPushButton_slot(void);
-   void initIssuerTablePushButton_slot(void);
-   void linkIssuerWithKeysPushButton_slot(void);
+  // Функционал для работы с транспортными мастер ключами
+  void showIssuerTablePushButton_slot(void);
+  void initTransportMasterKeysPushButton_slot(void);
+  void initIssuerTablePushButton_slot(void);
+  void linkIssuerWithKeysPushButton_slot(void);
 
-   // Функционал для взаимодействия с сервером
-   void releaseTransponderPushButton_slot(void);
-   void confirmTransponderPushButton_slot(void);
-   void rereleaseTransponderPushButton_slot(void);
-   void confirmRereleaseTransponderPushButton_slot(void);
-   void productionLineRollbackPushButton_slot(void);
+  // Функционал для взаимодействия с сервером
+  void releaseTransponderPushButton_slot(void);
+  void confirmTransponderPushButton_slot(void);
+  void rereleaseTransponderPushButton_slot(void);
+  void confirmRereleaseTransponderPushButton_slot(void);
+  void productionLineRollbackPushButton_slot(void);
 
-   void printBoxStickerOnServerPushButton_slot(void);
-   void printLastBoxStickerOnServerPushButton_slot(void);
-   void printPalletStickerOnServerPushButton_slot(void);
-   void printLastPalletStickerOnServerPushButton_slot(void);
+  void printBoxStickerOnServerPushButton_slot(void);
+  void printLastBoxStickerOnServerPushButton_slot(void);
+  void printPalletStickerOnServerPushButton_slot(void);
+  void printLastPalletStickerOnServerPushButton_slot(void);
 
-   // Функционал для выпуска, возврата и отгрузки транспондеров
-   void transponderManualReleasePushButton_slot(void);
-   void transponderManualRefundPushButton_slot(void);
-   void palletShipmentPushButton_slot(void);
+  // Функционал для выпуска, возврата и отгрузки транспондеров
+  void transponderManualReleasePushButton_slot(void);
+  void transponderManualRefundPushButton_slot(void);
+  void palletShipmentPushButton_slot(void);
 
-   // Функционал для работы с принтером стикеров
-   void printTransponderStickerPushButton_slot(void);
-   void printBoxStickerPushButton_slot(void);
-   void printPalletStickerPushButton_slot(void);
-   void execStickerPrinterCommandScriptPushButton_slot(void);
+  // Функционал для работы с принтером стикеров
+  void printTransponderStickerPushButton_slot(void);
+  void printBoxStickerPushButton_slot(void);
+  void printPalletStickerPushButton_slot(void);
+  void execStickerPrinterCommandScriptPushButton_slot(void);
 
-   // Функционал для настройки сервера
-   void applySettingsPushButton_slot(void);
+  // Функционал для настройки сервера
+  void applySettingsPushButton_slot(void);
 
-   // Отображение данных
-   void displayFirmware_slot(QSharedPointer<QFile> firmware);
-   void displayTransponderData_slot(QSharedPointer<QHash<QString, QString>> transponderData);
+  // Отображение данных
+  void displayFirmware_slot(QSharedPointer<QFile> firmware);
+  void displayTransponderData_slot(
+      QSharedPointer<QHash<QString, QString>> transponderData);
 
  private:
   Q_DISABLE_COPY(MainWindowKernel)
@@ -157,37 +155,37 @@ class MainWindowKernel : public QMainWindow {
   // База данных
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
-  void showDatabaseTable_signal(const QString& name, DatabaseTableModel* model);
+  void showDatabaseTable_signal(const QString& name, SqlResponseModel* model);
   void clearDatabaseTable_signal(const QString& name,
-                                 DatabaseTableModel* model);
+                                 SqlResponseModel* model);
 
   void performCustomRequest_signal(const QString& req,
-                                   DatabaseTableModel* model);
+                                   SqlResponseModel* model);
 
   // Заказы
   void createNewOrder_signal(
       const QSharedPointer<QHash<QString, QString>> orderParameterseters,
-      DatabaseTableModel* model);
+      SqlResponseModel* model);
   void startOrderAssembling_signal(const QString& orderId,
-                                   DatabaseTableModel* model);
+                                   SqlResponseModel* model);
   void stopOrderAssembling_signal(const QString& orderId,
-                                  DatabaseTableModel* model);
-  void deleteLastOrder_signal(DatabaseTableModel* model);
-  void showOrderTable_signal(DatabaseTableModel* model);
+                                  SqlResponseModel* model);
+  void deleteLastOrder_signal(SqlResponseModel* model);
+  void showOrderTable_signal(SqlResponseModel* model);
 
   // Производственные линии
   void createNewProductionLine_signal(
       const QSharedPointer<QHash<QString, QString>>
           productionLineParameterseters,
-      DatabaseTableModel* model);
+      SqlResponseModel* model);
   void allocateInactiveProductionLines_signal(const QString& orderId,
-                                              DatabaseTableModel* model);
-  void shutdownAllProductionLines_signal(DatabaseTableModel* model);
-  void deleteLastProductionLine_signal(DatabaseTableModel* model);
-  void showProductionLineTable_signal(DatabaseTableModel* model);
+                                              SqlResponseModel* model);
+  void shutdownAllProductionLines_signal(SqlResponseModel* model);
+  void deleteLastProductionLine_signal(SqlResponseModel* model);
+  void showProductionLineTable_signal(SqlResponseModel* model);
   void linkProductionLineWithBox_signal(
       const QSharedPointer<QHash<QString, QString>> linkParameters,
-      DatabaseTableModel* model);
+      SqlResponseModel* model);
 
   // Тест сервера
   void releaseTransponder_signal(
@@ -210,25 +208,25 @@ class MainWindowKernel : public QMainWindow {
   // Транспондеры
   void releaseTranspondersManually_signal(
       const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
+      SqlResponseModel* model);
   void refundTranspondersManually_signal(
       const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
+      SqlResponseModel* model);
   void shipPallets_signal(const QSharedPointer<QHash<QString, QString>> param,
-                          DatabaseTableModel* model);
+                          SqlResponseModel* model);
 
   // Заказчики
-  void initIssuers_signal(DatabaseTableModel* model);
-  void initTransportMasterKeys_signal(DatabaseTableModel* model);
+  void initIssuers_signal(SqlResponseModel* model);
+  void initTransportMasterKeys_signal(SqlResponseModel* model);
   void linkIssuerWithMasterKeys_signal(
-      DatabaseTableModel* model,
+      SqlResponseModel* model,
       const QSharedPointer<QHash<QString, QString>> Parameterseters);
 
   // Принтер
   void printTransponderSticker_signal(const QString& id,
-                                      DatabaseTableModel* model);
-  void printBoxSticker_signal(const QString& id, DatabaseTableModel* model);
-  void printPalletSticker_signal(const QString& id, DatabaseTableModel* model);
+                                      SqlResponseModel* model);
+  void printBoxSticker_signal(const QString& id, SqlResponseModel* model);
+  void printPalletSticker_signal(const QString& id, SqlResponseModel* model);
   void execPrinterStickerCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
 };

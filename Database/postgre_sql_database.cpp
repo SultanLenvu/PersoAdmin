@@ -140,9 +140,8 @@ void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
   }
 }
 
-bool PostgreSqlDatabase::execCustomRequest(
-    const QString& requestText,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
+                                           SqlResponseModel& response) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -159,13 +158,13 @@ bool PostgreSqlDatabase::execCustomRequest(
 
   // Обработка полученного ответа
   sendLog("Запрос выполнен. ");
-  extractRecords(request, records);
+  response.extractRecords(request);
   return true;
 }
 
 bool PostgreSqlDatabase::createRecords(
     const QString& table,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+    const SqlRecordCreationForm& records) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -182,9 +181,8 @@ bool PostgreSqlDatabase::createRecords(
   return Tables.value(table)->createRecords(records);
 }
 
-bool PostgreSqlDatabase::readRecords(
-    const QString& table,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+bool PostgreSqlDatabase::readRecords(const QString& table,
+                                     SqlResponseModel& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -198,13 +196,12 @@ bool PostgreSqlDatabase::readRecords(
     return false;
   }
 
-  return Tables.value(table)->readRecords(records);
+  return Tables.value(table)->readRecords(response);
 }
 
-bool PostgreSqlDatabase::readRecords(
-    const QString& table,
-    const QString& conditions,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+bool PostgreSqlDatabase::readRecords(const QString& table,
+                                     const QString& conditions,
+                                     SqlResponseModel& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -218,11 +215,11 @@ bool PostgreSqlDatabase::readRecords(
     return false;
   }
 
-  return Tables.value(table)->readRecords(conditions, records);
+  return Tables.value(table)->readRecords(conditions, response);
 }
 
 bool PostgreSqlDatabase::readLastRecord(const QString& table,
-                                        QHash<QString, QString>& record) const {
+                                        SqlResponseModel& record) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -294,10 +291,9 @@ bool PostgreSqlDatabase::clearTable(const QString& table) const {
   return Tables.value(table)->clear();
 }
 
-bool PostgreSqlDatabase::readMergedRecords(
-    const QStringList& tables,
-    const QString& conditions,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
+bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
+                                           const QString& conditions,
+                                           SqlResponseModel& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -333,7 +329,7 @@ bool PostgreSqlDatabase::readMergedRecords(
     return false;
   }
 
-  extractRecords(request, records);
+  response.extractRecords(request);
   return true;
 }
 
@@ -512,24 +508,4 @@ bool PostgreSqlDatabase::checkTableNames(const QStringList& names) const {
   }
 
   return true;
-}
-
-void PostgreSqlDatabase::extractRecords(
-    QSqlQuery& request,
-    QHash<QString, QSharedPointer<QVector<QString>>>& records) const {
-  QSharedPointer<QVector<QString>> record;
-  records.clear();
-
-  for (int32_t i = 0; i < request.record().count(); i++) {
-    QSharedPointer<QVector<QString>> record(new QVector<QString>());
-    record->resize(request.size());
-    records.insert(request.record().fieldName(i), record);
-  }
-
-  while (request.next()) {
-    for (int32_t i = 0; i < request.record().count(); i++) {
-      records.value(request.record().fieldName(i))
-          ->append(request.value(i).toString());
-    }
-  }
 }

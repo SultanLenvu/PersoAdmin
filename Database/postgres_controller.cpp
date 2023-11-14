@@ -98,7 +98,7 @@ bool PostgresController::abortTransaction() const {
 }
 
 bool PostgresController::execCustomRequest(const QString& req,
-                                           DatabaseTableModel* buffer) const {
+                                           SqlResponseModel* buffer) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -125,7 +125,7 @@ bool PostgresController::execCustomRequest(const QString& req,
 
 bool PostgresController::getTable(const QString& tableName,
                                   uint32_t rowCount,
-                                  DatabaseTableModel* buffer) const {
+                                  SqlResponseModel* buffer) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -713,7 +713,7 @@ void PostgresController::createDatabaseConnection() {
 
 void PostgresController::convertResponseToBuffer(
     QSqlQuery& request,
-    DatabaseTableModel* buffer) const {
+    SqlResponseModel* buffer) const {
   int32_t i = 0, j = 0;
 
   QVector<QVector<QString>*>* data = new QVector<QVector<QString>*>();
