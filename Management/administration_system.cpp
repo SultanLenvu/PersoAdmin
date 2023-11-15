@@ -1457,98 +1457,117 @@ int32_t AdministrationSystem::getLastId(const QString& table) const {
 bool AdministrationSystem::startBoxProcessing(
     const QString& id,
     const QString& productionLineId) const {
-  SqlResponseModel boxRecord;
-  SqlResponseModel productionLineRecord;
+  SqlResponseModel box;
+  SqlResponseModel pallet;
+  QHash<QString, QString> boxNewValues;
+  QHash<QString, QString> productionLineNewValues;
   SqlResponseModel transponderRecord;
 
   // Получаем данные о боксе
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
   if (!Database->readRecords("boxes", "id = " + id, boxRecord)) {
     sendLog(QString("Получена ошибка при поиске данных бокса %1. ").arg(id));
     return false;
   }
 
   // Ищем в боксе первый невыпущенный транспондер в боксе
-  Database->setRecordMaxCount(1);
-  Database->setCurrentOrder(Qt::AscendingOrder);
   if (!Database->readRecords("transponders",
                              "release_counter = 0 AND box_id = " + id,
                              transponderRecord)) {
-    sendLog(QString("Получена ошибка при поиске "
-                    "невыпущенного транспондера в боксе %1. ")
-                .arg(id));
+    sendLog(
+        QString("Получена ошибка при поиске первого транспондера в боксе %1. ")
+            .arg(id));
     return false;
   }
 
   // Связываем транспондер с производственной линией
-  productionLineRecord.insert("id", productionLineId);
-  productionLineRecord.insert("transponder_id", transponderRecord.value("id"));
+  productionLineRecord.insert("transponder_id",
+                              transponderRecord.getFirstValue("id"));
   productionLineRecord.insert("active", "true");
-  if (!Database->updateRecordById("production_lines", productionLineRecord)) {
+  if (!Database->updateRecords("production_lines", "id = " + productionLineId,
+                               productionLineRecord)) {
     sendLog(
         QString("Получена ошибка при связывании производственной линии %1 с "
                 "транспондером %2. ")
-            .arg(productionLineRecord.value("id"),
-                 transponderRecord.value("id")));
+            .arg(productionLineId, transponderRecord.getFirstValue("id")));
     return false;
   }
 
   // Связываем бокс с производственной линией и обновляем время начала сборки
-  if (boxRecord.value("in_process") != "true") {
-    boxRecord.insert("in_process", "true");
-    boxRecord.insert("assembling_start", QDateTime::currentDateTime().toString(
-                                             POSTGRES_TIMESTAMP_TEMPLATE));
-    boxRecord.insert("production_line_id", productionLineId);
-    if (!Database->updateRecordById("boxes", boxRecord)) {
-      sendLog(
-          QString("Получена ошибка при связывании производственной линии %1 с "
-                  "боксом %2. ")
-              .arg(productionLineId, id));
-      return false;
-    }
+  boxNewValues.insert("in_process", "true");
+  boxNewValues.insert("assembling_start", QDateTime::currentDateTime().toString(
+                                              POSTGRES_TIMESTAMP_TEMPLATE));
+  boxNewValues.insert("production_line_id", productionLineId);
+  if (!Database->updateRecords("boxes", "id = " + id, boxNewValues)) {
+    sendLog(
+        QString("Получена ошибка при связывании производственной линии %1 с "
+                "боксом %2. ")
+            .arg(productionLineId, id));
+    return false;
+  }
 
+  if (!Database->readRecords(
+          "pallets", "id = " + box.getFirstValue("pallet_id"), pallet)) {
+    sendLog(QString("Получена ошибка при поиске данных заказа %1. ")
+                .arg(pallet.getFirstValue("order_id")));
+    return false;
+  }
+
+  if (box.getFirstValue("in_process") == "false") {
     // Запуск сборки палеты
-    if (!startPalletProcessing(boxRecord.value("pallet_id"))) {
+    if (!startPalletProcessing(boxRecord.getFirstValue("pallet_id"))) {
       sendLog(QString("Не удалось запустить сборку палеты %1. ")
-                  .arg(boxRecord.value("pallet_id")));
+                  .arg(boxRecord.getFirstValue("pallet_id")));
       return false;
     }
   } else {
-    sendLog(
-        QString("Бокс %1 уже в процессе сборки.").arg(boxRecord.value("id")));
+    sendLog(QString("Паллета %1 уже в процессе сборки. ")
+                .arg(pallet.getFirstValue("id")));
   }
+
   return true;
 }
 
 bool AdministrationSystem::startPalletProcessing(const QString& id) const {
-  QHash<QString, QString> palletRecord;
+  SqlResponseModel pallet;
+  SqlResponseModel order;
+  QHash<QString, QString> palletNewValues;
 
-  palletRecord.insert("id", id);
-  palletRecord.insert("order_id", "");
-  palletRecord.insert("in_process", "");
-  if (!Database->getRecordById("pallets", palletRecord)) {
-    sendLog("Получена ошибка при поиске данных о паллете. ");
+  // Получаем данные о боксе
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords("pallets", "id = " + id, pallet)) {
+    sendLog(QString("Получена ошибка при поиске данных бокса %1. ").arg(id));
     return false;
   }
 
-  if (palletRecord.value("in_process") != "true") {
-    palletRecord.insert("in_process", "true");
-    palletRecord.insert(
-        "assembling_start",
-        QDateTime::currentDateTime().toString(POSTGRES_TIMESTAMP_TEMPLATE));
-    if (!Database->updateRecordById("pallets", palletRecord)) {
-      sendLog("Получена ошибка при запуске сборки палеты. ");
-      return false;
-    }
+  palletNewValues.insert("in_process", "true");
+  palletNewValues.insert(
+      "assembling_start",
+      QDateTime::currentDateTime().toString(POSTGRES_TIMESTAMP_TEMPLATE));
+  if (!Database->updateRecordById("pallets", "id = " + id, palletNewValues)) {
+    sendLog("Получена ошибка при запуске сборки палеты. ");
+    return false;
+  }
 
+  if (!Database->readRecords(
+          "orders", "id = " + pallet.getFirstValue("order_id"), order)) {
+    sendLog(QString("Получена ошибка при поиске данных заказа %1. ")
+                .arg(pallet.getFirstValue("order_id")));
+    return false;
+  }
+
+  if (order.getFirstValue("in_process") == "false") {
     // Запуск сборки заказа
-    if (!startOrderProcessing(palletRecord.value("order_id"))) {
+    if (!startOrderProcessing(pallet.getFirstValue("order_id"))) {
       sendLog(QString("Не удалось запустить сборку заказа. ")
-                  .arg(palletRecord.value("order_id")));
+                  .arg(pallet.getFirstValue("order_id")));
       return false;
     }
   } else {
-    sendLog(QString("Палета %1 уже в процессе сборки. ")
-                .arg(palletRecord.value("id")));
+    sendLog(QString("Заказ %1 уже в процессе сборки. ")
+                .arg(order.getFirstValue("id")));
   }
 
   return true;
@@ -1557,24 +1576,12 @@ bool AdministrationSystem::startPalletProcessing(const QString& id) const {
 bool AdministrationSystem::startOrderProcessing(const QString& id) const {
   QHash<QString, QString> orderRecord;
 
-  orderRecord.insert("id", id);
-  if (!Database->getRecordById("orders", orderRecord)) {
-    sendLog("Получена ошибка при поиске данных о заказе. ");
+  orderRecord.insert("in_process", "true");
+  orderRecord.insert("assembling_start", QDateTime::currentDateTime().toString(
+                                             POSTGRES_TIMESTAMP_TEMPLATE));
+  if (!Database->updateRecordById("orders", orderRecord)) {
+    sendLog("Получена ошибка при запуске сборки заказа. ");
     return false;
-  }
-
-  if (orderRecord.value("in_process") != "true") {
-    orderRecord.insert("in_process", "true");
-    orderRecord.insert(
-        "assembling_start",
-        QDateTime::currentDateTime().toString(POSTGRES_TIMESTAMP_TEMPLATE));
-    if (!Database->updateRecordById("orders", orderRecord)) {
-      sendLog("Получена ошибка при запуске сборки заказа. ");
-      return false;
-    }
-  } else {
-    sendLog(QString("Заказ %1 уже в процессе сборки. ")
-                .arg(orderRecord.value("id")));
   }
 
   return true;
