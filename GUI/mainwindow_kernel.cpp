@@ -603,18 +603,18 @@ void MainWindowKernel::saveSettings() const {
                     AbstractGUI->PersoClientServerPortLineEdit->text());
 
   // Настройки контроллера базы данных
-  settings.setValue("postgres_controller/server_ip",
+  settings.setValue("postgre_sql_database/server_ip",
                     AbstractGUI->DatabaseIpLineEdit->text());
-  settings.setValue("postgres_controller/server_port",
+  settings.setValue("postgre_sql_database/server_port",
                     AbstractGUI->DatabasePortLineEdit->text().toInt());
-  settings.setValue("postgres_controller/database_name",
+  settings.setValue("postgre_sql_database/database_name",
                     AbstractGUI->DatabaseNameLineEdit->text());
-  settings.setValue("postgres_controller/user_name",
+  settings.setValue("postgre_sql_database/user_name",
                     AbstractGUI->DatabaseUserNameLineEdit->text());
-  settings.setValue("postgres_controller/user_password",
+  settings.setValue("postgre_sql_database/user_password",
                     AbstractGUI->DatabaseUserPasswordLineEdit->text());
   settings.setValue(
-      "postgres_controller/log_enable",
+      "postgre_sql_database/log_enable",
       AbstractGUI->IDatabaseControllerLogEnable->checkState() == Qt::Checked);
 
   // Принтер стикеров

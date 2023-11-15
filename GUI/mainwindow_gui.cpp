@@ -678,36 +678,36 @@ void MainWindowGUI::createSettingsTab() {
   DatabaseIpLabel = new QLabel("IP-адрес");
   DatabaseSettingsLayout->addWidget(DatabaseIpLabel, 0, 0, 1, 1);
 
-  DatabaseIpLineEdit =
-      new QLineEdit(settings.value("postgres_controller/server_ip").toString());
+  DatabaseIpLineEdit = new QLineEdit(
+      settings.value("postgre_sql_database/server_ip").toString());
   DatabaseSettingsLayout->addWidget(DatabaseIpLineEdit, 0, 1, 1, 1);
 
   DatabasePortLabel = new QLabel("Порт ");
   DatabaseSettingsLayout->addWidget(DatabasePortLabel, 1, 0, 1, 1);
 
   DatabasePortLineEdit = new QLineEdit(
-      settings.value("postgres_controller/server_port").toString());
+      settings.value("postgre_sql_database/server_port").toString());
   DatabaseSettingsLayout->addWidget(DatabasePortLineEdit, 1, 1, 1, 1);
 
   DatabaseNameLabel = new QLabel("Название базы данных ");
   DatabaseSettingsLayout->addWidget(DatabaseNameLabel, 2, 0, 1, 1);
 
   DatabaseNameLineEdit = new QLineEdit(
-      settings.value("postgres_controller/database_name").toString());
+      settings.value("postgre_sql_database/database_name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseNameLineEdit, 2, 1, 1, 1);
 
   DatabaseUserNameLabel = new QLabel("Имя пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLabel, 3, 0, 1, 1);
 
-  DatabaseUserNameLineEdit =
-      new QLineEdit(settings.value("postgres_controller/user_name").toString());
+  DatabaseUserNameLineEdit = new QLineEdit(
+      settings.value("postgre_sql_database/user_name").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserNameLineEdit, 3, 1, 1, 1);
 
   DatabaseUserPasswordLabel = new QLabel("Пароль пользователя ");
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLabel, 4, 0, 1, 1);
 
   DatabaseUserPasswordLineEdit = new QLineEdit(
-      settings.value("postgres_controller/user_password").toString());
+      settings.value("postgre_sql_database/user_password").toString());
   DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLineEdit, 4, 1, 1, 1);
 
   IDatabaseControllerLogEnableLabel = new QLabel("Логирование ");
@@ -716,7 +716,7 @@ void MainWindowGUI::createSettingsTab() {
 
   IDatabaseControllerLogEnable = new QCheckBox();
   IDatabaseControllerLogEnable->setCheckState(
-      settings.value("postgres_controller/log_enable").toBool()
+      settings.value("postgre_sql_database/log_enable").toBool()
           ? Qt::Checked
           : Qt::Unchecked);
   DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnable, 5, 1, 1, 1);

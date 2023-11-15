@@ -51,7 +51,7 @@ class AdministrationSystem : public QObject {
                                  SqlResponseModel* response);
 
   ReturnStatus createNewOrder(
-      const QSharedPointer<QHash<QString, QString> > orderParameters);
+      const QSharedPointer<QHash<QString, QString>> orderParameters);
   ReturnStatus startOrderAssembling(const QString& orderId);
   ReturnStatus stopOrderAssembling(const QString& orderId);
   ReturnStatus deleteLastOrder(void);
@@ -90,18 +90,21 @@ class AdministrationSystem : public QObject {
   bool getCurrentContext(const QString& id);
 
   bool addOrder(
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
   bool addPallets(
       const QString& orderId,
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
+      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
   bool addBoxes(
-      const QString& orderId,
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
+      const QString& palletId,
+      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
   bool addTransponders(
-      const QString& orderId,
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
+      const QString& boxId,
+      const QSharedPointer<QVector<QString>> pans,
+      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
   bool addProductionLine(
       const QHash<QString, QString>* productionLineParameters) const;
+
+  int32_t getLastId(const QString& table) const;
 
   bool startBoxProcessing(const QString& id,
                           const QString& productionLineId) const;

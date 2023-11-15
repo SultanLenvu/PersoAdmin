@@ -120,27 +120,6 @@ AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
     return DatabaseQueryError;
   }
 
-  sendLog("Добавление палет. ");
-  if (!addPallets(orderParameters)) {
-    sendLog("Получена ошибка при добавлении палет. ");
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
-
-  sendLog("Добавление боксов. ");
-  if (!addBoxes(orderParameters)) {
-    sendLog("Получена ошибка при добавлении боксов. ");
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
-
-  sendLog("Добавление транспондеров. ");
-  if (!addTransponders(orderParameters)) {
-    sendLog("Получена ошибка при добавлении транспондеров. ");
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
-
   sendLog("Новый заказ успешно создан. ");
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
@@ -1261,6 +1240,7 @@ bool AdministrationSystem::addOrder(
   SqlRecordCreationForm newOrderRecord;
   int32_t lastId = 0;
 
+  // Ищем заказчика
   if (!Database->readRecords("issuers",
                              "name = " + orderParameters->value("issuer_name"),
                              issuerRecord)) {
@@ -1269,17 +1249,8 @@ bool AdministrationSystem::addOrder(
     return false;
   }
 
-  Database->setRecordMaxCount(1);
-  Database->setCurrentOrder(Qt::AscendingOrder);
-  if (!Database->readRecords("orders", orderRecord)) {
-    sendLog("Получена ошибка при поиске последнего добавленного заказа. ");
-    return false;
-  }
-  if (orderRecord.isEmpty()) {
-    lastId = ORDER_ID_START_SHIFT;
-  } else {
-    lastId = orderRecord.getFirstValue("id").toInt();
-  }
+  // Получаем последний идентификатор заказа
+  lastId = getLastId("orders");
 
   // Формируем новую запись
   newOrderRecord.addFieldValue("id", QString::number(lastId + 1));
@@ -1314,87 +1285,82 @@ bool AdministrationSystem::addPallets(
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
-  SqlResponseModel orderRecord;
-  SqlResponseModel palletRecord;
-  SqlRecordCreationForm newPalletRecords;
+  SqlRecordCreationForm newPallets;
   int32_t lastId = 0;
 
   // Получаем идентификатор последней палеты
-  Database->setRecordMaxCount(1);
-  Database->setCurrentOrder(Qt::AscendingOrder);
-  if (!Database->readRecords("pallets", palletRecord)) {
-    sendLog(QString("Получена ошибка при поиске последней палеты в заказе %1. ")
-                .arg(orderId));
-    return false;
-  }
-  lastId = palletRecord.getFirstValue("id").toInt();
+  lastId = getLastId("pallets");
 
   // Формируем новые записи
   for (uint32_t i = 1; i <= orderCapacity; i++) {
-    newPalletRecords.addFieldValue("id", QString::number(lastId + i));
-    newPalletRecords.addFieldValue("quantity", "0");
-    newPalletRecords.addFieldValue("order_id", orderId);
+    newPallets.addFieldValue("id", QString::number(lastId + i));
+    newPallets.addFieldValue("quantity", QString::number(palletCapacity));
+    newPallets.addFieldValue("order_id", orderId);
   }
 
   // Добавляем новые палеты
-  if (!Database->createRecords("pallets", newPalletRecords)) {
+  if (!Database->createRecords("pallets", newPallets)) {
     sendLog(QString("Получена ошибка при добавлении палет в заказ %1. ")
                 .arg(orderId));
     return false;
+  }
+
+  // Добавляем боксы в паллеты
+  for (uint32_t i = 0; i < orderCapacity; i++) {
+    if (!addBoxes(newPallets.getValue(i, "id"), orderParameters)) {
+      sendLog(QString("Получена ошибка при добавлении боксов в паллету %1. ")
+                  .arg(newPallets.getValue(i, "id")));
+      return false;
+    }
   }
 
   return true;
 }
 
 bool AdministrationSystem::addBoxes(
-    const QString& orderId,
+    const QString& palletId,
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
-  uint32_t transponderCount =
-      orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
-  uint32_t palletCount = transponderCount / (palletCapacity * boxCapacity);
-  SqlResponseModel palletRecord;
-  SqlResponseModel boxRecord;
+  SqlRecordCreationForm newBoxes;
   int32_t lastId = 0;
 
-  // Получаем паллеты в заказе
-  Database->setRecordMaxCount(palletCount);
-  Database->setCurrentOrder(Qt::AscendingOrder);
-  if (!Database->readRecords("pallets", "order_id = " + orderId,
-                             palletRecord)) {
-    sendLog(QString("Получена ошибка при поиске палет, входящих в заказ %1. ")
-                .arg(orderId));
+  // Получаем идентификатор последнего добавленного бокса
+  lastId = getLastId("boxes");
+
+  // Создаем боксы
+  for (uint32_t i = 1; i <= palletCapacity; i++) {
+    newBoxes.addFieldValue("id", QString::number(lastId + i));
+    newBoxes.addFieldValue("quantity", QString::number(boxCapacity));
+    newBoxes.addFieldValue("pallet_id", palletId);
+  }
+
+  // Добавляем новые записи
+  if (!Database->createRecords("boxes", newBoxes)) {
+    sendLog(QString("Получена ошибка при добавлении боксов в паллету %1.")
+                .arg(palletId));
     return false;
   }
 
-  for (uint32_t i = 0; i < palletCount; i++) {
-    // Создаем боксы
-    for (uint32_t i = 0; i < palletCapacity; i++) {
-      // Получаем идентификатор последнего добавленного бокса
-      boxRecord.insert("id", "");
-      if (!Database->getLastRecord("boxes", boxRecord)) {
-        sendLog("Получена ошибка при поиске последнего бокса. ");
-        return false;
-      }
-      lastId = boxRecord.value("id").toInt();
+  // Добавляем транспондеры в боксы
+  QFile panFile(orderParameters->value("pan_file_path"));
+  if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    sendLog("Получена ошибка при открытии PAN-файла. ");
+    return false;
+  }
+  QTextStream in(&panFile);
 
-      // Формируем новую запись
-      boxRecord.insert("id", QString::number(lastId + 1));
-      boxRecord.insert("quantity", "0");
-      boxRecord.insert("pallet_id", palletRecord.value("id"));
-      // Добавляем новую запись
-      if (!Database->addRecord("boxes", boxRecord)) {
-        sendLog("Получена ошибка при добавлении бокса. ");
-        return false;
-      }
+  for (uint32_t i = 0; i < palletCapacity; i++) {
+    // Считываем PAN'ы
+    QSharedPointer<QVector<QString>> pans(new QVector<QString>());
+    for (int i = 0; i < boxCapacity && !in.atEnd(); i++) {
+      pans->append(
+          in.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
     }
-
-    // Заполнение палеты
-    palletRecord.insert("quantity", QString::number(palletCapacity));
-    if (!Database->updateRecordById("pallets", palletRecord)) {
-      sendLog(QString("Получена ошибка при заполнении палеты %1. ")
-                  .arg(palletRecord.value("id")));
+    if (!addTransponders(newBoxes.getValue(i, "id"), pans, orderParameters)) {
+      sendLog(
+          QString("Получена ошибка при добавлении транспондеров в бокса %1. ")
+              .arg(newBoxes.getValue(i, "id")));
       return false;
     }
   }
@@ -1403,64 +1369,33 @@ bool AdministrationSystem::addBoxes(
 }
 
 bool AdministrationSystem::addTransponders(
+    const QString& boxId,
+    const QSharedPointer<QVector<QString>> pans,
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   uint32_t boxCount = transponderCount / boxCapacity;
-  QHash<QString, QString> boxRecord;
-  QHash<QString, QString> transponderRecord;
   int32_t lastId = 0;
+  SqlRecordCreationForm newTransponders;
 
-  QFile panFile(orderParameters->value("pan_file_path"));
-  if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    sendLog("Получена ошибка при открытии PAN-файла. ");
-    return false;
+  // Получаем идентификатор незаполненного бокса
+  lastId = getLastId("transponders");
+
+  // Создаем новые транспондеры
+  newTransponders.addFieldColumn("personal_account_number", pans);
+  for (uint32_t i = 1; i <= boxCapacity; i++) {
+    // Формируем новую запись
+    newTransponders.addFieldValue("id", QString::number(lastId + i));
+    newTransponders.addFieldValue("release_counter", "0");
+    newTransponders.addFieldValue("box_id", boxId);
   }
-  QTextStream in(&panFile);
 
-  for (uint32_t i = 0; i < boxCount; i++) {
-    // Получаем идентификатор незаполненного бокса
-    boxRecord.insert("id", "");
-    boxRecord.insert("quantity", "0");
-    if (!Database->getRecordByPart("boxes", boxRecord)) {
-      sendLog(
-          "Получена ошибка при поиске идентификатора незаполненного бокса. ");
-      return false;
-    }
-
-    // Создаем транспондеры
-    for (uint32_t i = 0; i < boxCapacity; i++) {
-      // Получаем идентификатор последнего добавленного транспондера
-      transponderRecord.insert("id", "");
-      if (!Database->getLastRecord("transponders", transponderRecord)) {
-        sendLog("Получена ошибка при поиске последнего бокса. ");
-        return false;
-      }
-      lastId = transponderRecord.value("id").toInt();
-
-      // Формируем новую запись
-      transponderRecord.insert("id", QString::number(lastId + 1));
-      transponderRecord.insert(
-          "personal_account_number",
-          in.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
-      transponderRecord.insert("release_counter", "0");
-      transponderRecord.insert("box_id", boxRecord.value("id"));
-
-      // Добавляем новую запись
-      if (!Database->addRecord("transponders", transponderRecord)) {
-        sendLog("Получена ошибка при добавлении транспондера. ");
-        return false;
-      }
-    }
-
-    // Заполнение бокса
-    boxRecord.insert("quantity", QString::number(boxCapacity));
-    if (!Database->updateRecordById("boxes", boxRecord)) {
-      sendLog(QString("Получена ошибка при заполнении бокса %1. ")
-                  .arg(boxRecord.value("id")));
-      return false;
-    }
+  // Добавляем новые записи
+  if (!Database->createRecords("transponders", newTransponders)) {
+    sendLog(QString("Получена ошибка при добавлении транспондеров в бокс %1.")
+                .arg(boxId));
+    return false;
   }
 
   return true;
@@ -1468,41 +1403,23 @@ bool AdministrationSystem::addTransponders(
 
 bool AdministrationSystem::addProductionLine(
     const QHash<QString, QString>* productionLineParameters) const {
-  QHash<QString, QString> productionLineRecord;
-  QHash<QString, QString> mergedRecord;
-  QStringList tables;
-  QStringList foreignKeys;
+  SqlRecordCreationForm newProductionLine;
   int32_t lastId = 0;
 
-  // Ищем первый транспондер в свободном боксе
-  tables.append("transponders");
-  tables.append("boxes");
-  foreignKeys.append("box_id");
-  mergedRecord.insert("transponders.id", "");
-  mergedRecord.insert("transponders.box_id", "");
-  mergedRecord.insert("boxes.in_process", "false");
-  mergedRecord.insert("boxes.ready_indicator", "false");
-  if (!Database->getMergedRecordByPart(tables, foreignKeys, mergedRecord)) {
-    sendLog(
-        "Получена ошибка при поиске первого транспондера свободного бокса. ");
-    return false;
-  }
-
   // Получаем идентификатор последней линии производства
-  productionLineRecord.insert("id", "");
-  if (!Database->getLastRecord("production_lines", productionLineRecord)) {
-    sendLog(
-        "Получена ошибка при поиске последней созданной линии производства. ");
-    return false;
-  }
-  lastId = productionLineRecord.value("id").toInt();
+  lastId = getLastId("production_lines");
 
-  // Добавляем новую линию производства
-  productionLineRecord = *productionLineParameters;
-  productionLineRecord.insert("id", QString::number(lastId + 1));
-  productionLineRecord.insert("transponder_id", "NULL");
-  productionLineRecord.insert("active", "false");
-  if (!Database->addRecord("production_lines", productionLineRecord)) {
+  // Создаем новую линию производства
+  newProductionLine.addFieldValue("login",
+                                  productionLineParameters->value("login"));
+  newProductionLine.addFieldValue("password",
+                                  productionLineParameters->value("password"));
+  newProductionLine.addFieldValue("id", QString::number(lastId + 1));
+  newProductionLine.addFieldValue("transponder_id", "NULL");
+  newProductionLine.addFieldValue("active", "false");
+
+  // Добавляем новую запись
+  if (!Database->createRecords("production_lines", newProductionLine)) {
     sendLog("Получена ошибка при добавлении линии производства. ");
     return false;
   }
@@ -1510,27 +1427,52 @@ bool AdministrationSystem::addProductionLine(
   return true;
 }
 
+int32_t AdministrationSystem::getLastId(const QString& table) const {
+  SqlResponseModel record;
+
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords(table, record)) {
+    sendLog(
+        QString("Получена ошибка при поиске последней записи в таблице '%1'. ")
+            .arg(table));
+    return false;
+  }
+  if (record.isEmpty()) {
+    if (table == "transponders") {
+      return TRANSPONDER_ID_START_SHIFT;
+    }
+    if (table == "boxes") {
+      return BOX_ID_START_SHIFT;
+    }
+    if (table == "pallets") {
+      return PALLET_ID_START_SHIFT;
+    }
+    return 0;
+  } else {
+    return record.getFirstValue("id").toInt();
+  }
+}
+
 bool AdministrationSystem::startBoxProcessing(
     const QString& id,
     const QString& productionLineId) const {
-  QHash<QString, QString> boxRecord;
-  QHash<QString, QString> productionLineRecord;
-  QHash<QString, QString> transponderRecord;
+  SqlResponseModel boxRecord;
+  SqlResponseModel productionLineRecord;
+  SqlResponseModel transponderRecord;
 
   // Получаем данные о боксе
-  boxRecord.insert("id", id);
-  boxRecord.insert("pallet_id", "");
-  boxRecord.insert("in_process", "");
-  if (!Database->getRecordById("boxes", boxRecord)) {
-    sendLog("Получена ошибка при поиске данных о боксе. ");
+  if (!Database->readRecords("boxes", "id = " + id, boxRecord)) {
+    sendLog(QString("Получена ошибка при поиске данных бокса %1. ").arg(id));
     return false;
   }
 
   // Ищем в боксе первый невыпущенный транспондер в боксе
-  transponderRecord.insert("id", "");
-  transponderRecord.insert("release_counter", "0");
-  transponderRecord.insert("box_id", id);
-  if (!Database->getRecordByPart("transponders", transponderRecord)) {
+  Database->setRecordMaxCount(1);
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  if (!Database->readRecords("transponders",
+                             "release_counter = 0 AND box_id = " + id,
+                             transponderRecord)) {
     sendLog(QString("Получена ошибка при поиске "
                     "невыпущенного транспондера в боксе %1. ")
                 .arg(id));

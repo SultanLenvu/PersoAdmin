@@ -11,7 +11,6 @@ qt_standard_project_setup()
 
 add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/database_controller.cpp Database/database_controller.h
-
     Database/postgres_controller.cpp Database/postgres_controller.h
     Database/abstract_sql_database.cpp Database/abstract_sql_database.h
     Database/postgre_sql_database.cpp Database/postgre_sql_database.h

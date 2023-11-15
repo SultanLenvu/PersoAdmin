@@ -119,7 +119,7 @@ bool PostgreSqlTable::createRecords(
 
   // Создаем запрос
   QString requestText = QString("INSERT INTO public.%1 (").arg(objectName());
-  for (int32_t i = 0; i < records.size(); i++) {
+  for (int32_t i = 0; i < records.getRecordNumber(); i++) {
     requestText += QString("%1, ").arg(records.getField(i));
   }
   requestText.chop(2);
@@ -273,7 +273,7 @@ void PostgreSqlTable::loadSettings() {
 
 bool PostgreSqlTable::checkFieldNames(
     const SqlRecordCreationForm& records) const {
-  for (int32_t i = 0; i < records.size(); i++) {
+  for (int32_t i = 0; i < records.getRecordNumber(); i++) {
     if (!Columns.contains(records.getField(i))) {
       return false;
     }
