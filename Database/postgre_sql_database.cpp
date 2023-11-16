@@ -141,7 +141,7 @@ void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
 }
 
 bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
-                                           SqlResponseModel& response) const {
+                                           SqlQueryValues& response) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -162,9 +162,8 @@ bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
   return true;
 }
 
-bool PostgreSqlDatabase::createRecords(
-    const QString& table,
-    const SqlRecordCreationForm& records) const {
+bool PostgreSqlDatabase::createRecords(const QString& table,
+                                       const SqlQueryValues& records) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -182,7 +181,7 @@ bool PostgreSqlDatabase::createRecords(
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
-                                     SqlResponseModel& response) const {
+                                     SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -201,7 +200,7 @@ bool PostgreSqlDatabase::readRecords(const QString& table,
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      const QString& conditions,
-                                     SqlResponseModel& response) const {
+                                     SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -219,7 +218,7 @@ bool PostgreSqlDatabase::readRecords(const QString& table,
 }
 
 bool PostgreSqlDatabase::readLastRecord(const QString& table,
-                                        SqlResponseModel& record) const {
+                                        SqlQueryValues& record) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -236,10 +235,9 @@ bool PostgreSqlDatabase::readLastRecord(const QString& table,
   return Tables.value(table)->readLastRecord(record);
 }
 
-bool PostgreSqlDatabase::updateRecords(
-    const QString& table,
-    const QString& conditions,
-    const QHash<QString, QString>& newValues) const {
+bool PostgreSqlDatabase::updateRecords(const QString& table,
+                                       const QString& conditions,
+                                       const SqlQueryValues& newValues) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -293,7 +291,7 @@ bool PostgreSqlDatabase::clearTable(const QString& table) const {
 
 bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
                                            const QString& conditions,
-                                           SqlResponseModel& response) const {
+                                           SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -308,7 +306,19 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   }
 
   // Создаем запрос
-  QString requestText = QString("SELECT * FROM public.%1 ").arg(tables.first());
+  QString requestText;
+  if (response.fieldCount() == 0) {
+    requestText = QString("SELECT * FROM public.%1 ").arg(tables.first());
+  } else {
+    requestText = "SELECT ";
+    for (int32_t i = 0; i < response.fieldCount(); i++) {
+      requestText += response.fieldName(i) + ", ";
+    }
+    requestText.chop(2);
+
+    requestText = QString(" FROM public.%1 ").arg(tables.first());
+  }
+
   for (int32_t i = 0; i < tables.size(); i++) {
     requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
                        .arg(tables.at(i + 1), tables.at(i),
@@ -318,8 +328,12 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
                             Tables.value(tables.at(i + 1))->getPrimaryKey());
   }
 
-  requestText += QString("WHERE %1 LIMIT %2;")
-                     .arg(conditions, QString::number(RecordMaxCount));
+  requestText +=
+      QString("WHERE %1 ").arg(conditions, QString::number(RecordMaxCount));
+  if (RecordMaxCount > 0) {
+    requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
+  }
+  requestText += ";";
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -336,7 +350,7 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
 bool PostgreSqlDatabase::updateMergedRecords(
     const QStringList& tables,
     const QString& conditions,
-    const QHash<QString, QString>& newValues) const {
+    const SqlQueryValues& newValues) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -359,13 +373,13 @@ bool PostgreSqlDatabase::updateMergedRecords(
   //      WHERE pallets.id = 1000001);
 
   // Создаем запрос
-  QString requestText = QString("UPDATE * public.%1 SET ").arg(tables.first());
-  for (QHash<QString, QString>::const_iterator it = newValues.constBegin();
-       it != newValues.constEnd(); it++) {
-    if ((it.value() == "NULL") || (it.value().isEmpty())) {
-      requestText += QString("%1 = NULL, ").arg(it.key());
+  QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
+  for (int32_t i = 0; i < newValues.fieldCount(); i++) {
+    if (newValues.get(i) == "NULL") {
+      requestText += QString("%1 = NULL, ").arg(newValues.fieldName(i));
     } else {
-      requestText += QString("%1 = '%2', ").arg(it.key(), it.value());
+      requestText +=
+          QString("%1 = '%2', ").arg(newValues.fieldName(i), newValues.get(i));
     }
   }
 
@@ -441,6 +455,24 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
   }
 
   return true;
+}
+
+bool PostgreSqlDatabase::getRecordCount(const QString& table,
+                                        uint32_t& count) const {
+  // Проверка подключения
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog(
+        QString("Соединение с Postgres не установлено. %1.")
+            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+
+  if (!Tables.contains(table)) {
+    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
+    return false;
+  }
+
+  return Tables.value(table)->getRecordCount(count);
 }
 
 /*

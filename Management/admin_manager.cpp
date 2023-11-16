@@ -1,7 +1,4 @@
 #include "admin_manager.h"
-#include "Database/database_controller.h"
-#include "Database/postgres_controller.h"
-#include "Database/sql_response_model.h"
 #include "Log/log_system.h"
 #include "StickerPrinter/te310_printer.h"
 
@@ -56,7 +53,7 @@ void AdminManager::disconnectDatabase() {
 }
 
 void AdminManager::showDatabaseTable(const QString& name,
-                                     SqlResponseModel* model) {
+                                     SqlQueryValues* model) {
   // Начинаем выполнение операции
   startOperationPerforming("showDatabaseTable");
 
@@ -74,7 +71,7 @@ void AdminManager::showDatabaseTable(const QString& name,
 }
 
 void AdminManager::clearDatabaseTable(const QString& name,
-                                      SqlResponseModel* model) {
+                                      SqlQueryValues* model) {
   // Начинаем выполнение операции
   startOperationPerforming("clearDatabaseTable");
 
@@ -99,7 +96,7 @@ void AdminManager::clearDatabaseTable(const QString& name,
 }
 
 void AdminManager::performCustomRequest(const QString& req,
-                                        SqlResponseModel* model) {
+                                        SqlQueryValues* model) {
   // Начинаем выполнение операции
   startOperationPerforming("performCustomRequest");
 
@@ -118,7 +115,7 @@ void AdminManager::performCustomRequest(const QString& req,
 
 void AdminManager::createNewOrder(
     const QSharedPointer<QHash<QString, QString>> orderParameters,
-    SqlResponseModel* model) {
+    SqlQueryValues* model) {
   startOperationPerforming("createNewOrder");
 
   AdministrationSystem::ReturnStatus status;
@@ -141,7 +138,7 @@ void AdminManager::createNewOrder(
   finishOperationPerforming("createNewOrder");
 }
 
-void AdminManager::deleteLastOrder(SqlResponseModel* model) {
+void AdminManager::deleteLastOrder(SqlQueryValues* model) {
   startOperationPerforming("deleteLastOrder");
 
   AdministrationSystem::ReturnStatus status;
@@ -165,7 +162,7 @@ void AdminManager::deleteLastOrder(SqlResponseModel* model) {
 }
 
 void AdminManager::startOrderAssembling(const QString& orderId,
-                                        SqlResponseModel* model) {
+                                        SqlQueryValues* model) {
   startOperationPerforming("startOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
@@ -189,7 +186,7 @@ void AdminManager::startOrderAssembling(const QString& orderId,
 }
 
 void AdminManager::stopOrderAssembling(const QString& orderId,
-                                       SqlResponseModel* model) {
+                                       SqlQueryValues* model) {
   startOperationPerforming("stopOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
@@ -212,13 +209,13 @@ void AdminManager::stopOrderAssembling(const QString& orderId,
   finishOperationPerforming("stopOrderAssembling");
 }
 
-void AdminManager::showOrderTable(SqlResponseModel* model) {
+void AdminManager::showOrderTable(SqlQueryValues* model) {
   showDatabaseTable("orders", model);
 }
 
 void AdminManager::createNewProductionLine(
     const QSharedPointer<QHash<QString, QString>> productionLineParameters,
-    SqlResponseModel* model) {
+    SqlQueryValues* model) {
   startOperationPerforming("createNewProductionLine");
 
   AdministrationSystem::ReturnStatus status;
@@ -242,40 +239,15 @@ void AdminManager::createNewProductionLine(
   finishOperationPerforming("createNewProductionLine");
 }
 
-void AdminManager::allocateInactiveProductionLines(const QString& orderId,
-                                                   SqlResponseModel* model) {
-  startOperationPerforming("allocateInactiveProductionLines");
-
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog(QString("Распределение неактивных линий производства в заказе %1. ")
-              .arg(orderId));
-  status = Administrator->allocateInactiveProductionLines(orderId);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "allocateInactiveProductionLines");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "allocateInactiveProductionLines");
-    return;
-  }
-
-  finishOperationPerforming("allocateInactiveProductionLines");
-}
-
-void AdminManager::shutdownAllProductionLines(SqlResponseModel* model) {
-  startOperationPerforming("shutdownAllProductionLines");
+void AdminManager::stopAllProductionLines(SqlQueryValues* model) {
+  startOperationPerforming("stopAllProductionLines");
 
   AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Остановка всех производственных линий. "));
-  status = Administrator->shutdownAllProductionLines();
+  status = Administrator->stopAllProductionLines();
   if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "shutdownAllProductionLines");
+    processAdministratorError(status, "stopAllProductionLines");
     return;
   }
 
@@ -283,14 +255,14 @@ void AdminManager::shutdownAllProductionLines(SqlResponseModel* model) {
   sendLog("Отображение производственных линий. ");
   status = Administrator->getDatabaseTable("production_lines", model);
   if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "shutdownAllProductionLines");
+    processAdministratorError(status, "stopAllProductionLines");
     return;
   }
 
-  finishOperationPerforming("shutdownAllProductionLines");
+  finishOperationPerforming("stopAllProductionLines");
 }
 
-void AdminManager::deleteLastProductionLine(SqlResponseModel* model) {
+void AdminManager::deleteLastProductionLine(SqlQueryValues* model) {
   startOperationPerforming("deleteLastProductionLine");
 
   AdministrationSystem::ReturnStatus status;
@@ -313,36 +285,11 @@ void AdminManager::deleteLastProductionLine(SqlResponseModel* model) {
   finishOperationPerforming("deleteLastProductionLine");
 }
 
-void AdminManager::showProductionLineTable(SqlResponseModel* model) {
+void AdminManager::showProductionLineTable(SqlQueryValues* model) {
   showDatabaseTable("orders", model);
 }
 
-void AdminManager::linkProductionLineWithBox(
-    const QSharedPointer<QHash<QString, QString>> parameters,
-    SqlResponseModel* model) {
-  startOperationPerforming("linkProductionLineWithBoxManually");
-
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog("Связывание линии производства с определенным боксом. ");
-  status = Administrator->linkProductionLineWithBox(parameters.get());
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "linkProductionLineWithBox");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "linkProductionLineWithBox");
-    return;
-  }
-
-  finishOperationPerforming("linkProductionLineWithBox");
-}
-
-void AdminManager::initIssuers(SqlResponseModel* model) {
+void AdminManager::initIssuers(SqlQueryValues* model) {
   startOperationPerforming("initIssuers");
 
   AdministrationSystem::ReturnStatus status;
@@ -365,7 +312,7 @@ void AdminManager::initIssuers(SqlResponseModel* model) {
   finishOperationPerforming("initIssuers");
 }
 
-void AdminManager::initTransportMasterKeys(SqlResponseModel* model) {
+void AdminManager::initTransportMasterKeys(SqlQueryValues* model) {
   startOperationPerforming("initTransportMasterKeys");
 
   AdministrationSystem::ReturnStatus status;
@@ -389,7 +336,7 @@ void AdminManager::initTransportMasterKeys(SqlResponseModel* model) {
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
-    SqlResponseModel* model,
+    SqlQueryValues* model,
     const QSharedPointer<QHash<QString, QString>> parameters) {
   startOperationPerforming("linkIssuerWithMasterKeys");
 
@@ -417,7 +364,7 @@ void AdminManager::linkIssuerWithMasterKeys(
 
 void AdminManager::releaseTranspondersManually(
     const QSharedPointer<QHash<QString, QString>> param,
-    SqlResponseModel* model) {
+    SqlQueryValues* model) {
   startOperationPerforming("releaseTranspondersManually");
   sendLog("Принудительный выпуск транспондеров. ");
 
@@ -441,7 +388,7 @@ void AdminManager::releaseTranspondersManually(
 
 void AdminManager::refundTranspondersManually(
     const QSharedPointer<QHash<QString, QString>> param,
-    SqlResponseModel* model) {
+    SqlQueryValues* model) {
   startOperationPerforming("refundTranspondersManually");
   sendLog("Возврат транспондеров. ");
 
@@ -465,7 +412,7 @@ void AdminManager::refundTranspondersManually(
 
 void AdminManager::shipPallets(
     const QSharedPointer<QHash<QString, QString>> param,
-    SqlResponseModel* model) {
+    SqlQueryValues* model) {
   startOperationPerforming("shipPallets");
   sendLog("Отгрузка паллет. ");
 
@@ -634,7 +581,7 @@ void AdminManager::printLastPalletStickerOnServer() {
 }
 
 void AdminManager::printTransponderSticker(const QString& id,
-                                           SqlResponseModel* model) {
+                                           SqlQueryValues* model) {
   startOperationPerforming("printTransponderSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -659,8 +606,7 @@ void AdminManager::printTransponderSticker(const QString& id,
   finishOperationPerforming("printTransponderSticker");
 }
 
-void AdminManager::printBoxSticker(const QString& id,
-                                   SqlResponseModel* model) {
+void AdminManager::printBoxSticker(const QString& id, SqlQueryValues* model) {
   startOperationPerforming("printBoxSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -685,7 +631,7 @@ void AdminManager::printBoxSticker(const QString& id,
 }
 
 void AdminManager::printPalletSticker(const QString& id,
-                                      SqlResponseModel* model) {
+                                      SqlQueryValues* model) {
   startOperationPerforming("printPalletSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;

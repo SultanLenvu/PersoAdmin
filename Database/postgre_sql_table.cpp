@@ -111,22 +111,21 @@ void PostgreSqlTable::applySettings() {
   loadSettings();
 }
 
-bool PostgreSqlTable::createRecords(
-    const SqlRecordCreationForm& records) const {
+bool PostgreSqlTable::createRecords(const SqlQueryValues& records) const {
   if (!checkFieldNames(records)) {
     return false;
   }
 
   // Создаем запрос
   QString requestText = QString("INSERT INTO public.%1 (").arg(objectName());
-  for (int32_t i = 0; i < records.getRecordNumber(); i++) {
-    requestText += QString("%1, ").arg(records.getField(i));
+  for (int32_t i = 0; i < records.recordCount(); i++) {
+    requestText += QString("%1, ").arg(records.fieldName(i));
   }
   requestText.chop(2);
 
-  QString valuesForm;
-  records.generate(valuesForm);
-  requestText += QString(") VALUES %1;").arg(valuesForm);
+  requestText += QString(") VALUES ");
+  records.appendToInsert(requestText);
+  requestText += QString(";");
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -139,12 +138,14 @@ bool PostgreSqlTable::createRecords(
   return true;
 }
 
-bool PostgreSqlTable::readRecords(SqlResponseModel& response) const {
+bool PostgreSqlTable::readRecords(SqlQueryValues& response) const {
   // Создаем запрос
-  QString requestText =
-      QString("SELECT * FROM public.%1 ORDER BY %2 %3 LIMIT %4;")
-          .arg(objectName(), PrimaryKey, CurrentOrder,
-               QString::number(RecordMaxCount));
+  QString requestText = QString("SELECT * FROM public.%1 ORDER BY %2 %3 ")
+                            .arg(objectName(), PrimaryKey, CurrentOrder);
+  if (RecordMaxCount > 0) {
+    requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
+  }
+  requestText += ";";
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -159,12 +160,15 @@ bool PostgreSqlTable::readRecords(SqlResponseModel& response) const {
 }
 
 bool PostgreSqlTable::readRecords(const QString& conditions,
-                                  SqlResponseModel& response) const {
+                                  SqlQueryValues& response) const {
   // Создаем запрос
   QString requestText =
-      QString("SELECT * FROM public.%1 WHERE %2 ORDER BY %3 %4 LIMIT %5;")
-          .arg(objectName(), conditions, PrimaryKey, CurrentOrder,
-               QString::number(RecordMaxCount));
+      QString("SELECT * FROM public.%1 WHERE %2 ORDER BY %3 %4 ")
+          .arg(objectName(), conditions, PrimaryKey, CurrentOrder);
+  if (RecordMaxCount > 0) {
+    requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
+  }
+  requestText += ";";
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
@@ -178,7 +182,7 @@ bool PostgreSqlTable::readRecords(const QString& conditions,
   return true;
 }
 
-bool PostgreSqlTable::readLastRecord(SqlResponseModel& response) const {
+bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) const {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 ORDER BY %2 ASC LIMIT 1;")
@@ -196,21 +200,20 @@ bool PostgreSqlTable::readLastRecord(SqlResponseModel& response) const {
   return true;
 }
 
-bool PostgreSqlTable::updateRecords(
-    const QString& condition,
-    const QHash<QString, QString>& newValues) const {
+bool PostgreSqlTable::updateRecords(const QString& condition,
+                                    const SqlQueryValues& newValues) const {
   if (!checkFieldNames(newValues)) {
     return false;
   }
 
   // Создаем запрос
   QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
-  for (QHash<QString, QString>::const_iterator it = newValues.constBegin();
-       it != newValues.constEnd(); it++) {
-    if ((it.value() == "NULL") || (it.value().isEmpty())) {
-      requestText += QString("%1 = NULL, ").arg(it.key());
+  for (int32_t i = 0; i < newValues.fieldCount(); i++) {
+    if (newValues.get(i) == "NULL") {
+      requestText += QString("%1 = NULL, ").arg(newValues.fieldName(i));
     } else {
-      requestText += QString("%1 = '%2', ").arg(it.key(), it.value());
+      requestText +=
+          QString("%1 = '%2', ").arg(newValues.fieldName(i), newValues.get(i));
     }
   }
 
@@ -259,6 +262,25 @@ bool PostgreSqlTable::clear() const {
   return true;
 }
 
+bool PostgreSqlTable::getRecordCount(uint32_t& count) const {
+  // Создаем запрос
+  QString requestText =
+      QString("SELECT COUNT(*) FROM public.%1;").arg(objectName());
+
+  // Выполняем запрос
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec(requestText)) {
+    sendLog(request.lastError().text());
+    sendLog("Отправленный запрос: " + requestText);
+    return false;
+  }
+
+  request.next();
+  count = request.value(0).toUInt();
+
+  return true;
+}
+
 void PostgreSqlTable::sendLog(const QString& log) const {
   if (LogEnable) {
     emit const_cast<PostgreSqlTable*>(this)->logging(log);
@@ -271,10 +293,9 @@ void PostgreSqlTable::loadSettings() {
   LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
-bool PostgreSqlTable::checkFieldNames(
-    const SqlRecordCreationForm& records) const {
-  for (int32_t i = 0; i < records.getRecordNumber(); i++) {
-    if (!Columns.contains(records.getField(i))) {
+bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
+  for (int32_t i = 0; i < records.recordCount(); i++) {
+    if (!Columns.contains(records.fieldName(i))) {
       return false;
     }
   }

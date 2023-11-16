@@ -42,24 +42,27 @@ class PostgreSqlTable : public AbstractSqlTable {
  public:
   virtual bool init() override;
   virtual void applySettings() override;
-  virtual bool createRecords(
-      const SqlRecordCreationForm& response) const override;
-  virtual bool readRecords(SqlResponseModel& response) const override;
+
+  // CRUD
+  virtual bool createRecords(const SqlQueryValues& response) const override;
+  virtual bool readRecords(SqlQueryValues& response) const override;
   virtual bool readRecords(const QString& conditions,
-                           SqlResponseModel& response) const override;
-  virtual bool readLastRecord(SqlResponseModel& response) const override;
-  virtual bool updateRecords(
-      const QString& condition,
-      const QHash<QString, QString>& newValues) const override;
+                           SqlQueryValues& response) const override;
+  virtual bool readLastRecord(SqlQueryValues& response) const override;
+  virtual bool updateRecords(const QString& condition,
+                             const SqlQueryValues& newValues) const override;
   virtual bool deleteRecords(const QString& condition) const override;
   virtual bool clear() const override;
+
+  // Aggregation
+  virtual bool getRecordCount(uint32_t& count) const override;
 
  private:
   Q_DISABLE_COPY_MOVE(PostgreSqlTable)
   void sendLog(const QString& log) const;
   void loadSettings(void);
 
-  bool checkFieldNames(const SqlRecordCreationForm& record) const;
+  bool checkFieldNames(const SqlQueryValues& record) const;
   bool checkFieldNames(const QHash<QString, QString>& record) const;
 
  signals:

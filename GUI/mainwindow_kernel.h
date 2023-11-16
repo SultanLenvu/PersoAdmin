@@ -36,12 +36,12 @@ class MainWindowKernel : public QMainWindow {
   QThread* LoggerThread;
   LogSystem* Logger;
 
-  SqlResponseModel* RandomModel;
-  SqlResponseModel* OrderModel;
-  SqlResponseModel* ProductionLineModel;
-  SqlResponseModel* IssuerModel;
-  SqlResponseModel* TransponderModel;
-  SqlResponseModel* StickerModel;
+  SqlQueryValues* RandomModel;
+  SqlQueryValues* OrderModel;
+  SqlQueryValues* ProductionLineModel;
+  SqlQueryValues* IssuerModel;
+  SqlQueryValues* TransponderModel;
+  SqlQueryValues* StickerModel;
 
   HashModel* TransponderData;
 
@@ -155,37 +155,37 @@ class MainWindowKernel : public QMainWindow {
   // База данных
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
-  void showDatabaseTable_signal(const QString& name, SqlResponseModel* model);
+  void showDatabaseTable_signal(const QString& name, SqlQueryValues* model);
   void clearDatabaseTable_signal(const QString& name,
-                                 SqlResponseModel* model);
+                                 SqlQueryValues* model);
 
   void performCustomRequest_signal(const QString& req,
-                                   SqlResponseModel* model);
+                                   SqlQueryValues* model);
 
   // Заказы
   void createNewOrder_signal(
       const QSharedPointer<QHash<QString, QString>> orderParameterseters,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void startOrderAssembling_signal(const QString& orderId,
-                                   SqlResponseModel* model);
+                                   SqlQueryValues* model);
   void stopOrderAssembling_signal(const QString& orderId,
-                                  SqlResponseModel* model);
-  void deleteLastOrder_signal(SqlResponseModel* model);
-  void showOrderTable_signal(SqlResponseModel* model);
+                                  SqlQueryValues* model);
+  void deleteLastOrder_signal(SqlQueryValues* model);
+  void showOrderTable_signal(SqlQueryValues* model);
 
   // Производственные линии
   void createNewProductionLine_signal(
       const QSharedPointer<QHash<QString, QString>>
           productionLineParameterseters,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void allocateInactiveProductionLines_signal(const QString& orderId,
-                                              SqlResponseModel* model);
-  void shutdownAllProductionLines_signal(SqlResponseModel* model);
-  void deleteLastProductionLine_signal(SqlResponseModel* model);
-  void showProductionLineTable_signal(SqlResponseModel* model);
+                                              SqlQueryValues* model);
+  void stopAllProductionLines_signal(SqlQueryValues* model);
+  void deleteLastProductionLine_signal(SqlQueryValues* model);
+  void showProductionLineTable_signal(SqlQueryValues* model);
   void linkProductionLineWithBox_signal(
       const QSharedPointer<QHash<QString, QString>> linkParameters,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
 
   // Тест сервера
   void releaseTransponder_signal(
@@ -208,25 +208,25 @@ class MainWindowKernel : public QMainWindow {
   // Транспондеры
   void releaseTranspondersManually_signal(
       const QSharedPointer<QHash<QString, QString>> param,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void refundTranspondersManually_signal(
       const QSharedPointer<QHash<QString, QString>> param,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void shipPallets_signal(const QSharedPointer<QHash<QString, QString>> param,
-                          SqlResponseModel* model);
+                          SqlQueryValues* model);
 
   // Заказчики
-  void initIssuers_signal(SqlResponseModel* model);
-  void initTransportMasterKeys_signal(SqlResponseModel* model);
+  void initIssuers_signal(SqlQueryValues* model);
+  void initTransportMasterKeys_signal(SqlQueryValues* model);
   void linkIssuerWithMasterKeys_signal(
-      SqlResponseModel* model,
+      SqlQueryValues* model,
       const QSharedPointer<QHash<QString, QString>> Parameterseters);
 
   // Принтер
   void printTransponderSticker_signal(const QString& id,
-                                      SqlResponseModel* model);
-  void printBoxSticker_signal(const QString& id, SqlResponseModel* model);
-  void printPalletSticker_signal(const QString& id, SqlResponseModel* model);
+                                      SqlQueryValues* model);
+  void printBoxSticker_signal(const QString& id, SqlQueryValues* model);
+  void printPalletSticker_signal(const QString& id, SqlQueryValues* model);
   void execPrinterStickerCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
 };

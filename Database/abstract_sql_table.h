@@ -3,8 +3,7 @@
 
 #include <QObject>
 
-#include "sql_record_creation_form.h"
-#include "sql_response_model.h"
+#include "sql_query_values.h"
 
 class AbstractSqlTable : public QObject {
   Q_OBJECT
@@ -17,22 +16,24 @@ class AbstractSqlTable : public QObject {
   virtual void applySettings() = 0;
 
   // Create
-  virtual bool createRecords(const SqlRecordCreationForm& records) const = 0;
+  virtual bool createRecords(const SqlQueryValues& records) const = 0;
 
   // Read
-  virtual bool readRecords(SqlResponseModel& records) const = 0;
+  virtual bool readRecords(SqlQueryValues& records) const = 0;
   virtual bool readRecords(const QString& conditions,
-                           SqlResponseModel& records) const = 0;
-  virtual bool readLastRecord(SqlResponseModel& record) const = 0;
+                           SqlQueryValues& records) const = 0;
+  virtual bool readLastRecord(SqlQueryValues& record) const = 0;
 
   // Update
-  virtual bool updateRecords(
-      const QString& condition,
-      const QHash<QString, QString>& newValues) const = 0;
+  virtual bool updateRecords(const QString& condition,
+                             const SqlQueryValues& newValues) const = 0;
 
   // Delete
   virtual bool deleteRecords(const QString& condition) const = 0;
   virtual bool clear(void) const = 0;
+
+  // Aggregation
+  virtual bool getRecordCount(uint32_t& count) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractSqlTable)

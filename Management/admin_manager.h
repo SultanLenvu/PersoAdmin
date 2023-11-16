@@ -39,48 +39,43 @@ class AdminManager : public QObject {
 
   void connectDatabase(void);
   void disconnectDatabase(void);
-  void showDatabaseTable(const QString& name, SqlResponseModel* model);
-  void clearDatabaseTable(const QString& name, SqlResponseModel* model);
-  void performCustomRequest(const QString& req, SqlResponseModel* model);
+  void showDatabaseTable(const QString& name, SqlQueryValues* model);
+  void clearDatabaseTable(const QString& name, SqlQueryValues* model);
+  void performCustomRequest(const QString& req, SqlQueryValues* model);
 
   // Заказы
   void createNewOrder(
       const QSharedPointer<QHash<QString, QString>> orderParameterseters,
-      SqlResponseModel* model);
-  void deleteLastOrder(SqlResponseModel* model);
-  void startOrderAssembling(const QString& orderId, SqlResponseModel* model);
-  void stopOrderAssembling(const QString& orderId, SqlResponseModel* model);
-  void showOrderTable(SqlResponseModel* model);
+      SqlQueryValues* model);
+  void deleteLastOrder(SqlQueryValues* model);
+  void startOrderAssembling(const QString& orderId, SqlQueryValues* model);
+  void stopOrderAssembling(const QString& orderId, SqlQueryValues* model);
+  void showOrderTable(SqlQueryValues* model);
 
   // Производственные линии
   void createNewProductionLine(const QSharedPointer<QHash<QString, QString>>
                                    productionLineParameterseters,
-                               SqlResponseModel* model);
-  void allocateInactiveProductionLines(const QString& orderId,
-                                       SqlResponseModel* model);
-  void shutdownAllProductionLines(SqlResponseModel* model);
-  void deleteLastProductionLine(SqlResponseModel* model);
-  void showProductionLineTable(SqlResponseModel* model);
-  void linkProductionLineWithBox(
-      const QSharedPointer<QHash<QString, QString>> linkParameterseters,
-      SqlResponseModel* model);
+                               SqlQueryValues* model);
+  void stopAllProductionLines(SqlQueryValues* model);
+  void deleteLastProductionLine(SqlQueryValues* model);
+  void showProductionLineTable(SqlQueryValues* model);
 
   // Заказчики
-  void initIssuers(SqlResponseModel* model);
-  void initTransportMasterKeys(SqlResponseModel* model);
+  void initIssuers(SqlQueryValues* model);
+  void initTransportMasterKeys(SqlQueryValues* model);
   void linkIssuerWithMasterKeys(
-      SqlResponseModel* model,
+      SqlQueryValues* model,
       const QSharedPointer<QHash<QString, QString>> param);
 
   // Транспондеры
   void releaseTranspondersManually(
       const QSharedPointer<QHash<QString, QString>> param,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void refundTranspondersManually(
       const QSharedPointer<QHash<QString, QString>> param,
-      SqlResponseModel* model);
+      SqlQueryValues* model);
   void shipPallets(const QSharedPointer<QHash<QString, QString>> param,
-                   SqlResponseModel* model);
+                   SqlQueryValues* model);
 
   // Клиент
   void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
@@ -99,9 +94,9 @@ class AdminManager : public QObject {
   void printLastPalletStickerOnServer();
 
   // Принтеры
-  void printTransponderSticker(const QString& id, SqlResponseModel* model);
-  void printBoxSticker(const QString& id, SqlResponseModel* model);
-  void printPalletSticker(const QString& id, SqlResponseModel* model);
+  void printTransponderSticker(const QString& id, SqlQueryValues* model);
+  void printBoxSticker(const QString& id, SqlQueryValues* model);
+  void printPalletSticker(const QString& id, SqlQueryValues* model);
   void execPrinterStickerCommandScript(
       const QSharedPointer<QStringList> commandScript);
 

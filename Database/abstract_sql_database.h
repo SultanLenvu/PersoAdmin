@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include "sql_record_creation_form.h"
-#include "sql_response_model.h"
+#include "sql_query_values.h"
 
 class AbstractSqlDatabase : public QObject {
   Q_OBJECT
@@ -31,22 +30,21 @@ class AbstractSqlDatabase : public QObject {
   virtual void setRecordMaxCount(uint32_t count) = 0;
 
   virtual bool execCustomRequest(const QString& requestText,
-                                 SqlResponseModel& records) const = 0;
+                                 SqlQueryValues& records) const = 0;
 
   // Single table CRUD
   virtual bool createRecords(const QString& table,
-                             const SqlRecordCreationForm& records) const = 0;
+                             const SqlQueryValues& records) const = 0;
   virtual bool readRecords(const QString& table,
-                           SqlResponseModel& records) const = 0;
+                           SqlQueryValues& records) const = 0;
   virtual bool readRecords(const QString& table,
                            const QString& conditions,
-                           SqlResponseModel& records) const = 0;
+                           SqlQueryValues& records) const = 0;
   virtual bool readLastRecord(const QString& table,
-                              SqlResponseModel& record) const = 0;
-  virtual bool updateRecords(
-      const QString& table,
-      const QString& condition,
-      const QHash<QString, QString>& newValues) const = 0;
+                              SqlQueryValues& record) const = 0;
+  virtual bool updateRecords(const QString& table,
+                             const QString& condition,
+                             const SqlQueryValues& newValues) const = 0;
   virtual bool deleteRecords(const QString& table,
                              const QString& condition) const = 0;
   virtual bool clearTable(const QString& table) const = 0;
@@ -54,13 +52,15 @@ class AbstractSqlDatabase : public QObject {
   // Multi table CRUD
   virtual bool readMergedRecords(const QStringList& tables,
                                  const QString& conditions,
-                                 SqlResponseModel& records) const = 0;
-  virtual bool updateMergedRecords(
-      const QStringList& tables,
-      const QString& conditions,
-      const QHash<QString, QString>& newValues) const = 0;
+                                 SqlQueryValues& records) const = 0;
+  virtual bool updateMergedRecords(const QStringList& tables,
+                                   const QString& conditions,
+                                   const SqlQueryValues& newValues) const = 0;
   virtual bool deleteMergedRecords(const QStringList& tables,
                                    const QString& conditions) const = 0;
+
+  // Aggregation
+  virtual bool getRecordCount(const QString& table, uint32_t& count) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractSqlDatabase)

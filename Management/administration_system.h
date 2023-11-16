@@ -6,7 +6,6 @@
 #include <QObject>
 
 #include "Database/postgre_sql_database.h"
-#include "Database/sql_response_model.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
@@ -18,8 +17,11 @@ class AdministrationSystem : public QObject {
     DatabaseTransactionError,
     DatabaseQueryError,
     ShipmentRegisterError,
-    FreeProductionLineMissed,
-    LogicError,
+    ProductionLineMissed,
+    ProductionLineLinkError,
+    ProductionLineRollbackLimit,
+    OrderRemovingError,
+    OtherOrderInProcess,
     UnknownError,
     Completed
   };
@@ -29,11 +31,11 @@ class AdministrationSystem : public QObject {
   bool LogEnable;
   QString ShipmentRegisterDir;
 
-  SqlResponseModel CurrentTransponder;
-  SqlResponseModel CurrentBox;
-  SqlResponseModel CurrentPallet;
-  SqlResponseModel CurrentOrder;
-  SqlResponseModel CurrentIssuer;
+  SqlQueryValues CurrentTransponder;
+  SqlQueryValues CurrentBox;
+  SqlQueryValues CurrentPallet;
+  SqlQueryValues CurrentOrder;
+  SqlQueryValues CurrentIssuer;
 
   PostgreSqlDatabase* Database;
 
@@ -46,22 +48,18 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus clearDatabaseTable(const QString& tableName);
   ReturnStatus getDatabaseTable(const QString& tableName,
-                                SqlResponseModel* response);
-  ReturnStatus getCustomResponse(const QString& req,
-                                 SqlResponseModel* response);
+                                SqlQueryValues* response);
+  ReturnStatus getCustomResponse(const QString& req, SqlQueryValues* response);
 
   ReturnStatus createNewOrder(
       const QSharedPointer<QHash<QString, QString>> orderParameters);
-  ReturnStatus startOrderAssembling(const QString& orderId);
-  ReturnStatus stopOrderAssembling(const QString& orderId);
+  ReturnStatus startOrderAssembling(const QString& orderId) const;
+  ReturnStatus stopOrderAssembling(const QString& orderId) const;
   ReturnStatus deleteLastOrder(void);
 
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);
-  ReturnStatus allocateInactiveProductionLines(const QString& orderId);
-  ReturnStatus linkProductionLineWithBox(
-      const QHash<QString, QString>* linkParameters);
-  ReturnStatus shutdownAllProductionLines(void);
+  ReturnStatus stopAllProductionLines(void) const;
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
@@ -106,19 +104,22 @@ class AdministrationSystem : public QObject {
 
   int32_t getLastId(const QString& table) const;
 
-  bool startBoxProcessing(const QString& id,
-                          const QString& productionLineId) const;
+  bool startProductionLine(const QString& id, const QString& orderId) const;
+  //  bool stopProductionLine(const QString& id) const;
+  bool linkProductionLineWithBox(const QString& id, const QString& boxId) const;
+
+  bool startBoxProcessing(const QString& id) const;
   bool startPalletProcessing(const QString& id) const;
   bool startOrderProcessing(const QString& id) const;
 
-  bool removeLastProductionLine(void) const;
-  bool stopBoxProcessing(const QString& id) const;
-  bool stopPalletProcessing(const QString& id) const;
-  bool stopOrderProcessing(const QString& id) const;
+  //  bool removeLastProductionLine(void) const;
+  //  bool stopBoxProcessing(const QString& id) const;
+  //  bool stopPalletProcessing(const QString& id) const;
+  //  bool stopOrderProcessing(const QString& id) const;
 
-  bool searchBoxForProductionLine(const QString& orderId,
-                                  const QString& productionLineId,
-                                  SqlResponseModel& boxRecord) const;
+  bool searchFreeBox(const QString& orderId,
+                     const QString& productionLineId,
+                     SqlQueryValues& boxRecord) const;
 
   ReturnStatus releaseTransponderManually(const QString& id);
   ReturnStatus releaseBoxManually(const QString& id);

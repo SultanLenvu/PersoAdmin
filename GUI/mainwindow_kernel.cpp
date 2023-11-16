@@ -238,7 +238,7 @@ void MainWindowKernel::linkProductionLinePushButton_slot() {
 void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
 
-  emit shutdownAllProductionLines_signal(ProductionLineModel);
+  emit stopAllProductionLines_signal(ProductionLineModel);
 }
 
 void MainWindowKernel::updateProductionLineViewPushButton_slot() {
@@ -1132,8 +1132,8 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::createNewProductionLine);
   connect(this, &MainWindowKernel::allocateInactiveProductionLines_signal,
           Manager, &AdminManager::allocateInactiveProductionLines);
-  connect(this, &MainWindowKernel::shutdownAllProductionLines_signal, Manager,
-          &AdminManager::shutdownAllProductionLines);
+  connect(this, &MainWindowKernel::stopAllProductionLines_signal, Manager,
+          &AdminManager::stopAllProductionLines);
   connect(this, &MainWindowKernel::deleteLastProductionLine_signal, Manager,
           &AdminManager::deleteLastProductionLine);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
@@ -1211,12 +1211,12 @@ void MainWindowKernel::createInteractorInstance() {
 }
 
 void MainWindowKernel::createModels() {
-  RandomModel = new SqlResponseModel(this);
-  OrderModel = new SqlResponseModel(this);
-  ProductionLineModel = new SqlResponseModel(this);
-  IssuerModel = new SqlResponseModel(this);
-  StickerModel = new SqlResponseModel(this);
-  TransponderModel = new SqlResponseModel(this);
+  RandomModel = new SqlQueryValues(this);
+  OrderModel = new SqlQueryValues(this);
+  ProductionLineModel = new SqlQueryValues(this);
+  IssuerModel = new SqlQueryValues(this);
+  StickerModel = new SqlQueryValues(this);
+  TransponderModel = new SqlQueryValues(this);
 
   TransponderData = new HashModel(this);
 }
