@@ -35,7 +35,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::disconnectDatabase() {
 }
 
 void AdministrationSystem::createDatabase() {
-  Database = new PostgreSqlDatabase(this, "AdministratorNewConnection");
+  Database = new PostgreSqlDatabase(this, "AdministratorConnection");
   connect(Database, &AbstractSqlDatabase::logging, LogSystem::instance(),
           &LogSystem::generate);
 }
@@ -69,6 +69,8 @@ AdministrationSystem::ReturnStatus AdministrationSystem::getDatabaseTable(
     return DatabaseTransactionError;
   }
 
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  Database->setRecordMaxCount(0);
   if (!Database->readRecords(tableName, *response)) {
     sendLog(QString("Получена ошибка при получении данных из таблицы %1. ")
                 .arg(tableName));
@@ -129,7 +131,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
-    const QString& orderId) const {
+    const QString& orderId) {
   SqlQueryValues productionLines;
   SqlQueryValues orders;
 
@@ -175,7 +177,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 
   // Запускаем производственные линии
   for (int32_t i = 0; i < productionLines.recordCount(); i++) {
-    if (!startProductionLine(productionLines.get(i, "id"), orderId)) {
+    if (!startProductionLine(productionLines.get(i, "id"))) {
       Database->rollbackTransaction();
       return DatabaseQueryError;
     }
@@ -190,7 +192,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::stopOrderAssembling(
-    const QString& orderId) const {
+    const QString& orderId) {
   SqlQueryValues busyProductionLines;
   ReturnStatus status;
 
@@ -318,7 +320,7 @@ AdministrationSystem::stopAllProductionLines() const {
 
   sendLog("Остановка процесса сборки всех боксов. ");
   boxNewValues.add("in_process", "false");
-  if (!Database->updateRecords("boxes", "active = true", boxNewValues)) {
+  if (!Database->updateRecords("boxes", "in_process = true", boxNewValues)) {
     sendLog(QString("Получена ошибка при остановке сборки всех боксов. "));
     Database->rollbackTransaction();
     return DatabaseQueryError;
@@ -326,7 +328,8 @@ AdministrationSystem::stopAllProductionLines() const {
 
   sendLog("Остановка процесса сборки всех паллет.");
   palletNewValues.add("in_process", "false");
-  if (!Database->updateRecords("pallets", "active = true", palletNewValues)) {
+  if (!Database->updateRecords("pallets", "in_process = true",
+                               palletNewValues)) {
     sendLog(QString("Получена ошибка при остановке сборки всех паллет."));
     Database->rollbackTransaction();
     return DatabaseQueryError;
@@ -334,7 +337,7 @@ AdministrationSystem::stopAllProductionLines() const {
 
   sendLog("Остановка процесса сборки всех заказов.");
   orderNewValues.add("in_process", "false");
-  if (!Database->updateRecords("orders", "active = true", orderNewValues)) {
+  if (!Database->updateRecords("orders", "in_process = true", orderNewValues)) {
     sendLog(QString("Получена ошибка при остановке сборки всех заказов."));
     Database->rollbackTransaction();
     return DatabaseQueryError;
@@ -345,6 +348,88 @@ AdministrationSystem::stopAllProductionLines() const {
     sendLog("Получена ошибка при закрытии транзакции. ");
     return DatabaseTransactionError;
   }
+  return Completed;
+}
+
+AdministrationSystem::ReturnStatus AdministrationSystem::startProductionLine(
+    const QString& id) {
+  SqlQueryValues order;
+  SqlQueryValues box;
+
+  // Ищем текущий активный заказ
+  if (!Database->readRecords("orders", "in_process = true", order)) {
+    sendLog(QString("Получена ошибка при поиске активного заказа. "));
+    return DatabaseQueryError;
+  }
+
+  // Активным может быть только один заказ
+  if (order.recordCount() > 1) {
+    sendLog(
+        QString("Несколько заказов активны одновременно. Запуск "
+                "производственной линии невозможен. "));
+    return MultipleActiveOrders;
+  }
+
+  // Ищем свободный бокс в заказе
+  if (!searchFreeBox(order.get("id"), id, box)) {
+    sendLog(QString("Получена ошибка при поиске свободного бокса в заказе %1. ")
+                .arg(order.get("id")));
+    return DatabaseQueryError;
+  }
+
+  // Если свободных боксов не найдено
+  if (box.isEmpty()) {
+    sendLog(QString("В заказе %1 все боксы заняты. ").arg(order.get("id")));
+    return FreeBoxMissed;
+  }
+
+  // Запускаем сборку бокса
+  if (!startBoxProcessing(box.get("id"))) {
+    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
+                .arg(box.get("id")));
+    return DatabaseQueryError;
+  }
+
+  // Связываем производственную линию
+  if (!linkProductionLineWithBox(id, box.get("id"))) {
+    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
+                .arg(box.get("id")));
+    return DatabaseQueryError;
+  }
+
+  return Completed;
+}
+
+AdministrationSystem::ReturnStatus AdministrationSystem::stopProductionLine(
+    const QString& id) {
+  SqlQueryValues productionLineNewValue;
+
+  if (!getCurrentContext(id)) {
+    sendLog(
+        QString(
+            "Получена ошибка при получении контекста линии производства %1. ")
+            .arg(id));
+    return DatabaseQueryError;
+  }
+
+  // Останавливаем производственную линию
+  productionLineNewValue.add("active", "false");
+  productionLineNewValue.add("transponder_id", "NULL");
+  if (!Database->updateRecords("production_lines", "id = " + id,
+                               productionLineNewValue)) {
+    sendLog(
+        QString("Получена ошибка при обновлении данных линии производства."));
+    Database->rollbackTransaction();
+    return DatabaseQueryError;
+  }
+
+  // Останавливаем сборку текущего бокса
+  if (!stopCurrentBoxProcessing()) {
+    sendLog(QString("Получена ошибка при остановке сборки бокса %1. ")
+                .arg(CurrentBox.get("id")));
+    return DatabaseQueryError;
+  }
+
   return Completed;
 }
 
@@ -829,13 +914,13 @@ AdministrationSystem::ReturnStatus AdministrationSystem::shipPallets(
   QFile file(ShipmentRegisterName);
   QTextStream out(&file);
 
-  if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+  // Открываем файл для записи
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     sendLog("Получена ошибка при открытии файла реестра отгрузки. ");
-    return ShipmentRegisterError;
+    return RegisterFileError;
   }
   file.resize(0);
   out << "model;sn;pan;box_id;pallet_id\n";
-  out.flush();
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
@@ -845,7 +930,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::shipPallets(
   for (uint32_t i = param->value("first_pallet_id").toUInt();
        i <= param->value("last_pallet_id").toUInt(); i++) {
     sendLog(QString("Отгрузка паллеты %1.").arg(QString::number(i)));
-    ret = shipPallet(QString::number(i), &file);
+    ret = shipPallet(QString::number(i), out);
     if (ret != Completed) {
       sendLog(QString("Получена ошибка при отгрузке паллеты %1.")
                   .arg(QString::number(i)));
@@ -855,7 +940,6 @@ AdministrationSystem::ReturnStatus AdministrationSystem::shipPallets(
     }
   }
 
-  file.close();
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     Database->rollbackTransaction();
@@ -874,7 +958,8 @@ void AdministrationSystem::loadSettings() {
 
 void AdministrationSystem::sendLog(const QString& log) const {
   if (LogEnable) {
-    emit logging(QString("%1 - %2").arg(objectName(), log));
+    emit const_cast<AdministrationSystem*>(this)->logging(
+        QString("%1 - %2").arg(objectName(), log));
   }
 }
 
@@ -934,11 +1019,12 @@ bool AdministrationSystem::addOrder(
   int32_t lastId = 0;
 
   // Ищем заказчика
-  if (!Database->readRecords("issuers",
-                             "name = " + orderParameters->value("issuer_name"),
-                             issuerRecord)) {
+  if (!Database->readRecords(
+          "issuers",
+          QString("name = '%1'").arg(orderParameters->value("issuer_name")),
+          issuerRecord)) {
     sendLog(QString("Получена ошибка при поиске эмитента \"%1\".")
-                .arg(orderParameters->value("IssuerName")));
+                .arg(orderParameters->value("issuer_name")));
     return false;
   }
 
@@ -998,9 +1084,17 @@ bool AdministrationSystem::addPallets(
     return false;
   }
 
+  // Открываем PAN-файл
+  QFile panFile(orderParameters->value("pan_file_path"));
+  if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    sendLog("Получена ошибка при открытии PAN-файла. ");
+    return false;
+  }
+  QTextStream panSource(&panFile);
+
   // Добавляем боксы в паллеты
   for (uint32_t i = 0; i < orderCapacity; i++) {
-    if (!addBoxes(newPalletValues.get(i, "id"), orderParameters)) {
+    if (!addBoxes(newPalletValues.get(i, "id"), orderParameters, panSource)) {
       sendLog(QString("Получена ошибка при добавлении боксов в паллету %1. ")
                   .arg(newPalletValues.get(i, "id")));
       return false;
@@ -1012,7 +1106,8 @@ bool AdministrationSystem::addPallets(
 
 bool AdministrationSystem::addBoxes(
     const QString& palletId,
-    const QSharedPointer<QHash<QString, QString>> orderParameters) const {
+    const QSharedPointer<QHash<QString, QString>> orderParameters,
+    QTextStream& panSource) const {
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   SqlQueryValues newBoxValues;
@@ -1035,20 +1130,12 @@ bool AdministrationSystem::addBoxes(
     return false;
   }
 
-  // Добавляем транспондеры в боксы
-  QFile panFile(orderParameters->value("pan_file_path"));
-  if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    sendLog("Получена ошибка при открытии PAN-файла. ");
-    return false;
-  }
-  QTextStream in(&panFile);
-
   for (uint32_t i = 0; i < palletCapacity; i++) {
     // Считываем PAN'ы
     QSharedPointer<QVector<QString>> pans(new QVector<QString>());
-    for (int i = 0; i < boxCapacity && !in.atEnd(); i++) {
+    for (int32_t j = 0; j < boxCapacity && !panSource.atEnd(); j++) {
       pans->append(
-          in.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
+          panSource.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
     }
     if (!addTransponders(newBoxValues.get(i, "id"), pans, orderParameters)) {
       sendLog(
@@ -1065,10 +1152,7 @@ bool AdministrationSystem::addTransponders(
     const QString& boxId,
     const QSharedPointer<QVector<QString>> pans,
     const QSharedPointer<QHash<QString, QString>> orderParameters) const {
-  uint32_t transponderCount =
-      orderParameters->value("transponder_quantity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
-  uint32_t boxCount = transponderCount / boxCapacity;
   int32_t lastId = 0;
   SqlQueryValues newTransponders;
 
@@ -1123,7 +1207,7 @@ int32_t AdministrationSystem::getLastId(const QString& table) const {
   SqlQueryValues record;
 
   Database->setRecordMaxCount(1);
-  Database->setCurrentOrder(Qt::AscendingOrder);
+  Database->setCurrentOrder(Qt::DescendingOrder);
   if (!Database->readRecords(table, record)) {
     sendLog(
         QString("Получена ошибка при поиске последней записи в таблице '%1'. ")
@@ -1144,49 +1228,9 @@ int32_t AdministrationSystem::getLastId(const QString& table) const {
   } else {
     return record.get("id").toInt();
   }
+  Database->setRecordMaxCount(0);
+  Database->setCurrentOrder(Qt::AscendingOrder);
 }
-
-bool AdministrationSystem::startProductionLine(const QString& id,
-                                               const QString& orderId) const {
-  SqlQueryValues boxRecord;
-
-  if (!searchFreeBox(orderId, id, boxRecord)) {
-    sendLog(QString("Получена ошибка при поиске свободного бокса для "
-                    "производственной линии %1. ")
-                .arg(id));
-    return false;
-  }
-
-  // Запускаем сборку бокса
-  if (!startBoxProcessing(boxRecord.get("id"))) {
-    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
-                .arg(boxRecord.get("id")));
-    return DatabaseQueryError;
-  }
-
-  // Связываем производственную линию
-  if (!linkProductionLineWithBox(id, boxRecord.get("id"))) {
-    sendLog(QString("Получена ошибка при запуске сборки бокса %1. ")
-                .arg(boxRecord.get("id")));
-    return DatabaseQueryError;
-  }
-}
-
-// bool AdministrationSystem::stopProductionLine(const QString& id) const {
-//   SqlQueryValues productionLine;
-//   SqlQueryValues productionLineNewValues;
-
-//  // Останавливаем производственную линию, связанную с боксом
-//  productionLineRecord.insert("id", boxRecord.value("production_line_id"));
-//  productionLineRecord.insert("active", "false");
-//  productionLineRecord.insert("transponder_id", "NULL");
-//  if (!Database->updateRecords("production_lines", productionLineRecord)) {
-//    sendLog(QString("Получена ошибка при остановке производственной линии
-//    %1.")
-//                .arg(productionLineRecord.value("id")));
-//    return false;
-//  }
-//}
 
 bool AdministrationSystem::linkProductionLineWithBox(
     const QString& id,
@@ -1225,6 +1269,8 @@ bool AdministrationSystem::linkProductionLineWithBox(
             .arg(id, transponderRecord.get("id")));
     return false;
   }
+
+  return true;
 }
 
 bool AdministrationSystem::startBoxProcessing(const QString& id) const {
@@ -1336,141 +1382,112 @@ bool AdministrationSystem::startOrderProcessing(const QString& id) const {
 //    return false;
 //  }
 
-//  // Если производственная линия активна, то удаление невозможно
-//  if (productionLineRecord.value("active") == "true") {
-//    sendLog("Производственная линия активна, удаление невозможно. ");
-//    return false;
-//  }
-
-//  // Удаляем запись из таблицы линий производства
-//  if (!Database->removeLastRecordById("production_lines")) {
-//    sendLog("Получена ошибка при удалении последней линии производства. ");
-//    return false;
-//  }
-
-//  return true;
+// Если производственная линия активна, то удаление невозможно
+// if (productionLineRecord.value("active") == "true") {
+//  sendLog("Производственная линия активна, удаление невозможно. ");
+//  return false;
 //}
 
-// bool AdministrationSystem::stopBoxProcessing(const QString& id) const {
-//   SqlQueryValues boxRecord;
-//   SqlQueryValues mergedRecord;
+//// Удаляем запись из таблицы линий производства
+// if (!Database->removeLastRecordById("production_lines")) {
+//   sendLog("Получена ошибка при удалении последней линии производства. ");
+//   return false;
+// }
 
-//  QStringList tables;
-//  QStringList foreignKeys;
+// return true;
+// }
 
-//  // Получаем данные о боксе
-//  if (!Database->readRecords("boxes", "id = " + id, boxRecord)) {
-//    sendLog("Получена ошибка при поиске данных о боксе. ");
-//    return false;
-//  }
+bool AdministrationSystem::stopCurrentBoxProcessing() const {
+  SqlQueryValues otherBoxes;
+  SqlQueryValues currentBoxNewValues;
 
-//  if (boxRecord.value("in_process") != "false") {
-//    boxRecord.insert("in_process", "false");
-//    if (!Database->updateRecords("boxes", boxRecord)) {
-//      sendLog("Получена ошибка при остановке сборки бокса. ");
-//      return false;
-//    }
+  // Если ни одного транспондера не было собрано в боксе, то его можно отвязать
+  // от производственной линии
+  if (CurrentBox.get("assembled_units") == "0") {
+    currentBoxNewValues.add("production_line_id", "NULL");
+  }
+  currentBoxNewValues.add("in_process", "false");
+  if (!Database->updateRecords("boxes", "id = " + CurrentBox.get("id"),
+                               currentBoxNewValues)) {
+    sendLog(QString("Получена ошибка при остановке сборки бокса %1. ")
+                .arg(CurrentBox.get("id")));
+    return false;
+  }
 
-//    // Проверка наличия в палете других боксов , находящихся в процессе сборки
-//    tables.append("boxes");
-//    tables.append("pallets");
-//    mergedRecord.insert("boxes.id", "");
-//    mergedRecord.insert("boxes.in_process", "true");
-//    mergedRecord.insert("boxes.pallet_id", boxRecord.value("pallet_id"));
-//    foreignKeys.append("pallet_id");
-//    if (Database->readMergedRecords(tables, foreignKeys, mergedRecord)) {
-//      // Проверка наличия записей
-//      if (mergedRecord.isEmpty()) {
-//        // Остановка сборки паллеты
-//        sendLog(QString("Остановка сборки паллеты %1. ")
-//                    .arg(boxRecord.value("pallet_id")));
-//        if (!stopPalletProcessing(boxRecord.value("pallet_id"))) {
-//          sendLog("Не удалось остановить сборку палеты. ");
-//          return false;
-//        }
-//      } else {
-//        sendLog("В паллете еще есть боксы, находящиеся в процессе сборки. ");
-//      }
-//    }
-//  } else {
-//    sendLog(QString("Бокс %1 не находится в процессе сборки. ")
-//                .arg(boxRecord.value("id")));
-//  }
-//  return true;
-//}
+  // Проверка наличия в текущей палете других боксов, находящихся в процессе
+  // сборки
+  if (!Database->readRecords("boxes", "pallet_id = " + CurrentPallet.get("id"),
+                             otherBoxes)) {
+    sendLog(
+        QString("Получена ошибка при поиске боксов, содержащися в паллете %1. ")
+            .arg(CurrentPallet.get("id")));
+    return false;
+  }
 
-// bool AdministrationSystem::stopPalletProcessing(const QString& id) const {
-//   QHash<QString, QString> palletRecord;
-//   QHash<QString, QString> mergedRecord;
-//   QStringList tables;
-//   QStringList foreignKeys;
+  // Если в паллете больше нет активных боксов, то останавливаем сборку паллеты
+  if (otherBoxes.isEmpty()) {
+    // Остановка сборки паллеты
+    sendLog(
+        QString("Остановка сборки паллеты %1. ").arg(CurrentPallet.get("id")));
+    if (!stopCurrentPalletProcessing()) {
+      sendLog(QString("Не удалось остановить сборку палеты. ")
+                  .arg(CurrentPallet.get("id")));
+      return false;
+    }
+  }
 
-//  palletRecord.insert("id", id);
-//  palletRecord.insert("order_id", "");
-//  palletRecord.insert("in_process", "");
-//  if (!Database->readRecords("pallets", palletRecord)) {
-//    sendLog("Получена ошибка при поиске данных о паллете. ");
-//    return false;
-//  }
+  return true;
+}
 
-//  if (palletRecord.value("in_process") != "false") {
-//    palletRecord.insert("in_process", "false");
-//    if (!Database->updateRecords("pallets", palletRecord)) {
-//      sendLog("Получена ошибка при остановке сборки палеты. ");
-//      return false;
-//    }
+bool AdministrationSystem::stopCurrentPalletProcessing() const {
+  SqlQueryValues otherPallets;
+  SqlQueryValues palletNewValues;
 
-//    // Проверка наличия в заказе других паллет, находящихся в процессе сборки
-//    tables.append("pallets");
-//    tables.append("orders");
-//    mergedRecord.insert("pallets.id", "");
-//    mergedRecord.insert("pallets.in_process", "true");
-//    mergedRecord.insert("pallets.order_id", palletRecord.value("order_id"));
-//    foreignKeys.append("order_id");
-//    if (Database->readMergedRecords(tables, foreignKeys, mergedRecord)) {
-//      // Проверка наличия записей
-//      if (mergedRecord.isEmpty()) {
-//        // Остановка сборки заказа
-//        sendLog(QString("Остановка сборки заказа %1. ")
-//                    .arg(palletRecord.value("order_id")));
-//        if (!stopOrderProcessing(palletRecord.value("order_id"))) {
-//          sendLog("Не удалось остановить сборку заказа. ");
-//          return false;
-//        }
-//      } else {
-//        sendLog("В заказе еще есть паллеты, находящиеся в процессе сборки. ");
-//      }
-//    }
-//  } else {
-//    sendLog(QString("Палета %1 не находится в процессе сборки. ")
-//                .arg(palletRecord.value("id")));
-//  }
+  palletNewValues.add("in_process", "false");
+  if (!Database->updateRecords("pallets", "id = " + CurrentPallet.get("id"),
+                               palletNewValues)) {
+    sendLog(QString("Получена ошибка при остановке сборки паллеты %1. ")
+                .arg(CurrentPallet.get("id")));
+    return false;
+  }
 
-//  return true;
-//}
+  // Проверка наличия в палете других боксов , находящихся в процессе сборки
+  if (!Database->readRecords("pallets", "order_id = " + CurrentOrder.get("id"),
+                             otherPallets)) {
+    sendLog(
+        QString("Получена ошибка при поиске паллет, содержащися в заказе %1. ")
+            .arg(CurrentOrder.get("id")));
+    return false;
+  }
 
-// bool AdministrationSystem::stopOrderProcessing(const QString& id) const {
-//   QHash<QString, QString> orderRecord;
+  // Если в паллете больше нет активных боксов, то останавливаем сборку паллеты
+  if (otherPallets.isEmpty()) {
+    // Остановка сборки паллеты
+    sendLog(
+        QString("Остановка сборки заказа %1. ").arg(CurrentOrder.get("id")));
+    if (!stopCurrentOrderProcessing()) {
+      sendLog(QString("Не удалось остановить сборку палеты. ")
+                  .arg(CurrentOrder.get("id")));
+      return false;
+    }
+  }
 
-//  orderRecord.insert("id", id);
-//  if (!Database->readRecords("orders", orderRecord)) {
-//    sendLog("Получена ошибка при поиске данных о заказе. ");
-//    return false;
-//  }
+  return true;
+}
 
-//  if (orderRecord.value("in_process") != "false") {
-//    orderRecord.insert("in_process", "false");
-//    if (!Database->updateRecords("orders", orderRecord)) {
-//      sendLog("Получена ошибка при остановке сборки заказа. ");
-//      return false;
-//    }
-//  } else {
-//    sendLog(QString("Заказ %1 не находится в процессе сборки. ")
-//                .arg(orderRecord.value("id")));
-//  }
+bool AdministrationSystem::stopCurrentOrderProcessing() const {
+  SqlQueryValues orderNewValues;
 
-//  return true;
-//}
+  orderNewValues.add("in_process", "false");
+  if (!Database->updateRecords("pallets", "id = " + CurrentOrder.get("id"),
+                               orderNewValues)) {
+    sendLog(QString("Получена ошибка при остановке сборки заказа %1. ")
+                .arg(CurrentOrder.get("id")));
+    return false;
+  }
+
+  return true;
+}
 
 bool AdministrationSystem::searchFreeBox(const QString& orderId,
                                          const QString& productionLineId,
@@ -1507,22 +1524,17 @@ bool AdministrationSystem::searchFreeBox(const QString& orderId,
     }
   }
 
-  // Если свободных боксов не найдено
-  if (boxRecord.isEmpty()) {
-    sendLog(QString("В заказе %1 все боксы заняты. ").arg(orderId));
-    return false;
-  }
-
   return true;
 }
 
 AdministrationSystem::ReturnStatus
 AdministrationSystem::releaseTransponderManually(const QString& id) {
-  if (!getCurrentContext(id)) {
-    sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
-                .arg(id));
-    return DatabaseQueryError;
-  }
+  //  if (!getCurrentContext(id)) {
+  //    sendLog(QString("Получена ошибка при получении контекста транспондера
+  //    %1. ")
+  //                .arg(id));
+  //    return DatabaseQueryError;
+  //  }
 
   //  if (CurrentTransponder.value("release_counter").toInt() > 0) {
   //    sendLog(
@@ -1622,7 +1634,7 @@ AdministrationSystem::releaseTransponderManually(const QString& id) {
 
 AdministrationSystem::ReturnStatus AdministrationSystem::releaseBoxManually(
     const QString& id) {
-  QHash<QString, QString> transponderRecord;
+  //  QHash<QString, QString> transponderRecord;
 
   //  while (1) {
   //    transponderRecord.insert("id", "");
@@ -1655,7 +1667,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::releaseBoxManually(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::releasePalletManually(
     const QString& id) {
-  QHash<QString, QString> boxRecord;
+  //  QHash<QString, QString> boxRecord;
 
   //  while (1) {
   //    boxRecord.insert("id", "");
@@ -1686,7 +1698,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::releasePalletManually(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::releaseOrderManually(
     const QString& id) {
-  QHash<QString, QString> palletRecord;
+  //  QHash<QString, QString> palletRecord;
 
   //  while (1) {
   //    palletRecord.insert("id", "");
@@ -1794,7 +1806,7 @@ AdministrationSystem::refundTransponderManually(const QString& id) {
 
 AdministrationSystem::ReturnStatus AdministrationSystem::refundBoxManually(
     const QString& id) {
-  QHash<QString, QString> transponderRecord;
+  //  QHash<QString, QString> transponderRecord;
 
   //  while (1) {
   //    transponderRecord.insert("id", "");
@@ -1826,7 +1838,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundBoxManually(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::refundPalletManually(
     const QString& id) {
-  QHash<QString, QString> boxRecord;
+  //  QHash<QString, QString> boxRecord;
 
   //  while (1) {
   //    boxRecord.insert("id", "");
@@ -1855,7 +1867,7 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundPalletManually(
 
 AdministrationSystem::ReturnStatus AdministrationSystem::refundOrderManually(
     const QString& id) {
-  QHash<QString, QString> palletRecord;
+  //  QHash<QString, QString> palletRecord;
 
   //  while (1) {
   //    palletRecord.insert("id", "");
@@ -1882,70 +1894,63 @@ AdministrationSystem::ReturnStatus AdministrationSystem::refundOrderManually(
   return Completed;
 }
 
-AdministrationSystem::ReturnStatus AdministrationSystem::shipTransponder(
-    const QString& id,
-    QFile* reg) {
-  QHash<QString, QString> transponderData;
-  ReturnStatus ret = getTransponderData(id, &transponderData);
-  if (ret != Completed) {
-    sendLog(QString("Получена ошибка при генерации данных транспондера %1.")
-                .arg(id));
-    return ret;
-  }
-
-  QString registerRecord =
-      QString("%1;%2;%3;%4;%5\n")
-          .arg(transponderData.value("transponder_model"),
-               transponderData.value("sn"), transponderData.value("pan"),
-               transponderData.value("box_id"),
-               transponderData.value("pallet_id"));
-  QTextStream out(reg);
-  out << registerRecord;
-  out.flush();
-
-  return Completed;
-}
-
 AdministrationSystem::ReturnStatus AdministrationSystem::shipPallet(
     const QString& id,
-    QFile* reg) {
-  QStringList tables;
-  QStringList foreignKeys;
-  QHash<QString, QString> mergedRecord;
+    QTextStream& registerOut) {
+  QStringList tables{"transponders", "boxes", "pallets", "orders"};
+  SqlQueryValues records;
   uint32_t quantity;
-  ReturnStatus ret;
 
-  tables.append("transponders");
-  tables.append("boxes");
-  tables.append("pallets");
-  foreignKeys.append("box_id");
-  foreignKeys.append("pallet_id");
-  mergedRecord.insert("transponders.id", "");
-  mergedRecord.insert("pallet_id", id);
-  if (!Database->readMergedRecords(tables, foreignKeys, mergedRecord)) {
-    sendLog(QString("Получена ошибка поиске первого транспондера в паллете %1.")
-                .arg(id));
+  Database->setCurrentOrder(Qt::AscendingOrder);
+  Database->setRecordMaxCount(0);
+
+  records.addField("transponder_model");
+  records.addField("personal_account_number");
+  records.addField("transponders.id");
+  records.addField("box_id");
+  records.addField("pallet_id");
+  records.addField("boxes.assembling_start");
+  records.addField("manufacturer_id");
+  if (!Database->readMergedRecords(tables, "pallets.id = " + id, records)) {
+    sendLog(
+        QString("Получена ошибка поиске транспондеров в паллете %1.").arg(id));
     return DatabaseQueryError;
   }
 
-  if (!getCurrentContext(mergedRecord.value("id"))) {
-    sendLog(QString("Получена ошибка при получении контекста транспондера %1. ")
-                .arg(mergedRecord.value("id")));
-    return DatabaseQueryError;
-  }
+  for (int32_t i = 0; i < records.recordCount(); i++) {
+    // Удаляем пробелы из названия модели
+    QString tempModel = records.get(i, "transponder_model");
 
-  quantity = CurrentBox.value("quantity").toUInt() *
-             CurrentPallet.value("quantity").toUInt();
-  for (uint32_t i = 0; i < quantity; i++) {
-    ret = shipTransponder(
-        QString::number(mergedRecord.value("id").toUInt() + i), reg);
-    if (ret != Completed) {
-      sendLog(
-          QString(
-              "Получена ошибка поиске отгрузке %1 транспондера в паллете %2.")
-              .arg(QString::number(mergedRecord.value("id").toUInt() + i), id));
-      return ret;
-    }
+    // Преобразуем в десятичный формат
+    QString manufacturerId =
+        QString::number(records.get(i, "manufacturer_id").toInt(nullptr, 16));
+
+    // Дата сборки
+    QStringList tempDate = records.get(i, "boxes.assembling_start").split("T");
+    QDate date = QDate::fromString(tempDate.first(), POSTGRES_DATE_TEMPLATE);
+    QString batteryInsertationDate =
+        QString("%1%2")
+            .arg(QString::number(date.weekNumber()), 2, QChar('0'))
+            .arg(QString::number(date.year() % 100), 2, QChar('0'));
+
+    // Дополняем серийник до 10 цифр нулями слева
+    QString extendedTransponderId =
+        QString("%1").arg(records.get(i, "transponders.id"), 10, QChar('0'));
+
+    // Конструируем серийный номер транспондера
+    QString sn = QString("%1%2%3").arg(manufacturerId, batteryInsertationDate,
+                                       extendedTransponderId);
+
+    // Вычленяем символ F из personal_account_number
+    QString tempPan = records.get(i, "personal_account_number");
+    QString pan = tempPan.remove(QChar('F'));
+
+    QString registerRecord =
+        QString("%1;%2;%3;%4;%5\n")
+            .arg(tempModel, sn, pan, records.get(i, "box_id"),
+                 records.get(i, "pallet_id"));
+
+    registerOut << registerRecord;
   }
 
   return Completed;

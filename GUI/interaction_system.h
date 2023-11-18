@@ -18,7 +18,7 @@ class InteractionSystem : public QWidget {
 
  private:
   bool LogEnable;
-  QProgressDialog* ProgressDialog;
+  QProgressDialog ProgressDialog;
   uint32_t CurrentOperationStep;
 
   InputDialog* CurrentDialog;

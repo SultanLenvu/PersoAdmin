@@ -1130,16 +1130,12 @@ void MainWindowKernel::createManagerInstance() {
 
   connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
           &AdminManager::createNewProductionLine);
-  connect(this, &MainWindowKernel::allocateInactiveProductionLines_signal,
-          Manager, &AdminManager::allocateInactiveProductionLines);
   connect(this, &MainWindowKernel::stopAllProductionLines_signal, Manager,
           &AdminManager::stopAllProductionLines);
   connect(this, &MainWindowKernel::deleteLastProductionLine_signal, Manager,
           &AdminManager::deleteLastProductionLine);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
           &AdminManager::showProductionLineTable);
-  connect(this, &MainWindowKernel::linkProductionLineWithBox_signal, Manager,
-          &AdminManager::linkProductionLineWithBox);
 
   connect(this, &MainWindowKernel::releaseTransponder_signal, Manager,
           &AdminManager::releaseTransponder);

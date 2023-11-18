@@ -7,8 +7,8 @@ InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   setObjectName("InteractionSystem");
   loadSettings();
 
-  ProgressDialog = nullptr;
   CurrentOperationStep = 0;
+  createProgressDialog();
 
   // Создаем таймеры
   createTimers();
@@ -37,9 +37,6 @@ void InteractionSystem::generateErrorMessage(const QString& text) {
 void InteractionSystem::startOperationProgressDialog(
     const QString& operationName) {
   QSettings settings;
-
-  // Создаем  окно
-  createProgressDialog();
 
   //  Настраиваем и запускаем таймер для измерения квантов времени
   uint64_t operationDuration =
@@ -120,20 +117,17 @@ void InteractionSystem::sendLog(const QString& log) {
 }
 
 void InteractionSystem::createProgressDialog() {
-  ProgressDialog =
-      new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
-  ProgressDialog->setWindowModality(Qt::ApplicationModal);
-  ProgressDialog->setAutoClose(false);
+  ProgressDialog.setLabelText("Выполнение операции...");
+  ProgressDialog.setMinimum(0);
+  ProgressDialog.setMaximum(100);
+  ProgressDialog.setCancelButton(nullptr);
+  ProgressDialog.setWindowModality(Qt::ApplicationModal);
+  ProgressDialog.setAutoClose(false);
   //  ProgressDialog->show();
 }
 
 void InteractionSystem::destroyProgressDialog() {
-  if (!ProgressDialog)
-    return;
-
-  ProgressDialog->close();
-  delete ProgressDialog;
-  ProgressDialog = nullptr;
+  ProgressDialog.close();
   CurrentOperationStep = 0;
 }
 
@@ -166,13 +160,9 @@ void InteractionSystem::on_ODTimerTimeout_slot() {
 }
 
 void InteractionSystem::on_ODQTimerTimeout_slot() {
-  if (ProgressDialog == nullptr) {
-    return;
-  }
-
   CurrentOperationStep++;
   if (CurrentOperationStep < 100) {
-    ProgressDialog->setValue(CurrentOperationStep);
+    ProgressDialog.setValue(CurrentOperationStep);
   } else {
     ODQTimer->stop();
   }

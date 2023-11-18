@@ -16,12 +16,14 @@ class AdministrationSystem : public QObject {
     DatabaseConnectionError,
     DatabaseTransactionError,
     DatabaseQueryError,
-    ShipmentRegisterError,
+    RegisterFileError,
     ProductionLineMissed,
     ProductionLineLinkError,
     ProductionLineRollbackLimit,
     OrderRemovingError,
     OtherOrderInProcess,
+    MultipleActiveOrders,
+    FreeBoxMissed,
     UnknownError,
     Completed
   };
@@ -31,6 +33,7 @@ class AdministrationSystem : public QObject {
   bool LogEnable;
   QString ShipmentRegisterDir;
 
+  SqlQueryValues CurrentProductionLine;
   SqlQueryValues CurrentTransponder;
   SqlQueryValues CurrentBox;
   SqlQueryValues CurrentPallet;
@@ -53,13 +56,15 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus createNewOrder(
       const QSharedPointer<QHash<QString, QString>> orderParameters);
-  ReturnStatus startOrderAssembling(const QString& orderId) const;
-  ReturnStatus stopOrderAssembling(const QString& orderId) const;
+  ReturnStatus startOrderAssembling(const QString& orderId);
+  ReturnStatus stopOrderAssembling(const QString& orderId);
   ReturnStatus deleteLastOrder(void);
 
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);
   ReturnStatus stopAllProductionLines(void) const;
+  ReturnStatus startProductionLine(const QString& id);
+  ReturnStatus stopProductionLine(const QString& id);
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
@@ -92,9 +97,9 @@ class AdministrationSystem : public QObject {
   bool addPallets(
       const QString& orderId,
       const QSharedPointer<QHash<QString, QString>> orderParameters) const;
-  bool addBoxes(
-      const QString& palletId,
-      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
+  bool addBoxes(const QString& palletId,
+                const QSharedPointer<QHash<QString, QString>> orderParameters,
+                QTextStream& panSource) const;
   bool addTransponders(
       const QString& boxId,
       const QSharedPointer<QVector<QString>> pans,
@@ -103,9 +108,6 @@ class AdministrationSystem : public QObject {
       const QHash<QString, QString>* productionLineParameters) const;
 
   int32_t getLastId(const QString& table) const;
-
-  bool startProductionLine(const QString& id, const QString& orderId) const;
-  //  bool stopProductionLine(const QString& id) const;
   bool linkProductionLineWithBox(const QString& id, const QString& boxId) const;
 
   bool startBoxProcessing(const QString& id) const;
@@ -113,9 +115,9 @@ class AdministrationSystem : public QObject {
   bool startOrderProcessing(const QString& id) const;
 
   //  bool removeLastProductionLine(void) const;
-  //  bool stopBoxProcessing(const QString& id) const;
-  //  bool stopPalletProcessing(const QString& id) const;
-  //  bool stopOrderProcessing(const QString& id) const;
+  bool stopCurrentBoxProcessing(void) const;
+  bool stopCurrentPalletProcessing(void) const;
+  bool stopCurrentOrderProcessing(void) const;
 
   bool searchFreeBox(const QString& orderId,
                      const QString& productionLineId,
@@ -131,11 +133,10 @@ class AdministrationSystem : public QObject {
   ReturnStatus refundPalletManually(const QString& id);
   ReturnStatus refundOrderManually(const QString& id);
 
-  ReturnStatus shipTransponder(const QString& id, QFile* reg);
-  ReturnStatus shipPallet(const QString& id, QFile* reg);
+  ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
 
  signals:
-  void logging(const QString& log) const;
+  void logging(const QString& log);
 };
 
 #endif  // ORDERCREATIONSYSTEM_H

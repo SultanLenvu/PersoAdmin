@@ -9,7 +9,7 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include "Database/sql_response_model.h"
+#include "Database/sql_query_values.h"
 #include "General/hash_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
@@ -156,11 +156,9 @@ class MainWindowKernel : public QMainWindow {
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
   void showDatabaseTable_signal(const QString& name, SqlQueryValues* model);
-  void clearDatabaseTable_signal(const QString& name,
-                                 SqlQueryValues* model);
+  void clearDatabaseTable_signal(const QString& name, SqlQueryValues* model);
 
-  void performCustomRequest_signal(const QString& req,
-                                   SqlQueryValues* model);
+  void performCustomRequest_signal(const QString& req, SqlQueryValues* model);
 
   // Заказы
   void createNewOrder_signal(
@@ -223,8 +221,7 @@ class MainWindowKernel : public QMainWindow {
       const QSharedPointer<QHash<QString, QString>> Parameterseters);
 
   // Принтер
-  void printTransponderSticker_signal(const QString& id,
-                                      SqlQueryValues* model);
+  void printTransponderSticker_signal(const QString& id, SqlQueryValues* model);
   void printBoxSticker_signal(const QString& id, SqlQueryValues* model);
   void printPalletSticker_signal(const QString& id, SqlQueryValues* model);
   void execPrinterStickerCommandScript_signal(

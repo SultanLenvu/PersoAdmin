@@ -15,12 +15,12 @@ class SqlQueryValues : public QAbstractTableModel {
 
  private:
   template <typename T>
-  using VectorPointer = QSharedPointer<QVector<T>>;
+  using SharedVector = QSharedPointer<QVector<T>>;
 
  private:
   QVector<QString> Fields;
   QHash<QString, int32_t> FieldIndex;
-  VectorPointer<VectorPointer<QString>> Values;
+  QVector<SharedVector<QString>> Values;
 
   QMutex Mutex;
 
@@ -43,7 +43,7 @@ class SqlQueryValues : public QAbstractTableModel {
   void add(const QHash<QString, QString>& record);
   void add(const QString& name, const QSharedPointer<QVector<QString>>& values);
   void add(const QString& field, const QString& value);
-  void add(const QString& field, const uint32_t size = 0);
+  void addField(const QString& field);
   void clear();
 
   // Интерфейс модели

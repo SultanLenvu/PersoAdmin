@@ -53,6 +53,7 @@
 
 #define POSTGRES_TIMESTAMP_DEFAULT_VALUE "2000-01-01 00:00:00"
 #define POSTGRES_TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
+#define POSTGRES_DATE_TEMPLATE "yyyy-MM-dd"
 //===============================================================
 
 /* Определения для генератора прошивок */

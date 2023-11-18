@@ -712,10 +712,27 @@ void AdminManager::createAdministrator() {
       AdministrationSystem::DatabaseQueryError,
       "Получена ошибка при выполнении запроса к базе данных.");
   AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::ShipmentRegisterError,
+      AdministrationSystem::RegisterFileError,
       "Не удалось открыть файл-реестр для отгрузки.");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::LogicError,
-                                        "Логическая ошибка.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::ProductionLineMissed,
+      "Не удалось найти производственную линию.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::ProductionLineLinkError,
+      "Не удалось связать производственную линию с боксом.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::ProductionLineRollbackLimit,
+      "Производственная линия находится на первом транспондере в боксе.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::OrderRemovingError, "Не удалось удалить заказ.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::OtherOrderInProcess,
+      "В процессе сборки находится другой заказ.");
+  AdministratorReturnStatusMatch.insert(
+      AdministrationSystem::MultipleActiveOrders,
+      "В процессе сборки находится несколько заказов.");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::FreeBoxMissed,
+                                        "Не удалось найти свободный бокс.");
   AdministratorReturnStatusMatch.insert(AdministrationSystem::UnknownError,
                                         "Неизвествная ошибка. ");
   AdministratorReturnStatusMatch.insert(AdministrationSystem::Completed,

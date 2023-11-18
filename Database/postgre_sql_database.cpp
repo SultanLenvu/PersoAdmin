@@ -1,4 +1,5 @@
 #include "postgre_sql_database.h"
+#include "Log/log_system.h"
 
 PostgreSqlDatabase::PostgreSqlDatabase(QObject* parent,
                                        const QString& connectionName)
@@ -308,24 +309,24 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   // Создаем запрос
   QString requestText;
   if (response.fieldCount() == 0) {
-    requestText = QString("SELECT * FROM public.%1 ").arg(tables.first());
+    requestText += QString("SELECT * FROM public.%1 ").arg(tables.first());
   } else {
-    requestText = "SELECT ";
+    requestText += "SELECT ";
     for (int32_t i = 0; i < response.fieldCount(); i++) {
       requestText += response.fieldName(i) + ", ";
     }
     requestText.chop(2);
 
-    requestText = QString(" FROM public.%1 ").arg(tables.first());
+    requestText += QString(" FROM public.%1 ").arg(tables.first());
   }
 
-  for (int32_t i = 0; i < tables.size(); i++) {
+  for (int32_t i = 1; i < tables.size(); i++) {
     requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i + 1), tables.at(i),
-                            Tables.value(tables.at(i))
+                       .arg(tables.at(i), tables.at(i - 1),
+                            Tables.value(tables.at(i - 1))
                                 ->relations()
-                                ->value(tables.at(i + 1)),
-                            Tables.value(tables.at(i + 1))->getPrimaryKey());
+                                ->value(tables.at(i)),
+                            Tables.value(tables.at(i))->getPrimaryKey());
   }
 
   requestText +=
@@ -337,6 +338,7 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -387,18 +389,19 @@ bool PostgreSqlDatabase::updateMergedRecords(
   requestText +=
       QString(" WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
           .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
-  for (int32_t i = 0; i < tables.size(); i++) {
+  for (int32_t i = 1; i < tables.size(); i++) {
     requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i + 1), tables.at(i),
-                            Tables.value(tables.at(i))
+                       .arg(tables.at(i), tables.at(i - 1),
+                            Tables.value(tables.at(i - 1))
                                 ->relations()
-                                ->value(tables.at(i + 1)),
-                            Tables.value(tables.at(i + 1))->getPrimaryKey());
+                                ->value(tables.at(i)),
+                            Tables.value(tables.at(i))->getPrimaryKey());
   }
   requestText += QString(" WHERE %1);").arg(conditions);
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -436,18 +439,19 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
       QString(
           "DELETE FROM public.%1 WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
           .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
-  for (int32_t i = 0; i < tables.size(); i++) {
+  for (int32_t i = 1; i < tables.size(); i++) {
     requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i + 1), tables.at(i),
-                            Tables.value(tables.at(i))
+                       .arg(tables.at(i), tables.at(i - 1),
+                            Tables.value(tables.at(i - 1))
                                 ->relations()
-                                ->value(tables.at(i + 1)),
-                            Tables.value(tables.at(i + 1))->getPrimaryKey());
+                                ->value(tables.at(i)),
+                            Tables.value(tables.at(i))->getPrimaryKey());
   }
   requestText += QString(" WHERE %1);").arg(conditions);
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -490,7 +494,7 @@ void PostgreSqlDatabase::loadSettings() {
   // Загружаем настройки
   QSettings settings;
 
-  LogEnable = settings.value("postgre_sql_database/log_enable").toBool();
+  LogEnable = settings.value("log_system/global_enable").toBool();
 
   HostAddress =
       QHostAddress(settings.value("postgre_sql_database/server_ip").toString());
@@ -519,6 +523,8 @@ bool PostgreSqlDatabase::init() {
   for (int32_t i = 0; i < tableNames.size(); i++) {
     QSharedPointer<PostgreSqlTable> table(
         new PostgreSqlTable(tableNames.at(i), ConnectionName));
+    QObject::connect(table.get(), &PostgreSqlTable::logging, this,
+                     &PostgreSqlDatabase::sendLog);
     if (!table->init()) {
       sendLog(QString("Получена ошибка при инициализации таблицы '%1'")
                   .arg(tableNames.at(i)));
