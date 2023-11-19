@@ -131,9 +131,11 @@ AdministrationSystem::ReturnStatus AdministrationSystem::createNewOrder(
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
-    const QString& orderId) {
+    const QString& id) {
   SqlQueryValues productionLines;
   SqlQueryValues orders;
+  SqlQueryValues orderNewValue;
+  ReturnStatus ret;
 
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
@@ -159,6 +161,14 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
     return OtherOrderInProcess;
   }
 
+  orderNewValue.add("in_process", "true");
+  if (!Database->updateRecords("orders", "id = " + id, orderNewValue)) {
+    sendLog(
+        QString("Получена ошибка при обновлении данных заказа %1.").arg(id));
+    Database->rollbackTransaction();
+    return DatabaseQueryError;
+  }
+
   // Ищем производственные линии
   Database->setRecordMaxCount(0);
   Database->setCurrentOrder(Qt::AscendingOrder);
@@ -177,13 +187,14 @@ AdministrationSystem::ReturnStatus AdministrationSystem::startOrderAssembling(
 
   // Запускаем производственные линии
   for (int32_t i = 0; i < productionLines.recordCount(); i++) {
-    if (!startProductionLine(productionLines.get(i, "id"))) {
+    ret = startProductionLine(productionLines.get(i, "id"), id);
+    if (ret != Completed) {
       Database->rollbackTransaction();
-      return DatabaseQueryError;
+      return ret;
     }
   }
 
-  sendLog(QString("Сборка заказа %1 запущена. ").arg(orderId));
+  sendLog(QString("Сборка заказа %1 запущена. ").arg(id));
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     return DatabaseTransactionError;
@@ -352,22 +363,23 @@ AdministrationSystem::stopAllProductionLines() const {
 }
 
 AdministrationSystem::ReturnStatus AdministrationSystem::startProductionLine(
-    const QString& id) {
+    const QString& id,
+    const QString& orderId) {
   SqlQueryValues order;
   SqlQueryValues box;
 
-  // Ищем текущий активный заказ
-  if (!Database->readRecords("orders", "in_process = true", order)) {
+  // Ищем данные заказа
+  if (!Database->readRecords("orders", "id = " + orderId, order)) {
     sendLog(QString("Получена ошибка при поиске активного заказа. "));
     return DatabaseQueryError;
   }
 
-  // Активным может быть только один заказ
-  if (order.recordCount() > 1) {
-    sendLog(
-        QString("Несколько заказов активны одновременно. Запуск "
-                "производственной линии невозможен. "));
-    return MultipleActiveOrders;
+  // Запустить производственную линию можно только на активном заказе
+  if (order.get("in_process") != "true") {
+    sendLog(QString("Заказ %1 не находится в процессе сборки. Запуск "
+                    "производственной линии %1 невозможен. ")
+                .arg(orderId, id));
+    return OrderNotInProcess;
   }
 
   // Ищем свободный бокс в заказе
@@ -1497,11 +1509,12 @@ bool AdministrationSystem::searchFreeBox(const QString& orderId,
   // Ищем незавершенные боксы
   Database->setRecordMaxCount(1);
   Database->setCurrentOrder(Qt::AscendingOrder);
+  boxRecord.addField("boxes.id");
   if (!Database->readMergedRecords(
           tables,
-          QString("boxes.assembled_units < boxes.quantity AND "
-                  "boxes.production_line_id = %1 "
-                  "AND pallets.order_id = %2")
+          QString("boxes.assembled_units > 0 AND boxes.production_line_id = %1 "
+                  "AND pallets.order_id = %2 AND boxes.in_process = false AND "
+                  "boxes.ready_indicator = false")
               .arg(productionLineId, orderId),
           boxRecord)) {
     sendLog(
@@ -1512,9 +1525,13 @@ bool AdministrationSystem::searchFreeBox(const QString& orderId,
 
   // Если незавершенных боксов нет, то ищем свободные боксы
   if (boxRecord.isEmpty()) {
+    boxRecord.clear();
+    boxRecord.addField("boxes.id");
     if (!Database->readMergedRecords(
             tables,
-            QString("boxes.assembled_units = 0 AND pallets.order_id = %2")
+            QString("boxes.assembled_units = 0 AND pallets.order_id = %2 AND "
+                    "boxes.in_process = false AND boxes.ready_indicator = "
+                    "false")
                 .arg(orderId),
             boxRecord)) {
       sendLog(

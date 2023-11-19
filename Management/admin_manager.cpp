@@ -728,6 +728,8 @@ void AdminManager::createAdministrator() {
   AdministratorReturnStatusMatch.insert(
       AdministrationSystem::OtherOrderInProcess,
       "В процессе сборки находится другой заказ.");
+  AdministratorReturnStatusMatch.insert(AdministrationSystem::OrderNotInProcess,
+                                        "Сборка заказа не была запущена.");
   AdministratorReturnStatusMatch.insert(
       AdministrationSystem::MultipleActiveOrders,
       "В процессе сборки находится несколько заказов.");

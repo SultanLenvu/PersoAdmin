@@ -22,6 +22,7 @@ class AdministrationSystem : public QObject {
     ProductionLineRollbackLimit,
     OrderRemovingError,
     OtherOrderInProcess,
+    OrderNotInProcess,
     MultipleActiveOrders,
     FreeBoxMissed,
     UnknownError,
@@ -63,7 +64,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);
   ReturnStatus stopAllProductionLines(void) const;
-  ReturnStatus startProductionLine(const QString& id);
+  ReturnStatus startProductionLine(const QString& id, const QString& orderId);
   ReturnStatus stopProductionLine(const QString& id);
   ReturnStatus deleteLastProductionLine(void);
 

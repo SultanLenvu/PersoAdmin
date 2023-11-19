@@ -84,7 +84,14 @@ bool PostgreSqlDatabase::openTransaction() const {
     return false;
   }
 
-  return QSqlDatabase::database(ConnectionName).transaction();
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec("BEGIN;")) {
+    sendLog(request.lastError().text());
+    sendLog("Получена ошибка при открытии транзакции");
+    return false;
+  }
+
+  return true;
 }
 
 bool PostgreSqlDatabase::commitTransaction() const {
@@ -93,7 +100,14 @@ bool PostgreSqlDatabase::commitTransaction() const {
     return false;
   }
 
-  return QSqlDatabase::database(ConnectionName).commit();
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec("COMMIT;")) {
+    sendLog(request.lastError().text());
+    sendLog("Получена ошибка при закрытии транзакции");
+    return false;
+  }
+
+  return true;
 }
 
 bool PostgreSqlDatabase::rollbackTransaction() const {
@@ -102,7 +116,14 @@ bool PostgreSqlDatabase::rollbackTransaction() const {
     return false;
   }
 
-  return QSqlDatabase::database(ConnectionName).rollback();
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec("ROLLBACK;")) {
+    sendLog(request.lastError().text());
+    sendLog("Получена ошибка при откате транзакции");
+    return false;
+  }
+
+  return true;
 }
 
 Qt::SortOrder PostgreSqlDatabase::getCurrentOrder() const {

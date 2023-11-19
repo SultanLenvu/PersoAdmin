@@ -31,6 +31,9 @@ QString SqlQueryValues::getLast(const QString& field) const {
 }
 
 int32_t SqlQueryValues::recordCount() const {
+  if (Values.isEmpty()) {
+    return 0;
+  }
   return Values.first()->size();
 }
 
@@ -39,6 +42,9 @@ int32_t SqlQueryValues::fieldCount() const {
 }
 
 bool SqlQueryValues::isEmpty() const {
+  if (Values.isEmpty()) {
+    return true;
+  }
   return Values.first()->isEmpty();
 }
 
