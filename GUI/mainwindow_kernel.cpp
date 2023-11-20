@@ -988,7 +988,7 @@ void MainWindowKernel::connectMainWindowGUI() {
           &MainWindowKernel::allocateInactiveProductionLinesPushButton_slot);
   connect(AbstractGUI->LinkProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::linkProductionLinePushButton_slot);
-  connect(AbstractGUI->DeactivateAllProductionLinesPushButton,
+  connect(AbstractGUI->ShutdownAllProductionLinesPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
   connect(AbstractGUI->UpdateProductionLineViewPushButton,

@@ -50,7 +50,7 @@ class IStickerPrinter : public QObject {
   void sendLog(const QString& log);
 
  private:
-  Q_DISABLE_COPY(IStickerPrinter);
+  Q_DISABLE_COPY_MOVE(IStickerPrinter);
 
  signals:
   void logging(const QString& log);

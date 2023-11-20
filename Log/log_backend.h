@@ -16,7 +16,7 @@ class LogBackend: public QObject {
   virtual void applySettings(void) = 0;
 
  private:
-  Q_DISABLE_COPY(LogBackend);
+  Q_DISABLE_COPY_MOVE(LogBackend);
 };
 
 #endif /* LOGBACKEND_H */

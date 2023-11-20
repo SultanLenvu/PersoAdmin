@@ -1,7 +1,8 @@
+#include <QApplication>
+
 #include "input_dialog.h"
 
-InputDialog::InputDialog(QWidget* parent, DialogType type)
-    : QDialog(parent) {
+InputDialog::InputDialog(QWidget* parent, DialogType type) : QDialog(parent) {
   Type = type;
 }
 

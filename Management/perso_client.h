@@ -117,7 +117,7 @@ public:
   void applySettings(void);
 
 private:
-  Q_DISABLE_COPY(PersoClient)
+  Q_DISABLE_COPY_MOVE(PersoClient)
   void loadSettings(void);
   void sendLog(const QString& log);
 

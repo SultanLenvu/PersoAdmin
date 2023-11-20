@@ -245,7 +245,7 @@ void AdminManager::stopAllProductionLines(SqlQueryValues* model) {
   AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Остановка всех производственных линий. "));
-  status = Administrator->stopAllProductionLines();
+  status = Administrator->stopAllProductionLinesManually();
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "stopAllProductionLines");
     return;

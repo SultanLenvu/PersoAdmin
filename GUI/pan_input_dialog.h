@@ -6,22 +6,21 @@
 #include <QRegularExpressionMatch>
 #include <QtWidgets>
 
-#include "General/definitions.h"
 #include "input_dialog.h"
 
 class PanInputDialog : public InputDialog {
   Q_OBJECT
  private:
-   QSize DesktopGeometry;
+  QSize DesktopGeometry;
 
-   QVBoxLayout* MainLayout;
-   QLabel* MainLabel;
-   QPlainTextEdit* StickerData;
-   QString pan;
+  QVBoxLayout* MainLayout;
+  QLabel* MainLabel;
+  QPlainTextEdit* StickerData;
+  QString pan;
 
-   QHBoxLayout* ButtonLayout;
-   QPushButton* AcceptButton;
-   QPushButton* RejectButton;
+  QHBoxLayout* ButtonLayout;
+  QPushButton* AcceptButton;
+  QPushButton* RejectButton;
 
  public:
   explicit PanInputDialog(QWidget* parent);
@@ -30,9 +29,9 @@ class PanInputDialog : public InputDialog {
   virtual void getData(QHash<QString, QString>* data) const override;
 
  private:
-  Q_DISABLE_COPY(PanInputDialog);
+  Q_DISABLE_COPY_MOVE(PanInputDialog);
   void create(void);
-  bool checkInput(QString& pan) const;
+  bool check(QString& pan) const;
 };
 
-#endif // PANINPUTDIALOG_H
+#endif  // PANINPUTDIALOG_H

@@ -110,30 +110,12 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* ProductionLinesControlPanel;
   QVBoxLayout* ProductionLinesControlPanelLayout;
 
-  QHBoxLayout* LoginLayout1;
-  QLabel* LoginLabel1;
-  QLineEdit* LoginLineEdit1;
-  QHBoxLayout* PasswordLayout1;
-  QLabel* PasswordLabel1;
-  QLineEdit* PasswordLineEdit1;
-  QPushButton* CreateNewProductionLinePushButton;
-  QSpacerItem* ProductionLinesControlPanelVS1;
-
-  QHBoxLayout* OrderIdLayout2;
-  QLabel* OrderIdLabel2;
-  QLineEdit* OrderIdLineEdit2;
-  QPushButton* AllocateInactiveProductionLinesPushButton;
+  QPushButton* StartProductionLinePushButton;
+  QPushButton* StopProductionLinePushButton;
+  QPushButton* ShutdownAllProductionLinesPushButton;
   QSpacerItem* ProductionLinesControlPanelVS2;
 
-  QHBoxLayout* BoxIdLayout;
-  QLabel* BoxIdLabel;
-  QLineEdit* BoxIdLineEdit1;
-  QPushButton* LinkProductionLinePushButton;
-  QSpacerItem* ProductionLinesControlPanelVS3;
-
-  QPushButton* DeactivateAllProductionLinesPushButton;
   QPushButton* UpdateProductionLineViewPushButton;
-  QPushButton* DeleteLastProductionLinePushButton;
 
   QGroupBox* ProductionLineTablePanel;
   QVBoxLayout* ProductionLineTableLayout;
@@ -338,7 +320,7 @@ class MainWindowGUI : public AbstractGUI {
   void clearLogDisplay(void);
 
  private:
-  Q_DISABLE_COPY(MainWindowGUI)
+  Q_DISABLE_COPY_MOVE(MainWindowGUI)
   void createTabs(void);
 
   void createDatabaseTab(void);

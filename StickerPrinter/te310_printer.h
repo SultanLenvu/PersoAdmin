@@ -48,7 +48,7 @@ class TE310Printer : public IStickerPrinter {
   virtual void applySetting(void) override;
 
  private:
-  Q_DISABLE_COPY(TE310Printer);
+  Q_DISABLE_COPY_MOVE(TE310Printer);
   void loadSetting(void);
   bool loadTscLib(void);
   void printNkdSticker(const QHash<QString, QString>* parameters);

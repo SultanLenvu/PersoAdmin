@@ -103,7 +103,7 @@ class AdminManager : public QObject {
   void applySettings();
 
  private:
-  Q_DISABLE_COPY(AdminManager)
+  Q_DISABLE_COPY_MOVE(AdminManager)
   void loadSettings(void);
   void sendLog(const QString& log) const;
 

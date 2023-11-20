@@ -68,6 +68,7 @@ void SqlQueryValues::extractRecords(QSqlQuery& request) {
   beginResetModel();
   Values.clear();
   Fields.clear();
+  FieldIndex.clear();
 
   QSqlRecord rec = request.record();
   for (int32_t i = 0; i < rec.count(); i++) {
@@ -142,6 +143,7 @@ void SqlQueryValues::clear() {
 
   Values.clear();
   Fields.clear();
+  FieldIndex.clear();
 }
 
 int SqlQueryValues::rowCount(const QModelIndex& parent) const {

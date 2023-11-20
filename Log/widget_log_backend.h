@@ -19,7 +19,7 @@ class WidgetLogBackend : public LogBackend {
   virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY(WidgetLogBackend);
+  Q_DISABLE_COPY_MOVE(WidgetLogBackend);
   void loadSettings(void);
 
  signals:

@@ -351,7 +351,9 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   }
 
   requestText +=
-      QString("WHERE %1 ").arg(conditions, QString::number(RecordMaxCount));
+      QString("WHERE %1 ORDER BY %2 %3 ")
+          .arg(conditions, Tables.value(tables.first())->getPrimaryKey(),
+               CurrentOrder);
   if (RecordMaxCount > 0) {
     requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
   }

@@ -63,9 +63,10 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);
-  ReturnStatus stopAllProductionLines(void) const;
-  ReturnStatus startProductionLine(const QString& id, const QString& orderId);
-  ReturnStatus stopProductionLine(const QString& id);
+  ReturnStatus stopAllProductionLinesManually(void) const;
+  ReturnStatus startProductionLineManually(const QString& id,
+                                           const QString& orderId);
+  ReturnStatus stopProductionLineManually(const QString& id);
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
@@ -87,7 +88,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus shipPallets(const QHash<QString, QString>* param);
 
  private:
-  Q_DISABLE_COPY(AdministrationSystem) void createDatabase(void);
+  Q_DISABLE_COPY_MOVE(AdministrationSystem) void createDatabase(void);
   void loadSettings(void);
   void sendLog(const QString& log) const;
 
@@ -109,6 +110,8 @@ class AdministrationSystem : public QObject {
       const QHash<QString, QString>* productionLineParameters) const;
 
   int32_t getLastId(const QString& table) const;
+  ReturnStatus startProductionLine(const QString& id, const QString& orderId);
+  bool stopAllProductionLines(void) const;
   bool linkProductionLineWithBox(const QString& id, const QString& boxId) const;
 
   bool startBoxProcessing(const QString& id) const;

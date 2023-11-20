@@ -45,7 +45,7 @@ class InteractionSystem : public QWidget {
 
  private:
   explicit InteractionSystem(QWidget* window);
-  Q_DISABLE_COPY(InteractionSystem)
+  Q_DISABLE_COPY_MOVE(InteractionSystem)
   void loadSettings(void);
   void sendLog(const QString& log);
 

@@ -30,9 +30,9 @@ public:
   virtual void getData(QHash<QString, QString>* data) const override;
 
  private:
-   Q_DISABLE_COPY(PalletShippingDialog)
+   Q_DISABLE_COPY_MOVE(PalletShippingDialog)
    void create(void);
-   bool checkInput(void) const;
+   bool check(void) const;
 };
 
 #endif  // PalletShippingDialog_H

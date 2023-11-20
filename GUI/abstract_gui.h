@@ -27,7 +27,7 @@ class AbstractGUI : public QWidget {
   GuiType type(void);
 
  private:
-  Q_DISABLE_COPY(AbstractGUI)
+  Q_DISABLE_COPY_MOVE(AbstractGUI)
 
  signals:
 };

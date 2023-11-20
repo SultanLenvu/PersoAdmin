@@ -117,7 +117,7 @@ class MainWindowKernel : public QMainWindow {
       QSharedPointer<QHash<QString, QString>> transponderData);
 
  private:
-  Q_DISABLE_COPY(MainWindowKernel)
+  Q_DISABLE_COPY_MOVE(MainWindowKernel)
   void loadSettings(void) const;
   void saveSettings(void) const;
   bool checkAuthorizationData(void) const;

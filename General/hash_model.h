@@ -32,7 +32,7 @@ public:
 		      int role = Qt::DisplayRole) const override;
 
 private:
-  Q_DISABLE_COPY(HashModel)
+  Q_DISABLE_COPY_MOVE(HashModel)
   void createMatchTables(void);
 };
 

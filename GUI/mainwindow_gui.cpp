@@ -282,71 +282,28 @@ void MainWindowGUI::createProductionLineTab() {
   ProductionLinesControlPanelLayout = new QVBoxLayout();
   ProductionLinesControlPanel->setLayout(ProductionLinesControlPanelLayout);
 
-  LoginLayout1 = new QHBoxLayout();
-  ProductionLinesControlPanelLayout->addLayout(LoginLayout1);
-  LoginLabel1 = new QLabel("Логин: ");
-  LoginLayout1->addWidget(LoginLabel1);
-  LoginLineEdit1 = new QLineEdit();
-  LoginLineEdit1->setMaxLength(PRODUCTION_LINE_LOGIN_MAX_LENGTH);
-  LoginLayout1->addWidget(LoginLineEdit1);
-  PasswordLayout1 = new QHBoxLayout();
-  ProductionLinesControlPanelLayout->addLayout(PasswordLayout1);
-  PasswordLabel1 = new QLabel("Пароль: ");
-  PasswordLayout1->addWidget(PasswordLabel1);
-  PasswordLineEdit1 = new QLineEdit();
-  PasswordLineEdit1->setMaxLength(PRODUCTION_LINE_PASSWORD_MAX_LENGTH);
-  PasswordLayout1->addWidget(PasswordLineEdit1);
-  CreateNewProductionLinePushButton =
-      new QPushButton("Создать новую производственную линию");
+  StartProductionLinePushButton =
+      new QPushButton("Запустить производственную линию");
+  ProductionLinesControlPanelLayout->addWidget(StartProductionLinePushButton);
+  StopProductionLinePushButton =
+      new QPushButton("Остановить производственную линию");
+  ProductionLinesControlPanelLayout->addWidget(StopProductionLinePushButton);
+  ShutdownAllProductionLinesPushButton =
+      new QPushButton("Остановить все производственные линии");
   ProductionLinesControlPanelLayout->addWidget(
-      CreateNewProductionLinePushButton);
-
-  ProductionLinesControlPanelVS1 =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  ProductionLinesControlPanelLayout->addItem(ProductionLinesControlPanelVS1);
-
-  OrderIdLayout2 = new QHBoxLayout();
-  ProductionLinesControlPanelLayout->addLayout(OrderIdLayout2);
-  OrderIdLabel2 = new QLabel("ID заказа: ");
-  OrderIdLayout2->addWidget(OrderIdLabel2);
-  OrderIdLineEdit2 = new QLineEdit();
-  OrderIdLayout2->addWidget(OrderIdLineEdit2);
-  AllocateInactiveProductionLinesPushButton =
-      new QPushButton("Распределить неактивные производственные линии");
+      ShutdownAllProductionLinesPushButton);
+  ShutdownAllProductionLinesPushButton =
+      new QPushButton("Редактировать производственную линию");
   ProductionLinesControlPanelLayout->addWidget(
-      AllocateInactiveProductionLinesPushButton);
+      ShutdownAllProductionLinesPushButton);
 
   ProductionLinesControlPanelVS2 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   ProductionLinesControlPanelLayout->addItem(ProductionLinesControlPanelVS2);
 
-  BoxIdLayout = new QHBoxLayout();
-  ProductionLinesControlPanelLayout->addLayout(BoxIdLayout);
-  BoxIdLabel = new QLabel("ID бокса: ");
-  BoxIdLayout->addWidget(BoxIdLabel);
-  BoxIdLineEdit1 = new QLineEdit();
-  BoxIdLayout->addWidget(BoxIdLineEdit1);
-  LinkProductionLinePushButton =
-      new QPushButton("Связать с производственной линией");
-  ProductionLinesControlPanelLayout->addWidget(LinkProductionLinePushButton);
-
-  // Сжатие по вертикали
-  ProductionLinesControlPanelVS3 =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  ProductionLinesControlPanelLayout->addItem(ProductionLinesControlPanelVS3);
-
-  DeactivateAllProductionLinesPushButton =
-      new QPushButton("Остановить все производственные линии");
-  ProductionLinesControlPanelLayout->addWidget(
-      DeactivateAllProductionLinesPushButton);
   UpdateProductionLineViewPushButton = new QPushButton("Обновить таблицу");
   ProductionLinesControlPanelLayout->addWidget(
       UpdateProductionLineViewPushButton);
-
-  DeleteLastProductionLinePushButton =
-      new QPushButton("Удалить последнюю созданную линию производства");
-  ProductionLinesControlPanelLayout->addWidget(
-      DeleteLastProductionLinePushButton);
 
   // Панель для отображения таблицы производственных линий
   ProductionLineTablePanel = new QGroupBox("Таблица производственных линий");
