@@ -2,11 +2,11 @@
 #include "General/definitions.h"
 
 ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
-    : InputDialog(parent, ProductionLineCreation) {
-  setObjectName("PanInputDialog");
+    : AbstractInputDialog(parent) {
+  setObjectName("PanAbstractInputDialog");
 
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.4, DesktopGeometry.height() * 0.45,
@@ -18,32 +18,50 @@ ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
 
 ProductionLineCreationMenu::~ProductionLineCreationMenu() {}
 
+void ProductionLineCreationMenu::getData(QHash<QString, QString>* data) const {
+  data->insert("login", LoginLineEdit->text());
+  data->insert("password", PasswordLineEdit->text());
+  data->insert("name", NameLineEdit->text());
+  data->insert("surname", SurnameLineEdit->text());
+}
+
+AbstractInputDialog::DialogType ProductionLineCreationMenu::type() const {
+  return ProductionLineCreation;
+}
+
 void ProductionLineCreationMenu::create() {
-  MainLayout = new QVBoxLayout();
+  MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
-  LoginLayout = new QHBoxLayout();
-  MainLayout->addLayout(LoginLayout);
   LoginLabel = new QLabel("Логин: ");
-  LoginLayout->addWidget(LoginLabel);
+  MainLayout->addWidget(LoginLabel, 0, 0, 1, 1);
   LoginLineEdit = new QLineEdit();
-  LoginLineEdit->setMaxLength(PRODUCTION_LINE_LOGIN_MAX_LENGTH);
-  LoginLayout->addWidget(LoginLineEdit);
+  LoginLineEdit->setMaxLength(PL_LOGIN_MAX_LENGHT);
+  MainLayout->addWidget(LoginLineEdit, 0, 1, 1, 1);
 
-  PasswordLayout = new QHBoxLayout();
-  MainLayout->addLayout(PasswordLayout);
   PasswordLabel = new QLabel("Пароль: ");
-  PasswordLayout->addWidget(PasswordLabel);
+  MainLayout->addWidget(PasswordLabel, 1, 0, 1, 1);
   PasswordLineEdit = new QLineEdit();
-  PasswordLineEdit->setMaxLength(PRODUCTION_LINE_PASSWORD_MAX_LENGTH);
-  PasswordLayout->addWidget(PasswordLineEdit);
+  PasswordLineEdit->setMaxLength(PL_PASSWORD_MAX_LENGHT);
+  MainLayout->addWidget(PasswordLineEdit, 1, 1, 1, 1);
 
-  CreateNewProductionLinePushButton = new QPushButton("Создать");
-  MainLayout->addWidget(CreateNewProductionLinePushButton);
+  NameLabel = new QLabel("Имя сборщика: ");
+  MainLayout->addWidget(NameLabel, 2, 0, 1, 1);
+  NameLineEdit = new QLineEdit();
+  NameLineEdit->setMaxLength(PL_NAME_MAX_LENGHT);
+  MainLayout->addWidget(NameLineEdit, 2, 1, 1, 1);
+
+  SurnameLabel = new QLabel("Фамилия сборщика: ");
+  MainLayout->addWidget(SurnameLabel, 3, 0, 1, 1);
+  SurnameLineEdit = new QLineEdit();
+  SurnameLineEdit->setMaxLength(PL_SURNAME_MAX_LENGHT);
+  MainLayout->addWidget(SurnameLineEdit, 3, 1, 1, 1);
 
   VerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  MainLayout->addItem(VerticalSpacer);
+  MainLayout->addItem(VerticalSpacer, 2, 0, 1, 2);
 }
 
-bool ProductionLineCreationMenu::check() const {}
+bool ProductionLineCreationMenu::check() const {
+  return true;
+}

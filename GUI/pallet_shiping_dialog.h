@@ -4,11 +4,11 @@
 #include <QDialog>
 #include <QtWidgets>
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
-class PalletShippingDialog : public InputDialog {
+class PalletShippingDialog : public AbstractInputDialog {
   Q_OBJECT
-private:
+ private:
   QSize DesktopGeometry;
 
   QGridLayout* MainLayout;
@@ -23,16 +23,17 @@ private:
   QPushButton* AcceptButton;
   QPushButton* RejectButton;
 
-public:
+ public:
   explicit PalletShippingDialog(QWidget* parent);
   ~PalletShippingDialog();
 
   virtual void getData(QHash<QString, QString>* data) const override;
+  virtual DialogType type() const override;
 
  private:
-   Q_DISABLE_COPY_MOVE(PalletShippingDialog)
-   void create(void);
-   bool check(void) const;
+  Q_DISABLE_COPY_MOVE(PalletShippingDialog)
+  void create(void);
+  bool check(void) const;
 };
 
 #endif  // PalletShippingDialog_H

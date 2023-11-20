@@ -1,23 +1,28 @@
 #ifndef PRODUCTIONLINECREATIONMENU_H
 #define PRODUCTIONLINECREATIONMENU_H
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
-class ProductionLineCreationMenu : public InputDialog {
+class ProductionLineCreationMenu : public AbstractInputDialog {
   Q_OBJECT
 
  private:
   QSize DesktopGeometry;
 
-  QVBoxLayout* MainLayout;
+  QGridLayout* MainLayout;
 
-  QHBoxLayout* LoginLayout;
   QLabel* LoginLabel;
   QLineEdit* LoginLineEdit;
-  QHBoxLayout* PasswordLayout;
+
   QLabel* PasswordLabel;
   QLineEdit* PasswordLineEdit;
-  QPushButton* CreateNewProductionLinePushButton;
+
+  QLabel* NameLabel;
+  QLineEdit* NameLineEdit;
+
+  QLabel* SurnameLabel;
+  QLineEdit* SurnameLineEdit;
+
   QSpacerItem* VerticalSpacer;
 
   QHBoxLayout* ButtonLayout;
@@ -28,7 +33,8 @@ class ProductionLineCreationMenu : public InputDialog {
   explicit ProductionLineCreationMenu(QWidget* parent);
   ~ProductionLineCreationMenu();
 
-  virtual void getData(QHash<QString, QString>* data) const = 0;
+  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual DialogType type() const override;
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionLineCreationMenu);

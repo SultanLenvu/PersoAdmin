@@ -1,7 +1,10 @@
 #include "interaction_system.h"
 #include "General/definitions.h"
+#include "idetifier_input_dialog.h"
+#include "order_creation_menu.h"
 #include "pallet_shiping_dialog.h"
 #include "pan_input_dialog.h"
+#include "production_line_creation_menu.h"
 
 InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   setObjectName("InteractionSystem");
@@ -87,7 +90,35 @@ bool InteractionSystem::getPalletShipingParameters(
 }
 
 bool InteractionSystem::getPan(QHash<QString, QString>* params) {
-  CurrentDialog = new PanInputDialog(this);
+  CurrentDialog = new PanAbstractInputDialog(this);
+
+  bool ret = CurrentDialog->exec();
+  CurrentDialog->getData(params);
+
+  return ret;
+}
+
+bool InteractionSystem::getId(QHash<QString, QString>* params) {
+  CurrentDialog = new IdentifierInputDialog(this);
+
+  bool ret = CurrentDialog->exec();
+  CurrentDialog->getData(params);
+
+  return ret;
+}
+
+bool InteractionSystem::getNewProductionLineData(
+    QHash<QString, QString>* params) {
+  CurrentDialog = new ProductionLineCreationMenu(this);
+
+  bool ret = CurrentDialog->exec();
+  CurrentDialog->getData(params);
+
+  return ret;
+}
+
+bool InteractionSystem::getNewOrderData(QHash<QString, QString>* params) {
+  CurrentDialog = new OrderCreationMenu(this);
 
   bool ret = CurrentDialog->exec();
   CurrentDialog->getData(params);
@@ -136,7 +167,7 @@ void InteractionSystem::createTimers() {
   ODTimer = new QTimer(this);
   ODTimer->setInterval(SERVER_MANAGER_OPERATION_MAX_DURATION);
   connect(ODTimer, &QTimer::timeout, this,
-          &InteractionSystem::on_ODTimerTimeout_slot);
+          &InteractionSystem::ODTimerTimeout_slot);
   connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
 
   // Таймер для измерения длительности операции
@@ -145,21 +176,21 @@ void InteractionSystem::createTimers() {
   // Таймер, отслеживающий квант длительности операции
   ODQTimer = new QTimer(this);
   connect(ODQTimer, &QTimer::timeout, this,
-          &InteractionSystem::on_ODQTimerTimeout_slot);
+          &InteractionSystem::ODQTimerTimeout_slot);
 }
 
-void InteractionSystem::on_ProgressDialogCanceled_slot() {
+void InteractionSystem::progressDialogCanceled_slot() {
   destroyProgressDialog();
 
   emit abortCurrentOperation();
 }
 
-void InteractionSystem::on_ODTimerTimeout_slot() {
+void InteractionSystem::ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
   generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
-void InteractionSystem::on_ODQTimerTimeout_slot() {
+void InteractionSystem::ODQTimerTimeout_slot() {
   CurrentOperationStep++;
   if (CurrentOperationStep < 100) {
     ProgressDialog.setValue(CurrentOperationStep);

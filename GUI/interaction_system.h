@@ -11,7 +11,7 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
@@ -21,7 +21,7 @@ class InteractionSystem : public QWidget {
   QProgressDialog ProgressDialog;
   uint32_t CurrentOperationStep;
 
-  InputDialog* CurrentDialog;
+  AbstractInputDialog* CurrentDialog;
 
   QTimer* ODTimer;
   QTimer* ODQTimer;
@@ -40,12 +40,17 @@ class InteractionSystem : public QWidget {
 
   bool getPalletShipingParameters(QHash<QString, QString>* params);
   bool getPan(QHash<QString, QString>* params);
+  bool getId(QHash<QString, QString>* params);
+  bool getNewProductionLineData(QHash<QString, QString>* params);
+  bool getNewOrderData(QHash<QString, QString>* params);
 
   void applySettings(void);
 
  private:
   explicit InteractionSystem(QWidget* window);
   Q_DISABLE_COPY_MOVE(InteractionSystem)
+
+ private:
   void loadSettings(void);
   void sendLog(const QString& log);
 
@@ -54,10 +59,10 @@ class InteractionSystem : public QWidget {
   void createTimers(void);
 
  private slots:
-  void on_ProgressDialogCanceled_slot(void);
+  void progressDialogCanceled_slot(void);
 
-  void on_ODTimerTimeout_slot(void);
-  void on_ODQTimerTimeout_slot(void);
+  void ODTimerTimeout_slot(void);
+  void ODQTimerTimeout_slot(void);
 
  signals:
   void logging(const QString& log);

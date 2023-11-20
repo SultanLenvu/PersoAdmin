@@ -1,7 +1,7 @@
 #include "idetifier_input_dialog.h"
 
 IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
-    : InputDialog(parent, IdentifierInput) {
+    : AbstractInputDialog(parent) {
   setObjectName("IdentifierInputDialog");
 
   // Считываем размеры дисплея
@@ -17,7 +17,8 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
 
 IdentifierInputDialog::~IdentifierInputDialog() {}
 
-void IdentifierInputDialog::getData(QHash<QString, QString>* data) const {
+void IdentifierInputDialog::getData(
+    QHash<QString, QString>* data) const {
   if (!data) {
     return;
   }
@@ -27,6 +28,10 @@ void IdentifierInputDialog::getData(QHash<QString, QString>* data) const {
   } else {
     data->clear();
   }
+}
+
+AbstractInputDialog::DialogType IdentifierInputDialog::type() const {
+  return IdentifierInput;
 }
 
 void IdentifierInputDialog::create() {

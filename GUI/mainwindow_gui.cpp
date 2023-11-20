@@ -249,10 +249,6 @@ void MainWindowGUI::createOrderTab() {
   UpdateOrderViewPushButton = new QPushButton("Обновить таблицу");
   OrderControlPanelLayout->addWidget(UpdateOrderViewPushButton);
 
-  DeleteLastOrderPushButton =
-      new QPushButton("Удалить последний созданный заказ");
-  OrderControlPanelLayout->addWidget(DeleteLastOrderPushButton);
-
   // Панель для отображения таблицы заказов
   OrderTablePanel = new QGroupBox("Таблица заказов");
   OrderTabMainLayout->addWidget(OrderTablePanel);
@@ -282,6 +278,10 @@ void MainWindowGUI::createProductionLineTab() {
   ProductionLinesControlPanelLayout = new QVBoxLayout();
   ProductionLinesControlPanel->setLayout(ProductionLinesControlPanelLayout);
 
+  CreateNewProductionLinePushButton =
+      new QPushButton("Создать производственную линию");
+  ProductionLinesControlPanelLayout->addWidget(
+      CreateNewProductionLinePushButton);
   StartProductionLinePushButton =
       new QPushButton("Запустить производственную линию");
   ProductionLinesControlPanelLayout->addWidget(StartProductionLinePushButton);
@@ -292,10 +292,9 @@ void MainWindowGUI::createProductionLineTab() {
       new QPushButton("Остановить все производственные линии");
   ProductionLinesControlPanelLayout->addWidget(
       ShutdownAllProductionLinesPushButton);
-  ShutdownAllProductionLinesPushButton =
+  EditProductionLinesPushButton =
       new QPushButton("Редактировать производственную линию");
-  ProductionLinesControlPanelLayout->addWidget(
-      ShutdownAllProductionLinesPushButton);
+  ProductionLinesControlPanelLayout->addWidget(EditProductionLinesPushButton);
 
   ProductionLinesControlPanelVS2 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);

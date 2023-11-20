@@ -170,69 +170,35 @@ void MainWindowKernel::updateOrderViewPushButton_slot() {
   emit showDatabaseTable_signal("orders", OrderModel);
 }
 
-void MainWindowKernel::deleteLastOrderPushButton_slot() {
-  emit loggerClear_signal();
-
-  emit deleteLastOrder_signal(OrderModel);
-}
-
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  QSharedPointer<QHash<QString, QString>> productionLineParameters(
+      new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  if (!checkNewProductionLineInput()) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод параметров нового производственной линии. ");
+  if (Interactor->getNewProductionLineData(productionLineParameters.get())) {
     return;
   }
 
-  QSharedPointer<QHash<QString, QString>> productionLineParameters(
-      new QHash<QString, QString>);
-  productionLineParameters->insert("login",
-                                   AbstractGUI->LoginLineEdit1->text());
-  productionLineParameters->insert("password",
-                                   AbstractGUI->PasswordLineEdit1->text());
+  if (productionLineParameters->isEmpty()) {
+    Interactor->generateErrorMessage(
+        "Некорректный ввод параметров производственной линии. ");
+    return;
+  }
+
   emit createNewProductionLine_signal(productionLineParameters,
                                       ProductionLineModel);
 
   CurrentGUI->update();
 }
 
-void MainWindowKernel::allocateInactiveProductionLinesPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-
+void MainWindowKernel::startProductionLinePushButton_slot() {
   emit loggerClear_signal();
-
-  if (AbstractGUI->OrderIdLineEdit2->text().toInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод идентификатора заказа. ");
-    return;
-  }
-
-  emit allocateInactiveProductionLines_signal(
-      AbstractGUI->OrderIdLineEdit2->text(), ProductionLineModel);
 }
 
-void MainWindowKernel::linkProductionLinePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-
+void MainWindowKernel::stopProductionLinePushButton_slot() {
   emit loggerClear_signal();
-
-  if ((!checkNewProductionLineInput()) ||
-      (AbstractGUI->BoxIdLineEdit1->text().toInt() == 0)) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод параметров производственной линии. ");
-    return;
-  }
-
-  const QSharedPointer<QHash<QString, QString>> linkParameters(
-      new QHash<QString, QString>);
-  linkParameters->insert("login", AbstractGUI->LoginLineEdit1->text());
-  linkParameters->insert("password", AbstractGUI->PasswordLineEdit1->text());
-  linkParameters->insert("box_id", AbstractGUI->BoxIdLineEdit1->text());
-
-  emit linkProductionLineWithBox_signal(linkParameters, ProductionLineModel);
 }
 
 void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
@@ -241,16 +207,14 @@ void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
   emit stopAllProductionLines_signal(ProductionLineModel);
 }
 
+void MainWindowKernel::editProductionLinesPushButton_slot() {
+  emit loggerClear_signal();
+}
+
 void MainWindowKernel::updateProductionLineViewPushButton_slot() {
   emit loggerClear_signal();
 
   emit showDatabaseTable_signal("production_lines", ProductionLineModel);
-}
-
-void MainWindowKernel::deleteLastProductionLinePushButton_slot() {
-  emit loggerClear_signal();
-
-  emit deleteLastProductionLine_signal(ProductionLineModel);
 }
 
 void MainWindowKernel::showIssuerTablePushButton_slot() {
@@ -775,22 +739,6 @@ bool MainWindowKernel::checkNewOrderInput() const {
   return true;
 }
 
-bool MainWindowKernel::checkNewProductionLineInput() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QString login = AbstractGUI->LoginLineEdit1->text();
-  QString pass = AbstractGUI->PasswordLineEdit1->text();
-
-  if ((login.size() == 0) || (login.size() > 20)) {
-    return false;
-  }
-
-  if ((pass.size() == 0) || (pass.size() > 20)) {
-    return false;
-  }
-
-  return true;
-}
-
 bool MainWindowKernel::checkReleaseTransponderInput() const {
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   QRegularExpression regex("[A-Fa-f0-9]+");
@@ -977,26 +925,16 @@ void MainWindowKernel::connectMainWindowGUI() {
           this, &MainWindowKernel::stopOrderAssemblingPushButton_slot);
   connect(AbstractGUI->UpdateOrderViewPushButton, &QPushButton::clicked, this,
           &MainWindowKernel::updateOrderViewPushButton_slot);
-  connect(AbstractGUI->DeleteLastOrderPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::deleteLastOrderPushButton_slot);
 
   // Производственные линии
   connect(AbstractGUI->CreateNewProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::createNewProductionLinePushButton_slot);
-  connect(AbstractGUI->AllocateInactiveProductionLinesPushButton,
-          &QPushButton::clicked, this,
-          &MainWindowKernel::allocateInactiveProductionLinesPushButton_slot);
-  connect(AbstractGUI->LinkProductionLinePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::linkProductionLinePushButton_slot);
   connect(AbstractGUI->ShutdownAllProductionLinesPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
   connect(AbstractGUI->UpdateProductionLineViewPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::updateProductionLineViewPushButton_slot);
-  connect(AbstractGUI->DeleteLastProductionLinePushButton,
-          &QPushButton::clicked, this,
-          &MainWindowKernel::deleteLastProductionLinePushButton_slot);
 
   // Эмитенты
   connect(AbstractGUI->ShowIssuerTablePushButton, &QPushButton::clicked, this,
@@ -1123,8 +1061,6 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::startOrderAssembling);
   connect(this, &MainWindowKernel::stopOrderAssembling_signal, Manager,
           &AdminManager::stopOrderAssembling);
-  connect(this, &MainWindowKernel::deleteLastOrder_signal, Manager,
-          &AdminManager::deleteLastOrder);
   connect(this, &MainWindowKernel::showOrderTable_signal, Manager,
           &AdminManager::showOrderTable);
 
@@ -1132,8 +1068,6 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::createNewProductionLine);
   connect(this, &MainWindowKernel::stopAllProductionLines_signal, Manager,
           &AdminManager::stopAllProductionLines);
-  connect(this, &MainWindowKernel::deleteLastProductionLine_signal, Manager,
-          &AdminManager::deleteLastProductionLine);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
           &AdminManager::showProductionLineTable);
 

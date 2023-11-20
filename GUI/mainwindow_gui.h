@@ -95,7 +95,6 @@ class MainWindowGUI : public AbstractGUI {
   QSpacerItem* OrderControlPanelVS2;
 
   QPushButton* UpdateOrderViewPushButton;
-  QPushButton* DeleteLastOrderPushButton;
 
   QGroupBox* OrderTablePanel;
   QVBoxLayout* OrderTablePanelLayout;
@@ -110,9 +109,11 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* ProductionLinesControlPanel;
   QVBoxLayout* ProductionLinesControlPanelLayout;
 
+  QPushButton* CreateNewProductionLinePushButton;
   QPushButton* StartProductionLinePushButton;
   QPushButton* StopProductionLinePushButton;
   QPushButton* ShutdownAllProductionLinesPushButton;
+  QPushButton* EditProductionLinesPushButton;
   QSpacerItem* ProductionLinesControlPanelVS2;
 
   QPushButton* UpdateProductionLineViewPushButton;

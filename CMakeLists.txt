@@ -19,7 +19,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/input_dialog.cpp GUI/input_dialog.h
+    GUI/abstract_input_dialog.cpp GUI/abstract_input_dialog.h
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/mainwindow_kernel.cpp GUI/mainwindow_kernel.h

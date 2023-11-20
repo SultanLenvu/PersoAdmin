@@ -1,9 +1,9 @@
-#ifndef IDENTIFIERINPUTDIALOG_H
-#define IDENTIFIERINPUTDIALOG_H
+#ifndef IdentifierInputDialog_H
+#define IdentifierInputDialog_H
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
-class IdentifierInputDialog : public InputDialog {
+class IdentifierInputDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -22,6 +22,7 @@ class IdentifierInputDialog : public InputDialog {
   ~IdentifierInputDialog();
 
   virtual void getData(QHash<QString, QString>* data) const override;
+  virtual DialogType type() const override;
 
  private:
   Q_DISABLE_COPY_MOVE(IdentifierInputDialog);
@@ -29,4 +30,4 @@ class IdentifierInputDialog : public InputDialog {
   bool check() const;
 };
 
-#endif  // IDENTIFIERINPUTDIALOG_H
+#endif  // IdentifierInputDialog_H

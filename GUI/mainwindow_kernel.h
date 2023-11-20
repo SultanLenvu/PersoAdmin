@@ -69,15 +69,14 @@ class MainWindowKernel : public QMainWindow {
   void startOrderAssemblingPushButton_slot(void);
   void stopOrderAssemblingPushButton_slot(void);
   void updateOrderViewPushButton_slot(void);
-  void deleteLastOrderPushButton_slot(void);
 
   // Функционал для работы с производственными линиями
   void createNewProductionLinePushButton_slot(void);
-  void allocateInactiveProductionLinesPushButton_slot(void);
-  void linkProductionLinePushButton_slot(void);
+  void startProductionLinePushButton_slot(void);
+  void stopProductionLinePushButton_slot(void);
   void deactivateAllProductionLinesPushButton_slot(void);
+  void editProductionLinesPushButton_slot(void);
   void updateProductionLineViewPushButton_slot(void);
-  void deleteLastProductionLinePushButton_slot(void);
 
   // Функционал для работы с транспортными мастер ключами
   void showIssuerTablePushButton_slot(void);
@@ -123,7 +122,6 @@ class MainWindowKernel : public QMainWindow {
   bool checkAuthorizationData(void) const;
   bool checkNewSettings(void) const;
   bool checkNewOrderInput(void) const;
-  bool checkNewProductionLineInput(void) const;
   bool checkReleaseTransponderInput(void) const;
   bool checkConfirmRereleaseTransponderInput(void) const;
   bool checkLinkIssuerInput(void) const;
@@ -168,7 +166,6 @@ class MainWindowKernel : public QMainWindow {
                                    SqlQueryValues* model);
   void stopOrderAssembling_signal(const QString& orderId,
                                   SqlQueryValues* model);
-  void deleteLastOrder_signal(SqlQueryValues* model);
   void showOrderTable_signal(SqlQueryValues* model);
 
   // Производственные линии
@@ -176,14 +173,14 @@ class MainWindowKernel : public QMainWindow {
       const QSharedPointer<QHash<QString, QString>>
           productionLineParameterseters,
       SqlQueryValues* model);
-  void allocateInactiveProductionLines_signal(const QString& orderId,
-                                              SqlQueryValues* model);
+  void startProductionLine_signal(const QSharedPointer<QHash<QString, QString>>,
+                                  SqlQueryValues* model);
+  void stopProductionLine_signal(const QSharedPointer<QHash<QString, QString>>,
+                                 SqlQueryValues* model);
   void stopAllProductionLines_signal(SqlQueryValues* model);
-  void deleteLastProductionLine_signal(SqlQueryValues* model);
+  void editProductionLine_signal(const QSharedPointer<QHash<QString, QString>>,
+                                 SqlQueryValues* model);
   void showProductionLineTable_signal(SqlQueryValues* model);
-  void linkProductionLineWithBox_signal(
-      const QSharedPointer<QHash<QString, QString>> linkParameters,
-      SqlQueryValues* model);
 
   // Тест сервера
   void releaseTransponder_signal(
