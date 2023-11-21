@@ -23,17 +23,17 @@ class ProductionLineCreationMenu : public AbstractInputDialog {
   QLabel* SurnameLabel;
   QLineEdit* SurnameLineEdit;
 
-  QSpacerItem* VerticalSpacer;
-
   QHBoxLayout* ButtonLayout;
   QPushButton* AcceptButton;
   QPushButton* RejectButton;
 
+  QSpacerItem* VerticalSpacer;
+
  public:
-  explicit ProductionLineCreationMenu(QWidget* parent);
+  explicit ProductionLineCreationMenu(QWidget* paren);
   ~ProductionLineCreationMenu();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(QHash<QString, QString>* datat, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:

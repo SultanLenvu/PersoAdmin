@@ -17,6 +17,8 @@
 
 /* Определения для вводимых данных */
 //===============================================================
+#define ID_MAX_LENGHT 10
+
 #define PL_LOGIN_MAX_LENGHT 20
 #define PL_PASSWORD_MAX_LENGHT 20
 

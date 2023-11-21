@@ -3,7 +3,7 @@
 
 ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
     : AbstractInputDialog(parent) {
-  setObjectName("PanAbstractInputDialog");
+  setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
@@ -18,11 +18,19 @@ ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
 
 ProductionLineCreationMenu::~ProductionLineCreationMenu() {}
 
-void ProductionLineCreationMenu::getData(QHash<QString, QString>* data) const {
+void ProductionLineCreationMenu::getData(QHash<QString, QString>* data,
+                                         bool& ok) const {
+  if (!check()) {
+    ok = false;
+    return;
+  }
+
   data->insert("login", LoginLineEdit->text());
   data->insert("password", PasswordLineEdit->text());
   data->insert("name", NameLineEdit->text());
   data->insert("surname", SurnameLineEdit->text());
+
+  ok = true;
 }
 
 AbstractInputDialog::DialogType ProductionLineCreationMenu::type() const {
@@ -59,7 +67,18 @@ void ProductionLineCreationMenu::create() {
 
   VerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  MainLayout->addItem(VerticalSpacer, 2, 0, 1, 2);
+  MainLayout->addItem(VerticalSpacer, 4, 0, 1, 2);
+
+  ButtonLayout = new QHBoxLayout();
+  MainLayout->addLayout(ButtonLayout, 5, 0, 1, 2);
+
+  AcceptButton = new QPushButton("Ввод");
+  MainLayout->addWidget(AcceptButton);
+  connect(AcceptButton, &QPushButton::clicked, this, &QDialog::accept);
+
+  RejectButton = new QPushButton("Отмена");
+  MainLayout->addWidget(RejectButton);
+  connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
 bool ProductionLineCreationMenu::check() const {

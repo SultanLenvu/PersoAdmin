@@ -11,7 +11,6 @@ class IdentifierInputDialog : public AbstractInputDialog {
   QVBoxLayout* MainLayout;
   QLabel* MainLabel;
   QLineEdit* InputData;
-  QString pan;
 
   QHBoxLayout* ButtonLayout;
   QPushButton* AcceptButton;
@@ -21,7 +20,7 @@ class IdentifierInputDialog : public AbstractInputDialog {
   explicit IdentifierInputDialog(QWidget* parent);
   ~IdentifierInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:

@@ -1,5 +1,5 @@
-#ifndef PANAbstractInputDialog_H
-#define PANAbstractInputDialog_H
+#ifndef PanInputDialog_H
+#define PanInputDialog_H
 
 #include <QDialog>
 #include <QRegularExpression>
@@ -8,7 +8,7 @@
 
 #include "abstract_input_dialog.h"
 
-class PanAbstractInputDialog : public AbstractInputDialog {
+class PanInputDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -23,16 +23,16 @@ class PanAbstractInputDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit PanAbstractInputDialog(QWidget* parent);
-  ~PanAbstractInputDialog();
+  explicit PanInputDialog(QWidget* parent);
+  ~PanInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(PanAbstractInputDialog);
+  Q_DISABLE_COPY_MOVE(PanInputDialog);
   void create(void);
   bool check(QString& pan) const;
 };
 
-#endif  // PANAbstractInputDialog_H
+#endif  // PanInputDialog_H

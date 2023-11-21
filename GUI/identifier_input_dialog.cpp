@@ -17,17 +17,16 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
 
 IdentifierInputDialog::~IdentifierInputDialog() {}
 
-void IdentifierInputDialog::getData(
-    QHash<QString, QString>* data) const {
-  if (!data) {
+void IdentifierInputDialog::getData(QHash<QString, QString>* data,
+                                    bool& ok) const {
+  if (!check()) {
+    ok = false;
     return;
   }
 
-  if (check()) {
-    data->insert("id", InputData->text());
-  } else {
-    data->clear();
-  }
+  data->insert("id", InputData->text());
+
+  ok = true;
 }
 
 AbstractInputDialog::DialogType IdentifierInputDialog::type() const {

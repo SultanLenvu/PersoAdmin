@@ -13,6 +13,7 @@ class AbstractInputDialog : public QDialog {
     PanInput,
     IdentifierInput,
     ProductionLineCreation,
+    StartProductionLine,
     OrderCreation,
   };
   Q_ENUM(DialogType);
@@ -21,8 +22,8 @@ class AbstractInputDialog : public QDialog {
   explicit AbstractInputDialog(QWidget* parent);
   virtual ~AbstractInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const = 0;
-  virtual DialogType type() const = 0;
+  virtual void getData(QHash<QString, QString>* data, bool& ok) const = 0;
+  virtual DialogType type(void) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractInputDialog);

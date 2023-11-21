@@ -10,7 +10,6 @@ InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   setObjectName("InteractionSystem");
   loadSettings();
 
-  CurrentOperationStep = 0;
   createProgressDialog();
 
   // Создаем таймеры
@@ -41,6 +40,10 @@ void InteractionSystem::startOperationProgressDialog(
     const QString& operationName) {
   QSettings settings;
 
+  // Открываем окно загрузки
+  ProgressDialog.setValue(0);
+  ProgressDialog.show();
+
   //  Настраиваем и запускаем таймер для измерения квантов времени
   uint64_t operationDuration =
       settings.value(QString("duration_of_operations/") + operationName)
@@ -53,7 +56,7 @@ void InteractionSystem::startOperationProgressDialog(
   ODQTimer->start();
 
   // Запускаем таймер для контроля максимальной длительности операции
-  ODTimer->start();
+  //  ODTimer->start();
 
   // Запускаем измеритель длительности операции
   ODMeter->start();
@@ -70,60 +73,52 @@ void InteractionSystem::finishOperationProgressDialog(
                     QVariant::fromValue(duration));
 
   // Останавливаем таймер для контроля максимальной длительности операции
-  ODTimer->stop();
+  //  ODTimer->stop();
 
   // Останавливаем для измерения кванта длительности операции
   ODQTimer->stop();
 
   // Закрываем окно
-  destroyProgressDialog();
+  ProgressDialog.close();
 }
 
-bool InteractionSystem::getPalletShipingParameters(
-    QHash<QString, QString>* params) {
-  CurrentDialog = new PalletShippingDialog(this);
+void InteractionSystem::getPalletShipingParameters(
+    QHash<QString, QString>* data,
+    bool& ok) {
+  CurrentDialog = std::move(
+      std::unique_ptr<AbstractInputDialog>(new PalletShippingDialog(this)));
 
-  bool ret = CurrentDialog->exec();
-  CurrentDialog->getData(params);
-
-  return ret;
+  processCurrentDialog(data, ok);
 }
 
-bool InteractionSystem::getPan(QHash<QString, QString>* params) {
-  CurrentDialog = new PanAbstractInputDialog(this);
+void InteractionSystem::getPan(QHash<QString, QString>* data, bool& ok) {
+  CurrentDialog =
+      std::move(std::unique_ptr<AbstractInputDialog>(new PanInputDialog(this)));
 
-  bool ret = CurrentDialog->exec();
-  CurrentDialog->getData(params);
-
-  return ret;
+  processCurrentDialog(data, ok);
 }
 
-bool InteractionSystem::getId(QHash<QString, QString>* params) {
-  CurrentDialog = new IdentifierInputDialog(this);
+void InteractionSystem::getId(QHash<QString, QString>* data, bool& ok) {
+  CurrentDialog = std::move(
+      std::unique_ptr<AbstractInputDialog>(new IdentifierInputDialog(this)));
 
-  bool ret = CurrentDialog->exec();
-  CurrentDialog->getData(params);
-
-  return ret;
+  processCurrentDialog(data, ok);
 }
 
-bool InteractionSystem::getNewProductionLineData(
-    QHash<QString, QString>* params) {
-  CurrentDialog = new ProductionLineCreationMenu(this);
+void InteractionSystem::getNewProductionLineData(QHash<QString, QString>* data,
+                                                 bool& ok) {
+  CurrentDialog = std::move(std::unique_ptr<AbstractInputDialog>(
+      new ProductionLineCreationMenu(this)));
 
-  bool ret = CurrentDialog->exec();
-  CurrentDialog->getData(params);
-
-  return ret;
+  processCurrentDialog(data, ok);
 }
 
-bool InteractionSystem::getNewOrderData(QHash<QString, QString>* params) {
-  CurrentDialog = new OrderCreationMenu(this);
+void InteractionSystem::getNewOrderData(QHash<QString, QString>* data,
+                                        bool& ok) {
+  CurrentDialog = std::move(
+      std::unique_ptr<AbstractInputDialog>(new OrderCreationMenu(this)));
 
-  bool ret = CurrentDialog->exec();
-  CurrentDialog->getData(params);
-
-  return ret;
+  processCurrentDialog(data, ok);
 }
 
 void InteractionSystem::applySettings() {
@@ -154,12 +149,6 @@ void InteractionSystem::createProgressDialog() {
   ProgressDialog.setCancelButton(nullptr);
   ProgressDialog.setWindowModality(Qt::ApplicationModal);
   ProgressDialog.setAutoClose(false);
-  //  ProgressDialog->show();
-}
-
-void InteractionSystem::destroyProgressDialog() {
-  ProgressDialog.close();
-  CurrentOperationStep = 0;
 }
 
 void InteractionSystem::createTimers() {
@@ -179,8 +168,22 @@ void InteractionSystem::createTimers() {
           &InteractionSystem::ODQTimerTimeout_slot);
 }
 
+void InteractionSystem::processCurrentDialog(QHash<QString, QString>* data,
+                                             bool& ok) {
+  if (CurrentDialog->exec() == QDialog::Rejected) {
+    ok = false;
+    return;
+  }
+
+  CurrentDialog->getData(data, ok);
+
+  if (!ok) {
+    generateErrorMessage("Некорректный ввод параметров нового заказа. ");
+  }
+}
+
 void InteractionSystem::progressDialogCanceled_slot() {
-  destroyProgressDialog();
+  ProgressDialog.close();
 
   emit abortCurrentOperation();
 }
@@ -191,9 +194,8 @@ void InteractionSystem::ODTimerTimeout_slot() {
 }
 
 void InteractionSystem::ODQTimerTimeout_slot() {
-  CurrentOperationStep++;
-  if (CurrentOperationStep < 100) {
-    ProgressDialog.setValue(CurrentOperationStep);
+  if (ProgressDialog.value() < 100) {
+    ProgressDialog.setValue(ProgressDialog.value() + 1);
   } else {
     ODQTimer->stop();
   }

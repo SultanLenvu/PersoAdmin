@@ -21,7 +21,7 @@ class InteractionSystem : public QWidget {
   QProgressDialog ProgressDialog;
   uint32_t CurrentOperationStep;
 
-  AbstractInputDialog* CurrentDialog;
+  std::unique_ptr<AbstractInputDialog> CurrentDialog;
 
   QTimer* ODTimer;
   QTimer* ODQTimer;
@@ -38,11 +38,12 @@ class InteractionSystem : public QWidget {
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
 
-  bool getPalletShipingParameters(QHash<QString, QString>* params);
-  bool getPan(QHash<QString, QString>* params);
-  bool getId(QHash<QString, QString>* params);
-  bool getNewProductionLineData(QHash<QString, QString>* params);
-  bool getNewOrderData(QHash<QString, QString>* params);
+  void getPalletShipingParameters(QHash<QString, QString>* data, bool& ok);
+  void getPan(QHash<QString, QString>* data, bool& ok);
+  void getId(QHash<QString, QString>* data, bool& ok);
+  void getNewProductionLineData(QHash<QString, QString>* data, bool& ok);
+  void getStartProductionLineData(QHash<QString, QString>* data, bool& ok);
+  void getNewOrderData(QHash<QString, QString>* data, bool& ok);
 
   void applySettings(void);
 
@@ -57,6 +58,7 @@ class InteractionSystem : public QWidget {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
+  void processCurrentDialog(QHash<QString, QString>* data, bool& ok);
 
  private slots:
   void progressDialogCanceled_slot(void);

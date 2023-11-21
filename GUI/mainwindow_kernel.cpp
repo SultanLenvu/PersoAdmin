@@ -48,11 +48,6 @@ void MainWindowKernel::requestAuthorizationGUIAct_slot() {
 }
 
 void MainWindowKernel::authorizePushButton_slot() {
-  if (!checkAuthorizationData()) {
-    Interactor->generateErrorMessage("Неверный логин или пароль. ");
-    return;
-  }
-
   createMainWindowGUI();
 
   emit connectDatabase_signal();
@@ -78,14 +73,6 @@ void MainWindowKernel::showDatabaseTablePushButton_slot() {
                                 RandomModel);
 }
 
-void MainWindowKernel::clearDatabaseTablePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  emit loggerClear_signal();
-
-  emit clearDatabaseTable_signal(
-      AbstractGUI->DatabaseTableChoice->currentText(), RandomModel);
-}
-
 void MainWindowKernel::transmitCustomRequestPushButton_slot() {
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   emit loggerClear_signal();
@@ -95,41 +82,16 @@ void MainWindowKernel::transmitCustomRequestPushButton_slot() {
 }
 
 void MainWindowKernel::createNewOrderPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> orderParameters(
+      new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  if (!checkNewOrderInput()) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод параметров нового заказа. ");
+  Interactor->getNewOrderData(orderParameters.get(), ok);
+  if (!ok) {
     return;
   }
-
-  QSharedPointer<QHash<QString, QString>> orderParameters(
-      new QHash<QString, QString>);
-  orderParameters->insert("issuer_name",
-                          AbstractGUI->IssuerNameComboBox->currentText());
-  orderParameters->insert("transponder_quantity",
-                          AbstractGUI->TransponderQuantityLineEdit->text());
-  orderParameters->insert("box_capacity",
-                          AbstractGUI->BoxCapacityLineEdit->text());
-  orderParameters->insert("pallet_capacity",
-                          AbstractGUI->PalletCapacityLineEdit->text());
-  orderParameters->insert(
-      "full_personalization",
-      AbstractGUI->FullPersonalizationCheckBox->checkState() == Qt::Checked
-          ? "true"
-          : "false");
-  orderParameters->insert("pan_file_path",
-                          AbstractGUI->PanFilePathLineEdit->text());
-  orderParameters->insert("transponder_model",
-                          AbstractGUI->TransponderModelLineEdit->text());
-  orderParameters->insert("accr_reference",
-                          AbstractGUI->AccrReferenceLineEdit->text());
-  orderParameters->insert("equipment_class",
-                          AbstractGUI->EquipmentClassLineEdit->text());
-  orderParameters->insert("manufacturer_id",
-                          AbstractGUI->ManufacturerIdLineEdit->text());
 
   emit createNewOrder_signal(orderParameters, OrderModel);
 }
@@ -588,22 +550,6 @@ void MainWindowKernel::saveSettings() const {
                     AbstractGUI->StickerPrinterNameLineEdit->text());
 }
 
-bool MainWindowKernel::checkAuthorizationData() const {
-  AuthorizationGUI* AbstractGUI = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-
-  QString login = AbstractGUI->LoginLineEdit->text();
-  QString password = AbstractGUI->PasswordLineEdit->text();
-
-  if ((login != MASTER_ACCESS_LOGIN) || (password != MASTER_ACCESS_PASSWORD)) {
-    return false;
-  }
-
-  QSettings settings;
-  settings.setValue("authorization/login", login);
-
-  return true;
-}
-
 bool MainWindowKernel::checkNewSettings() const {
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   QFileInfo info;
@@ -656,83 +602,6 @@ bool MainWindowKernel::checkNewSettings() const {
 
   info.setFile(AbstractGUI->StickerPrinterLibPathLineEdit->text());
   if (!info.isFile()) {
-    return false;
-  }
-
-  return true;
-}
-
-bool MainWindowKernel::checkNewOrderInput() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-
-  int32_t transponderQuantity =
-      AbstractGUI->TransponderQuantityLineEdit->text().toInt();
-  int32_t boxCapacity = AbstractGUI->BoxCapacityLineEdit->text().toInt();
-  int32_t palletCapacity = AbstractGUI->PalletCapacityLineEdit->text().toInt();
-  QString transponderModel = AbstractGUI->TransponderModelLineEdit->text();
-  QString accrReference = AbstractGUI->AccrReferenceLineEdit->text();
-  QString equipmnetClass = AbstractGUI->EquipmentClassLineEdit->text();
-  QString manufacturerId = AbstractGUI->ManufacturerIdLineEdit->text();
-  QString panFilePath = AbstractGUI->PanFilePathLineEdit->text();
-
-  if (transponderQuantity <= 0) {
-    return false;
-  }
-
-  if (boxCapacity <= 0) {
-    return false;
-  }
-
-  if (palletCapacity <= 0) {
-    return false;
-  }
-
-  if ((transponderQuantity % (boxCapacity * palletCapacity)) != 0) {
-    return false;
-  }
-
-  if ((transponderModel.length() > TRANSPONDER_MODEL_CHAR_LENGTH) ||
-      (transponderModel.length() == 0)) {
-    return false;
-  }
-
-  QFileInfo info(AbstractGUI->PanFilePathLineEdit->text());
-  if ((!info.exists()) || (!info.isFile()) || (info.suffix() != "csv")) {
-    return false;
-  }
-
-  QFile file(panFilePath);
-  int32_t recordCount = 0;
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    return false;
-  }
-  QTextStream in(&file);
-  while (!in.atEnd()) {
-    QString record = in.readLine();
-    if (record.length() != PAN_CHAR_LENGTH) {
-      file.close();
-      return false;
-    }
-    recordCount++;
-  }
-  file.close();
-
-  if (recordCount != transponderQuantity) {
-    return false;
-  }
-
-  if ((accrReference.length() > ACCR_REFERENCE_CHAR_LENGTH) ||
-      (accrReference.length() == 0)) {
-    return false;
-  }
-
-  if ((equipmnetClass.length() > EQUIPMENT_CLASS_CHAR_LENGTH) ||
-      (equipmnetClass.length() == 0)) {
-    return false;
-  }
-
-  if ((manufacturerId.length() > MANUFACTURER_ID_CHAR_LENGTH) ||
-      (manufacturerId.length() == 0)) {
     return false;
   }
 

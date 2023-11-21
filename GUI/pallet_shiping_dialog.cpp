@@ -5,7 +5,7 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
   setObjectName("PalletShippingDialog");
 
   setWindowTitle("Отгрузка");
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
               DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.05);
 
@@ -14,13 +14,17 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(QHash<QString, QString>* data) const {
-  if (check()) {
-    data->insert("first_pallet_id", FirstPalletId->text());
-    data->insert("last_pallet_id", LastPalletId->text());
-  } else {
-    data->clear();
+void PalletShippingDialog::getData(QHash<QString, QString>* data,
+                                   bool& ok) const {
+  if (!check()) {
+    ok = false;
+    return;
   }
+
+  data->insert("first_pallet_id", FirstPalletId->text());
+  data->insert("last_pallet_id", LastPalletId->text());
+
+  ok = true;
 }
 
 AbstractInputDialog::DialogType PalletShippingDialog::type() const {

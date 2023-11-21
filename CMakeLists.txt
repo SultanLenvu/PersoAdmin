@@ -28,6 +28,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     GUI/idetifier_input_dialog.h GUI/identifier_input_dialog.cpp
     GUI/production_line_creation_menu.h GUI/production_line_creation_menu.cpp
     GUI/order_creation_menu.h GUI/order_creation_menu.cpp
+    GUI/start_production_line_menu.h GUI/start_production_line_menu.cpp
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h

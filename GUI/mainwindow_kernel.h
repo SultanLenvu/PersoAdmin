@@ -121,7 +121,6 @@ class MainWindowKernel : public QMainWindow {
   void saveSettings(void) const;
   bool checkAuthorizationData(void) const;
   bool checkNewSettings(void) const;
-  bool checkNewOrderInput(void) const;
   bool checkReleaseTransponderInput(void) const;
   bool checkConfirmRereleaseTransponderInput(void) const;
   bool checkLinkIssuerInput(void) const;

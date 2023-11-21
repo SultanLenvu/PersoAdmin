@@ -1,4 +1,5 @@
 #include "mainwindow_gui.h"
+#include "General/definitions.h"
 
 MainWindowGUI::MainWindowGUI(QWidget* parent) : AbstractGUI(parent, Master) {
   setObjectName("MainWindowGUI");
@@ -149,80 +150,6 @@ void MainWindowGUI::createOrderTab() {
 
   OrderControlPanelLayout = new QVBoxLayout();
   OrderControlPanel->setLayout(OrderControlPanelLayout);
-
-  FullPersonalizationCheckBox = new QCheckBox("Полная персонализация");
-  OrderControlPanelLayout->addWidget(FullPersonalizationCheckBox);
-
-  OrderPanelSubLayout = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout);
-  PanFilePathLabel = new QLabel("PAN-файл");
-  OrderPanelSubLayout->addWidget(PanFilePathLabel);
-  PanFilePathLineEdit = new QLineEdit();
-  OrderPanelSubLayout->addWidget(PanFilePathLineEdit);
-  PanFileExplorePushButton = new QPushButton("Обзор");
-  OrderPanelSubLayout->addWidget(PanFileExplorePushButton);
-  connect(PanFileExplorePushButton, &QPushButton::clicked, this,
-          &MainWindowGUI::on_PanFileExplorePushButton_slot);
-
-  OrderPanelSubLayout1 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout1);
-
-  IssuerNameComboLabel = new QLabel("Компания заказчик");
-  OrderPanelSubLayout1->addWidget(IssuerNameComboLabel);
-
-  IssuerNameComboBox = new QComboBox();
-  IssuerNameComboBox->addItem("Новое качество дорог");
-  IssuerNameComboBox->addItem("Западный скоростной диаметр");
-  OrderPanelSubLayout1->addWidget(IssuerNameComboBox);
-
-  OrderPanelSubLayout2 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout2);
-  TransponderQuantityLabel = new QLabel("Количество транспондеров");
-  OrderPanelSubLayout2->addWidget(TransponderQuantityLabel);
-  TransponderQuantityLineEdit = new QLineEdit("500");
-  OrderPanelSubLayout2->addWidget(TransponderQuantityLineEdit);
-
-  OrderPanelSubLayout3 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout3);
-  BoxCapacityLabel = new QLabel("Емкость бокса");
-  OrderPanelSubLayout3->addWidget(BoxCapacityLabel);
-  BoxCapacityLineEdit = new QLineEdit("50");
-  OrderPanelSubLayout3->addWidget(BoxCapacityLineEdit);
-
-  OrderPanelSublayout4 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSublayout4);
-  PalletCapacityLabel = new QLabel("Емкость палеты");
-  OrderPanelSublayout4->addWidget(PalletCapacityLabel);
-  PalletCapacityLineEdit = new QLineEdit("10");
-  OrderPanelSublayout4->addWidget(PalletCapacityLineEdit);
-
-  OrderPanelSublayout5 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSublayout5);
-  TransponderModelLabel = new QLabel("Модель транспондера");
-  OrderPanelSublayout5->addWidget(TransponderModelLabel);
-  TransponderModelLineEdit = new QLineEdit("PS1001");
-  OrderPanelSublayout5->addWidget(TransponderModelLineEdit);
-
-  OrderPanelSubLayout6 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout6);
-  AccrReferenceLabel = new QLabel("ACCR Reference (HEX)");
-  OrderPanelSubLayout6->addWidget(AccrReferenceLabel);
-  AccrReferenceLineEdit = new QLineEdit("1DD1");
-  OrderPanelSubLayout6->addWidget(AccrReferenceLineEdit);
-
-  OrderPanelSubLayout7 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout7);
-  EquipmentClassLabel = new QLabel("Класс оборудования (HEX)");
-  OrderPanelSubLayout7->addWidget(EquipmentClassLabel);
-  EquipmentClassLineEdit = new QLineEdit("F301");
-  OrderPanelSubLayout7->addWidget(EquipmentClassLineEdit);
-
-  OrderPanelSubLayout8 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderPanelSubLayout8);
-  ManufacturerIdLabel = new QLabel("Идентификатор производителя (HEX)");
-  OrderPanelSubLayout8->addWidget(ManufacturerIdLabel);
-  ManufacturerIdLineEdit = new QLineEdit("0032");
-  OrderPanelSubLayout8->addWidget(ManufacturerIdLineEdit);
 
   CreateNewOrderPushButton = new QPushButton("Создать новый заказ");
   OrderControlPanelLayout->addWidget(CreateNewOrderPushButton);
@@ -861,13 +788,6 @@ void MainWindowGUI::createLog() {
   LogDisplay->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   LogDisplay->setCenterOnScroll(false);
   LogLayout->addWidget(LogDisplay);
-}
-void MainWindowGUI::on_PanFileExplorePushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(nullptr, "Выбрать файл", "./", "*.csv");
-  if (!filePath.isEmpty()) {
-    PanFilePathLineEdit->setText(filePath);
-  }
 }
 
 void MainWindowGUI::on_RereleaseKeyComboBox_slot(const QString& text) {

@@ -1,9 +1,9 @@
 #include "pan_input_dialog.h"
 #include "General/definitions.h"
 
-PanAbstractInputDialog::PanAbstractInputDialog(QWidget* parent)
+PanInputDialog::PanInputDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
-  setObjectName("PanAbstractInputDialog");
+  setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
@@ -16,26 +16,26 @@ PanAbstractInputDialog::PanAbstractInputDialog(QWidget* parent)
   create();
 }
 
-PanAbstractInputDialog::~PanAbstractInputDialog() {}
+PanInputDialog::~PanInputDialog() {}
 
-void PanAbstractInputDialog::getData(QHash<QString, QString>* data) const {
-  if (!data) {
+void PanInputDialog::getData(QHash<QString, QString>* data,
+                                     bool& ok) const {
+  QString pan;
+  if (!check(pan)) {
+    ok = false;
     return;
   }
 
-  QString pan;
-  if (check(pan)) {
-    data->insert("pan", pan);
-  } else {
-    data->clear();
-  }
+  data->insert("pan", pan);
+
+  ok = true;
 }
 
-AbstractInputDialog::DialogType PanAbstractInputDialog::type() const {
+AbstractInputDialog::DialogType PanInputDialog::type() const {
   return PanInput;
 }
 
-void PanAbstractInputDialog::create() {
+void PanInputDialog::create() {
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
 
@@ -54,7 +54,7 @@ void PanAbstractInputDialog::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PanAbstractInputDialog::check(QString& pan) const {
+bool PanInputDialog::check(QString& pan) const {
   QStringList input = StickerData->toPlainText().split("\n");
 
   if (input.size() == 2) {

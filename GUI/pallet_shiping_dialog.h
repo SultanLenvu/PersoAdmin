@@ -27,7 +27,7 @@ class PalletShippingDialog : public AbstractInputDialog {
   explicit PalletShippingDialog(QWidget* parent);
   ~PalletShippingDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual ReturnStatus getData(QHash<QString, QString>* data) const override;
   virtual DialogType type() const override;
 
  private:
