@@ -1,7 +1,7 @@
-#include "production_line_creation_menu.h"
+#include "production_line_creation_dialog.h"
 #include "General/definitions.h"
 
-ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
+ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
   setObjectName("PanInputDialog");
 
@@ -16,9 +16,9 @@ ProductionLineCreationMenu::ProductionLineCreationMenu(QWidget* parent)
   create();
 }
 
-ProductionLineCreationMenu::~ProductionLineCreationMenu() {}
+ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
-void ProductionLineCreationMenu::getData(QHash<QString, QString>* data,
+void ProductionLineCreationDialog::getData(QHash<QString, QString>* data,
                                          bool& ok) const {
   if (!check()) {
     ok = false;
@@ -33,11 +33,11 @@ void ProductionLineCreationMenu::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType ProductionLineCreationMenu::type() const {
+AbstractInputDialog::DialogType ProductionLineCreationDialog::type() const {
   return ProductionLineCreation;
 }
 
-void ProductionLineCreationMenu::create() {
+void ProductionLineCreationDialog::create() {
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
@@ -81,6 +81,6 @@ void ProductionLineCreationMenu::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool ProductionLineCreationMenu::check() const {
+bool ProductionLineCreationDialog::check() const {
   return true;
 }

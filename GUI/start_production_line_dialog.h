@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class StartProductionLineMenu : public AbstractInputDialog {
+class StartProductionLineDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -21,14 +21,14 @@ class StartProductionLineMenu : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit StartProductionLineMenu(QWidget* parent);
-  ~StartProductionLineMenu();
+  explicit StartProductionLineDialog(QWidget* parent);
+  ~StartProductionLineDialog();
 
   virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(StartProductionLineMenu);
+  Q_DISABLE_COPY_MOVE(StartProductionLineDialog);
   void create(void);
   bool check() const;
 };

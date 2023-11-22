@@ -26,9 +26,9 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     GUI/pallet_shiping_dialog.cpp GUI/pallet_shiping_dialog.h
     GUI/pan_input_dialog.cpp GUI/pan_input_dialog.h
     GUI/idetifier_input_dialog.h GUI/identifier_input_dialog.cpp
-    GUI/production_line_creation_menu.h GUI/production_line_creation_menu.cpp
-    GUI/order_creation_menu.h GUI/order_creation_menu.cpp
-    GUI/start_production_line_menu.h GUI/start_production_line_menu.cpp
+    GUI/production_line_creation_dialog.h GUI/production_line_creation_dialog.cpp
+    GUI/order_creation_dialog.h GUI/order_creation_dialog.cpp
+    GUI/start_production_line_dialog.h GUI/start_production_line_dialog.cpp
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h

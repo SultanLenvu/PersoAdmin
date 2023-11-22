@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class OrderCreationMenu : public AbstractInputDialog {
+class OrderCreationDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -45,14 +45,14 @@ class OrderCreationMenu : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit OrderCreationMenu(QWidget* parent);
-  ~OrderCreationMenu();
+  explicit OrderCreationDialog(QWidget* parent);
+  ~OrderCreationDialog();
 
   virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(OrderCreationMenu);
+  Q_DISABLE_COPY_MOVE(OrderCreationDialog);
   void create(void);
   bool check(void) const;
 

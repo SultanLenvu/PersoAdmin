@@ -1,10 +1,11 @@
 #include "interaction_system.h"
 #include "General/definitions.h"
 #include "idetifier_input_dialog.h"
-#include "order_creation_menu.h"
+#include "order_creation_dialog.h"
 #include "pallet_shiping_dialog.h"
 #include "pan_input_dialog.h"
-#include "production_line_creation_menu.h"
+#include "production_line_creation_dialog.h"
+#include "start_production_line_dialog.h"
 
 InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
   setObjectName("InteractionSystem");
@@ -108,7 +109,16 @@ void InteractionSystem::getId(QHash<QString, QString>* data, bool& ok) {
 void InteractionSystem::getNewProductionLineData(QHash<QString, QString>* data,
                                                  bool& ok) {
   CurrentDialog = std::move(std::unique_ptr<AbstractInputDialog>(
-      new ProductionLineCreationMenu(this)));
+      new ProductionLineCreationDialog(this)));
+
+  processCurrentDialog(data, ok);
+}
+
+void InteractionSystem::getStartProductionLineData(
+    QHash<QString, QString>* data,
+    bool& ok) {
+  CurrentDialog = std::move(
+      std::unique_ptr<AbstractInputDialog>(new StartProductionLineDialog(this)));
 
   processCurrentDialog(data, ok);
 }
@@ -116,7 +126,7 @@ void InteractionSystem::getNewProductionLineData(QHash<QString, QString>* data,
 void InteractionSystem::getNewOrderData(QHash<QString, QString>* data,
                                         bool& ok) {
   CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new OrderCreationMenu(this)));
+      std::unique_ptr<AbstractInputDialog>(new OrderCreationDialog(this)));
 
   processCurrentDialog(data, ok);
 }

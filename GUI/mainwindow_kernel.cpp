@@ -133,26 +133,19 @@ void MainWindowKernel::updateOrderViewPushButton_slot() {
 }
 
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
   QSharedPointer<QHash<QString, QString>> productionLineParameters(
       new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  if (Interactor->getNewProductionLineData(productionLineParameters.get())) {
-    return;
-  }
-
-  if (productionLineParameters->isEmpty()) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод параметров производственной линии. ");
+  Interactor->getNewProductionLineData(productionLineParameters.get(), ok);
+  if (!ok) {
     return;
   }
 
   emit createNewProductionLine_signal(productionLineParameters,
                                       ProductionLineModel);
-
-  CurrentGUI->update();
 }
 
 void MainWindowKernel::startProductionLinePushButton_slot() {
@@ -290,15 +283,13 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
-  emit loggerClear_signal();
-
+  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
-  if (!Interactor->getPan(param.get())) {
-    return;
-  }
 
-  if (param->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных");
+  emit loggerClear_signal();
+  Interactor->getPan(param.get(), ok);
+
+  if (!ok) {
     return;
   }
 
@@ -312,15 +303,14 @@ void MainWindowKernel::printLastBoxStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+
+  Interactor->getPan(param.get(), ok);
+
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
-  if (!Interactor->getPan(param.get())) {
-    return;
-  }
-
-  if (param->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных");
+  if (!ok) {
     return;
   }
 
@@ -366,15 +356,14 @@ void MainWindowKernel::transponderManualRefundPushButton_slot() {
 }
 
 void MainWindowKernel::palletShipmentPushButton_slot() {
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> params(new QHash<QString, QString>());
+
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> params(new QHash<QString, QString>());
-  if (!Interactor->getPalletShipingParameters(params.get())) {
-    return;
-  }
+  Interactor->getPalletShipingParameters(params.get(), ok);
 
-  if (params->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных");
+  if (!ok) {
     return;
   }
 

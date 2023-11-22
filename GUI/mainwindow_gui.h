@@ -336,8 +336,6 @@ class MainWindowGUI : public AbstractGUI {
   void createLog(void);
 
  private slots:
-  void on_PanFileExplorePushButton_slot(void);
-
   void on_RereleaseKeyComboBox_slot(const QString& text);
 
   void on_LogSystemEnableCheckBox_slot(int32_t state);

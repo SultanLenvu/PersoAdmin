@@ -1,7 +1,7 @@
-#include "start_production_line_menu.h"
+#include "start_production_line_dialog.h"
 #include "General/definitions.h"
 
-StartProductionLineMenu::StartProductionLineMenu(QWidget* parent)
+StartProductionLineDialog::StartProductionLineDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
@@ -14,9 +14,9 @@ StartProductionLineMenu::StartProductionLineMenu(QWidget* parent)
   create();
 }
 
-StartProductionLineMenu::~StartProductionLineMenu() {}
+StartProductionLineDialog::~StartProductionLineDialog() {}
 
-void StartProductionLineMenu::getData(QHash<QString, QString>* data,
+void StartProductionLineDialog::getData(QHash<QString, QString>* data,
                                       bool& ok) const {
   if (!check()) {
     ok = false;
@@ -29,11 +29,11 @@ void StartProductionLineMenu::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType StartProductionLineMenu::type() const {
+AbstractInputDialog::DialogType StartProductionLineDialog::type() const {
   return StartProductionLine;
 }
 
-void StartProductionLineMenu::create() {
+void StartProductionLineDialog::create() {
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
@@ -61,7 +61,7 @@ void StartProductionLineMenu::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool StartProductionLineMenu::check() const {
+bool StartProductionLineDialog::check() const {
   if (ProductionLineIdInput->text().toUInt() == 0) {
     return false;
   }

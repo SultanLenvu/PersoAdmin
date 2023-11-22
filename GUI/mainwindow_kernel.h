@@ -61,7 +61,6 @@ class MainWindowKernel : public QMainWindow {
   void connectDatabasePushButton_slot(void);
   void disconnectDatabasePushButton_slot(void);
   void showDatabaseTablePushButton_slot(void);
-  void clearDatabaseTablePushButton_slot(void);
   void transmitCustomRequestPushButton_slot(void);
 
   // Функционал для работы с заказами

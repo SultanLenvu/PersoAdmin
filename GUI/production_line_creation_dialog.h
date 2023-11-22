@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class ProductionLineCreationMenu : public AbstractInputDialog {
+class ProductionLineCreationDialog : public AbstractInputDialog {
   Q_OBJECT
 
  private:
@@ -30,14 +30,14 @@ class ProductionLineCreationMenu : public AbstractInputDialog {
   QSpacerItem* VerticalSpacer;
 
  public:
-  explicit ProductionLineCreationMenu(QWidget* paren);
-  ~ProductionLineCreationMenu();
+  explicit ProductionLineCreationDialog(QWidget* paren);
+  ~ProductionLineCreationDialog();
 
   virtual void getData(QHash<QString, QString>* datat, bool& ok) const override;
   virtual DialogType type() const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionLineCreationMenu);
+  Q_DISABLE_COPY_MOVE(ProductionLineCreationDialog);
   void create(void);
   bool check(void) const;
 };

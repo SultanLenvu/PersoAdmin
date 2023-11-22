@@ -1,9 +1,9 @@
-#include "order_creation_menu.h"
+#include "order_creation_dialog.h"
 #include "General/definitions.h"
 
-OrderCreationMenu::OrderCreationMenu(QWidget* parent)
+OrderCreationDialog::OrderCreationDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
-  setObjectName("OrderCreationMenu");
+  setObjectName("OrderCreationDialog");
 
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
@@ -16,9 +16,9 @@ OrderCreationMenu::OrderCreationMenu(QWidget* parent)
   create();
 }
 
-OrderCreationMenu::~OrderCreationMenu() {}
+OrderCreationDialog::~OrderCreationDialog() {}
 
-void OrderCreationMenu::getData(QHash<QString, QString>* data, bool& ok) const {
+void OrderCreationDialog::getData(QHash<QString, QString>* data, bool& ok) const {
   if (!check()) {
     ok = false;
     return;
@@ -41,11 +41,11 @@ void OrderCreationMenu::getData(QHash<QString, QString>* data, bool& ok) const {
   ok = true;
 }
 
-AbstractInputDialog::DialogType OrderCreationMenu::type() const {
+AbstractInputDialog::DialogType OrderCreationDialog::type() const {
   return OrderCreation;
 }
 
-void OrderCreationMenu::create() {
+void OrderCreationDialog::create() {
   FullPersonalizationCheckBox = new QCheckBox("Полная персонализация");
   MainLayout->addWidget(FullPersonalizationCheckBox, 0, 0, 1, 3);
 
@@ -56,7 +56,7 @@ void OrderCreationMenu::create() {
   PanFileExplorePushButton = new QPushButton("Обзор");
   MainLayout->addWidget(PanFileExplorePushButton, 1, 2, 1, 1);
   connect(PanFileExplorePushButton, &QPushButton::clicked, this,
-          &OrderCreationMenu::panFileExplore_slot);
+          &OrderCreationDialog::panFileExplore_slot);
 
   IssuerNameComboLabel = new QLabel("Компания заказчик");
   MainLayout->addWidget(IssuerNameComboLabel, 2, 0, 1, 1);
@@ -112,7 +112,7 @@ void OrderCreationMenu::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool OrderCreationMenu::check() const {
+bool OrderCreationDialog::check() const {
   int32_t transponderQuantity = TransponderQuantityLineEdit->text().toInt();
   int32_t boxCapacity = BoxCapacityLineEdit->text().toInt();
   int32_t palletCapacity = PalletCapacityLineEdit->text().toInt();
@@ -186,7 +186,7 @@ bool OrderCreationMenu::check() const {
   return true;
 }
 
-void OrderCreationMenu::panFileExplore_slot() {
+void OrderCreationDialog::panFileExplore_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(nullptr, "Выбрать файл", "./", "*.csv");
   if (!filePath.isEmpty()) {
