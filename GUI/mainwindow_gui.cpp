@@ -171,7 +171,7 @@ void MainWindowGUI::createOrderTab() {
   OrderPanelSubLayout1->addWidget(IssuerNameComboLabel);
 
   IssuerNameComboBox = new QComboBox();
-  IssuerNameComboBox->addItem("Новое качество дорог");
+  IssuerNameComboBox->addItem("Магистраль северной столицы");
   IssuerNameComboBox->addItem("Западный скоростной диаметр");
   OrderPanelSubLayout1->addWidget(IssuerNameComboBox);
 
