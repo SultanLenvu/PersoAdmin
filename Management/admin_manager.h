@@ -40,16 +40,16 @@ class AdminManager : public QObject {
   void connectDatabase(void);
   void disconnectDatabase(void);
   void showDatabaseTable(const QString& name, SqlQueryValues* model);
-  void clearDatabaseTable(const QString& name, SqlQueryValues* model);
   void performCustomRequest(const QString& req, SqlQueryValues* model);
 
   // Заказы
   void createNewOrder(
       const QSharedPointer<QHash<QString, QString>> orderParameterseters,
       SqlQueryValues* model);
-  void deleteLastOrder(SqlQueryValues* model);
-  void startOrderAssembling(const QString& orderId, SqlQueryValues* model);
-  void stopOrderAssembling(const QString& orderId, SqlQueryValues* model);
+  void startOrderAssembling(const QSharedPointer<QHash<QString, QString>> param,
+                            SqlQueryValues* model);
+  void stopOrderAssembling(const QSharedPointer<QHash<QString, QString>> param,
+                           SqlQueryValues* model);
   void showOrderTable(SqlQueryValues* model);
 
   // Производственные линии
@@ -57,15 +57,14 @@ class AdminManager : public QObject {
                                    productionLineParameterseters,
                                SqlQueryValues* model);
   void stopAllProductionLines(SqlQueryValues* model);
-  void deleteLastProductionLine(SqlQueryValues* model);
   void showProductionLineTable(SqlQueryValues* model);
 
   // Заказчики
   void initIssuers(SqlQueryValues* model);
   void initTransportMasterKeys(SqlQueryValues* model);
   void linkIssuerWithMasterKeys(
-      SqlQueryValues* model,
-      const QSharedPointer<QHash<QString, QString>> param);
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
 
   // Транспондеры
   void releaseTranspondersManually(
@@ -94,9 +93,13 @@ class AdminManager : public QObject {
   void printLastPalletStickerOnServer();
 
   // Принтеры
-  void printTransponderSticker(const QString& id, SqlQueryValues* model);
-  void printBoxSticker(const QString& id, SqlQueryValues* model);
-  void printPalletSticker(const QString& id, SqlQueryValues* model);
+  void printTransponderSticker(
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
+  void printBoxSticker(const QSharedPointer<QHash<QString, QString>> param,
+                       SqlQueryValues* model);
+  void printPalletSticker(const QSharedPointer<QHash<QString, QString>> param,
+                          SqlQueryValues* model);
   void execPrinterStickerCommandScript(
       const QSharedPointer<QStringList> commandScript);
 

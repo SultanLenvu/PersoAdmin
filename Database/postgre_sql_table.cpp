@@ -206,6 +206,7 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) const {
 bool PostgreSqlTable::updateRecords(const QString& condition,
                                     const SqlQueryValues& newValues) const {
   if (!checkFieldNames(newValues)) {
+    sendLog("Получено неизвестное имя поля таблицы. ");
     return false;
   }
 

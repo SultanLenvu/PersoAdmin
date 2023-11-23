@@ -1,8 +1,7 @@
 #include "pan_input_dialog.h"
 #include "General/definitions.h"
 
-PanInputDialog::PanInputDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
   setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
@@ -14,12 +13,14 @@ PanInputDialog::PanInputDialog(QWidget* parent)
   setWindowTitle("Сканирование стикера");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 PanInputDialog::~PanInputDialog() {}
 
-void PanInputDialog::getData(QHash<QString, QString>* data,
-                                     bool& ok) const {
+void PanInputDialog::getData(QHash<QString, QString>* data, bool& ok) const {
   QString pan;
   if (!check(pan)) {
     ok = false;

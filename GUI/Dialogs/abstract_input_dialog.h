@@ -15,6 +15,7 @@ class AbstractInputDialog : public QDialog {
     ProductionLineCreation,
     StartProductionLine,
     OrderCreation,
+    ManualReleaseRefund,
   };
   Q_ENUM(DialogType);
 

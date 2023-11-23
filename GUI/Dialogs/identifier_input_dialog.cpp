@@ -13,6 +13,9 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
   setWindowTitle("Ввод данных");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 IdentifierInputDialog::~IdentifierInputDialog() {}
@@ -34,26 +37,31 @@ AbstractInputDialog::DialogType IdentifierInputDialog::type() const {
 }
 
 void IdentifierInputDialog::create() {
-  MainLayout = new QVBoxLayout();
+  MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
   MainLabel = new QLabel("Идентификатор: ");
-  MainLayout->addWidget(MainLabel);
+  MainLayout->addWidget(MainLabel, 0, 0, 1, 1);
 
   InputData = new QLineEdit();
-  MainLayout->addWidget(InputData);
+  MainLayout->addWidget(InputData, 0, 1, 1, 1);
+
+  ButtonLayout = new QHBoxLayout();
+  MainLayout->addLayout(ButtonLayout, 1, 0, 1, 2);
 
   AcceptButton = new QPushButton("Ввод");
-  MainLayout->addWidget(AcceptButton);
+  ButtonLayout->addWidget(AcceptButton);
   connect(AcceptButton, &QPushButton::clicked, this, &QDialog::accept);
 
   RejectButton = new QPushButton("Отмена");
-  MainLayout->addWidget(RejectButton);
+  ButtonLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
 bool IdentifierInputDialog::check() const {
-  bool ok;
-  uint32_t t = InputData->text().toUInt(&ok);
-  return ok;
+  if (InputData->text().toUInt() == 0) {
+    return false;
+  }
+
+  return true;
 }

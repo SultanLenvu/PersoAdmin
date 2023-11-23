@@ -5,7 +5,7 @@
 
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Загружаем пользовательские настройки
   loadSettings();
@@ -88,7 +88,7 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  Interactor->getNewOrderData(orderParameters.get(), ok);
+  Interactor->getNewOrderParam(orderParameters.get(), ok);
   if (!ok) {
     return;
   }
@@ -97,33 +97,31 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
 }
 
 void MainWindowKernel::startOrderAssemblingPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  if (AbstractGUI->OrderIdLineEdit1->text().toInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод идентификатора заказа. ");
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  emit startOrderAssembling_signal(AbstractGUI->OrderIdLineEdit1->text(),
-                                   OrderModel);
+  emit startOrderAssembling_signal(param, OrderModel);
 }
 
 void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  if (AbstractGUI->OrderIdLineEdit1->text().toInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Некорректный ввод идентификатора заказа. ");
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  emit stopOrderAssembling_signal(AbstractGUI->OrderIdLineEdit1->text(),
-                                  OrderModel);
+  emit stopOrderAssembling_signal(param, OrderModel);
 }
 
 void MainWindowKernel::updateOrderViewPushButton_slot() {
@@ -134,26 +132,44 @@ void MainWindowKernel::updateOrderViewPushButton_slot() {
 
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
   bool ok;
-  QSharedPointer<QHash<QString, QString>> productionLineParameters(
-      new QHash<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  Interactor->getNewProductionLineData(productionLineParameters.get(), ok);
+  Interactor->getNewProductionLineParam(param.get(), ok);
   if (!ok) {
     return;
   }
 
-  emit createNewProductionLine_signal(productionLineParameters,
-                                      ProductionLineModel);
+  emit createNewProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::startProductionLinePushButton_slot() {
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+
   emit loggerClear_signal();
+
+  Interactor->getStartProductionLineParam(param.get(), ok);
+  if (!ok) {
+    return;
+  }
+
+  emit startProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::stopProductionLinePushButton_slot() {
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+
   emit loggerClear_signal();
+
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
+    return;
+  }
+
+  emit stopProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
@@ -172,14 +188,6 @@ void MainWindowKernel::updateProductionLineViewPushButton_slot() {
   emit showDatabaseTable_signal("production_lines", ProductionLineModel);
 }
 
-void MainWindowKernel::showIssuerTablePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QString tableName = AbstractGUI->IssuerTableChoice->currentText();
-  emit loggerClear_signal();
-
-  emit showDatabaseTable_signal(MatchingTable->value(tableName), IssuerModel);
-}
-
 void MainWindowKernel::initTransportMasterKeysPushButton_slot() {
   emit loggerClear_signal();
 
@@ -193,29 +201,17 @@ void MainWindowKernel::initIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> linkParameters(
-      new QHash<QString, QString>());
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QString issuerId = AbstractGUI->IssuerIdLineEdit1->text();
-  QString masterKeysId = AbstractGUI->MasterKeysLineEdit1->text();
-  QString masterKeysType = AbstractGUI->MasterKeysChoice->currentText();
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   emit loggerClear_signal();
 
-  // Проверка пользовательского ввода
-  if (!checkLinkIssuerInput()) {
-    Interactor->generateErrorMessage(
-        "Введены некорректные данные для связывания эмитента с ключами. ");
+  Interactor->getLinkIssuerKeyParam(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  // Собираем параметры
-  linkParameters->insert("issuer_id", issuerId);
-  linkParameters->insert("master_keys_id", masterKeysId);
-  linkParameters->insert("master_keys_type",
-                         MatchingTable->value(masterKeysType));
-
-  emit linkIssuerWithMasterKeys_signal(IssuerModel, linkParameters);
+  emit linkIssuerWithMasterKeys_signal(param, IssuerModel);
 }
 
 void MainWindowKernel::releaseTransponderPushButton_slot() {
@@ -306,10 +302,9 @@ void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
   bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  Interactor->getPan(param.get(), ok);
-
   emit loggerClear_signal();
 
+  Interactor->getPan(param.get(), ok);
   if (!ok) {
     return;
   }
@@ -322,36 +317,30 @@ void MainWindowKernel::printLastPalletStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualReleasePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   emit loggerClear_signal();
 
-  if (AbstractGUI->AnyIdLineEdit->text().toInt() == 0) {
-    Interactor->generateErrorMessage("Некорректный ввод данных.");
+  Interactor->getManualReleaseRefundParam(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
-  param->insert("table", MatchingTable->value(
-                             AbstractGUI->ChoiceAnyIdComboBox->currentText()));
-  param->insert("id", AbstractGUI->AnyIdLineEdit->text());
   emit releaseTranspondersManually_signal(param, TransponderModel);
 }
 
 void MainWindowKernel::transponderManualRefundPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   emit loggerClear_signal();
 
-  if (AbstractGUI->AnyIdLineEdit->text().toInt() == 0) {
-    Interactor->generateErrorMessage("Некорректный ввод данных.");
+  Interactor->getManualReleaseRefundParam(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
-  param->insert("table", MatchingTable->value(
-                             AbstractGUI->ChoiceAnyIdComboBox->currentText()));
-  param->insert("id", AbstractGUI->AnyIdLineEdit->text());
   emit refundTranspondersManually_signal(param, TransponderModel);
 }
 
@@ -361,7 +350,7 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
 
   emit loggerClear_signal();
 
-  Interactor->getPalletShipingParameters(params.get(), ok);
+  Interactor->getPalletShipingParam(params.get(), ok);
 
   if (!ok) {
     return;
@@ -371,45 +360,45 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
 }
 
 void MainWindowKernel::printTransponderStickerPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+
   emit loggerClear_signal();
 
-  if (AbstractGUI->TransponderIdLineEdit->text().toUInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Введен некорректный идентификатор транспондера. ");
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  emit printTransponderSticker_signal(
-      AbstractGUI->TransponderIdLineEdit->text(), StickerModel);
+  emit printTransponderSticker_signal(param, StickerModel);
 }
 
 void MainWindowKernel::printBoxStickerPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+
   emit loggerClear_signal();
 
-  if (AbstractGUI->BoxIdLineEdit2->text().toUInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Введен некорректный идентификатор транспондера. ");
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  emit printBoxSticker_signal(AbstractGUI->BoxIdLineEdit2->text(),
-                              StickerModel);
+  emit printBoxSticker_signal(param, StickerModel);
 }
 
 void MainWindowKernel::printPalletStickerPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+  bool ok;
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+
   emit loggerClear_signal();
 
-  if (AbstractGUI->PalletIdLineEdit->text().toUInt() == 0) {
-    Interactor->generateErrorMessage(
-        "Введен некорректный идентификатор транспондера. ");
+  Interactor->getId(param.get(), ok);
+  if (!ok) {
     return;
   }
 
-  emit printPalletSticker_signal(AbstractGUI->PalletIdLineEdit->text(),
-                                 StickerModel);
+  emit printPalletSticker_signal(param, StickerModel);
 }
 
 void MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot() {
@@ -597,95 +586,95 @@ bool MainWindowKernel::checkNewSettings() const {
   return true;
 }
 
-bool MainWindowKernel::checkReleaseTransponderInput() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QRegularExpression regex("[A-Fa-f0-9]+");
-  QString login = AbstractGUI->LoginLineEdit2->text();
-  QString pass = AbstractGUI->PasswordLineEdit2->text();
-  QString ucid = AbstractGUI->UcidLineEdit->text();
+// bool MainWindowKernel::checkReleaseTransponderInput() const {
+//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+//   QRegularExpression regex("[A-Fa-f0-9]+");
+//   QString login = AbstractGUI->LoginLineEdit2->text();
+//   QString pass = AbstractGUI->PasswordLineEdit2->text();
+//   QString ucid = AbstractGUI->UcidLineEdit->text();
 
-  if (ucid.size() != UCID_CHAR_LENGTH) {
-    return false;
-  }
+//  if (ucid.size() != UCID_CHAR_LENGTH) {
+//    return false;
+//  }
 
-  QRegularExpressionMatch match = regex.match(ucid);
-  if ((!match.hasMatch()) || (match.captured(0) != ucid)) {
-    return false;
-  }
+//  QRegularExpressionMatch match = regex.match(ucid);
+//  if ((!match.hasMatch()) || (match.captured(0) != ucid)) {
+//    return false;
+//  }
 
-  if ((login.size() == 0) || (login.size() > 20)) {
-    return false;
-  }
+//  if ((login.size() == 0) || (login.size() > 20)) {
+//    return false;
+//  }
 
-  if ((pass.size() == 0) || (pass.size() > 20)) {
-    return false;
-  }
+//  if ((pass.size() == 0) || (pass.size() > 20)) {
+//    return false;
+//  }
 
-  return true;
-}
+//  return true;
+//}
 
-bool MainWindowKernel::checkConfirmRereleaseTransponderInput() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QRegularExpression ucidRegex("[A-Fa-f0-9]+");
-  QRegularExpression panRegex("[0-9]+");
-  QString choice = AbstractGUI->RereleaseKeyComboBox->currentText();
-  QString input = AbstractGUI->RereleaseKeyLineEdit->text();
-  QString ucid = AbstractGUI->UcidLineEdit->text();
-  QString login = AbstractGUI->LoginLineEdit2->text();
-  QString pass = AbstractGUI->PasswordLineEdit2->text();
+// bool MainWindowKernel::checkConfirmRereleaseTransponderInput() const {
+//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+//   QRegularExpression ucidRegex("[A-Fa-f0-9]+");
+//   QRegularExpression panRegex("[0-9]+");
+//   QString choice = AbstractGUI->RereleaseKeyComboBox->currentText();
+//   QString input = AbstractGUI->RereleaseKeyLineEdit->text();
+//   QString ucid = AbstractGUI->UcidLineEdit->text();
+//   QString login = AbstractGUI->LoginLineEdit2->text();
+//   QString pass = AbstractGUI->PasswordLineEdit2->text();
 
-  if ((login.size() == 0) || (login.size() > 20)) {
-    return false;
-  }
+//  if ((login.size() == 0) || (login.size() > 20)) {
+//    return false;
+//  }
 
-  if ((pass.size() == 0) || (pass.size() > 20)) {
-    return false;
-  }
+//  if ((pass.size() == 0) || (pass.size() > 20)) {
+//    return false;
+//  }
 
-  if (choice == "SN") {
-    if (input.toInt() == 0) {
-      return false;
-    }
-  } else if (choice == "PAN") {
-    if (input.length() != PAN_CHAR_LENGTH) {
-      return false;
-    }
+//  if (choice == "SN") {
+//    if (input.toInt() == 0) {
+//      return false;
+//    }
+//  } else if (choice == "PAN") {
+//    if (input.length() != PAN_CHAR_LENGTH) {
+//      return false;
+//    }
 
-    QRegularExpressionMatch match = panRegex.match(input);
-    if ((!match.hasMatch()) || (match.captured(0) != input)) {
-      return false;
-    }
-  } else {
-    return false;
-  }
+//    QRegularExpressionMatch match = panRegex.match(input);
+//    if ((!match.hasMatch()) || (match.captured(0) != input)) {
+//      return false;
+//    }
+//  } else {
+//    return false;
+//  }
 
-  if (ucid.size() != UCID_CHAR_LENGTH) {
-    return false;
-  }
+//  if (ucid.size() != UCID_CHAR_LENGTH) {
+//    return false;
+//  }
 
-  QRegularExpressionMatch match = ucidRegex.match(ucid);
-  if ((!match.hasMatch()) || (match.captured(0) != ucid)) {
-    return false;
-  }
+//  QRegularExpressionMatch match = ucidRegex.match(ucid);
+//  if ((!match.hasMatch()) || (match.captured(0) != ucid)) {
+//    return false;
+//  }
 
-  return true;
-}
+//  return true;
+//}
 
-bool MainWindowKernel::checkLinkIssuerInput() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QString issuerId = AbstractGUI->IssuerIdLineEdit1->text();
-  QString masterKeysId = AbstractGUI->MasterKeysLineEdit1->text();
+// bool MainWindowKernel::checkLinkIssuerInput() const {
+//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+//   QString issuerId = AbstractGUI->IssuerIdLineEdit1->text();
+//   QString masterKeysId = AbstractGUI->MasterKeysLineEdit1->text();
 
-  if (issuerId.toInt() == 0) {
-    return false;
-  }
+//  if (issuerId.toInt() == 0) {
+//    return false;
+//  }
 
-  if (masterKeysId.toInt() == 0) {
-    return false;
-  }
+//  if (masterKeysId.toInt() == 0) {
+//    return false;
+//  }
 
-  return true;
-}
+//  return true;
+//}
 
 void MainWindowKernel::createTopMenu() {
   menuBar()->clear();
@@ -744,7 +733,7 @@ void MainWindowKernel::createMainWindowGUI() {
   }
   // Настраиваем размер главного окна
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
+              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
 
   // Создаем интерфейс
   CurrentGUI = new MainWindowGUI(this);
@@ -795,8 +784,6 @@ void MainWindowKernel::connectMainWindowGUI() {
           &MainWindowKernel::updateProductionLineViewPushButton_slot);
 
   // Эмитенты
-  connect(AbstractGUI->ShowIssuerTablePushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::showIssuerTablePushButton_slot);
   connect(AbstractGUI->InitTransportMasterKeysPushButton, &QPushButton::clicked,
           this, &MainWindowKernel::initTransportMasterKeysPushButton_slot);
   connect(AbstractGUI->LinkIssuerWithKeysPushButton, &QPushButton::clicked,
@@ -908,8 +895,6 @@ void MainWindowKernel::createManagerInstance() {
           &AdminManager::disconnectDatabase);
   connect(this, &MainWindowKernel::showDatabaseTable_signal, Manager,
           &AdminManager::showDatabaseTable);
-  connect(this, &MainWindowKernel::clearDatabaseTable_signal, Manager,
-          &AdminManager::clearDatabaseTable);
   connect(this, &MainWindowKernel::performCustomRequest_signal, Manager,
           &AdminManager::performCustomRequest);
 
@@ -1014,10 +999,6 @@ void MainWindowKernel::createMatchingTable() {
   MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
   MatchingTable->insert("Эмитенты", "issuers");
-  MatchingTable->insert("ID транспондера", "transponders");
-  MatchingTable->insert("ID бокса", "boxes");
-  MatchingTable->insert("ID паллеты", "pallets");
-  MatchingTable->insert("ID заказа", "orders");
 }
 
 void MainWindowKernel::registerMetaType() {

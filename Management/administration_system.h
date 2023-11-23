@@ -50,7 +50,6 @@ class AdministrationSystem : public QObject {
   ReturnStatus connectDatabase(void);
   ReturnStatus disconnectDatabase(void);
 
-  ReturnStatus clearDatabaseTable(const QString& tableName);
   ReturnStatus getDatabaseTable(const QString& tableName,
                                 SqlQueryValues* response);
   ReturnStatus getCustomResponse(const QString& req, SqlQueryValues* response);
@@ -59,7 +58,6 @@ class AdministrationSystem : public QObject {
       const QSharedPointer<QHash<QString, QString>> orderParameters);
   ReturnStatus startOrderAssembling(const QString& orderId);
   ReturnStatus stopOrderAssembling(const QString& orderId);
-  ReturnStatus deleteLastOrder(void);
 
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);

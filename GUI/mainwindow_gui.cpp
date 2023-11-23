@@ -154,24 +154,14 @@ void MainWindowGUI::createOrderTab() {
   CreateNewOrderPushButton = new QPushButton("Создать новый заказ");
   OrderControlPanelLayout->addWidget(CreateNewOrderPushButton);
 
-  OrderControlPanelVS1 =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  OrderControlPanelLayout->addItem(OrderControlPanelVS1);
-
-  OrderIdLayout1 = new QHBoxLayout();
-  OrderControlPanelLayout->addLayout(OrderIdLayout1);
-  OrderIdLabel1 = new QLabel("ID заказа: ");
-  OrderIdLayout1->addWidget(OrderIdLabel1);
-  OrderIdLineEdit1 = new QLineEdit();
-  OrderIdLayout1->addWidget(OrderIdLineEdit1);
   StartOrderAssemblingPushButton = new QPushButton("Начать сборку заказа");
   OrderControlPanelLayout->addWidget(StartOrderAssemblingPushButton);
   StopOrderAssemblingPushButton = new QPushButton("Остановить сборку заказа");
   OrderControlPanelLayout->addWidget(StopOrderAssemblingPushButton);
 
-  OrderControlPanelVS2 =
+  OrderControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  OrderControlPanelLayout->addItem(OrderControlPanelVS2);
+  OrderControlPanelLayout->addItem(OrderControlPanelVS1);
 
   UpdateOrderViewPushButton = new QPushButton("Обновить таблицу");
   OrderControlPanelLayout->addWidget(UpdateOrderViewPushButton);
@@ -366,19 +356,6 @@ void MainWindowGUI::createTransponderTab() {
   TransponderControlPanelLayout = new QVBoxLayout();
   TransponderControlPanel->setLayout(TransponderControlPanelLayout);
 
-  TransponderControlPanelSublayout = new QHBoxLayout();
-  TransponderControlPanelLayout->addLayout(TransponderControlPanelSublayout);
-
-  ChoiceAnyIdComboBox = new QComboBox();
-  ChoiceAnyIdComboBox->addItem("ID транспондера");
-  ChoiceAnyIdComboBox->addItem("ID бокса");
-  ChoiceAnyIdComboBox->addItem("ID паллеты");
-  ChoiceAnyIdComboBox->addItem("ID заказа");
-  ChoiceAnyIdComboBox->setCurrentIndex(0);
-  TransponderControlPanelSublayout->addWidget(ChoiceAnyIdComboBox);
-  AnyIdLineEdit = new QLineEdit();
-  TransponderControlPanelSublayout->addWidget(AnyIdLineEdit);
-
   TransponderManualReleasePushButton = new QPushButton("Принудительный выпуск");
   TransponderControlPanelLayout->addWidget(TransponderManualReleasePushButton);
   TransponderManualRefundPushButton = new QPushButton("Произвести возврат");
@@ -422,44 +399,17 @@ void MainWindowGUI::createIssuerTab() {
   IssuerControlPanelLayout = new QVBoxLayout();
   IssuerControlPanelGroup->setLayout(IssuerControlPanelLayout);
 
-  IssuerTableChoice = new QComboBox();
-  IssuerTableChoice->addItem("Эмитенты");
-  IssuerTableChoice->addItem("Транспортные мастер ключи");
-  IssuerTableChoice->addItem("Коммерческие мастер ключи");
-  IssuerTableChoice->setCurrentIndex(0);
-  IssuerControlPanelLayout->addWidget(IssuerTableChoice);
-
-  ShowIssuerTablePushButton = new QPushButton("Загрузить");
-  IssuerControlPanelLayout->addWidget(ShowIssuerTablePushButton);
   InitTransportMasterKeysPushButton =
       new QPushButton("Инициализировать транспортные ключи");
   IssuerControlPanelLayout->addWidget(InitTransportMasterKeysPushButton);
   InitIssuerTablePushButton = new QPushButton("Инициализировать эмитентов");
   IssuerControlPanelLayout->addWidget(InitIssuerTablePushButton);
+  LinkIssuerWithKeysPushButton = new QPushButton("Связать эмитента и ключи");
+  IssuerControlPanelLayout->addWidget(LinkIssuerWithKeysPushButton);
 
   TransportKeyVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   IssuerControlPanelLayout->addItem(TransportKeyVS1);
-
-  IssuerIdLayout1 = new QHBoxLayout();
-  IssuerControlPanelLayout->addLayout(IssuerIdLayout1);
-  IssuerIdLabel1 = new QLabel("ID эмитента: ");
-  IssuerIdLayout1->addWidget(IssuerIdLabel1);
-  IssuerIdLineEdit1 = new QLineEdit();
-  IssuerIdLayout1->addWidget(IssuerIdLineEdit1);
-
-  MasterKeysIdLayout1 = new QHBoxLayout();
-  IssuerControlPanelLayout->addLayout(MasterKeysIdLayout1);
-  MasterKeysChoice = new QComboBox();
-  MasterKeysChoice->addItem("Транспортные мастер ключи");
-  MasterKeysChoice->addItem("Коммерческие мастер ключи");
-  MasterKeysChoice->setCurrentIndex(0);
-  MasterKeysIdLayout1->addWidget(MasterKeysChoice);
-  MasterKeysLineEdit1 = new QLineEdit();
-  MasterKeysIdLayout1->addWidget(MasterKeysLineEdit1);
-
-  LinkIssuerWithKeysPushButton = new QPushButton("Связать эмитента и ключи");
-  IssuerControlPanelLayout->addWidget(LinkIssuerWithKeysPushButton);
 
   // Отображение буфера считанных данных из БД
   IssuerViewGroup = new QGroupBox(QString("Таблица"));
@@ -493,17 +443,11 @@ void MainWindowGUI::createStickerTab() {
   StickerControlPanelLayout = new QVBoxLayout();
   StickerControlPanel->setLayout(StickerControlPanelLayout);
 
-  TransponderIdLineEdit = new QLineEdit();
-  StickerControlPanelLayout->addWidget(TransponderIdLineEdit);
   PrintTransponderStickerPushButton =
       new QPushButton("Распечатать стикер для транспондера");
   StickerControlPanelLayout->addWidget(PrintTransponderStickerPushButton);
-  BoxIdLineEdit2 = new QLineEdit();
-  StickerControlPanelLayout->addWidget(BoxIdLineEdit2);
   PrintBoxStickerPushButton = new QPushButton("Распечатать стикер для бокса");
   StickerControlPanelLayout->addWidget(PrintBoxStickerPushButton);
-  PalletIdLineEdit = new QLineEdit();
-  StickerControlPanelLayout->addWidget(PalletIdLineEdit);
   PrintPalletStickerPushButton =
       new QPushButton("Распечатать стикер для паллеты");
   StickerControlPanelLayout->addWidget(PrintPalletStickerPushButton);

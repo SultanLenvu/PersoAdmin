@@ -40,27 +40,6 @@ void AdministrationSystem::createDatabase() {
           &LogSystem::generate);
 }
 
-AdministrationSystem::ReturnStatus AdministrationSystem::clearDatabaseTable(
-    const QString& tableName) {
-  if (!Database->openTransaction()) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    return DatabaseTransactionError;
-  }
-
-  if (!Database->clearTable(tableName)) {
-    sendLog(QString("Получена ошибка при очистке таблицы %1. ").arg(tableName));
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
-
-  sendLog(QString("Таблица %1 очищена. ").arg(tableName));
-  if (!Database->commitTransaction()) {
-    sendLog("Получена ошибка при закрытии транзакции. ");
-    return DatabaseTransactionError;
-  }
-  return Completed;
-}
-
 AdministrationSystem::ReturnStatus AdministrationSystem::getDatabaseTable(
     const QString& tableName,
     SqlQueryValues* response) {
@@ -220,46 +199,10 @@ AdministrationSystem::ReturnStatus AdministrationSystem::stopOrderAssembling(
   sendLog("Остановка всех производственных линий. ");
   if (!stopAllProductionLines()) {
     Database->rollbackTransaction();
-    sendLog("Получена ошибка при остановке всех производственных линий. ");
     return DatabaseQueryError;
   }
 
   sendLog(QString("Сборка заказа %1 остановлена. ").arg(orderId));
-  if (!Database->commitTransaction()) {
-    sendLog("Получена ошибка при закрытии транзакции. ");
-    return DatabaseTransactionError;
-  }
-  return Completed;
-}
-
-AdministrationSystem::ReturnStatus AdministrationSystem::deleteLastOrder() {
-  SqlQueryValues lastOrder;
-
-  sendLog("Удаление последнего добавленного заказа. ");
-
-  if (!Database->openTransaction()) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    return DatabaseTransactionError;
-  }
-
-  if (!Database->readLastRecord("orders", lastOrder)) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    Database->rollbackTransaction();
-    return DatabaseQueryError;
-  }
-
-  if ((lastOrder.get("in_process") == "true") ||
-      (lastOrder.get("quantity") == lastOrder.get("assembled_units"))) {
-    sendLog(QString("Заказ %1 находится в процессе сборки, либо уже собран, "
-                    "удаление невозможно. ")
-                .arg(lastOrder.get("id")));
-    Database->rollbackTransaction();
-    return OrderRemovingError;
-  }
-
-  Database->deleteRecords("orders", "id = " + lastOrder.get("id"));
-
-  sendLog("Последний добавленный заказ успешно удален. ");
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     return DatabaseTransactionError;
@@ -520,12 +463,12 @@ AdministrationSystem::linkIssuerWithMasterKeys(
 
   sendLog(QString("Обновление записи эмитента %1.")
               .arg(linkParameters->value("issuer_id")));
-  if (linkParameters->value("master_keys_type") == "transport_master_keys") {
+  if (linkParameters->value("key_table") == "transport_master_keys") {
     issuerNewValue.add("transport_master_keys_id",
-                       linkParameters->value("master_keys_id"));
+                       linkParameters->value("key_group_id"));
   } else {
     issuerNewValue.add("commercial_master_keys_id",
-                       linkParameters->value("master_keys_id"));
+                       linkParameters->value("key_group_id"));
   }
 
   if (!Database->updateRecords("issuers",
@@ -539,7 +482,7 @@ AdministrationSystem::linkIssuerWithMasterKeys(
 
   sendLog(QString("Эмитент %1 успешно связан с мастер ключами %2. ")
               .arg(linkParameters->value("issuer_id"),
-                   linkParameters->value("master_keys_id")));
+                   linkParameters->value("key_group_id")));
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     Database->rollbackTransaction();
@@ -1274,7 +1217,15 @@ bool AdministrationSystem::stopAllProductionLines() const {
 
   sendLog("Остановка процесса сборки всех боксов. ");
   boxNewValues.add("in_process", "false");
-  if (!Database->updateRecords("boxes", "in_process = true", boxNewValues)) {
+  if (!Database->updateRecords(
+          "boxes", "in_process = true AND assembled_units > 0", boxNewValues)) {
+    sendLog(QString("Получена ошибка при остановке сборки всех боксов. "));
+    Database->rollbackTransaction();
+    return false;
+  }
+  boxNewValues.add("production_line_id", "NULL");
+  if (!Database->updateRecords(
+          "boxes", "in_process = true AND assembled_units = 0", boxNewValues)) {
     sendLog(QString("Получена ошибка при остановке сборки всех боксов. "));
     Database->rollbackTransaction();
     return false;
@@ -1296,6 +1247,8 @@ bool AdministrationSystem::stopAllProductionLines() const {
     Database->rollbackTransaction();
     return false;
   }
+
+  return true;
 }
 
 bool AdministrationSystem::linkProductionLineWithBox(

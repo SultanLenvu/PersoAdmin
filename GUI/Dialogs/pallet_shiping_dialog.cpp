@@ -10,6 +10,9 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
               DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.05);
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 PalletShippingDialog::~PalletShippingDialog() {}

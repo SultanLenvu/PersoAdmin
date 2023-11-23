@@ -70,31 +70,6 @@ void AdminManager::showDatabaseTable(const QString& name,
   finishOperationPerforming("showDatabaseTable");
 }
 
-void AdminManager::clearDatabaseTable(const QString& name,
-                                      SqlQueryValues* model) {
-  // Начинаем выполнение операции
-  startOperationPerforming("clearDatabaseTable");
-
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog(QString("Очистка таблицы %1. ").arg(name));
-  status = Administrator->clearDatabaseTable(name);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "clearDatabaseTable");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение таблицы базы данных. ");
-  status = Administrator->getDatabaseTable(name, model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "clearDatabaseTable");
-    return;
-  }
-
-  finishOperationPerforming("clearDatabaseTable");
-}
-
 void AdminManager::performCustomRequest(const QString& req,
                                         SqlQueryValues* model) {
   // Начинаем выполнение операции
@@ -138,37 +113,15 @@ void AdminManager::createNewOrder(
   finishOperationPerforming("createNewOrder");
 }
 
-void AdminManager::deleteLastOrder(SqlQueryValues* model) {
-  startOperationPerforming("deleteLastOrder");
-
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog("Удаление последнего заказа. ");
-  status = Administrator->deleteLastOrder();
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "deleteLastOrder");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение заказов. ");
-  status = Administrator->getDatabaseTable("orders", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "deleteLastOrder");
-    return;
-  }
-
-  finishOperationPerforming("deleteLastOrder");
-}
-
-void AdminManager::startOrderAssembling(const QString& orderId,
-                                        SqlQueryValues* model) {
+void AdminManager::startOrderAssembling(
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("startOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
 
-  sendLog(QString("Запуск сборки заказа %1. ").arg(orderId));
-  status = Administrator->startOrderAssembling(orderId);
+  sendLog(QString("Запуск сборки заказа %1. ").arg(param->value("id")));
+  status = Administrator->startOrderAssembling(param->value("id"));
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "startOrderAssembling");
     return;
@@ -185,14 +138,15 @@ void AdminManager::startOrderAssembling(const QString& orderId,
   finishOperationPerforming("startOrderAssembling");
 }
 
-void AdminManager::stopOrderAssembling(const QString& orderId,
-                                       SqlQueryValues* model) {
+void AdminManager::stopOrderAssembling(
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("stopOrderAssembling");
 
   AdministrationSystem::ReturnStatus status;
 
-  sendLog(QString("Остановка сборки заказа %1. ").arg(orderId));
-  status = Administrator->stopOrderAssembling(orderId);
+  sendLog(QString("Остановка сборки заказа %1. ").arg(param->value("id")));
+  status = Administrator->stopOrderAssembling(param->value("id"));
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "stopOrderAssembling");
     return;
@@ -262,29 +216,6 @@ void AdminManager::stopAllProductionLines(SqlQueryValues* model) {
   finishOperationPerforming("stopAllProductionLines");
 }
 
-void AdminManager::deleteLastProductionLine(SqlQueryValues* model) {
-  startOperationPerforming("deleteLastProductionLine");
-
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog("Удаление последней линии производства. ");
-  status = Administrator->deleteLastProductionLine();
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "deleteLastProductionLine");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "deleteLastProductionLine");
-    return;
-  }
-
-  finishOperationPerforming("deleteLastProductionLine");
-}
-
 void AdminManager::showProductionLineTable(SqlQueryValues* model) {
   showDatabaseTable("orders", model);
 }
@@ -336,16 +267,15 @@ void AdminManager::initTransportMasterKeys(SqlQueryValues* model) {
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
-    SqlQueryValues* model,
-    const QSharedPointer<QHash<QString, QString>> parameters) {
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("linkIssuerWithMasterKeys");
 
   AdministrationSystem::ReturnStatus status;
 
   sendLog(QString("Связывание эмитента %1 с мастер ключами %2. ")
-              .arg(parameters->value("issuer_id"),
-                   parameters->value("master_keys_id")));
-  status = Administrator->linkIssuerWithMasterKeys(parameters.get());
+              .arg(param->value("issuer_id"), param->value("key_group_id")));
+  status = Administrator->linkIssuerWithMasterKeys(param.get());
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;
@@ -580,8 +510,9 @@ void AdminManager::printLastPalletStickerOnServer() {
   finishOperationPerforming("printLastPalletStickerOnServer");
 }
 
-void AdminManager::printTransponderSticker(const QString& id,
-                                           SqlQueryValues* model) {
+void AdminManager::printTransponderSticker(
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("printTransponderSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -589,7 +520,8 @@ void AdminManager::printTransponderSticker(const QString& id,
 
   QHash<QString, QString> transponderData;
   sendLog("Запрос данных транспондера. ");
-  administratorStatus = Administrator->getTransponderData(id, &transponderData);
+  administratorStatus =
+      Administrator->getTransponderData(param->value("id"), &transponderData);
   if (administratorStatus != AdministrationSystem::Completed) {
     processAdministratorError(administratorStatus, "printTransponderSticker");
     return;
@@ -606,7 +538,9 @@ void AdminManager::printTransponderSticker(const QString& id,
   finishOperationPerforming("printTransponderSticker");
 }
 
-void AdminManager::printBoxSticker(const QString& id, SqlQueryValues* model) {
+void AdminManager::printBoxSticker(
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("printBoxSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -614,7 +548,7 @@ void AdminManager::printBoxSticker(const QString& id, SqlQueryValues* model) {
 
   QHash<QString, QString> boxData;
   sendLog("Запрос данных бокса. ");
-  administratorStatus = Administrator->getBoxData(id, &boxData);
+  administratorStatus = Administrator->getBoxData(param->value("id"), &boxData);
   if (administratorStatus != AdministrationSystem::Completed) {
     processAdministratorError(administratorStatus, "printBoxSticker");
     return;
@@ -630,8 +564,9 @@ void AdminManager::printBoxSticker(const QString& id, SqlQueryValues* model) {
   finishOperationPerforming("printBoxSticker");
 }
 
-void AdminManager::printPalletSticker(const QString& id,
-                                      SqlQueryValues* model) {
+void AdminManager::printPalletSticker(
+    const QSharedPointer<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
   startOperationPerforming("printPalletSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -639,7 +574,8 @@ void AdminManager::printPalletSticker(const QString& id,
 
   QHash<QString, QString> palletData;
   sendLog("Запрос данных паллеты. ");
-  administratorStatus = Administrator->getPalletData(id, &palletData);
+  administratorStatus =
+      Administrator->getPalletData(param->value("id"), &palletData);
   if (administratorStatus != AdministrationSystem::Completed) {
     processAdministratorError(administratorStatus, "printTransponderSticker");
     return;

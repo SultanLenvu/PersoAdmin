@@ -19,16 +19,19 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/abstract_input_dialog.cpp GUI/abstract_input_dialog.h
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/mainwindow_kernel.cpp GUI/mainwindow_kernel.h
-    GUI/pallet_shiping_dialog.cpp GUI/pallet_shiping_dialog.h
-    GUI/pan_input_dialog.cpp GUI/pan_input_dialog.h
-    GUI/idetifier_input_dialog.h GUI/identifier_input_dialog.cpp
-    GUI/production_line_creation_dialog.h GUI/production_line_creation_dialog.cpp
-    GUI/order_creation_dialog.h GUI/order_creation_dialog.cpp
-    GUI/start_production_line_dialog.h GUI/start_production_line_dialog.cpp
+
+    GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
+    GUI/Dialogs/pallet_shiping_dialog.cpp GUI/Dialogs/pallet_shiping_dialog.h
+    GUI/Dialogs/pan_input_dialog.cpp GUI/Dialogs/pan_input_dialog.h
+    GUI/Dialogs/idetifier_input_dialog.h GUI/Dialogs/identifier_input_dialog.cpp
+    GUI/Dialogs/production_line_creation_dialog.h GUI/Dialogs/production_line_creation_dialog.cpp
+    GUI/Dialogs/order_creation_dialog.h GUI/Dialogs/order_creation_dialog.cpp
+    GUI/Dialogs/start_production_line_dialog.h GUI/Dialogs/start_production_line_dialog.cpp
+    GUI/Dialogs/manual_release_refund_dialog.h GUI/Dialogs/manual_release_refund_dialog.cpp
+    GUI/Dialogs/link_issuer_key_dialog.h GUI/Dialogs/link_issuer_key_dialog.cpp
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h

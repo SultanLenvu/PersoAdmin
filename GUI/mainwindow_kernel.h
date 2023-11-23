@@ -78,7 +78,6 @@ class MainWindowKernel : public QMainWindow {
   void updateProductionLineViewPushButton_slot(void);
 
   // Функционал для работы с транспортными мастер ключами
-  void showIssuerTablePushButton_slot(void);
   void initTransportMasterKeysPushButton_slot(void);
   void initIssuerTablePushButton_slot(void);
   void linkIssuerWithKeysPushButton_slot(void);
@@ -118,11 +117,7 @@ class MainWindowKernel : public QMainWindow {
   Q_DISABLE_COPY_MOVE(MainWindowKernel)
   void loadSettings(void) const;
   void saveSettings(void) const;
-  bool checkAuthorizationData(void) const;
   bool checkNewSettings(void) const;
-  bool checkReleaseTransponderInput(void) const;
-  bool checkConfirmRereleaseTransponderInput(void) const;
-  bool checkLinkIssuerInput(void) const;
 
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню
@@ -152,17 +147,16 @@ class MainWindowKernel : public QMainWindow {
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
   void showDatabaseTable_signal(const QString& name, SqlQueryValues* model);
-  void clearDatabaseTable_signal(const QString& name, SqlQueryValues* model);
-
   void performCustomRequest_signal(const QString& req, SqlQueryValues* model);
 
   // Заказы
   void createNewOrder_signal(
       const QSharedPointer<QHash<QString, QString>> orderParameterseters,
       SqlQueryValues* model);
-  void startOrderAssembling_signal(const QString& orderId,
-                                   SqlQueryValues* model);
-  void stopOrderAssembling_signal(const QString& orderId,
+  void startOrderAssembling_signal(
+      const QSharedPointer<QHash<QString, QString>>,
+      SqlQueryValues* model);
+  void stopOrderAssembling_signal(const QSharedPointer<QHash<QString, QString>>,
                                   SqlQueryValues* model);
   void showOrderTable_signal(SqlQueryValues* model);
 
@@ -212,13 +206,19 @@ class MainWindowKernel : public QMainWindow {
   void initIssuers_signal(SqlQueryValues* model);
   void initTransportMasterKeys_signal(SqlQueryValues* model);
   void linkIssuerWithMasterKeys_signal(
-      SqlQueryValues* model,
-      const QSharedPointer<QHash<QString, QString>> Parameterseters);
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
 
   // Принтер
-  void printTransponderSticker_signal(const QString& id, SqlQueryValues* model);
-  void printBoxSticker_signal(const QString& id, SqlQueryValues* model);
-  void printPalletSticker_signal(const QString& id, SqlQueryValues* model);
+  void printTransponderSticker_signal(
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
+  void printBoxSticker_signal(
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
+  void printPalletSticker_signal(
+      const QSharedPointer<QHash<QString, QString>> param,
+      SqlQueryValues* model);
   void execPrinterStickerCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
 };

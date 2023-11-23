@@ -11,7 +11,7 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "abstract_input_dialog.h"
+#include "Dialogs/abstract_input_dialog.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
@@ -38,12 +38,14 @@ class InteractionSystem : public QWidget {
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
 
-  void getPalletShipingParameters(QHash<QString, QString>* data, bool& ok);
-  void getPan(QHash<QString, QString>* data, bool& ok);
-  void getId(QHash<QString, QString>* data, bool& ok);
-  void getNewProductionLineData(QHash<QString, QString>* data, bool& ok);
-  void getStartProductionLineData(QHash<QString, QString>* data, bool& ok);
-  void getNewOrderData(QHash<QString, QString>* data, bool& ok);
+  void getPalletShipingParam(QHash<QString, QString>* param, bool& ok);
+  void getPan(QHash<QString, QString>* param, bool& ok);
+  void getId(QHash<QString, QString>* param, bool& ok);
+  void getNewProductionLineParam(QHash<QString, QString>* param, bool& ok);
+  void getStartProductionLineParam(QHash<QString, QString>* param, bool& ok);
+  void getNewOrderParam(QHash<QString, QString>* param, bool& ok);
+  void getManualReleaseRefundParam(QHash<QString, QString>* param, bool& ok);
+  void getLinkIssuerKeyParam(QHash<QString, QString>* param, bool& ok);
 
   void applySettings(void);
 

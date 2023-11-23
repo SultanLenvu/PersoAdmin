@@ -12,12 +12,15 @@ StartProductionLineDialog::StartProductionLineDialog(QWidget* parent)
   setWindowTitle("Запуск производственной линии");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 StartProductionLineDialog::~StartProductionLineDialog() {}
 
 void StartProductionLineDialog::getData(QHash<QString, QString>* data,
-                                      bool& ok) const {
+                                        bool& ok) const {
   if (!check()) {
     ok = false;
     return;

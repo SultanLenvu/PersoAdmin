@@ -14,12 +14,15 @@ ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
   setWindowTitle("Cоздание производственной линии");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
 void ProductionLineCreationDialog::getData(QHash<QString, QString>* data,
-                                         bool& ok) const {
+                                           bool& ok) const {
   if (!check()) {
     ok = false;
     return;

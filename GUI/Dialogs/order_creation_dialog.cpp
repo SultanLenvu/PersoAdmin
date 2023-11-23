@@ -14,11 +14,15 @@ OrderCreationDialog::OrderCreationDialog(QWidget* parent)
   setWindowTitle("Создание нового заказа");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 OrderCreationDialog::~OrderCreationDialog() {}
 
-void OrderCreationDialog::getData(QHash<QString, QString>* data, bool& ok) const {
+void OrderCreationDialog::getData(QHash<QString, QString>* data,
+                                  bool& ok) const {
   if (!check()) {
     ok = false;
     return;
@@ -46,10 +50,13 @@ AbstractInputDialog::DialogType OrderCreationDialog::type() const {
 }
 
 void OrderCreationDialog::create() {
+  MainLayout = new QGridLayout();
+  setLayout(MainLayout);
+
   FullPersonalizationCheckBox = new QCheckBox("Полная персонализация");
   MainLayout->addWidget(FullPersonalizationCheckBox, 0, 0, 1, 3);
 
-  PanFilePathLabel = new QLabel("PAN-файл");
+  PanFilePathLabel = new QLabel("PAN-файл:");
   MainLayout->addWidget(PanFilePathLabel, 1, 0, 1, 1);
   PanFilePathLineEdit = new QLineEdit();
   MainLayout->addWidget(PanFilePathLineEdit, 1, 1, 1, 1);
@@ -58,44 +65,44 @@ void OrderCreationDialog::create() {
   connect(PanFileExplorePushButton, &QPushButton::clicked, this,
           &OrderCreationDialog::panFileExplore_slot);
 
-  IssuerNameComboLabel = new QLabel("Компания заказчик");
+  IssuerNameComboLabel = new QLabel("Компания заказчик:");
   MainLayout->addWidget(IssuerNameComboLabel, 2, 0, 1, 1);
   IssuerNameComboBox = new QComboBox();
   IssuerNameComboBox->addItem("Новое качество дорог");
   IssuerNameComboBox->addItem("Западный скоростной диаметр");
   MainLayout->addWidget(IssuerNameComboBox, 2, 1, 1, 2);
 
-  TransponderQuantityLabel = new QLabel("Количество транспондеров");
+  TransponderQuantityLabel = new QLabel("Количество транспондеров:");
   MainLayout->addWidget(TransponderQuantityLabel, 3, 0, 1, 1);
   TransponderQuantityLineEdit = new QLineEdit("500");
   MainLayout->addWidget(TransponderQuantityLineEdit, 3, 1, 1, 2);
 
-  BoxCapacityLabel = new QLabel("Емкость бокса");
+  BoxCapacityLabel = new QLabel("Емкость бокса:");
   MainLayout->addWidget(BoxCapacityLabel, 4, 0, 1, 1);
   BoxCapacityLineEdit = new QLineEdit("50");
   MainLayout->addWidget(BoxCapacityLineEdit, 4, 1, 1, 2);
 
-  PalletCapacityLabel = new QLabel("Емкость палеты");
+  PalletCapacityLabel = new QLabel("Емкость палеты:");
   MainLayout->addWidget(PalletCapacityLabel, 5, 0, 1, 1);
   PalletCapacityLineEdit = new QLineEdit("10");
   MainLayout->addWidget(PalletCapacityLineEdit, 5, 1, 1, 2);
 
-  TransponderModelLabel = new QLabel("Модель транспондера");
+  TransponderModelLabel = new QLabel("Модель транспондера:");
   MainLayout->addWidget(TransponderModelLabel, 6, 0, 1, 1);
   TransponderModelLineEdit = new QLineEdit("PS1001");
   MainLayout->addWidget(TransponderModelLineEdit, 6, 1, 1, 2);
 
-  AccrReferenceLabel = new QLabel("ACCR Reference (HEX)");
+  AccrReferenceLabel = new QLabel("ACCR Reference (HEX):");
   MainLayout->addWidget(AccrReferenceLabel, 7, 0, 1, 1);
   AccrReferenceLineEdit = new QLineEdit("1DD1");
   MainLayout->addWidget(AccrReferenceLineEdit, 7, 1, 1, 2);
 
-  EquipmentClassLabel = new QLabel("Класс оборудования (HEX)");
+  EquipmentClassLabel = new QLabel("Класс оборудования (HEX):");
   MainLayout->addWidget(EquipmentClassLabel, 8, 0, 1, 1);
   EquipmentClassLineEdit = new QLineEdit("F301");
   MainLayout->addWidget(EquipmentClassLineEdit, 8, 1, 1, 2);
 
-  ManufacturerIdLabel = new QLabel("Идентификатор производителя (HEX)");
+  ManufacturerIdLabel = new QLabel("Идентификатор производителя (HEX):");
   MainLayout->addWidget(ManufacturerIdLabel, 9, 0, 1, 1);
   ManufacturerIdLineEdit = new QLineEdit("0032");
   MainLayout->addWidget(ManufacturerIdLineEdit, 9, 1, 1, 2);
@@ -104,11 +111,11 @@ void OrderCreationDialog::create() {
   MainLayout->addLayout(ButtonLayout, 10, 0, 1, 3);
 
   AcceptButton = new QPushButton("Ввод");
-  MainLayout->addWidget(AcceptButton);
+  ButtonLayout->addWidget(AcceptButton);
   connect(AcceptButton, &QPushButton::clicked, this, &QDialog::accept);
 
   RejectButton = new QPushButton("Отмена");
-  MainLayout->addWidget(RejectButton);
+  ButtonLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 

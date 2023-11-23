@@ -8,7 +8,8 @@ class IdentifierInputDialog : public AbstractInputDialog {
  private:
   QSize DesktopGeometry;
 
-  QVBoxLayout* MainLayout;
+  QGridLayout* MainLayout;
+
   QLabel* MainLabel;
   QLineEdit* InputData;
 

@@ -6,8 +6,6 @@
 
 #include "abstract_gui.h"
 
-#include "General/definitions.h"
-
 class MainWindowGUI : public AbstractGUI {
   Q_OBJECT
 
@@ -55,44 +53,10 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* OrderControlPanel;
   QVBoxLayout* OrderControlPanelLayout;
 
-  QCheckBox* FullPersonalizationCheckBox;
-  QHBoxLayout* OrderPanelSubLayout;
-  QLabel* PanFilePathLabel;
-  QLineEdit* PanFilePathLineEdit;
-  QPushButton* PanFileExplorePushButton;
-  QHBoxLayout* OrderPanelSubLayout1;
-  QLabel* IssuerNameComboLabel;
-  QComboBox* IssuerNameComboBox;
-  QHBoxLayout* OrderPanelSubLayout2;
-  QLabel* TransponderQuantityLabel;
-  QLineEdit* TransponderQuantityLineEdit;
-  QHBoxLayout* OrderPanelSubLayout3;
-  QLabel* BoxCapacityLabel;
-  QLineEdit* BoxCapacityLineEdit;
-  QHBoxLayout* OrderPanelSublayout4;
-  QLabel* PalletCapacityLabel;
-  QLineEdit* PalletCapacityLineEdit;
-  QHBoxLayout* OrderPanelSublayout5;
-  QLabel* TransponderModelLabel;
-  QLineEdit* TransponderModelLineEdit;
-  QHBoxLayout* OrderPanelSubLayout6;
-  QLabel* AccrReferenceLabel;
-  QLineEdit* AccrReferenceLineEdit;
-  QHBoxLayout* OrderPanelSubLayout7;
-  QLabel* EquipmentClassLabel;
-  QLineEdit* EquipmentClassLineEdit;
-  QHBoxLayout* OrderPanelSubLayout8;
-  QLabel* ManufacturerIdLabel;
-  QLineEdit* ManufacturerIdLineEdit;
   QPushButton* CreateNewOrderPushButton;
-  QSpacerItem* OrderControlPanelVS1;
-
-  QHBoxLayout* OrderIdLayout1;
-  QLabel* OrderIdLabel1;
-  QLineEdit* OrderIdLineEdit1;
   QPushButton* StartOrderAssemblingPushButton;
   QPushButton* StopOrderAssemblingPushButton;
-  QSpacerItem* OrderControlPanelVS2;
+  QSpacerItem* OrderControlPanelVS1;
 
   QPushButton* UpdateOrderViewPushButton;
 
@@ -169,9 +133,7 @@ class MainWindowGUI : public AbstractGUI {
 
   QGroupBox* TransponderControlPanel;
   QVBoxLayout* TransponderControlPanelLayout;
-  QHBoxLayout* TransponderControlPanelSublayout;
-  QComboBox* ChoiceAnyIdComboBox;
-  QLineEdit* AnyIdLineEdit;
+
   QPushButton* TransponderManualReleasePushButton;
   QPushButton* TransponderManualRefundPushButton;
   QSpacerItem* TransponderControlPanelLayoutVS;
@@ -192,19 +154,10 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* IssuerControlPanelGroup;
   QVBoxLayout* IssuerControlPanelLayout;
 
-  QComboBox* IssuerTableChoice;
-  QPushButton* ShowIssuerTablePushButton;
   QPushButton* InitTransportMasterKeysPushButton;
   QPushButton* InitIssuerTablePushButton;
-  QSpacerItem* TransportKeyVS1;
-
-  QHBoxLayout* IssuerIdLayout1;
-  QLabel* IssuerIdLabel1;
-  QLineEdit* IssuerIdLineEdit1;
-  QHBoxLayout* MasterKeysIdLayout1;
-  QComboBox* MasterKeysChoice;
-  QLineEdit* MasterKeysLineEdit1;
   QPushButton* LinkIssuerWithKeysPushButton;
+  QSpacerItem* TransportKeyVS1;
 
   // Отображение записей
   QGroupBox* IssuerViewGroup;
@@ -219,11 +172,9 @@ class MainWindowGUI : public AbstractGUI {
 
   QGroupBox* StickerControlPanel;
   QVBoxLayout* StickerControlPanelLayout;
-  QLineEdit* TransponderIdLineEdit;
+
   QPushButton* PrintTransponderStickerPushButton;
-  QLineEdit* BoxIdLineEdit2;
   QPushButton* PrintBoxStickerPushButton;
-  QLineEdit* PalletIdLineEdit;
   QPushButton* PrintPalletStickerPushButton;
   QSpacerItem* StickerControlPanelVS;
   QPushButton* ExecStickerPrinterCommandScriptPushButton;
