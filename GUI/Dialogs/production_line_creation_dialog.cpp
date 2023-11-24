@@ -36,7 +36,7 @@ void ProductionLineCreationDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType ProductionLineCreationDialog::type() const {
+AbstractInputDialog::InputDialogType ProductionLineCreationDialog::type() const {
   return ProductionLineCreation;
 }
 

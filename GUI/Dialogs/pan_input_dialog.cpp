@@ -32,7 +32,7 @@ void PanInputDialog::getData(QHash<QString, QString>* data, bool& ok) const {
   ok = true;
 }
 
-AbstractInputDialog::DialogType PanInputDialog::type() const {
+AbstractInputDialog::InputDialogType PanInputDialog::type() const {
   return PanInput;
 }
 

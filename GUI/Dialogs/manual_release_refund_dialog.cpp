@@ -35,7 +35,7 @@ void ManualReleaseRefundDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType ManualReleaseRefundDialog::type() const {
+AbstractInputDialog::InputDialogType ManualReleaseRefundDialog::type() const {
   return ManualReleaseRefund;
 }
 

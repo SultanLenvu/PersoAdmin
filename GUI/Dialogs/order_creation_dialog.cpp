@@ -45,7 +45,7 @@ void OrderCreationDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType OrderCreationDialog::type() const {
+AbstractInputDialog::InputDialogType OrderCreationDialog::type() const {
   return OrderCreation;
 }
 

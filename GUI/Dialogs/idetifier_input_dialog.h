@@ -22,7 +22,7 @@ class IdentifierInputDialog : public AbstractInputDialog {
   ~IdentifierInputDialog();
 
   virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
-  virtual DialogType type() const override;
+  virtual InputDialogType type() const override;
 
  private:
   Q_DISABLE_COPY_MOVE(IdentifierInputDialog);

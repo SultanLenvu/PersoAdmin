@@ -30,7 +30,7 @@ void PalletShippingDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType PalletShippingDialog::type() const {
+AbstractInputDialog::InputDialogType PalletShippingDialog::type() const {
   return PalletShipping;
 }
 

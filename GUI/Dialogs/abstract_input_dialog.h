@@ -8,7 +8,7 @@
 class AbstractInputDialog : public QDialog {
   Q_OBJECT
  public:
-  enum DialogType {
+  enum InputDialogType {
     PalletShipping,
     PanInput,
     IdentifierInput,
@@ -17,14 +17,14 @@ class AbstractInputDialog : public QDialog {
     OrderCreation,
     ManualReleaseRefund,
   };
-  Q_ENUM(DialogType);
+  Q_ENUM(InputDialogType);
 
  public:
   explicit AbstractInputDialog(QWidget* parent);
   virtual ~AbstractInputDialog();
 
   virtual void getData(QHash<QString, QString>* data, bool& ok) const = 0;
-  virtual DialogType type(void) const = 0;
+  virtual InputDialogType type(void) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractInputDialog);

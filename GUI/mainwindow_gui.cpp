@@ -66,7 +66,6 @@ void MainWindowGUI::createTabs() {
   createTransponderTab();
   createIssuerTab();
   createStickerTab();
-  createSettingsTab();
 }
 
 void MainWindowGUI::createDatabaseTab() {
@@ -290,7 +289,7 @@ void MainWindowGUI::createServerTab() {
   RereleaseKeyComboBox->setCurrentIndex(0);
   RereleaseKeyLayout->addWidget(RereleaseKeyComboBox);
   connect(RereleaseKeyComboBox, &QComboBox::currentTextChanged, this,
-          &MainWindowGUI::on_RereleaseKeyComboBox_slot);
+          &MainWindowGUI::rereleaseKeyComboBox_slot);
   RereleaseKeyLineEdit = new QLineEdit();
   RereleaseKeyLineEdit->setMaxLength(PAN_CHAR_LENGTH);
   RereleaseKeyLayout->addWidget(RereleaseKeyLineEdit);
@@ -479,244 +478,6 @@ void MainWindowGUI::createStickerTab() {
   StickerMainLayout->setStretch(1, 2);
 }
 
-void MainWindowGUI::createSettingsTab() {
-  QSettings settings;
-  SettingsTab = new QWidget();
-  Tabs->addTab(SettingsTab, "Настройки");
-
-  // Главный макет меню настроек
-  SettingsMainLayout = new QHBoxLayout();
-  SettingsTab->setLayout(SettingsMainLayout);
-
-  SettingsMainSubLayout = new QVBoxLayout();
-  SettingsMainLayout->addLayout(SettingsMainSubLayout);
-
-  SettingsHorizontalSpacer1 =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  SettingsMainLayout->addItem(SettingsHorizontalSpacer1);
-
-  // Настройки базы данных
-  DatabaseSettingsGroupBox = new QGroupBox(QString("Настройки базы данных"));
-  SettingsMainSubLayout->addWidget(DatabaseSettingsGroupBox);
-
-  DatabaseSettingsLayout = new QGridLayout();
-  DatabaseSettingsGroupBox->setLayout(DatabaseSettingsLayout);
-
-  DatabaseIpLabel = new QLabel("IP-адрес");
-  DatabaseSettingsLayout->addWidget(DatabaseIpLabel, 0, 0, 1, 1);
-
-  DatabaseIpLineEdit = new QLineEdit(
-      settings.value("postgre_sql_database/server_ip").toString());
-  DatabaseSettingsLayout->addWidget(DatabaseIpLineEdit, 0, 1, 1, 1);
-
-  DatabasePortLabel = new QLabel("Порт ");
-  DatabaseSettingsLayout->addWidget(DatabasePortLabel, 1, 0, 1, 1);
-
-  DatabasePortLineEdit = new QLineEdit(
-      settings.value("postgre_sql_database/server_port").toString());
-  DatabaseSettingsLayout->addWidget(DatabasePortLineEdit, 1, 1, 1, 1);
-
-  DatabaseNameLabel = new QLabel("Название базы данных ");
-  DatabaseSettingsLayout->addWidget(DatabaseNameLabel, 2, 0, 1, 1);
-
-  DatabaseNameLineEdit = new QLineEdit(
-      settings.value("postgre_sql_database/database_name").toString());
-  DatabaseSettingsLayout->addWidget(DatabaseNameLineEdit, 2, 1, 1, 1);
-
-  DatabaseUserNameLabel = new QLabel("Имя пользователя ");
-  DatabaseSettingsLayout->addWidget(DatabaseUserNameLabel, 3, 0, 1, 1);
-
-  DatabaseUserNameLineEdit = new QLineEdit(
-      settings.value("postgre_sql_database/user_name").toString());
-  DatabaseSettingsLayout->addWidget(DatabaseUserNameLineEdit, 3, 1, 1, 1);
-
-  DatabaseUserPasswordLabel = new QLabel("Пароль пользователя ");
-  DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLabel, 4, 0, 1, 1);
-
-  DatabaseUserPasswordLineEdit = new QLineEdit(
-      settings.value("postgre_sql_database/user_password").toString());
-  DatabaseSettingsLayout->addWidget(DatabaseUserPasswordLineEdit, 4, 1, 1, 1);
-
-  IDatabaseControllerLogEnableLabel = new QLabel("Логирование ");
-  DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnableLabel, 5, 0, 1,
-                                    1);
-
-  IDatabaseControllerLogEnable = new QCheckBox();
-  IDatabaseControllerLogEnable->setCheckState(
-      settings.value("postgre_sql_database/log_enable").toBool()
-          ? Qt::Checked
-          : Qt::Unchecked);
-  DatabaseSettingsLayout->addWidget(IDatabaseControllerLogEnable, 5, 1, 1, 1);
-
-  // Настройки клиента
-  PersoClientSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
-  SettingsMainSubLayout->addWidget(PersoClientSettingsGroupBox);
-
-  PersoClientSettingsMainLayout = new QGridLayout();
-  PersoClientSettingsGroupBox->setLayout(PersoClientSettingsMainLayout);
-
-  PersoClientServerIdLabel =
-      new QLabel("IP адрес или URL сервера персонализации");
-  PersoClientSettingsMainLayout->addWidget(PersoClientServerIdLabel, 0, 0, 1,
-                                           1);
-  PersoClientServerIpLineEdit =
-      new QLineEdit(settings.value("perso_client/server_ip").toString());
-  PersoClientSettingsMainLayout->addWidget(PersoClientServerIpLineEdit, 0, 1, 1,
-                                           1);
-  PersoClientServerPortLabel = new QLabel("Порт сервера персонализации");
-  PersoClientSettingsMainLayout->addWidget(PersoClientServerPortLabel, 1, 0, 1,
-                                           1);
-  PersoClientServerPortLineEdit =
-      new QLineEdit(settings.value("perso_client/server_port").toString());
-  PersoClientSettingsMainLayout->addWidget(PersoClientServerPortLineEdit, 1, 1,
-                                           1, 1);
-
-  // Настройки логгера
-  LogSystemSettingsGroupBox = new QGroupBox("Настройки системы логгирования");
-  SettingsMainSubLayout->addWidget(LogSystemSettingsGroupBox);
-
-  LogSystemSettingsLayout = new QGridLayout();
-  LogSystemSettingsGroupBox->setLayout(LogSystemSettingsLayout);
-
-  LogSystemGlobalEnableLabel = new QLabel("Глобальное включение");
-  LogSystemSettingsLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 1);
-  LogSystemGlobalEnableCheckBox = new QCheckBox();
-  LogSystemGlobalEnableCheckBox->setCheckState(
-      settings.value("log_system/global_enable").toBool() ? Qt::Checked
-                                                          : Qt::Unchecked);
-  LogSystemSettingsLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 1);
-  connect(LogSystemGlobalEnableCheckBox, &QCheckBox::stateChanged, this,
-          &MainWindowGUI::on_LogSystemEnableCheckBox_slot);
-
-  LogSystemExtendedEnableLabel = new QLabel("Расширенное логгирование");
-  LogSystemSettingsLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1, 1);
-  LogSystemExtendedEnableCheckBox = new QCheckBox();
-  LogSystemExtendedEnableCheckBox->setCheckState(
-      settings.value("log_system/extended_enable").toBool() ? Qt::Checked
-                                                            : Qt::Unchecked);
-  LogSystemSettingsLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1, 1,
-                                     1);
-
-  LogSystemProxyWidget1 = new QWidget();
-  LogSystemSettingsLayout->addWidget(LogSystemProxyWidget1, 2, 0, 1, 2);
-  if (!LogSystemGlobalEnableCheckBox->isChecked()) {
-    LogSystemProxyWidget1->hide();
-  }
-  LogSystemProxyWidget1Layout = new QGridLayout();
-  LogSystemProxyWidget1->setLayout(LogSystemProxyWidget1Layout);
-
-  LogSystemDisplayEnableLabel = new QLabel("Вывод на дисплей вкл/выкл");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemDisplayEnableLabel, 0, 0, 1,
-                                         1);
-  LogSystemDisplayEnableCheckBox = new QCheckBox();
-  LogSystemDisplayEnableCheckBox->setCheckState(
-      settings.value("log_system/display_log_enable").toBool() ? Qt::Checked
-                                                               : Qt::Unchecked);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemDisplayEnableCheckBox, 0, 1,
-                                         1, 1);
-
-  LogSystemListenPersoServerLabel =
-      new QLabel("Получение логов с сервера персонализации");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerLabel, 1, 0,
-                                         1, 1);
-  LogSystemListenPersoServerCheckBox = new QCheckBox();
-  LogSystemListenPersoServerCheckBox->setCheckState(
-      settings.value("log_system/udp_listen_enable").toBool() ? Qt::Checked
-                                                              : Qt::Unchecked);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemListenPersoServerCheckBox, 1,
-                                         1, 1, 1);
-  connect(LogSystemListenPersoServerCheckBox, &QCheckBox::stateChanged, this,
-          &MainWindowGUI::on_LogSystemListenPersoServerCheckBox_slot);
-
-  LogSystemProxyWidget2 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 3, 0, 1, 2);
-  if (!LogSystemListenPersoServerCheckBox->isChecked()) {
-    LogSystemProxyWidget2->hide();
-  }
-  LogSystemProxyWidget2Layout = new QGridLayout();
-  LogSystemProxyWidget2->setLayout(LogSystemProxyWidget2Layout);
-
-  LogSystemListenIpLabel = new QLabel("Прослушиваемый IP");
-  LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLabel, 0, 0, 1, 1);
-  LogSystemListenIpLineEdit =
-      new QLineEdit(settings.value("log_system/udp_listen_ip").toString());
-  LogSystemListenIpLineEdit->setMaxLength(300);
-  LogSystemProxyWidget2Layout->addWidget(LogSystemListenIpLineEdit, 0, 1, 1, 1);
-
-  LogSystemListenPortLabel = new QLabel("Прослушиваемый порт");
-  LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLabel, 1, 0, 1, 1);
-  LogSystemListenPortLineEdit =
-      new QLineEdit(settings.value("log_system/udp_listen_port").toString());
-  LogSystemProxyWidget2Layout->addWidget(LogSystemListenPortLineEdit, 1, 1, 1,
-                                         1);
-
-  LogSystemFileEnableLabel = new QLabel("Логгирование в файл");
-  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableLabel, 4, 0, 1, 1);
-  LogSystemFileEnableCheckBox = new QCheckBox();
-  LogSystemFileEnableCheckBox->setCheckState(
-      settings.value("log_system/file_log_enable").toBool() ? Qt::Checked
-                                                            : Qt::Unchecked);
-  LogSystemProxyWidget1Layout->addWidget(LogSystemFileEnableCheckBox, 4, 1, 1,
-                                         1);
-  connect(LogSystemFileEnableCheckBox, &QCheckBox::stateChanged, this,
-          &MainWindowGUI::on_LogSystemFileEnableCheckBox_slot);
-
-  LogSystemProxyWidget3 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3, 5, 0, 1, 2);
-  if (!LogSystemFileEnableCheckBox->isChecked()) {
-    LogSystemProxyWidget3->hide();
-  }
-  LogSystemProxyWidget3Layout = new QGridLayout();
-  LogSystemProxyWidget3->setLayout(LogSystemProxyWidget3Layout);
-
-  LogSystemFileMaxNumberLabel =
-      new QLabel("Максимальное количество лог-файлов");
-  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLabel, 0, 0, 1,
-                                         1);
-  LogSystemFileMaxNumberLineEdit = new QLineEdit(
-      settings.value("log_system/log_file_max_number").toString());
-  LogSystemFileMaxNumberLineEdit->setMaxLength(10);
-  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLineEdit, 0, 1,
-                                         1, 1);
-
-  // Настройки принтера стикеров
-  StickerPrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
-  SettingsMainSubLayout->addWidget(StickerPrinterSettingsGroupBox);
-
-  StickerPrinterSettingsMainLayout = new QGridLayout();
-  StickerPrinterSettingsGroupBox->setLayout(StickerPrinterSettingsMainLayout);
-
-  StickerPrinterLibPathLabel = new QLabel("Путь к библиотеке");
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
-                                              1, 1);
-  StickerPrinterLibPathLineEdit =
-      new QLineEdit(settings.value("sticker_printer/library_path").toString());
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
-                                              1, 1, 1);
-  StickerPrinterLibPathPushButton = new QPushButton("Обзор");
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathPushButton,
-                                              0, 2, 1, 1);
-  connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
-          &MainWindowGUI::on_StickerPrinterLibPathPushButton_slot);
-
-  StickerPrinterNameLabel = new QLabel("Название");
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterNameLabel, 1, 0, 1,
-                                              1);
-  StickerPrinterNameLineEdit =
-      new QLineEdit(settings.value("sticker_printer/name").toString());
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1,
-                                              1, 2);
-
-  // Кнопка сохранения настроек
-  ApplySettingsPushButton = new QPushButton("Применить изменения");
-  SettingsMainSubLayout->addWidget(ApplySettingsPushButton);
-
-  // Сжатие по горизонтали
-  SettingsVerticalSpacer1 =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  SettingsMainSubLayout->addItem(SettingsVerticalSpacer1);
-}
-
 void MainWindowGUI::createLog() {
   LogGroup = new QGroupBox("Лог");
   LogGroup->setAlignment(Qt::AlignCenter);
@@ -734,7 +495,7 @@ void MainWindowGUI::createLog() {
   LogLayout->addWidget(LogDisplay);
 }
 
-void MainWindowGUI::on_RereleaseKeyComboBox_slot(const QString& text) {
+void MainWindowGUI::rereleaseKeyComboBox_slot(const QString& text) {
   if (text == "PAN") {
     RereleaseKeyLineEdit->setMaxLength(PAN_CHAR_LENGTH);
   } else if (text == "SN") {
@@ -742,34 +503,4 @@ void MainWindowGUI::on_RereleaseKeyComboBox_slot(const QString& text) {
   } else {
     RereleaseKeyLineEdit->setMaxLength(0);
   }
-}
-
-void MainWindowGUI::on_LogSystemEnableCheckBox_slot(int state) {
-  if (state == Qt::Checked) {
-    LogSystemProxyWidget1->show();
-  } else {
-    LogSystemProxyWidget1->hide();
-  }
-}
-
-void MainWindowGUI::on_LogSystemListenPersoServerCheckBox_slot(int state) {
-  if (state == Qt::Checked) {
-    LogSystemProxyWidget2->show();
-  } else {
-    LogSystemProxyWidget2->hide();
-  }
-}
-
-void MainWindowGUI::on_LogSystemFileEnableCheckBox_slot(int32_t state) {
-  if (state == Qt::Checked) {
-    LogSystemProxyWidget3->show();
-  } else {
-    LogSystemProxyWidget3->hide();
-  }
-}
-
-void MainWindowGUI::on_StickerPrinterLibPathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
-  StickerPrinterLibPathLineEdit->setText(filePath);
 }

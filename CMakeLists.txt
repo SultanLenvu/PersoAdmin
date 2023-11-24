@@ -32,6 +32,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     GUI/Dialogs/start_production_line_dialog.h GUI/Dialogs/start_production_line_dialog.cpp
     GUI/Dialogs/manual_release_refund_dialog.h GUI/Dialogs/manual_release_refund_dialog.cpp
     GUI/Dialogs/link_issuer_key_dialog.h GUI/Dialogs/link_issuer_key_dialog.cpp
+    GUI/Dialogs/settings_dialog.h GUI/Dialogs/settings_dialog.cpp
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h

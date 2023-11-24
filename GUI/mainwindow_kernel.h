@@ -25,8 +25,9 @@ class MainWindowKernel : public QMainWindow {
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
-  QAction* AboutProgramAct;
-  QAction* RequestAuthorizationGUIAct;
+  QAction* SettingsAction;
+  QAction* AboutProgramAction;
+  QAction* RequestAuthorizationGuiAction;
 
   InteractionSystem* Interactor;
 
@@ -106,7 +107,7 @@ class MainWindowKernel : public QMainWindow {
   void execStickerPrinterCommandScriptPushButton_slot(void);
 
   // Функционал для настройки сервера
-  void applySettingsPushButton_slot(void);
+  void settingsActionTrigger_slot(void);
 
   // Отображение данных
   void displayFirmware_slot(QSharedPointer<QFile> firmware);
@@ -116,8 +117,6 @@ class MainWindowKernel : public QMainWindow {
  private:
   Q_DISABLE_COPY_MOVE(MainWindowKernel)
   void loadSettings(void) const;
-  void saveSettings(void) const;
-  bool checkNewSettings(void) const;
 
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню

@@ -32,7 +32,7 @@ void IdentifierInputDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType IdentifierInputDialog::type() const {
+AbstractInputDialog::InputDialogType IdentifierInputDialog::type() const {
   return IdentifierInput;
 }
 

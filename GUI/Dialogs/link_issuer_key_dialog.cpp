@@ -37,7 +37,7 @@ void LinkIssuerKeyDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType LinkIssuerKeyDialog::type() const {
+AbstractInputDialog::InputDialogType LinkIssuerKeyDialog::type() const {
   return ManualReleaseRefund;
 }
 

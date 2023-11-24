@@ -185,82 +185,6 @@ class MainWindowGUI : public AbstractGUI {
   QPlainTextEdit* StickerPrinterCommandScriptInput;
   //============================================================
 
-  /* Настройки админпанели */
-  //============================================================
-  QWidget* SettingsTab;
-  QHBoxLayout* SettingsMainLayout;
-  QVBoxLayout* SettingsMainSubLayout;
-  QPushButton* ApplySettingsPushButton;
-
-  QSpacerItem* SettingsHorizontalSpacer1;
-  QSpacerItem* SettingsVerticalSpacer1;
-
-  // Настройки базы данных
-  QGroupBox* DatabaseSettingsGroupBox;
-  QGridLayout* DatabaseSettingsLayout;
-  QLabel* DatabaseIpLabel;
-  QLineEdit* DatabaseIpLineEdit;
-  QLabel* DatabasePortLabel;
-  QLineEdit* DatabasePortLineEdit;
-  QLabel* DatabaseNameLabel;
-  QLineEdit* DatabaseNameLineEdit;
-  QLabel* DatabaseUserNameLabel;
-  QLineEdit* DatabaseUserNameLineEdit;
-  QLabel* DatabaseUserPasswordLabel;
-  QLineEdit* DatabaseUserPasswordLineEdit;
-  QLabel* IDatabaseControllerLogEnableLabel;
-  QCheckBox* IDatabaseControllerLogEnable;
-
-  // Настройки клиента
-  QGroupBox* PersoClientSettingsGroupBox;
-  QGridLayout* PersoClientSettingsMainLayout;
-  QLabel* PersoClientServerIdLabel;
-  QLineEdit* PersoClientServerIpLineEdit;
-  QLabel* PersoClientServerPortLabel;
-  QLineEdit* PersoClientServerPortLineEdit;
-
-  // Настройки системы логгирования
-  QGroupBox* LogSystemSettingsGroupBox;
-  QGridLayout* LogSystemSettingsLayout;
-  QLabel* LogSystemGlobalEnableLabel;
-  QCheckBox* LogSystemGlobalEnableCheckBox;
-
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
-
-  QWidget* LogSystemProxyWidget1;
-  QGridLayout* LogSystemProxyWidget1Layout;
-
-  QLabel* LogSystemDisplayEnableLabel;
-  QCheckBox* LogSystemDisplayEnableCheckBox;
-
-  QLabel* LogSystemListenPersoServerLabel;
-  QCheckBox* LogSystemListenPersoServerCheckBox;
-
-  QWidget* LogSystemProxyWidget2;
-  QGridLayout* LogSystemProxyWidget2Layout;
-  QLabel* LogSystemListenIpLabel;
-  QLineEdit* LogSystemListenIpLineEdit;
-  QLabel* LogSystemListenPortLabel;
-  QLineEdit* LogSystemListenPortLineEdit;
-
-  QLabel* LogSystemFileEnableLabel;
-  QCheckBox* LogSystemFileEnableCheckBox;
-
-  QWidget* LogSystemProxyWidget3;
-  QGridLayout* LogSystemProxyWidget3Layout;
-  QLabel* LogSystemFileMaxNumberLabel;
-  QLineEdit* LogSystemFileMaxNumberLineEdit;
-
-  // Настройки принтера
-  QGroupBox* StickerPrinterSettingsGroupBox;
-  QGridLayout* StickerPrinterSettingsMainLayout;
-  QLabel* StickerPrinterLibPathLabel;
-  QLineEdit* StickerPrinterLibPathLineEdit;
-  QPushButton* StickerPrinterLibPathPushButton;
-  QLabel* StickerPrinterNameLabel;
-  QLineEdit* StickerPrinterNameLineEdit;
-
  public:
   explicit MainWindowGUI(QWidget* parent);
 
@@ -282,18 +206,11 @@ class MainWindowGUI : public AbstractGUI {
   void createTransponderTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
-  void createSettingsTab(void);
 
   void createLog(void);
 
  private slots:
-  void on_RereleaseKeyComboBox_slot(const QString& text);
-
-  void on_LogSystemEnableCheckBox_slot(int32_t state);
-  void on_LogSystemListenPersoServerCheckBox_slot(int32_t state);
-  void on_LogSystemFileEnableCheckBox_slot(int32_t state);
-
-  void on_StickerPrinterLibPathPushButton_slot(void);
+  void rereleaseKeyComboBox_slot(const QString& text);
 
  signals:
 };

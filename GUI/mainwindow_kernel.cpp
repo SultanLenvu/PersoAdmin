@@ -1,4 +1,5 @@
 #include "mainwindow_kernel.h"
+#include "GUI/Dialogs/settings_dialog.h"
 #include "General/definitions.h"
 #include "authorization_gui.h"
 #include "mainwindow_gui.h"
@@ -412,18 +413,10 @@ void MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot() {
   emit execPrinterStickerCommandScript_signal(commandScript);
 }
 
-void MainWindowKernel::applySettingsPushButton_slot() {
+void MainWindowKernel::settingsActionTrigger_slot() {
+  std::unique_ptr<SettingsDialog> menu(new SettingsDialog(nullptr));
+
   emit loggerClear_signal();
-
-  // Проверка пользовательского ввода
-  if (!checkNewSettings()) {
-    Interactor->generateErrorMessage(
-        "Введены некорректные данные для настроек. ");
-    return;
-  }
-
-  // Сохранение настроек
-  saveSettings();
 
   // Применение новых настроек
   emit applySettings_signal();
@@ -460,130 +453,6 @@ void MainWindowKernel::loadSettings() const {
   QCoreApplication::setApplicationName(PROGRAM_NAME);
 
   QSettings::setDefaultFormat(QSettings::IniFormat);
-}
-
-void MainWindowKernel::saveSettings() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QSettings settings;
-
-  // Настройки системы логгирования
-  settings.setValue(
-      "log_system/global_enable",
-      AbstractGUI->LogSystemGlobalEnableCheckBox->checkState() == Qt::Checked
-          ? true
-          : false);
-  settings.setValue(
-      "log_system/extended_enable",
-      AbstractGUI->LogSystemExtendedEnableCheckBox->checkState() == Qt::Checked
-          ? true
-          : false);
-  settings.setValue(
-      "log_system/display_log_enable",
-      AbstractGUI->LogSystemDisplayEnableCheckBox->checkState() == Qt::Checked
-          ? true
-          : false);
-  settings.setValue(
-      "log_system/file_log_enable",
-      AbstractGUI->LogSystemFileEnableCheckBox->checkState() == Qt::Checked
-          ? true
-          : false);
-  settings.setValue("log_system/log_file_max_number",
-                    AbstractGUI->LogSystemFileMaxNumberLineEdit->text());
-  settings.setValue(
-      "log_system/udp_listen_enable",
-      AbstractGUI->LogSystemListenPersoServerCheckBox->checkState() ==
-              Qt::Checked
-          ? true
-          : false);
-  settings.setValue("log_system/udp_listen_ip",
-                    AbstractGUI->LogSystemListenIpLineEdit->text());
-  settings.setValue("log_system/udp_listen_port",
-                    AbstractGUI->LogSystemListenPortLineEdit->text().toInt());
-
-  // Настройки клиента
-  settings.setValue("perso_client/server_ip",
-                    AbstractGUI->PersoClientServerIpLineEdit->text());
-  settings.setValue("perso_client/server_port",
-                    AbstractGUI->PersoClientServerPortLineEdit->text());
-
-  // Настройки контроллера базы данных
-  settings.setValue("postgre_sql_database/server_ip",
-                    AbstractGUI->DatabaseIpLineEdit->text());
-  settings.setValue("postgre_sql_database/server_port",
-                    AbstractGUI->DatabasePortLineEdit->text().toInt());
-  settings.setValue("postgre_sql_database/database_name",
-                    AbstractGUI->DatabaseNameLineEdit->text());
-  settings.setValue("postgre_sql_database/user_name",
-                    AbstractGUI->DatabaseUserNameLineEdit->text());
-  settings.setValue("postgre_sql_database/user_password",
-                    AbstractGUI->DatabaseUserPasswordLineEdit->text());
-  settings.setValue(
-      "postgre_sql_database/log_enable",
-      AbstractGUI->IDatabaseControllerLogEnable->checkState() == Qt::Checked);
-
-  // Принтер стикеров
-  settings.setValue("sticker_printer/library_path",
-                    AbstractGUI->StickerPrinterLibPathLineEdit->text());
-  settings.setValue("sticker_printer/name",
-                    AbstractGUI->StickerPrinterNameLineEdit->text());
-}
-
-bool MainWindowKernel::checkNewSettings() const {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-  QFileInfo info;
-  QHostAddress ip;
-  int32_t port;
-
-  if (AbstractGUI->LogSystemGlobalEnableCheckBox->checkState() ==
-      Qt::Unchecked) {
-    return true;
-  }
-
-  if (AbstractGUI->LogSystemListenPersoServerCheckBox->checkState() ==
-      Qt::Checked) {
-    ip = QHostAddress(AbstractGUI->LogSystemListenIpLineEdit->text());
-    if (ip.isNull()) {
-      return false;
-    }
-
-    port = AbstractGUI->LogSystemListenPortLineEdit->text().toInt();
-    if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-      return false;
-    }
-  }
-
-  ip = QHostAddress(AbstractGUI->DatabaseIpLineEdit->text());
-  if (ip.isNull()) {
-    return false;
-  }
-
-  ip = QHostAddress(AbstractGUI->PersoClientServerIpLineEdit->text());
-  if (ip.isNull()) {
-    return false;
-  }
-
-  port = AbstractGUI->PersoClientServerPortLineEdit->text().toInt();
-  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-    return false;
-  }
-
-  if (AbstractGUI->LogSystemFileEnableCheckBox->checkState() == Qt::Checked) {
-    port = AbstractGUI->DatabasePortLineEdit->text().toInt();
-    if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-      return false;
-    }
-
-    if (AbstractGUI->LogSystemFileMaxNumberLineEdit->text().toInt() == 0) {
-      return false;
-    }
-  }
-
-  info.setFile(AbstractGUI->StickerPrinterLibPathLineEdit->text());
-  if (!info.isFile()) {
-    return false;
-  }
-
-  return true;
 }
 
 // bool MainWindowKernel::checkReleaseTransponderInput() const {
@@ -681,21 +550,27 @@ void MainWindowKernel::createTopMenu() {
   createTopMenuActions();
 
   ServiceMenu = menuBar()->addMenu("Сервис");
-  ServiceMenu->addAction(RequestAuthorizationGUIAct);
+  ServiceMenu->addAction(RequestAuthorizationGuiAction);
+  ServiceMenu->addAction(SettingsAction);
 
   HelpMenu = menuBar()->addMenu("Справка");
-  HelpMenu->addAction(AboutProgramAct);
+  HelpMenu->addAction(AboutProgramAction);
 }
 
 void MainWindowKernel::createTopMenuActions() {
-  RequestAuthorizationGUIAct = new QAction("Авторизация");
-  RequestAuthorizationGUIAct->setStatusTip(
+  SettingsAction = new QAction("Настройки");
+  SettingsAction->setStatusTip("Открыть меню настроек");
+  connect(SettingsAction, &QAction::triggered, this,
+          &MainWindowKernel::settingsActionTrigger_slot);
+
+  RequestAuthorizationGuiAction = new QAction("Авторизация");
+  RequestAuthorizationGuiAction->setStatusTip(
       "Закрыть текущий интерфейс и создать начальный интерфейс");
-  connect(RequestAuthorizationGUIAct, &QAction::triggered, this,
+  connect(RequestAuthorizationGuiAction, &QAction::triggered, this,
           &MainWindowKernel::requestAuthorizationGUIAct_slot);
 
-  AboutProgramAct = new QAction("О программе", this);
-  AboutProgramAct->setStatusTip("Показать сведения о программе");
+  AboutProgramAction = new QAction("О программе", this);
+  AboutProgramAction->setStatusTip("Показать сведения о программе");
 }
 
 void MainWindowKernel::createAuthorazationGUI() {
@@ -835,8 +710,8 @@ void MainWindowKernel::connectMainWindowGUI() {
           &MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot);
 
   // Сохранение настроек
-  connect(AbstractGUI->ApplySettingsPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::applySettingsPushButton_slot);
+  connect(AbstractGUI->ApplyPushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::settingsActionTrigger_slot);
 
   // Подключаем логгер
   connect(Logger->getWidgetLogger(), &WidgetLogBackend::displayLog_signal,

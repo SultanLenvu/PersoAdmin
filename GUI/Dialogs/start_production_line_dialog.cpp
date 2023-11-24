@@ -32,7 +32,7 @@ void StartProductionLineDialog::getData(QHash<QString, QString>* data,
   ok = true;
 }
 
-AbstractInputDialog::DialogType StartProductionLineDialog::type() const {
+AbstractInputDialog::InputDialogType StartProductionLineDialog::type() const {
   return StartProductionLine;
 }
 
