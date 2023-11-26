@@ -88,6 +88,8 @@ class SettingsDialog : public QDialog {
   explicit SettingsDialog(QWidget* parent);
   ~SettingsDialog();
 
+  virtual void accept(void) override;
+
  private:
   Q_DISABLE_COPY_MOVE(SettingsDialog)
   void create(void);
@@ -100,10 +102,8 @@ class SettingsDialog : public QDialog {
   void logSystemFileEnableCheckBox_slot(int32_t state);
   void stickerPrinterLibPathPushButton_slot(void);
 
-  void apply(void);
-
  signals:
-  void notifyUserAboutError(const QString& msg);
+  void applyNewSettings();
 };
 
 #endif  // SETTINGSINPUTDIALOG_H

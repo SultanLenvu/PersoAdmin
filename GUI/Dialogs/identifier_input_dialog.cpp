@@ -20,20 +20,22 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
 
 IdentifierInputDialog::~IdentifierInputDialog() {}
 
-void IdentifierInputDialog::getData(QHash<QString, QString>* data,
-                                    bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void IdentifierInputDialog::getData(QHash<QString, QString>* data) const {
   data->insert("id", InputData->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType IdentifierInputDialog::type() const {
   return IdentifierInput;
+}
+
+void IdentifierInputDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
+                          QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void IdentifierInputDialog::create() {

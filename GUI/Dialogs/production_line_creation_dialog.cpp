@@ -21,23 +21,26 @@ ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
 
 ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
-void ProductionLineCreationDialog::getData(QHash<QString, QString>* data,
-                                           bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void ProductionLineCreationDialog::getData(
+    QHash<QString, QString>* data) const {
   data->insert("login", LoginLineEdit->text());
   data->insert("password", PasswordLineEdit->text());
   data->insert("name", NameLineEdit->text());
   data->insert("surname", SurnameLineEdit->text());
-
-  ok = true;
 }
 
-AbstractInputDialog::InputDialogType ProductionLineCreationDialog::type() const {
+AbstractInputDialog::InputDialogType ProductionLineCreationDialog::type()
+    const {
   return ProductionLineCreation;
+}
+
+void ProductionLineCreationDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void ProductionLineCreationDialog::create() {

@@ -17,21 +17,22 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(QHash<QString, QString>* data,
-                                   bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void PalletShippingDialog::getData(QHash<QString, QString>* data) const {
   data->insert("first_pallet_id", FirstPalletId->text());
   data->insert("last_pallet_id", LastPalletId->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType PalletShippingDialog::type() const {
   return PalletShipping;
+}
+
+void PalletShippingDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void PalletShippingDialog::create() {

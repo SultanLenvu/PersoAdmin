@@ -1,12 +1,5 @@
 #include "interaction_system.h"
-#include "Dialogs/idetifier_input_dialog.h"
-#include "Dialogs/link_issuer_key_dialog.h"
-#include "Dialogs/manual_release_refund_dialog.h"
-#include "Dialogs/order_creation_dialog.h"
-#include "Dialogs/pallet_shiping_dialog.h"
-#include "Dialogs/pan_input_dialog.h"
-#include "Dialogs/production_line_creation_dialog.h"
-#include "Dialogs/start_production_line_dialog.h"
+
 #include "General/definitions.h"
 
 InteractionSystem::InteractionSystem(QWidget* parent) : QWidget(parent) {
@@ -85,71 +78,6 @@ void InteractionSystem::finishOperationProgressDialog(
   ProgressDialog.close();
 }
 
-void InteractionSystem::getPalletShipingParam(QHash<QString, QString>* param,
-                                              bool& ok) {
-  CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new PalletShippingDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getPan(QHash<QString, QString>* param, bool& ok) {
-  CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new PanInputDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getId(QHash<QString, QString>* param, bool& ok) {
-  CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new IdentifierInputDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getNewProductionLineParam(
-    QHash<QString, QString>* param,
-    bool& ok) {
-  CurrentDialog = std::move(std::unique_ptr<AbstractInputDialog>(
-      new ProductionLineCreationDialog(this)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getStartProductionLineParam(
-    QHash<QString, QString>* param,
-    bool& ok) {
-  CurrentDialog = std::move(std::unique_ptr<AbstractInputDialog>(
-      new StartProductionLineDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getNewOrderParam(QHash<QString, QString>* param,
-                                         bool& ok) {
-  CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new OrderCreationDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getManualReleaseRefundParam(
-    QHash<QString, QString>* param,
-    bool& ok) {
-  CurrentDialog = std::move(std::unique_ptr<AbstractInputDialog>(
-      new ManualReleaseRefundDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
-void InteractionSystem::getLinkIssuerKeyParam(QHash<QString, QString>* param,
-                                              bool& ok) {
-  CurrentDialog = std::move(
-      std::unique_ptr<AbstractInputDialog>(new LinkIssuerKeyDialog(nullptr)));
-
-  processCurrentDialog(param, ok);
-}
-
 void InteractionSystem::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
@@ -198,18 +126,12 @@ void InteractionSystem::createTimers() {
           &InteractionSystem::ODQTimerTimeout_slot);
 }
 
-void InteractionSystem::processCurrentDialog(QHash<QString, QString>* data,
-                                             bool& ok) {
+void InteractionSystem::processCurrentDialog(QHash<QString, QString>* param) {
   if (CurrentDialog->exec() == QDialog::Rejected) {
-    ok = false;
     return;
   }
 
-  CurrentDialog->getData(data, ok);
-
-  if (!ok) {
-    generateErrorMessage("Некорректный ввод параметров нового заказа. ");
-  }
+  CurrentDialog->getData(param);
 }
 
 void InteractionSystem::progressDialogCanceled_slot() {
@@ -229,4 +151,8 @@ void InteractionSystem::ODQTimerTimeout_slot() {
   } else {
     ODQTimer->stop();
   }
+}
+
+void InteractionSystem::invalidInput_slot() {
+  generateErrorMessage("Некорректный ввод данных.");
 }

@@ -1,7 +1,7 @@
 #include "settings_dialog.h"
 #include "General/definitions.h"
 
-SettingsDialog::SettingsDialog(QWidget* parent) {
+SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
   setObjectName("SettingsDialog");
 
   // Считываем размеры дисплея
@@ -224,11 +224,12 @@ void SettingsDialog::create() {
 
   ApplyPushButton = new QPushButton("Применить");
   ButtonLayout->addWidget(ApplyPushButton);
-  connect(ApplyPushButton, &QPushButton::clicked, this, &SettingsDialog::apply);
+  connect(ApplyPushButton, &QPushButton::clicked, this,
+          &SettingsDialog::accept);
 
   RejectPushButton = new QPushButton("Закрыть");
   ButtonLayout->addWidget(RejectPushButton);
-  connect(RejectPushButton, &QPushButton::clicked, this, &QDialog::rejected);
+  connect(RejectPushButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
 bool SettingsDialog::check() const {
@@ -338,12 +339,28 @@ void SettingsDialog::save() {
   Settings.setValue("sticker_printer/name", StickerPrinterNameLineEdit->text());
 }
 
+void SettingsDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
+                          QMessageBox::Ok);
+    return;
+  }
+
+  save();
+  QMessageBox::information(this, "Оповещение", "Новые настройки применены.",
+                           QMessageBox::Ok);
+  emit applyNewSettings();
+}
+
 void SettingsDialog::logSystemEnableCheckBox_slot(int state) {
   if (state == Qt::Checked) {
     LogSystemProxyWidget1->show();
   } else {
     LogSystemProxyWidget1->hide();
   }
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 void SettingsDialog::logSystemListenPersoServerCheckBox_slot(int state) {
@@ -352,6 +369,9 @@ void SettingsDialog::logSystemListenPersoServerCheckBox_slot(int state) {
   } else {
     LogSystemProxyWidget2->hide();
   }
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 void SettingsDialog::logSystemFileEnableCheckBox_slot(int32_t state) {
@@ -360,19 +380,13 @@ void SettingsDialog::logSystemFileEnableCheckBox_slot(int32_t state) {
   } else {
     LogSystemProxyWidget3->hide();
   }
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 void SettingsDialog::stickerPrinterLibPathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
   StickerPrinterLibPathLineEdit->setText(filePath);
-}
-
-void SettingsDialog::apply() {
-  if (!check()) {
-    emit notifyUserAboutError("Некорретный ввод данных");
-    return;
-  }
-
-  save();
 }

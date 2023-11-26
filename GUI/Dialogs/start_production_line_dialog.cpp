@@ -19,21 +19,22 @@ StartProductionLineDialog::StartProductionLineDialog(QWidget* parent)
 
 StartProductionLineDialog::~StartProductionLineDialog() {}
 
-void StartProductionLineDialog::getData(QHash<QString, QString>* data,
-                                        bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void StartProductionLineDialog::getData(QHash<QString, QString>* data) const {
   data->insert("production_line_id", ProductionLineIdInput->text());
   data->insert("order_id", OrderIdInput->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType StartProductionLineDialog::type() const {
   return StartProductionLine;
+}
+
+void StartProductionLineDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void StartProductionLineDialog::create() {

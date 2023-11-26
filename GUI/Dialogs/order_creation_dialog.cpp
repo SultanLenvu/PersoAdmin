@@ -21,13 +21,7 @@ OrderCreationDialog::OrderCreationDialog(QWidget* parent)
 
 OrderCreationDialog::~OrderCreationDialog() {}
 
-void OrderCreationDialog::getData(QHash<QString, QString>* data,
-                                  bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void OrderCreationDialog::getData(QHash<QString, QString>* data) const {
   data->insert("issuer_name", IssuerNameComboBox->currentText());
   data->insert("transponder_quantity", TransponderQuantityLineEdit->text());
   data->insert("box_capacity", BoxCapacityLineEdit->text());
@@ -41,12 +35,19 @@ void OrderCreationDialog::getData(QHash<QString, QString>* data,
   data->insert("accr_reference", AccrReferenceLineEdit->text());
   data->insert("equipment_class", EquipmentClassLineEdit->text());
   data->insert("manufacturer_id", ManufacturerIdLineEdit->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType OrderCreationDialog::type() const {
   return OrderCreation;
+}
+
+void OrderCreationDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void OrderCreationDialog::create() {

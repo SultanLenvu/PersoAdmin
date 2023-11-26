@@ -21,13 +21,15 @@ class IdentifierInputDialog : public AbstractInputDialog {
   explicit IdentifierInputDialog(QWidget* parent);
   ~IdentifierInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
-  virtual InputDialogType type() const override;
+  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual InputDialogType type(void) const override;
+
+  virtual void accept() override;
 
  private:
   Q_DISABLE_COPY_MOVE(IdentifierInputDialog);
   void create(void);
-  bool check() const;
+  bool check(void) const;
 };
 
 #endif  // IdentifierInputDialog_H

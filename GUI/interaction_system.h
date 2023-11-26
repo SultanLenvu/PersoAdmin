@@ -38,16 +38,9 @@ class InteractionSystem : public QWidget {
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
 
-  void getPalletShipingParam(QHash<QString, QString>* param, bool& ok);
-  void getPan(QHash<QString, QString>* param, bool& ok);
-  void getId(QHash<QString, QString>* param, bool& ok);
-  void getNewProductionLineParam(QHash<QString, QString>* param, bool& ok);
-  void getStartProductionLineParam(QHash<QString, QString>* param, bool& ok);
-  void getNewOrderParam(QHash<QString, QString>* param, bool& ok);
-  void getManualReleaseRefundParam(QHash<QString, QString>* param, bool& ok);
-  void getLinkIssuerKeyParam(QHash<QString, QString>* param, bool& ok);
-
   void applySettings(void);
+
+  void invalidInput_slot(void);
 
  private:
   explicit InteractionSystem(QWidget* window);
@@ -60,7 +53,7 @@ class InteractionSystem : public QWidget {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
-  void processCurrentDialog(QHash<QString, QString>* data, bool& ok);
+  void processCurrentDialog(QHash<QString, QString>* param);
 
  private slots:
   void progressDialogCanceled_slot(void);

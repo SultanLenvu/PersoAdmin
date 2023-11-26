@@ -136,8 +136,6 @@ class MainWindowKernel : public QMainWindow {
   void registerMetaType(void);
 
  signals:
-  void applySettings_signal();
-
   // Логгер
   void loggerClear_signal(void);
   void logging(const QString& log);

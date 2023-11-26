@@ -20,20 +20,30 @@ PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
 
 PanInputDialog::~PanInputDialog() {}
 
-void PanInputDialog::getData(QHash<QString, QString>* data, bool& ok) const {
+void PanInputDialog::getData(QHash<QString, QString>* data) const {
   QString pan;
-  if (!check(pan)) {
-    ok = false;
-    return;
+  QStringList input = StickerData->toPlainText().split("\n");
+
+  if (input.size() == 2) {
+    pan = input.at(1);
+  } else if (input.size() == 1) {
+    pan = input.at(0);
   }
 
   data->insert("pan", pan);
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType PanInputDialog::type() const {
   return PanInput;
+}
+
+void PanInputDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void PanInputDialog::create() {
@@ -55,7 +65,8 @@ void PanInputDialog::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PanInputDialog::check(QString& pan) const {
+bool PanInputDialog::check() const {
+  QString pan;
   QStringList input = StickerData->toPlainText().split("\n");
 
   if (input.size() == 2) {

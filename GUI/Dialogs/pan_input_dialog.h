@@ -26,13 +26,15 @@ class PanInputDialog : public AbstractInputDialog {
   explicit PanInputDialog(QWidget* parent);
   ~PanInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
+  virtual void getData(QHash<QString, QString>* data) const override;
   virtual InputDialogType type() const override;
+
+  virtual void accept() override;
 
  private:
   Q_DISABLE_COPY_MOVE(PanInputDialog);
   void create(void);
-  bool check(QString& pan) const;
+  bool check(void) const;
 };
 
 #endif  // PanInputDialog_H

@@ -22,21 +22,22 @@ ManualReleaseRefundDialog::ManualReleaseRefundDialog(QWidget* parent)
 
 ManualReleaseRefundDialog::~ManualReleaseRefundDialog() {}
 
-void ManualReleaseRefundDialog::getData(QHash<QString, QString>* data,
-                                        bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void ManualReleaseRefundDialog::getData(QHash<QString, QString>* data) const {
   data->insert("table", MatchingTable.value(UnitChoiceComboBox->currentText()));
   data->insert("id", IdLineEdit->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType ManualReleaseRefundDialog::type() const {
   return ManualReleaseRefund;
+}
+
+void ManualReleaseRefundDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void ManualReleaseRefundDialog::create() {

@@ -48,8 +48,10 @@ class OrderCreationDialog : public AbstractInputDialog {
   explicit OrderCreationDialog(QWidget* parent);
   ~OrderCreationDialog();
 
-  virtual void getData(QHash<QString, QString>* data, bool& ok) const override;
+  virtual void getData(QHash<QString, QString>* data) const override;
   virtual InputDialogType type() const override;
+
+  virtual void accept() override;
 
  private:
   Q_DISABLE_COPY_MOVE(OrderCreationDialog);

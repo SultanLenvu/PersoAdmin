@@ -22,23 +22,24 @@ LinkIssuerKeyDialog::LinkIssuerKeyDialog(QWidget* parent)
 
 LinkIssuerKeyDialog::~LinkIssuerKeyDialog() {}
 
-void LinkIssuerKeyDialog::getData(QHash<QString, QString>* data,
-                                  bool& ok) const {
-  if (!check()) {
-    ok = false;
-    return;
-  }
-
+void LinkIssuerKeyDialog::getData(QHash<QString, QString>* data) const {
   data->insert("issuer_id", IssuerIdLineEdit->text());
   data->insert("key_table",
                MatchingTable.value(KeyChoiceComboBox->currentText()));
   data->insert("key_group_id", KeyGroupLineEdit->text());
-
-  ok = true;
 }
 
 AbstractInputDialog::InputDialogType LinkIssuerKeyDialog::type() const {
   return ManualReleaseRefund;
+}
+
+void LinkIssuerKeyDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
+  }
+
+  QDialog::accept();
 }
 
 void LinkIssuerKeyDialog::create() {

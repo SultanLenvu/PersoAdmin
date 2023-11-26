@@ -1,4 +1,12 @@
 #include "mainwindow_kernel.h"
+#include "Dialogs/idetifier_input_dialog.h"
+#include "Dialogs/link_issuer_key_dialog.h"
+#include "Dialogs/manual_release_refund_dialog.h"
+#include "Dialogs/order_creation_dialog.h"
+#include "Dialogs/pallet_shiping_dialog.h"
+#include "Dialogs/pan_input_dialog.h"
+#include "Dialogs/production_line_creation_dialog.h"
+#include "Dialogs/start_production_line_dialog.h"
 #include "GUI/Dialogs/settings_dialog.h"
 #include "General/definitions.h"
 #include "authorization_gui.h"
@@ -83,99 +91,90 @@ void MainWindowKernel::transmitCustomRequestPushButton_slot() {
 }
 
 void MainWindowKernel::createNewOrderPushButton_slot() {
-  bool ok;
-  QSharedPointer<QHash<QString, QString>> orderParameters(
-      new QHash<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getNewOrderParam(orderParameters.get(), ok);
-  if (!ok) {
+  OrderCreationDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
-  emit createNewOrder_signal(orderParameters, OrderModel);
+  emit loggerClear_signal();
+  emit createNewOrder_signal(param, OrderModel);
 }
 
 void MainWindowKernel::startOrderAssemblingPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit startOrderAssembling_signal(param, OrderModel);
 }
 
 void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit stopOrderAssembling_signal(param, OrderModel);
 }
 
 void MainWindowKernel::updateOrderViewPushButton_slot() {
   emit loggerClear_signal();
-
   emit showDatabaseTable_signal("orders", OrderModel);
 }
 
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getNewProductionLineParam(param.get(), ok);
-  if (!ok) {
+  ProductionLineCreationDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit createNewProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::startProductionLinePushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getStartProductionLineParam(param.get(), ok);
-  if (!ok) {
+  StartProductionLineDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit startProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::stopProductionLinePushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit stopProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
-
   emit stopAllProductionLines_signal(ProductionLineModel);
 }
 
@@ -185,7 +184,6 @@ void MainWindowKernel::editProductionLinesPushButton_slot() {
 
 void MainWindowKernel::updateProductionLineViewPushButton_slot() {
   emit loggerClear_signal();
-
   emit showDatabaseTable_signal("production_lines", ProductionLineModel);
 }
 
@@ -202,16 +200,15 @@ void MainWindowKernel::initIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getLinkIssuerKeyParam(param.get(), ok);
-  if (!ok) {
+  LinkIssuerKeyDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit linkIssuerWithMasterKeys_signal(param, IssuerModel);
 }
 
@@ -280,16 +277,15 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  emit loggerClear_signal();
-  Interactor->getPan(param.get(), ok);
-
-  if (!ok) {
+  PanInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit printBoxStickerOnServer_signal(param);
 }
 
@@ -300,16 +296,15 @@ void MainWindowKernel::printLastBoxStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  emit loggerClear_signal();
-
-  Interactor->getPan(param.get(), ok);
-  if (!ok) {
+  PanInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit printPalletStickerOnServer_signal(param);
 }
 
@@ -318,87 +313,80 @@ void MainWindowKernel::printLastPalletStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualReleasePushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  emit loggerClear_signal();
-
-  Interactor->getManualReleaseRefundParam(param.get(), ok);
-  if (!ok) {
+  ManualReleaseRefundDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit releaseTranspondersManually_signal(param, TransponderModel);
 }
 
 void MainWindowKernel::transponderManualRefundPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  emit loggerClear_signal();
-
-  Interactor->getManualReleaseRefundParam(param.get(), ok);
-  if (!ok) {
+  ManualReleaseRefundDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit refundTranspondersManually_signal(param, TransponderModel);
 }
 
 void MainWindowKernel::palletShipmentPushButton_slot() {
-  bool ok;
-  QSharedPointer<QHash<QString, QString>> params(new QHash<QString, QString>());
+  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
 
-  emit loggerClear_signal();
-
-  Interactor->getPalletShipingParam(params.get(), ok);
-
-  if (!ok) {
+  PalletShippingDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
-  emit shipPallets_signal(params, TransponderModel);
+  emit loggerClear_signal();
+  emit shipPallets_signal(param, TransponderModel);
 }
 
 void MainWindowKernel::printTransponderStickerPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit printTransponderSticker_signal(param, StickerModel);
 }
 
 void MainWindowKernel::printBoxStickerPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit printBoxSticker_signal(param, StickerModel);
 }
 
 void MainWindowKernel::printPalletStickerPushButton_slot() {
-  bool ok;
   QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  emit loggerClear_signal();
-
-  Interactor->getId(param.get(), ok);
-  if (!ok) {
+  IdentifierInputDialog dialog(this);
+  if (dialog.exec() == QDialog::Rejected) {
     return;
   }
+  dialog.getData(param.get());
 
+  emit loggerClear_signal();
   emit printPalletSticker_signal(param, StickerModel);
 }
 
@@ -414,15 +402,19 @@ void MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot() {
 }
 
 void MainWindowKernel::settingsActionTrigger_slot() {
-  std::unique_ptr<SettingsDialog> menu(new SettingsDialog(nullptr));
-
   emit loggerClear_signal();
 
-  // Применение новых настроек
-  emit applySettings_signal();
+  SettingsDialog dialog(this);
+  connect(&dialog, &SettingsDialog::applyNewSettings, Interactor,
+          &InteractionSystem::applySettings);
+  connect(&dialog, &SettingsDialog::applyNewSettings, Logger,
+          &LogSystem::applySettings);
+  connect(&dialog, &SettingsDialog::applyNewSettings, Manager,
+          &AdminManager::applySettings);
 
-  // Оповещаем пользователя
-  Interactor->generateMessage("Новые настройки успешно применены. ");
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
 }
 
 void MainWindowKernel::displayFirmware_slot(QSharedPointer<QFile> firmware) {
@@ -709,10 +701,6 @@ void MainWindowKernel::connectMainWindowGUI() {
           &QPushButton::clicked, this,
           &MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot);
 
-  // Сохранение настроек
-  connect(AbstractGUI->ApplyPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::settingsActionTrigger_slot);
-
   // Подключаем логгер
   connect(Logger->getWidgetLogger(), &WidgetLogBackend::displayLog_signal,
           AbstractGUI, &MainWindowGUI::displayLog);
@@ -734,8 +722,6 @@ void MainWindowKernel::connectMainWindowGUI() {
 
 void MainWindowKernel::createLoggerInstance() {
   Logger = LogSystem::instance();
-  connect(this, &MainWindowKernel::applySettings_signal, Logger,
-          &LogSystem::applySettings);
   connect(this, &MainWindowKernel::loggerClear_signal, Logger,
           &LogSystem::clear);
   connect(this, &MainWindowKernel::logging, Logger, &LogSystem::generate);
@@ -761,9 +747,6 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::finishOperationProgressDialog);
 
   // Подключаем функционал
-  connect(this, &MainWindowKernel::applySettings_signal, Manager,
-          &AdminManager::applySettings);
-
   connect(this, &MainWindowKernel::connectDatabase_signal, Manager,
           &AdminManager::connectDatabase);
   connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager,
@@ -854,8 +837,6 @@ void MainWindowKernel::createInteractorInstance() {
   Interactor = InteractionSystem::instance();
   connect(Interactor, &InteractionSystem::logging, Logger,
           &LogSystem::generate);
-  connect(this, &MainWindowKernel::applySettings_signal, Interactor,
-          &InteractionSystem::applySettings);
 }
 
 void MainWindowKernel::createModels() {
