@@ -17,6 +17,12 @@ class AdministrationSystem : public QObject {
     DatabaseTransactionError,
     DatabaseQueryError,
     RegisterFileError,
+    TransponderMissed,
+    BoxMissed,
+    PalletMissed,
+    OrderMissed,
+    OrderAlreadyReleased,
+    OrderNotReleased,
     ProductionLineMissed,
     ProductionLineLinkError,
     ProductionLineRollbackLimit,
@@ -34,13 +40,6 @@ class AdministrationSystem : public QObject {
   bool LogEnable;
   QString ShipmentRegisterDir;
 
-  SqlQueryValues CurrentProductionLine;
-  SqlQueryValues CurrentTransponder;
-  SqlQueryValues CurrentBox;
-  SqlQueryValues CurrentPallet;
-  SqlQueryValues CurrentOrder;
-  SqlQueryValues CurrentIssuer;
-
   PostgreSqlDatabase* Database;
 
  public:
@@ -55,7 +54,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus getCustomResponse(const QString& req, SqlQueryValues* response);
 
   ReturnStatus createNewOrder(
-      const QSharedPointer<QHash<QString, QString>> orderParameters);
+      const std::shared_ptr<QHash<QString, QString>> orderParameters);
   ReturnStatus startOrderAssembling(const QString& orderId);
   ReturnStatus stopOrderAssembling(const QString& orderId);
 
@@ -79,10 +78,16 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus rollbackProductionLine(const QString& id);
 
-  ReturnStatus releaseTranspondersManually(const QString& table,
-                                           const QString& id);
-  ReturnStatus refundTranspondersManually(const QString& table,
-                                          const QString& id);
+  ReturnStatus releaseTransponderManually(const QString& id);
+  ReturnStatus releaseBoxManually(const QString& id);
+  ReturnStatus releasePalletManually(const QString& id);
+  ReturnStatus releaseOrderManually(const QString& id);
+
+  ReturnStatus refundTransponderManually(const QString& id);
+  ReturnStatus refundBoxManually(const QString& id);
+  ReturnStatus refundPalletManually(const QString& id);
+  ReturnStatus refundOrderManually(const QString& id);
+
   ReturnStatus shipPallets(const QHash<QString, QString>* param);
 
  private:
@@ -90,20 +95,18 @@ class AdministrationSystem : public QObject {
   void loadSettings(void);
   void sendLog(const QString& log) const;
 
-  bool getCurrentContext(const QString& id);
-
   bool addOrder(
-      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
+      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
   bool addPallets(
       const QString& orderId,
-      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
+      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
   bool addBoxes(const QString& palletId,
-                const QSharedPointer<QHash<QString, QString>> orderParameters,
+                const std::shared_ptr<QHash<QString, QString>> orderParameters,
                 QTextStream& panSource) const;
   bool addTransponders(
       const QString& boxId,
-      const QSharedPointer<QVector<QString>> pans,
-      const QSharedPointer<QHash<QString, QString>> orderParameters) const;
+      const std::shared_ptr<QVector<QString>> pans,
+      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
   bool addProductionLine(
       const QHash<QString, QString>* productionLineParameters) const;
 
@@ -117,23 +120,13 @@ class AdministrationSystem : public QObject {
   bool startOrderProcessing(const QString& id) const;
 
   //  bool removeLastProductionLine(void) const;
-  bool stopCurrentBoxProcessing(void) const;
-  bool stopCurrentPalletProcessing(void) const;
-  bool stopCurrentOrderProcessing(void) const;
+  bool stopBoxProcessing(const QString& id) const;
+  bool stopPalletProcessing(const QString& id) const;
+  bool stopOrderProcessing(const QString& id) const;
 
   bool searchFreeBox(const QString& orderId,
                      const QString& productionLineId,
                      SqlQueryValues& boxRecord) const;
-
-  ReturnStatus releaseTransponderManually(const QString& id);
-  ReturnStatus releaseBoxManually(const QString& id);
-  ReturnStatus releasePalletManually(const QString& id);
-  ReturnStatus releaseOrderManually(const QString& id);
-
-  ReturnStatus refundTransponderManually(const QString& id);
-  ReturnStatus refundBoxManually(const QString& id);
-  ReturnStatus refundPalletManually(const QString& id);
-  ReturnStatus refundOrderManually(const QString& id);
 
   ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
 

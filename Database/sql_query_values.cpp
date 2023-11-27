@@ -51,11 +51,15 @@ bool SqlQueryValues::isEmpty() const {
 void SqlQueryValues::appendToInsert(QString& queryText) const {
   for (int32_t i = 0; i < Values.first()->size(); i++) {
     queryText.append("(");
-    queryText.append(QString("'%1'").arg(Values.at(0)->at(i)));
-    for (int32_t j = 1; j < Values.size(); j++) {
+    for (int32_t j = 0; j < Values.size(); j++) {
+      if (Values.at(j)->at(i) != "NULL") {
+        queryText.append(QString("'%1'").arg(Values.at(j)->at(i)));
+      } else {
+        queryText.append(QString("NULL"));
+      }
       queryText.append(", ");
-      queryText.append(QString("'%1'").arg(Values.at(j)->at(i)));
     }
+    queryText.chop(2);
     queryText.append("),\n");
   }
   queryText.chop(2);
@@ -100,7 +104,7 @@ void SqlQueryValues::add(const QHash<QString, QString>& record) {
 }
 
 void SqlQueryValues::add(const QString& field,
-                         const QSharedPointer<QVector<QString>>& values) {
+                         const std::shared_ptr<QVector<QString>>& values) {
   // Блокируем доступ
   QMutexLocker locker(&Mutex);
 
@@ -120,7 +124,7 @@ void SqlQueryValues::add(const QString& field, const QString& value) {
   if (FieldIndex.contains(field)) {
     Values.at(FieldIndex.value(field))->append(value);
   } else {
-    QSharedPointer<QVector<QString>> values(new QVector<QString>);
+    std::shared_ptr<QVector<QString>> values(new QVector<QString>);
     values->append(value);
     FieldIndex.insert(field, FieldIndex.size());
     Values.append(values);
@@ -130,7 +134,7 @@ void SqlQueryValues::add(const QString& field, const QString& value) {
 
 void SqlQueryValues::addField(const QString& field) {
   if (!FieldIndex.contains(field)) {
-    QSharedPointer<QVector<QString>> values(new QVector<QString>);
+    std::shared_ptr<QVector<QString>> values(new QVector<QString>);
     FieldIndex.insert(field, FieldIndex.size());
     Values.append(values);
     Fields.append(field);
@@ -147,7 +151,7 @@ void SqlQueryValues::clear() {
 }
 
 int SqlQueryValues::rowCount(const QModelIndex& parent) const {
-  if ((Values.size() == 0) || (Values.first().isNull())) {
+  if ((Values.size() == 0) || (!Values.first())) {
     return 0;
   }
 

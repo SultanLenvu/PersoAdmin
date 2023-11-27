@@ -141,7 +141,7 @@ void PostgreSqlDatabase::setCurrentOrder(Qt::SortOrder order) {
     CurrentOrder = "DESC";
   }
 
-  for (QHash<QString, QSharedPointer<PostgreSqlTable>>::const_iterator it =
+  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
            Tables.constBegin();
        it != Tables.constEnd(); it++) {
     it.value()->setCurrentOrder(order);
@@ -155,7 +155,7 @@ uint32_t PostgreSqlDatabase::getRecordMaxCount() const {
 void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
   RecordMaxCount = count;
 
-  for (QHash<QString, QSharedPointer<PostgreSqlTable>>::const_iterator it =
+  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
            Tables.constBegin();
        it != Tables.constEnd(); it++) {
     it.value()->setRecordMaxCount(count);
@@ -398,7 +398,7 @@ bool PostgreSqlDatabase::updateMergedRecords(
   //      WHERE pallets.id = 1000001);
 
   // Создаем запрос
-  QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
+  QString requestText = QString("UPDATE public.%1 SET ").arg(tables.first());
   for (int32_t i = 0; i < newValues.fieldCount(); i++) {
     if (newValues.get(i) == "NULL") {
       requestText += QString("%1 = NULL, ").arg(newValues.fieldName(i));
@@ -448,14 +448,6 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
     sendLog("Получено неизвестное имя таблицы.");
     return false;
   }
-
-  //  UPDATE transponders
-  //  SET awaiting_confirmation = true
-  //  WHERE transponders.id IN (
-  //      SELECT transponders.id FROM transponders
-  //      JOIN boxes ON transponders.box_id = boxes.id
-  //      JOIN pallets ON boxes.pallet_id = pallets.id
-  //      WHERE pallets.id = 1000001);
 
   // Создаем запрос
   QString requestText =
@@ -540,22 +532,29 @@ void PostgreSqlDatabase::createDatabaseConnection() {
 }
 
 bool PostgreSqlDatabase::init() {
-  QSqlDatabase db = QSqlDatabase::database(ConnectionName);
   QStringList tableNames = QSqlDatabase::database(ConnectionName).tables();
 
   for (int32_t i = 0; i < tableNames.size(); i++) {
-    QSharedPointer<PostgreSqlTable> table(
-        new PostgreSqlTable(tableNames.at(i), ConnectionName));
-    QObject::connect(table.get(), &PostgreSqlTable::logging, this,
-                     &PostgreSqlDatabase::sendLog);
-    if (!table->init()) {
-      sendLog(QString("Получена ошибка при инициализации таблицы '%1'")
-                  .arg(tableNames.at(i)));
+    if (!createTable(tableNames[i])) {
       return false;
     }
-
-    Tables.insert(tableNames.at(i), table);
   }
+
+  return true;
+}
+
+bool PostgreSqlDatabase::createTable(const QString& name) {
+  std::shared_ptr<PostgreSqlTable> table(
+      new PostgreSqlTable("Table " + name, ConnectionName));
+  QObject::connect(table.get(), &PostgreSqlTable::logging,
+                   LogSystem::instance(), &LogSystem::generate);
+  if (!table->init()) {
+    sendLog(
+        QString("Получена ошибка при инициализации таблицы '%1'").arg(name));
+    return false;
+  }
+
+  Tables.insert("Table " + name, table);
 
   return true;
 }

@@ -44,18 +44,23 @@ class AdminManager : public QObject {
 
   // Заказы
   void createNewOrder(
-      const QSharedPointer<QHash<QString, QString>> orderParameterseters,
+      const std::shared_ptr<QHash<QString, QString>> orderParameterseters,
       SqlQueryValues* model);
-  void startOrderAssembling(const QSharedPointer<QHash<QString, QString>> param,
-                            SqlQueryValues* model);
-  void stopOrderAssembling(const QSharedPointer<QHash<QString, QString>> param,
+  void startOrderAssembling(
+      const std::shared_ptr<QHash<QString, QString>> param,
+      SqlQueryValues* model);
+  void stopOrderAssembling(const std::shared_ptr<QHash<QString, QString>> param,
                            SqlQueryValues* model);
   void showOrderTable(SqlQueryValues* model);
 
   // Производственные линии
-  void createNewProductionLine(const QSharedPointer<QHash<QString, QString>>
+  void createNewProductionLine(const std::shared_ptr<QHash<QString, QString>>
                                    productionLineParameterseters,
                                SqlQueryValues* model);
+  void startProductionLine(const std::shared_ptr<QHash<QString, QString>>,
+                           SqlQueryValues* model);
+  void stopProductionLine(const std::shared_ptr<QHash<QString, QString>>,
+                          SqlQueryValues* model);
   void stopAllProductionLines(SqlQueryValues* model);
   void showProductionLineTable(SqlQueryValues* model);
 
@@ -63,45 +68,45 @@ class AdminManager : public QObject {
   void initIssuers(SqlQueryValues* model);
   void initTransportMasterKeys(SqlQueryValues* model);
   void linkIssuerWithMasterKeys(
-      const QSharedPointer<QHash<QString, QString>> param,
+      const std::shared_ptr<QHash<QString, QString>> param,
       SqlQueryValues* model);
 
   // Транспондеры
   void releaseTranspondersManually(
-      const QSharedPointer<QHash<QString, QString>> param,
+      const std::shared_ptr<QHash<QString, QString>> param,
       SqlQueryValues* model);
   void refundTranspondersManually(
-      const QSharedPointer<QHash<QString, QString>> param,
+      const std::shared_ptr<QHash<QString, QString>> param,
       SqlQueryValues* model);
-  void shipPallets(const QSharedPointer<QHash<QString, QString>> param,
+  void shipPallets(const std::shared_ptr<QHash<QString, QString>> param,
                    SqlQueryValues* model);
 
   // Клиент
-  void releaseTransponder(const QSharedPointer<QHash<QString, QString>> param);
+  void releaseTransponder(const std::shared_ptr<QHash<QString, QString>> param);
   void confirmTransponderRelease(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<QHash<QString, QString>> param);
   void rereleaseTransponder(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<QHash<QString, QString>> param);
   void confirmTransponderRerelease(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<QHash<QString, QString>> param);
   void rollbackProductionLine(
-      const QSharedPointer<QHash<QString, QString>> param);
-  void printBoxStickerOnServer(QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<QHash<QString, QString>> param);
+  void printBoxStickerOnServer(std::shared_ptr<QHash<QString, QString>> param);
   void printLastBoxStickerOnServer();
   void printPalletStickerOnServer(
-      QSharedPointer<QHash<QString, QString>> param);
+      std::shared_ptr<QHash<QString, QString>> param);
   void printLastPalletStickerOnServer();
 
   // Принтеры
   void printTransponderSticker(
-      const QSharedPointer<QHash<QString, QString>> param,
+      const std::shared_ptr<QHash<QString, QString>> param,
       SqlQueryValues* model);
-  void printBoxSticker(const QSharedPointer<QHash<QString, QString>> param,
+  void printBoxSticker(const std::shared_ptr<QHash<QString, QString>> param,
                        SqlQueryValues* model);
-  void printPalletSticker(const QSharedPointer<QHash<QString, QString>> param,
+  void printPalletSticker(const std::shared_ptr<QHash<QString, QString>> param,
                           SqlQueryValues* model);
   void execPrinterStickerCommandScript(
-      const QSharedPointer<QStringList> commandScript);
+      const std::shared_ptr<QStringList> commandScript);
 
   void applySettings();
 
@@ -125,15 +130,15 @@ class AdminManager : public QObject {
                                   const QString& operationName);
 
  signals:
-  void logging(const QString& log) const;
+  void logging(const QString& log);
   void notifyUser(const QString& data);
   void notifyUserAboutError(const QString& data);
   void operationPerfomingStarted(const QString& operationName);
   void operationPerformingFinished(const QString& operationName);
 
-  void displayFirmware_signal(QSharedPointer<QFile> firmware);
+  void displayFirmware_signal(std::shared_ptr<QFile> firmware);
   void displayTransponderData_signal(
-      QSharedPointer<QHash<QString, QString>> transponderData);
+      std::shared_ptr<QHash<QString, QString>> transponderData);
 };
 
 //==================================================================================

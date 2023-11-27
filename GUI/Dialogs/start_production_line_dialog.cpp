@@ -30,7 +30,8 @@ AbstractInputDialog::InputDialogType StartProductionLineDialog::type() const {
 
 void StartProductionLineDialog::accept() {
   if (!check()) {
-    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
+                          QMessageBox::Ok);
     return;
   }
 
@@ -41,13 +42,13 @@ void StartProductionLineDialog::create() {
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
-  ProductionLineIdLabel = new QLabel("Имя сборщика: ");
+  ProductionLineIdLabel = new QLabel("Идентификатор производственной линии: ");
   MainLayout->addWidget(ProductionLineIdLabel, 0, 0, 1, 1);
   ProductionLineIdInput = new QLineEdit();
   ProductionLineIdInput->setMaxLength(ID_MAX_LENGHT);
   MainLayout->addWidget(ProductionLineIdInput, 0, 1, 1, 1);
 
-  OrderIdLabel = new QLabel("Имя сборщика: ");
+  OrderIdLabel = new QLabel("Идентификатор заказа: ");
   MainLayout->addWidget(OrderIdLabel, 1, 0, 1, 1);
   OrderIdInput = new QLineEdit();
   OrderIdInput->setMaxLength(ID_MAX_LENGHT);

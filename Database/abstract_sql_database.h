@@ -2,7 +2,6 @@
 #define ABSTRACTSQLDATABASE_H
 
 #include <QObject>
-#include <QSharedPointer>
 
 #include "sql_query_values.h"
 

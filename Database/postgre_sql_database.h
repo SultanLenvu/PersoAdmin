@@ -2,7 +2,6 @@
 #define PostgreSqlDatabase_H
 
 #include <QHostAddress>
-#include <QSharedPointer>
 #include <QVector>
 #include <QtSql>
 
@@ -26,7 +25,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   QString UserName;
   QString UserPassword;
 
-  QHash<QString, QSharedPointer<PostgreSqlTable>> Tables;
+  QHash<QString, std::shared_ptr<PostgreSqlTable>> Tables;
 
  public:
   explicit PostgreSqlDatabase(QObject* parent, const QString& connectionName);
@@ -91,7 +90,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
   void createDatabaseConnection(void);
   bool init(void);
-  bool createTable(void);
+  bool createTable(const QString& name);
 
   bool checkTableNames(const QStringList& names) const;
 };

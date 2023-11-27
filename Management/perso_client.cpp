@@ -701,17 +701,17 @@ void PersoClient::createResponseHandlers() {
 }
 
 void PersoClient::createResponseTemplates() {
-  QSharedPointer<QVector<QString>> echoSyntax(new QVector<QString>());
+  std::shared_ptr<QVector<QString>> echoSyntax(new QVector<QString>());
   echoSyntax->append("data");
   echoSyntax->append("return_status");
   ResponseTemplates.insert("echo", echoSyntax);
 
-  QSharedPointer<QVector<QString>> authorizationSyntax(new QVector<QString>());
+  std::shared_ptr<QVector<QString>> authorizationSyntax(new QVector<QString>());
   authorizationSyntax->append("access");
   authorizationSyntax->append("return_status");
   ResponseTemplates.insert("authorization", authorizationSyntax);
 
-  QSharedPointer<QVector<QString>> transponderReleaseSyntax(
+  std::shared_ptr<QVector<QString>> transponderReleaseSyntax(
       new QVector<QString>());
   transponderReleaseSyntax->append("firmware");
   transponderReleaseSyntax->append("sn");
@@ -724,13 +724,13 @@ void PersoClient::createResponseTemplates() {
   transponderReleaseSyntax->append("return_status");
   ResponseTemplates.insert("transponder_release", transponderReleaseSyntax);
 
-  QSharedPointer<QVector<QString>> transponderReleaseConfirmSyntax(
+  std::shared_ptr<QVector<QString>> transponderReleaseConfirmSyntax(
       new QVector<QString>());
   transponderReleaseConfirmSyntax->append("return_status");
   ResponseTemplates.insert("transponder_release_confirm",
                            transponderReleaseConfirmSyntax);
 
-  QSharedPointer<QVector<QString>> transponderRereleaseSyntax(
+  std::shared_ptr<QVector<QString>> transponderRereleaseSyntax(
       new QVector<QString>());
   transponderRereleaseSyntax->append("firmware");
   transponderRereleaseSyntax->append("sn");
@@ -743,34 +743,34 @@ void PersoClient::createResponseTemplates() {
   transponderRereleaseSyntax->append("return_status");
   ResponseTemplates.insert("transponder_rerelease", transponderRereleaseSyntax);
 
-  QSharedPointer<QVector<QString>> transponderRereleaseConfirmSyntax(
+  std::shared_ptr<QVector<QString>> transponderRereleaseConfirmSyntax(
       new QVector<QString>());
   transponderRereleaseConfirmSyntax->append("return_status");
   ResponseTemplates.insert("transponder_rerelease_confirm",
                            transponderReleaseConfirmSyntax);
 
-  QSharedPointer<QVector<QString>> productionLineRollbackSyntax(
+  std::shared_ptr<QVector<QString>> productionLineRollbackSyntax(
       new QVector<QString>());
   productionLineRollbackSyntax->append("return_status");
   ResponseTemplates.insert("production_line_rollback",
                            productionLineRollbackSyntax);
 
-  QSharedPointer<QVector<QString>> printBoxStickerSyntax(
+  std::shared_ptr<QVector<QString>> printBoxStickerSyntax(
       new QVector<QString>());
   printBoxStickerSyntax->append("return_status");
   ResponseTemplates.insert("print_box_sticker", printBoxStickerSyntax);
 
-  QSharedPointer<QVector<QString>> printLastBoxStickerSyntax(
+  std::shared_ptr<QVector<QString>> printLastBoxStickerSyntax(
       new QVector<QString>());
   printLastBoxStickerSyntax->append("return_status");
   ResponseTemplates.insert("print_last_box_sticker", printLastBoxStickerSyntax);
 
-  QSharedPointer<QVector<QString>> printPalletStickerSyntax(
+  std::shared_ptr<QVector<QString>> printPalletStickerSyntax(
       new QVector<QString>());
   printPalletStickerSyntax->append("return_status");
   ResponseTemplates.insert("print_pallet_sticker", printPalletStickerSyntax);
 
-  QSharedPointer<QVector<QString>> printLastPalletStickerSyntax(
+  std::shared_ptr<QVector<QString>> printLastPalletStickerSyntax(
       new QVector<QString>());
   printLastPalletStickerSyntax->append("return_status");
   ResponseTemplates.insert("print_last_pallet_sticker",

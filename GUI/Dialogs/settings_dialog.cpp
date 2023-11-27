@@ -14,8 +14,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
 
   create();
 
-  adjustSize();
-  setFixedHeight(size().height());
+  //  adjustSize();
+  //  setFixedHeight(size().height());
 }
 
 SettingsDialog::~SettingsDialog() {}
@@ -359,8 +359,8 @@ void SettingsDialog::logSystemEnableCheckBox_slot(int state) {
     LogSystemProxyWidget1->hide();
   }
 
-  adjustSize();
-  setFixedHeight(size().height());
+  //  adjustSize();
+  //  setFixedHeight(size().height());
 }
 
 void SettingsDialog::logSystemListenPersoServerCheckBox_slot(int state) {
@@ -370,8 +370,8 @@ void SettingsDialog::logSystemListenPersoServerCheckBox_slot(int state) {
     LogSystemProxyWidget2->hide();
   }
 
-  adjustSize();
-  setFixedHeight(size().height());
+  //  adjustSize();
+  //  setFixedHeight(size().height());
 }
 
 void SettingsDialog::logSystemFileEnableCheckBox_slot(int32_t state) {
@@ -381,8 +381,8 @@ void SettingsDialog::logSystemFileEnableCheckBox_slot(int32_t state) {
     LogSystemProxyWidget3->hide();
   }
 
-  adjustSize();
-  setFixedHeight(size().height());
+  //  adjustSize();
+  //  setFixedHeight(size().height());
 }
 
 void SettingsDialog::stickerPrinterLibPathPushButton_slot() {

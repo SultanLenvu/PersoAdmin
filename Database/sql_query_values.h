@@ -6,7 +6,7 @@
 #include <QMutex>
 #include <QObject>
 #include <QSet>
-#include <QSharedPointer>
+
 #include <QSqlQuery>
 #include <QVector>
 
@@ -15,7 +15,7 @@ class SqlQueryValues : public QAbstractTableModel {
 
  private:
   template <typename T>
-  using SharedVector = QSharedPointer<QVector<T>>;
+  using SharedVector = std::shared_ptr<QVector<T>>;
 
  private:
   QVector<QString> Fields;
@@ -41,7 +41,7 @@ class SqlQueryValues : public QAbstractTableModel {
 
   void extractRecords(QSqlQuery& request);
   void add(const QHash<QString, QString>& record);
-  void add(const QString& name, const QSharedPointer<QVector<QString>>& values);
+  void add(const QString& name, const std::shared_ptr<QVector<QString>>& values);
   void add(const QString& field, const QString& value);
   void addField(const QString& field);
   void clear();

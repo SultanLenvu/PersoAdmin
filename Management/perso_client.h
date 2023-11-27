@@ -77,7 +77,7 @@ private:
   QByteArray TransmittedDataBlock;
 
   QHash<QString, ReturnStatus (PersoClient::*)(void)> ResponseHandlers;
-  QHash<QString, QSharedPointer<QVector<QString>>> ResponseTemplates;
+  QHash<QString, std::shared_ptr<QVector<QString>>> ResponseTemplates;
   QJsonObject CurrentCommand;
   QJsonObject CurrentResponse;
 

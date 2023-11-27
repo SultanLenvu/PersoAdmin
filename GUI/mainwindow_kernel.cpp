@@ -91,7 +91,7 @@ void MainWindowKernel::transmitCustomRequestPushButton_slot() {
 }
 
 void MainWindowKernel::createNewOrderPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   OrderCreationDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -104,7 +104,7 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
 }
 
 void MainWindowKernel::startOrderAssemblingPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -117,7 +117,7 @@ void MainWindowKernel::startOrderAssemblingPushButton_slot() {
 }
 
 void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -135,7 +135,7 @@ void MainWindowKernel::updateOrderViewPushButton_slot() {
 }
 
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   ProductionLineCreationDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -148,7 +148,7 @@ void MainWindowKernel::createNewProductionLinePushButton_slot() {
 }
 
 void MainWindowKernel::startProductionLinePushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   StartProductionLineDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -161,7 +161,7 @@ void MainWindowKernel::startProductionLinePushButton_slot() {
 }
 
 void MainWindowKernel::stopProductionLinePushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -200,7 +200,7 @@ void MainWindowKernel::initIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   LinkIssuerKeyDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -217,7 +217,7 @@ void MainWindowKernel::releaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
 
@@ -229,7 +229,7 @@ void MainWindowKernel::confirmTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("ucid", AbstractGUI->UcidLineEdit->text());
@@ -242,7 +242,7 @@ void MainWindowKernel::rereleaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
@@ -255,7 +255,7 @@ void MainWindowKernel::confirmRereleaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
@@ -269,7 +269,7 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
 
@@ -277,7 +277,7 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   PanInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -296,7 +296,7 @@ void MainWindowKernel::printLastBoxStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   PanInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -313,7 +313,7 @@ void MainWindowKernel::printLastPalletStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualReleasePushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   ManualReleaseRefundDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -326,7 +326,7 @@ void MainWindowKernel::transponderManualReleasePushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualRefundPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   ManualReleaseRefundDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -339,7 +339,7 @@ void MainWindowKernel::transponderManualRefundPushButton_slot() {
 }
 
 void MainWindowKernel::palletShipmentPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
 
   PalletShippingDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -352,7 +352,7 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
 }
 
 void MainWindowKernel::printTransponderStickerPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -365,7 +365,7 @@ void MainWindowKernel::printTransponderStickerPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -378,7 +378,7 @@ void MainWindowKernel::printBoxStickerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerPushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -395,7 +395,7 @@ void MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot() {
 
   emit loggerClear_signal();
 
-  QSharedPointer<QStringList> commandScript(new QStringList(
+  std::shared_ptr<QStringList> commandScript(new QStringList(
       AbstractGUI->StickerPrinterCommandScriptInput->toPlainText().split(
           "\n")));
   emit execPrinterStickerCommandScript_signal(commandScript);
@@ -417,7 +417,7 @@ void MainWindowKernel::settingsActionTrigger_slot() {
   }
 }
 
-void MainWindowKernel::displayFirmware_slot(QSharedPointer<QFile> firmware) {
+void MainWindowKernel::displayFirmware_slot(std::shared_ptr<QFile> firmware) {
   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   if (!firmware.get()->open(QIODevice::ReadOnly)) {
@@ -430,7 +430,7 @@ void MainWindowKernel::displayFirmware_slot(QSharedPointer<QFile> firmware) {
 }
 
 void MainWindowKernel::displayTransponderData_slot(
-    QSharedPointer<QHash<QString, QString>> transponderData) {
+    std::shared_ptr<QHash<QString, QString>> transponderData) {
   TransponderData->buildTransponderData(transponderData.get());
   CurrentGUI->update();
 }
@@ -643,6 +643,10 @@ void MainWindowKernel::connectMainWindowGUI() {
   // Производственные линии
   connect(AbstractGUI->CreateNewProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::createNewProductionLinePushButton_slot);
+  connect(AbstractGUI->StartProductionLinePushButton, &QPushButton::clicked,
+          this, &MainWindowKernel::startProductionLinePushButton_slot);
+  connect(AbstractGUI->StopProductionLinePushButton, &QPushButton::clicked,
+          this, &MainWindowKernel::stopProductionLinePushButton_slot);
   connect(AbstractGUI->ShutdownAllProductionLinesPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
@@ -767,6 +771,12 @@ void MainWindowKernel::createManagerInstance() {
 
   connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
           &AdminManager::createNewProductionLine);
+  connect(this, &MainWindowKernel::startProductionLine_signal, Manager,
+          &AdminManager::startProductionLine);
+  connect(this, &MainWindowKernel::stopProductionLine_signal, Manager,
+          &AdminManager::stopProductionLine);
+  connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
+          &AdminManager::showProductionLineTable);
   connect(this, &MainWindowKernel::stopAllProductionLines_signal, Manager,
           &AdminManager::stopAllProductionLines);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
@@ -858,10 +868,11 @@ void MainWindowKernel::createMatchingTable() {
 }
 
 void MainWindowKernel::registerMetaType() {
-  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
-      "QSharedPointer<QHash<QString, QString> >");
-  qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
-      "QSharedPointer<QHash<QString, QString> >");
-  qRegisterMetaType<QSharedPointer<QStringList>>("QSharedPointer<QStringList>");
-  qRegisterMetaType<QSharedPointer<QFile>>("QSharedPointer<QFile>");
+  qRegisterMetaType<std::shared_ptr<QMap<QString, QString>>>(
+      "std::shared_ptr<QHash<QString, QString> >");
+  qRegisterMetaType<std::shared_ptr<QHash<QString, QString>>>(
+      "std::shared_ptr<QHash<QString, QString> >");
+  qRegisterMetaType<std::shared_ptr<QStringList>>(
+      "std::shared_ptr<QStringList>");
+  qRegisterMetaType<std::shared_ptr<QFile>>("std::shared_ptr<QFile>");
 }
