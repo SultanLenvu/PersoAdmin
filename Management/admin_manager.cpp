@@ -43,7 +43,7 @@ void AdminManager::disconnectDatabase() {
   AdministrationSystem::ReturnStatus status;
 
   sendLog("Отключение от базы данных. ");
-  status = Administrator->connectDatabase();
+  status = Administrator->disconnectDatabase();
   if (status != AdministrationSystem::Completed) {
     processAdministratorError(status, "disconnectDatabase");
     return;

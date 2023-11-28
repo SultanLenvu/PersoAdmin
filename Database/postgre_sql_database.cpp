@@ -545,7 +545,7 @@ bool PostgreSqlDatabase::init() {
 
 bool PostgreSqlDatabase::createTable(const QString& name) {
   std::shared_ptr<PostgreSqlTable> table(
-      new PostgreSqlTable("Table " + name, ConnectionName));
+      new PostgreSqlTable(name, ConnectionName));
   QObject::connect(table.get(), &PostgreSqlTable::logging,
                    LogSystem::instance(), &LogSystem::generate);
   if (!table->init()) {
@@ -554,7 +554,7 @@ bool PostgreSqlDatabase::createTable(const QString& name) {
     return false;
   }
 
-  Tables.insert("Table " + name, table);
+  Tables.insert(name, table);
 
   return true;
 }

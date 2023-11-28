@@ -292,7 +292,7 @@ bool PostgreSqlTable::getRecordCount(uint32_t& count) const {
 void PostgreSqlTable::sendLog(const QString& log) const {
   if (LogEnable) {
     emit const_cast<PostgreSqlTable*>(this)->logging(
-        QString("%1 - %2").arg(objectName(), log));
+        QString("Table %1 - %2").arg(objectName(), log));
   }
 }
 
