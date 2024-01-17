@@ -73,6 +73,7 @@ class MainWindowKernel : public QMainWindow {
   // Функционал для работы с производственными линиями
   void createNewProductionLinePushButton_slot(void);
   void startProductionLinePushButton_slot(void);
+  void deactivateProductionLinePushButton_slot(void);
   void stopProductionLinePushButton_slot(void);
   void deactivateAllProductionLinesPushButton_slot(void);
   void editProductionLinesPushButton_slot(void);
@@ -162,11 +163,14 @@ class MainWindowKernel : public QMainWindow {
       const std::shared_ptr<QHash<QString, QString>>
           productionLineParameterseters,
       SqlQueryValues* model);
-  void startProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
-                                  SqlQueryValues* model);
-  void stopProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
-                                 SqlQueryValues* model);
-  void stopAllProductionLines_signal(SqlQueryValues* model);
+  void activateProductionLine_signal(
+      const std::shared_ptr<QHash<QString, QString>>,
+      SqlQueryValues* model);
+  void activateAllProductionLines_signal(SqlQueryValues* model);
+  void deactivateProductionLine_signal(
+      const std::shared_ptr<QHash<QString, QString>>,
+      SqlQueryValues* model);
+  void deactivateAllProductionLines_signal(SqlQueryValues* model);
   void editProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
                                  SqlQueryValues* model);
   void showProductionLineTable_signal(SqlQueryValues* model);

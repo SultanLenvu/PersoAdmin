@@ -150,14 +150,19 @@ void MainWindowKernel::createNewProductionLinePushButton_slot() {
 void MainWindowKernel::startProductionLinePushButton_slot() {
   std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
 
-  StartProductionLineDialog dialog(this);
+  IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
   dialog.getData(param.get());
 
   emit loggerClear_signal();
-  emit startProductionLine_signal(param, ProductionLineModel);
+  emit activateProductionLine_signal(param, ProductionLineModel);
+}
+
+void MainWindowKernel::deactivateProductionLinePushButton_slot() {
+  emit loggerClear_signal();
+  emit activateAllProductionLines_signal(ProductionLineModel);
 }
 
 void MainWindowKernel::stopProductionLinePushButton_slot() {
@@ -170,12 +175,12 @@ void MainWindowKernel::stopProductionLinePushButton_slot() {
   dialog.getData(param.get());
 
   emit loggerClear_signal();
-  emit stopProductionLine_signal(param, ProductionLineModel);
+  emit deactivateProductionLine_signal(param, ProductionLineModel);
 }
 
 void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
-  emit stopAllProductionLines_signal(ProductionLineModel);
+  emit deactivateAllProductionLines_signal(ProductionLineModel);
 }
 
 void MainWindowKernel::editProductionLinesPushButton_slot() {
@@ -643,11 +648,15 @@ void MainWindowKernel::connectMainWindowGUI() {
   // Производственные линии
   connect(AbstractGUI->CreateNewProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::createNewProductionLinePushButton_slot);
-  connect(AbstractGUI->StartProductionLinePushButton, &QPushButton::clicked,
+  connect(AbstractGUI->ActivateProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::startProductionLinePushButton_slot);
-  connect(AbstractGUI->StopProductionLinePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::stopProductionLinePushButton_slot);
-  connect(AbstractGUI->ShutdownAllProductionLinesPushButton,
+  connect(AbstractGUI->DeactivateProductionLinePushButton,
+          &QPushButton::clicked, this,
+          &MainWindowKernel::deactivateProductionLinePushButton_slot);
+  connect(AbstractGUI->DeactivateProductionLinePushButton,
+          &QPushButton::clicked, this,
+          &MainWindowKernel::stopProductionLinePushButton_slot);
+  connect(AbstractGUI->DeactivateAllProductionLinesPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
   connect(AbstractGUI->UpdateProductionLineViewPushButton,
@@ -745,10 +754,10 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::generateMessage);
   connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
           &InteractionSystem::generateErrorMessage, Qt::QueuedConnection);
-  connect(Manager, &AdminManager::operationPerfomingStarted, Interactor,
-          &InteractionSystem::startOperationProgressDialog);
-  connect(Manager, &AdminManager::operationPerformingFinished, Interactor,
-          &InteractionSystem::finishOperationProgressDialog);
+  connect(Manager, &AdminManager::executionStarted, Interactor,
+          &InteractionSystem::processOperationStart);
+  connect(Manager, &AdminManager::executionFinished, Interactor,
+          &InteractionSystem::processOperationFinish);
 
   // Подключаем функционал
   connect(this, &MainWindowKernel::connectDatabase_signal, Manager,
@@ -771,14 +780,16 @@ void MainWindowKernel::createManagerInstance() {
 
   connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
           &AdminManager::createNewProductionLine);
-  connect(this, &MainWindowKernel::startProductionLine_signal, Manager,
-          &AdminManager::startProductionLine);
-  connect(this, &MainWindowKernel::stopProductionLine_signal, Manager,
-          &AdminManager::stopProductionLine);
+  connect(this, &MainWindowKernel::activateProductionLine_signal, Manager,
+          &AdminManager::activateProductionLine);
+  connect(this, &MainWindowKernel::activateAllProductionLines_signal, Manager,
+          &AdminManager::activateAllProductionLines);
+  connect(this, &MainWindowKernel::deactivateProductionLine_signal, Manager,
+          &AdminManager::deactivateProductionLine);
+  connect(this, &MainWindowKernel::deactivateAllProductionLines_signal, Manager,
+          &AdminManager::deactivateAllProductionLines);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
           &AdminManager::showProductionLineTable);
-  connect(this, &MainWindowKernel::stopAllProductionLines_signal, Manager,
-          &AdminManager::stopAllProductionLines);
   connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
           &AdminManager::showProductionLineTable);
 
@@ -874,5 +885,6 @@ void MainWindowKernel::registerMetaType() {
       "std::shared_ptr<QHash<QString, QString> >");
   qRegisterMetaType<std::shared_ptr<QStringList>>(
       "std::shared_ptr<QStringList>");
+  qRegisterMetaType<ReturnStatus>("ReturnStatus");
   qRegisterMetaType<std::shared_ptr<QFile>>("std::shared_ptr<QFile>");
 }

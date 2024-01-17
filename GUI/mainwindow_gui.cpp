@@ -198,16 +198,23 @@ void MainWindowGUI::createProductionLineTab() {
       new QPushButton("Создать производственную линию");
   ProductionLinesControlPanelLayout->addWidget(
       CreateNewProductionLinePushButton);
-  StartProductionLinePushButton =
+  ActivateProductionLinePushButton =
       new QPushButton("Запустить производственную линию");
-  ProductionLinesControlPanelLayout->addWidget(StartProductionLinePushButton);
-  StopProductionLinePushButton =
+  ProductionLinesControlPanelLayout->addWidget(
+      ActivateProductionLinePushButton);
+
+  ActivateAllProductionLinesPushButton =
+      new QPushButton("Запустить все производственные линии");
+  ProductionLinesControlPanelLayout->addWidget(
+      ActivateAllProductionLinesPushButton);
+  DeactivateProductionLinePushButton =
       new QPushButton("Остановить производственную линию");
-  ProductionLinesControlPanelLayout->addWidget(StopProductionLinePushButton);
-  ShutdownAllProductionLinesPushButton =
+  ProductionLinesControlPanelLayout->addWidget(
+      DeactivateProductionLinePushButton);
+  DeactivateAllProductionLinesPushButton =
       new QPushButton("Остановить все производственные линии");
   ProductionLinesControlPanelLayout->addWidget(
-      ShutdownAllProductionLinesPushButton);
+      DeactivateAllProductionLinesPushButton);
   EditProductionLinesPushButton =
       new QPushButton("Редактировать производственную линию");
   ProductionLinesControlPanelLayout->addWidget(EditProductionLinesPushButton);

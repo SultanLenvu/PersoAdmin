@@ -203,6 +203,36 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) const {
   return true;
 }
 
+bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) const {
+  if (!checkFieldNames(newValues)) {
+    sendLog("Получено неизвестное имя поля таблицы. ");
+    return false;
+  }
+
+  // Создаем запрос
+  QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
+  for (int32_t i = 0; i < newValues.fieldCount(); i++) {
+    if (newValues.get(i) == "NULL") {
+      requestText += QString("%1 = NULL, ").arg(newValues.fieldName(i));
+    } else {
+      requestText +=
+          QString("%1 = '%2', ").arg(newValues.fieldName(i), newValues.get(i));
+    }
+  }
+  requestText.chop(2);
+
+  // Выполняем запрос
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  request.setForwardOnly(true);
+  if (!request.exec(requestText)) {
+    sendLog(request.lastError().text());
+    sendLog("Отправленный запрос: " + requestText);
+    return false;
+  }
+
+  return true;
+}
+
 bool PostgreSqlTable::updateRecords(const QString& condition,
                                     const SqlQueryValues& newValues) const {
   if (!checkFieldNames(newValues)) {

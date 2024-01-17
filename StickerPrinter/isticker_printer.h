@@ -21,7 +21,7 @@ class IStickerPrinter : public QObject {
     LibraryMissed,
     ConnectionError,
     Failed,
-    Completed,
+    NoError,
   };
   Q_ENUM(ReturnStatus);
 

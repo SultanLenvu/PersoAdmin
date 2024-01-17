@@ -42,6 +42,8 @@ class AbstractSqlDatabase : public QObject {
   virtual bool readLastRecord(const QString& table,
                               SqlQueryValues& record) const = 0;
   virtual bool updateRecords(const QString& table,
+                             const SqlQueryValues& newValues) const = 0;
+  virtual bool updateRecords(const QString& table,
                              const QString& condition,
                              const SqlQueryValues& newValues) const = 0;
   virtual bool deleteRecords(const QString& table,

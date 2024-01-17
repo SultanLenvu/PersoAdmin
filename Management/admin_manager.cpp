@@ -2,8 +2,8 @@
 #include "Log/log_system.h"
 #include "StickerPrinter/te310_printer.h"
 
-AdminManager::AdminManager(QObject* parent) : QObject(parent) {
-  setObjectName("AdminManager");
+AdminManager::AdminManager(const QString& name) : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
 }
 
@@ -22,145 +22,145 @@ void AdminManager::insctanceThreadStarted_slot() {
 
 void AdminManager::connectDatabase() {
   // Начинаем выполнение операции
-  startOperationPerforming("connectDatabase");
+  emit executionStarted("connectDatabase");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Подключение к базе данных. ");
   status = Administrator->connectDatabase();
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "connectDatabase");
     return;
   }
 
-  finishOperationPerforming("connectDatabase");
+  emit executionFinished("connectDatabase", ReturnStatus::NoError);
 }
 
 void AdminManager::disconnectDatabase() {
   // Начинаем выполнение операции
-  startOperationPerforming("disconnectDatabase");
+  emit executionStarted("disconnectDatabase");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Отключение от базы данных. ");
   status = Administrator->disconnectDatabase();
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "disconnectDatabase");
     return;
   }
 
-  finishOperationPerforming("disconnectDatabase");
+  emit executionFinished("disconnectDatabase", ReturnStatus::NoError);
 }
 
 void AdminManager::showDatabaseTable(const QString& name,
                                      SqlQueryValues* model) {
   // Начинаем выполнение операции
-  startOperationPerforming("showDatabaseTable");
+  emit executionStarted("showDatabaseTable");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   model->clear();
   sendLog(QString("Отображение таблицы %1. ").arg(name));
-  status = Administrator->getDatabaseTable(name, model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable(name, model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "showDatabaseTable");
     return;
   }
 
-  finishOperationPerforming("showDatabaseTable");
+  emit executionFinished("showDatabaseTable", ReturnStatus::NoError);
 }
 
 void AdminManager::performCustomRequest(const QString& req,
                                         SqlQueryValues* model) {
   // Начинаем выполнение операции
-  startOperationPerforming("performCustomRequest");
+  emit executionStarted("performCustomRequest");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   model->clear();
   sendLog("Представление ответа на кастомный запрос. ");
   status = Administrator->getCustomResponse(req, model);
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "performCustomRequest");
     return;
   }
 
-  finishOperationPerforming("performCustomRequest");
+  emit executionFinished("performCustomRequest", ReturnStatus::NoError);
 }
 
 void AdminManager::createNewOrder(
     const std::shared_ptr<QHash<QString, QString>> orderParameters,
     SqlQueryValues* model) {
-  startOperationPerforming("createNewOrder");
+  emit executionStarted("createNewOrder");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Создание нового заказа. ");
   status = Administrator->createNewOrder(orderParameters);
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "createNewOrder");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  status = Administrator->getDatabaseTable("orders", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("orders", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "createNewOrder");
     return;
   }
 
-  finishOperationPerforming("createNewOrder");
+  emit executionFinished("createNewOrder", ReturnStatus::NoError);
 }
 
 void AdminManager::startOrderAssembling(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("startOrderAssembling");
+  emit executionStarted("startOrderAssembling");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog(QString("Запуск сборки заказа %1. ").arg(param->value("id")));
   status = Administrator->startOrderAssembling(param->value("id"));
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "startOrderAssembling");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  status = Administrator->getDatabaseTable("orders", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("orders", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "startOrderAssembling");
     return;
   }
 
-  finishOperationPerforming("startOrderAssembling");
+  emit executionFinished("startOrderAssembling", ReturnStatus::NoError);
 }
 
 void AdminManager::stopOrderAssembling(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("stopOrderAssembling");
+  emit executionStarted("stopOrderAssembling");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog(QString("Остановка сборки заказа %1. ").arg(param->value("id")));
   status = Administrator->stopOrderAssembling(param->value("id"));
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "stopOrderAssembling");
     return;
   }
 
   model->clear();
   sendLog("Отображение заказов. ");
-  status = Administrator->getDatabaseTable("orders", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("orders", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "stopOrderAssembling");
     return;
   }
 
-  finishOperationPerforming("stopOrderAssembling");
+  emit executionFinished("stopOrderAssembling", ReturnStatus::NoError);
 }
 
 void AdminManager::showOrderTable(SqlQueryValues* model) {
@@ -170,100 +170,123 @@ void AdminManager::showOrderTable(SqlQueryValues* model) {
 void AdminManager::createNewProductionLine(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("createNewProductionLine");
+  emit executionStarted("createNewProductionLine");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Создание новой линии производства. ");
   status = Administrator->createNewProductionLine(param.get());
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "createNewProductionLine");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("production_lines", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "createNewProductionLine");
     return;
   }
 
-  finishOperationPerforming("createNewProductionLine");
+  emit executionFinished("createNewProductionLine", ReturnStatus::NoError);
 }
 
-void AdminManager::startProductionLine(
+void AdminManager::activateProductionLine(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("startProductionLine");
+  emit executionStarted("activateProductionLine");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Запуск линии производства. ");
-  status = Administrator->startProductionLineManually(
-      param->value("production_line_id"), param->value("order_id"));
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "startProductionLine");
+  status =
+      Administrator->activateProductionLine(param->value("production_line_id"));
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "activateProductionLine");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "startProductionLine");
+  status = Administrator->getTable("production_lines", model);
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "activateProductionLine");
     return;
   }
 
-  finishOperationPerforming("startProductionLine");
+  emit executionFinished("activateProductionLine", ReturnStatus::NoError);
 }
 
-void AdminManager::stopProductionLine(
-    const std::shared_ptr<QHash<QString, QString>> param,
-    SqlQueryValues* model) {
-  startOperationPerforming("stopProductionLine");
+void AdminManager::activateAllProductionLines(SqlQueryValues* model) {
+  emit executionStarted("activateAllProductionLines");
 
-  AdministrationSystem::ReturnStatus status;
-
-  sendLog("Остановка линии производства. ");
-  status = Administrator->stopProductionLineManually(param->value("id"));
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "stopProductionLine");
-    return;
-  }
-
-  model->clear();
-  sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "stopProductionLine");
-    return;
-  }
-
-  finishOperationPerforming("stopProductionLine");
-}
-
-void AdminManager::stopAllProductionLines(SqlQueryValues* model) {
-  startOperationPerforming("stopAllProductionLines");
-
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog(QString("Остановка всех производственных линий. "));
-  status = Administrator->stopAllProductionLinesManually();
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "stopAllProductionLines");
+  status = Administrator->activateAllProductionLines();
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "activateAllProductionLines");
     return;
   }
 
   model->clear();
   sendLog("Отображение производственных линий. ");
-  status = Administrator->getDatabaseTable("production_lines", model);
-  if (status != AdministrationSystem::Completed) {
-    processAdministratorError(status, "stopAllProductionLines");
+  status = Administrator->getTable("production_lines", model);
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "activateAllProductionLines");
     return;
   }
 
-  finishOperationPerforming("stopAllProductionLines");
+  emit executionFinished("activateAllProductionLines", ReturnStatus::NoError);
+}
+
+void AdminManager::deactivateProductionLine(
+    const std::shared_ptr<QHash<QString, QString>> param,
+    SqlQueryValues* model) {
+  emit executionStarted("deactivateProductionLine");
+
+  ReturnStatus status;
+
+  sendLog("Остановка линии производства. ");
+  status = Administrator->deactivateProductionLine(param->value("id"));
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "deactivateProductionLine");
+    return;
+  }
+
+  model->clear();
+  sendLog("Отображение производственных линий. ");
+  status = Administrator->getTable("production_lines", model);
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "deactivateProductionLine");
+    return;
+  }
+
+  emit executionFinished("deactivateProductionLine", ReturnStatus::NoError);
+}
+
+void AdminManager::deactivateAllProductionLines(SqlQueryValues* model) {
+  emit executionStarted("deactivateAllProductionLines");
+
+  ReturnStatus status;
+
+  sendLog(QString("Остановка всех производственных линий. "));
+  status = Administrator->deactivateAllProductionLines();
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "deactivateAllProductionLines");
+    return;
+  }
+
+  model->clear();
+  sendLog("Отображение производственных линий. ");
+  status = Administrator->getTable("production_lines", model);
+  if (status != ReturnStatus::NoError) {
+    processAdministratorError(status, "deactivateAllProductionLines");
+    return;
+  }
+
+  emit executionFinished("deactivateAllProductionLines", ReturnStatus::NoError);
 }
 
 void AdminManager::showProductionLineTable(SqlQueryValues* model) {
@@ -271,84 +294,84 @@ void AdminManager::showProductionLineTable(SqlQueryValues* model) {
 }
 
 void AdminManager::initIssuers(SqlQueryValues* model) {
-  startOperationPerforming("initIssuers");
+  emit executionStarted("initIssuers");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Инициализация данных об эмитентах. ");
   status = Administrator->initIssuerTable();
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "initIssuers");
     return;
   }
 
   model->clear();
   sendLog("Отображение эмитентов. ");
-  status = Administrator->getDatabaseTable("issuers", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("issuers", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "initIssuers");
     return;
   }
 
-  finishOperationPerforming("initIssuers");
+  emit executionFinished("initIssuers", ReturnStatus::NoError);
 }
 
 void AdminManager::initTransportMasterKeys(SqlQueryValues* model) {
-  startOperationPerforming("initTransportMasterKeys");
+  emit executionStarted("initTransportMasterKeys");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog("Инициализация транспортных мастер ключей. ");
   status = Administrator->initTransportMasterKeysTable();
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "initTransportMasterKeys");
     return;
   }
 
   model->clear();
   sendLog("Отображение транспортных мастер ключей. ");
-  status = Administrator->getDatabaseTable("transport_master_keys", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("transport_master_keys", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "initTransportMasterKeys");
     return;
   }
 
-  finishOperationPerforming("initTransportMasterKeys");
+  emit executionFinished("initTransportMasterKeys", ReturnStatus::NoError);
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("linkIssuerWithMasterKeys");
+  emit executionStarted("linkIssuerWithMasterKeys");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
 
   sendLog(QString("Связывание эмитента %1 с мастер ключами %2. ")
               .arg(param->value("issuer_id"), param->value("key_group_id")));
   status = Administrator->linkIssuerWithMasterKeys(param.get());
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;
   }
 
   model->clear();
   sendLog("Отображение таблицы эмитентов. ");
-  status = Administrator->getDatabaseTable("issuers", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("issuers", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "linkIssuerWithMasterKeys");
     return;
   }
 
-  finishOperationPerforming("linkIssuerWithMasterKeys");
+  emit executionFinished("linkIssuerWithMasterKeys", ReturnStatus::NoError);
 }
 
 void AdminManager::releaseTranspondersManually(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("releaseTranspondersManually");
+  emit executionStarted("releaseTranspondersManually");
   sendLog("Принудительный выпуск транспондеров. ");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
   QString table = param->value("table");
 
   if (table == "transponders") {
@@ -360,32 +383,32 @@ void AdminManager::releaseTranspondersManually(
   } else if (table == "orders") {
     status = Administrator->releaseOrderManually(param->value("id"));
   } else {
-    processAdministratorError(AdministrationSystem::ParameterError,
+    processAdministratorError(ReturnStatus::ParameterError,
                               "releaseTranspondersManually");
     return;
   }
 
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "releaseTranspondersManually");
     return;
   }
 
-  status = Administrator->getDatabaseTable(param->value("table"), model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable(param->value("table"), model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "releaseTranspondersManually");
     return;
   }
 
-  finishOperationPerforming("releaseTranspondersManually");
+  emit executionFinished("releaseTranspondersManually", ReturnStatus::NoError);
 }
 
 void AdminManager::refundTranspondersManually(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("refundTranspondersManually");
+  emit executionStarted("refundTranspondersManually");
   sendLog("Возврат транспондеров. ");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
   QString table = param->value("table");
 
   if (table == "transponders") {
@@ -397,50 +420,50 @@ void AdminManager::refundTranspondersManually(
   } else if (table == "orders") {
     status = Administrator->refundOrderManually(param->value("id"));
   } else {
-    processAdministratorError(AdministrationSystem::ParameterError,
+    processAdministratorError(ReturnStatus::ParameterError,
                               "refundTranspondersManually");
     return;
   }
 
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "refundTranspondersManually");
     return;
   }
 
-  status = Administrator->getDatabaseTable(param->value("table"), model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable(param->value("table"), model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "refundTranspondersManually");
     return;
   }
 
-  finishOperationPerforming("refundTranspondersManually");
+  emit executionFinished("refundTranspondersManually", ReturnStatus::NoError);
 }
 
 void AdminManager::shipPallets(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("shipPallets");
+  emit executionStarted("shipPallets");
   sendLog("Отгрузка паллет. ");
 
-  AdministrationSystem::ReturnStatus status;
+  ReturnStatus status;
   status = Administrator->shipPallets(param.get());
-  if (status != AdministrationSystem::Completed) {
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "shipPallets");
     return;
   }
 
-  status = Administrator->getDatabaseTable("pallets", model);
-  if (status != AdministrationSystem::Completed) {
+  status = Administrator->getTable("pallets", model);
+  if (status != ReturnStatus::NoError) {
     processAdministratorError(status, "shipPallets");
     return;
   }
 
-  finishOperationPerforming("shipPallets");
+  emit executionFinished("shipPallets", ReturnStatus::NoError);
 }
 
 void AdminManager::releaseTransponder(
     const std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("releaseTransponder");
+  emit executionStarted("releaseTransponder");
   sendLog("Выпуск транспондера. ");
 
   std::shared_ptr<QFile> firmware(new QFile("temp.bin"));
@@ -448,7 +471,7 @@ void AdminManager::releaseTransponder(
       new QHash<QString, QString>());
   PersoClient::ReturnStatus status = Client->requestTransponderRelease(
       param.get(), firmware.get(), transponderData.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "releaseTransponder");
     return;
   }
@@ -459,27 +482,27 @@ void AdminManager::releaseTransponder(
   sendLog("Запрос на отображение данных транспондера. ");
   emit displayTransponderData_signal(transponderData);
 
-  finishOperationPerforming("releaseTransponder");
+  emit executionFinished("releaseTransponder", ReturnStatus::NoError);
 }
 
 void AdminManager::confirmTransponderRelease(
     const std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("confirmTransponderRelease");
+  emit executionStarted("confirmTransponderRelease");
   sendLog("Подтверждение выпуска транспондера. ");
 
   PersoClient::ReturnStatus status =
       Client->requestTransponderReleaseConfirm(param.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "confirmTransponderRelease");
     return;
   }
 
-  finishOperationPerforming("confirmTransponderRelease");
+  emit executionFinished("confirmTransponderRelease", ReturnStatus::NoError);
 }
 
 void AdminManager::rereleaseTransponder(
     const std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("rereleaseTransponder");
+  emit executionStarted("rereleaseTransponder");
   sendLog("Перевыпуск транспондера. ");
 
   std::shared_ptr<QFile> firmware(new QFile("temp.bin"));
@@ -487,7 +510,7 @@ void AdminManager::rereleaseTransponder(
       new QHash<QString, QString>());
   PersoClient::ReturnStatus status = Client->requestTransponderRerelease(
       param.get(), firmware.get(), transponderData.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "releaseTransponder");
     return;
   }
@@ -497,108 +520,109 @@ void AdminManager::rereleaseTransponder(
   sendLog("Запрос на отображение данных транспондера. ");
   emit displayTransponderData_signal(transponderData);
 
-  finishOperationPerforming("rereleaseTransponder");
+  emit executionFinished("rereleaseTransponder", ReturnStatus::NoError);
 }
 
 void AdminManager::confirmTransponderRerelease(
     const std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("confirmTransponderRerelease");
+  emit executionStarted("confirmTransponderRerelease");
   sendLog("Подтверждение перевыпуска транспондера. ");
 
   PersoClient::ReturnStatus status =
       Client->requestTransponderRereleaseConfirm(param.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "confirmTransponderRelease");
     return;
   }
 
-  finishOperationPerforming("confirmTransponderRerelease");
+  emit executionFinished("confirmTransponderRerelease", ReturnStatus::NoError);
 }
 
 void AdminManager::rollbackProductionLine(
     const std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("rollbackProductionLine");
+  emit executionStarted("rollbackProductionLine");
   sendLog("Откат производственной линии. ");
 
   PersoClient::ReturnStatus status =
       Client->requestProductionLineRollback(param.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "rollbackProductionLine");
     return;
   }
 
-  finishOperationPerforming("rollbackProductionLine");
+  emit executionFinished("rollbackProductionLine", ReturnStatus::NoError);
 }
 
 void AdminManager::printBoxStickerOnServer(
     std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("printBoxStickerOnServer");
+  emit executionStarted("printBoxStickerOnServer");
   sendLog("Печать стикера для бокса на сервере. ");
 
   PersoClient::ReturnStatus status =
       Client->requestBoxStickerPrint(param.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "printBoxStickerOnServer");
     return;
   }
 
-  finishOperationPerforming("printBoxStickerOnServer");
+  emit executionFinished("printBoxStickerOnServer");
 }
 
 void AdminManager::printLastBoxStickerOnServer() {
-  startOperationPerforming("printLastBoxStickerOnServer");
+  emit executionStarted("printLastBoxStickerOnServer");
   sendLog("Повторная печать последнего стикера для бокса на сервере. ");
 
   PersoClient::ReturnStatus status = Client->requestBoxStickerReprint();
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "printLastBoxStickerOnServer");
     return;
   }
 
-  finishOperationPerforming("printLastBoxStickerOnServer");
+  emit executionFinished("printLastBoxStickerOnServer", ReturnStatus::NoError);
 }
 
 void AdminManager::printPalletStickerOnServer(
     std::shared_ptr<QHash<QString, QString>> param) {
-  startOperationPerforming("printPalletStickerOnServer");
+  emit executionStarted("printPalletStickerOnServer");
   sendLog("Печать стикера для паллеты на сервере. ");
 
   PersoClient::ReturnStatus status =
       Client->requestPalletStickerPrint(param.get());
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "printPalletStickerOnServer");
     return;
   }
 
-  finishOperationPerforming("printPalletStickerOnServer");
+  emit executionFinished("printPalletStickerOnServer", ReturnStatus::NoError);
 }
 
 void AdminManager::printLastPalletStickerOnServer() {
-  startOperationPerforming("printLastPalletStickerOnServer");
+  emit executionStarted("printLastPalletStickerOnServer");
   sendLog("Повторная печать последнего стикера для паллеты на сервере. ");
 
   PersoClient::ReturnStatus status = Client->requestPalletStickerReprint();
-  if (status != PersoClient::Completed) {
+  if (status != PersoClient::NoError) {
     processClientError(status, "printLastPalletStickerOnServer");
     return;
   }
 
-  finishOperationPerforming("printLastPalletStickerOnServer");
+  emit executionFinished("printLastPalletStickerOnServer",
+                         ReturnStatus::NoError);
 }
 
 void AdminManager::printTransponderSticker(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("printTransponderSticker");
+  emit executionStarted("printTransponderSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
-  AdministrationSystem::ReturnStatus administratorStatus;
+  ReturnStatus administratorStatus;
 
   QHash<QString, QString> transponderData;
   sendLog("Запрос данных транспондера. ");
   administratorStatus =
       Administrator->getTransponderData(param->value("id"), &transponderData);
-  if (administratorStatus != AdministrationSystem::Completed) {
+  if (administratorStatus != ReturnStatus::NoError) {
     processAdministratorError(administratorStatus, "printTransponderSticker");
     return;
   }
@@ -606,82 +630,83 @@ void AdminManager::printTransponderSticker(
   sendLog("Печать стикера транспондера. ");
   stickerPrinterStatus =
       StickerPrinter->printTransponderSticker(&transponderData);
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != IStickerPrinter::NoError) {
     processStickerPrinterError(stickerPrinterStatus, "printTransponderSticker");
     return;
   }
 
-  finishOperationPerforming("printTransponderSticker");
+  emit executionFinished("printTransponderSticker", ReturnStatus::NoError);
 }
 
 void AdminManager::printBoxSticker(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("printBoxSticker");
+  emit executionStarted("printBoxSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
-  AdministrationSystem::ReturnStatus administratorStatus;
+  ReturnStatus administratorStatus;
 
   QHash<QString, QString> boxData;
   sendLog("Запрос данных бокса. ");
   administratorStatus = Administrator->getBoxData(param->value("id"), &boxData);
-  if (administratorStatus != AdministrationSystem::Completed) {
+  if (administratorStatus != ReturnStatus::NoError) {
     processAdministratorError(administratorStatus, "printBoxSticker");
     return;
   }
 
   sendLog("Печать стикера бокса. ");
   stickerPrinterStatus = StickerPrinter->printBoxSticker(&boxData);
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != IStickerPrinter::NoError) {
     processStickerPrinterError(stickerPrinterStatus, "printBoxSticker");
     return;
   }
 
-  finishOperationPerforming("printBoxSticker");
+  emit executionFinished("printBoxSticker", ReturnStatus::NoError);
 }
 
 void AdminManager::printPalletSticker(
     const std::shared_ptr<QHash<QString, QString>> param,
     SqlQueryValues* model) {
-  startOperationPerforming("printPalletSticker");
+  emit executionStarted("printPalletSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
-  AdministrationSystem::ReturnStatus administratorStatus;
+  ReturnStatus administratorStatus;
 
   QHash<QString, QString> palletData;
   sendLog("Запрос данных паллеты. ");
   administratorStatus =
       Administrator->getPalletData(param->value("id"), &palletData);
-  if (administratorStatus != AdministrationSystem::Completed) {
+  if (administratorStatus != ReturnStatus::NoError) {
     processAdministratorError(administratorStatus, "printTransponderSticker");
     return;
   }
 
   sendLog("Печать стикера паллеты. ");
   stickerPrinterStatus = StickerPrinter->printPalletSticker(&palletData);
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != IStickerPrinter::NoError) {
     processStickerPrinterError(stickerPrinterStatus, "printPalletSticker");
     return;
   }
 
-  finishOperationPerforming("printPalletSticker");
+  emit executionFinished("printPalletSticker", ReturnStatus::NoError);
 }
 
 void AdminManager::execPrinterStickerCommandScript(
     const std::shared_ptr<QStringList> commandScript) {
-  startOperationPerforming("execPrinterStickerCommandScript");
+  emit executionStarted("execPrinterStickerCommandScript");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
   sendLog("Выполнение командного скрипта принтера стикеров. ");
   stickerPrinterStatus = StickerPrinter->exec(commandScript.get());
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != IStickerPrinter::NoError) {
     processStickerPrinterError(stickerPrinterStatus,
                                "execPrinterStickerCommandScript");
     return;
   }
 
-  finishOperationPerforming("execPrinterStickerCommandScript");
+  emit executionFinished("execPrinterStickerCommandScript",
+                         ReturnStatus::NoError);
 }
 
 void AdminManager::applySettings() {
@@ -689,198 +714,31 @@ void AdminManager::applySettings() {
   loadSettings();
 
   Administrator->applySettings();
-  Client->applySettings();
+  //  Client->applySettings();
   StickerPrinter->applySetting();
 }
 
 void AdminManager::loadSettings() {
   QSettings settings;
-
-  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
-void AdminManager::sendLog(const QString& log) const {
-  if (LogEnable) {
-    emit const_cast<AdminManager*>(this)->logging(
-        QString("%1 - %2").arg(objectName(), log));
-  }
+void AdminManager::sendLog(const QString& log) {
+  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 void AdminManager::createAdministrator() {
-  Administrator = new AdministrationSystem(this);
-  connect(Administrator, &AdministrationSystem::logging, LogSystem::instance(),
-          &LogSystem::generate);
-
-  // Заполняем таблицу соответствий статусов возврата
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::NotExecuted,
-                                        "Выполнение операции не началось.");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::ParameterError,
-                                        "Получены некорректные параметры.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::DatabaseConnectionError,
-      "Не удалось подключиться к базе данных. ");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::DatabaseTransactionError, "Ошибка транзакции. ");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::DatabaseQueryError,
-      "Получена ошибка при выполнении запроса к базе данных.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::RegisterFileError,
-      "Не удалось открыть файл-реестр для отгрузки.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::ProductionLineMissed,
-      "Не удалось найти производственную линию.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::ProductionLineLinkError,
-      "Не удалось связать производственную линию с боксом.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::ProductionLineRollbackLimit,
-      "Производственная линия находится на первом транспондере в боксе.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::OrderRemovingError, "Не удалось удалить заказ.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::OtherOrderInProcess,
-      "В процессе сборки находится другой заказ.");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::OrderNotInProcess,
-                                        "Сборка заказа не была запущена.");
-  AdministratorReturnStatusMatch.insert(
-      AdministrationSystem::MultipleActiveOrders,
-      "В процессе сборки находится несколько заказов.");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::FreeBoxMissed,
-                                        "Не удалось найти свободный бокс.");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::UnknownError,
-                                        "Неизвествная ошибка. ");
-  AdministratorReturnStatusMatch.insert(AdministrationSystem::Completed,
-                                        "Выполнено. ");
-}
-
-void AdminManager::createClient() {
-  Client = new PersoClient(this);
-  connect(Client, &PersoClient::logging, LogSystem::instance(),
-          &LogSystem::generate);
-
-  // Заполняем таблицу соответствий статусов возврата
-  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
-  ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
-                                 "Не удалось обработать параметры запроса. ");
-  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
-                                 "Не удалось подключиться к серверу. ");
-  ClientReturnStatusMatch.insert(PersoClient::ServerNotResponding,
-                                 "Сервер не отвечает.");
-  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
-                                 "Оборвалось соединение с сервером.");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
-                                 "Производственная линия не найдена. ");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
-                                 "Ошибка доступа к производственной линии.");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
-                                 "Производственная линия не активна. ");
-  ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
-                                 "Синтаксическая ошибка в ответе на запрос. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::CommandSyntaxError,
-      "В серверном запросе допущена синтаксическая ошибка. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::DatabaseError,
-      "Получена ошибка при выполнении запроса в базу данных. ");
-  ClientReturnStatusMatch.insert(PersoClient::TransponderNotFound,
-                                 "Транспондер не найден.");
-  ClientReturnStatusMatch.insert(
-      PersoClient::TransponderNotReleasedEarlier,
-      "Транспондер не был выпущен ранее, перевыпуск невозможен. ");
-  ClientReturnStatusMatch.insert(PersoClient::AwaitingConfirmationError,
-                                 "Транспондер не ожидает подтверждения. ");
-  ClientReturnStatusMatch.insert(PersoClient::IdenticalUcidError,
-                                 "Используется одна и та же печатная плата. "
-                                 "Перевыпуск транспондера невозможен. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineMissed,
-                                 "Производственная линия не найдена. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineNotActive,
-                                 "Производственная линия не активна. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::CurrentOrderRunOut,
-      "В текущем заказе отсутствуют свободные транспондеры . ");
-  ClientReturnStatusMatch.insert(PersoClient::CurrentOrderAssembled,
-                                 "Текущий заказ собран. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineRollbackLimitError,
-                                 "Производственная линия связана с первым "
-                                 "транспондером в боксе. Откат невозможен. ");
-  ClientReturnStatusMatch.insert(PersoClient::BoxStickerPrintError,
-                                 "Не удалось распечатать стикер для бокса. ");
-  ClientReturnStatusMatch.insert(PersoClient::PalletStickerPrintError,
-                                 "Не удалось распечатать стикер для паллеты. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::NextTransponderNotFound,
-      "Получена ошибка при поиске очередного транспондера. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::StartBoxAssemblingError,
-      "Получена ошибка при запуске сборки очередного бокса. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::StartPalletAssemblingError,
-      "Получена ошибка при запуске сборки очередной паллеты. ");
+  Administrator = std::unique_ptr<AdministrationSystem>(
+      new AdministrationSystem("AdministrationSystem"));
+  connect(Administrator.get(), &AdministrationSystem::logging,
+          LogSystem::instance(), &LogSystem::generate);
 }
 
 void AdminManager::createStickerPrinter() {
-  StickerPrinter = new TE310Printer(this, "RandomPrinter");
-  connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
-          &LogSystem::generate);
-
-  // Заполняем таблицу соответствий статусов возврата
-  StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::ParameterError,
-      "Получены некорректные параметры для стикера.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
-                                         "Не удалось распечать стикер.");
-  StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::LibraryMissed,
-      "Отсутствует библиотека для работы с принтером стикеров.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
-                                         "Не удалось подключиться к принтеру.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Completed,
-                                         "Выполнено.");
+  StickerPrinter =
+      std::unique_ptr<IStickerPrinter>(new TE310Printer(this, "RandomPrinter"));
+  connect(StickerPrinter.get(), &IStickerPrinter::logging,
+          LogSystem::instance(), &LogSystem::generate);
 }
 
-void AdminManager::startOperationPerforming(const QString& operationName) {
-  Mutex.lock();
-
-  emit operationPerfomingStarted(operationName);
-}
-
-void AdminManager::finishOperationPerforming(const QString& operationName) {
-  // Сигнал о завершении текущей операции
-  emit operationPerformingFinished(operationName);
-
-  // Оповещаем пользователя
-  emit notifyUser("Выполнено.");
-
-  // Разблокируем мьютекс
-  Mutex.unlock();
-}
-
-void AdminManager::processAdministratorError(
-    AdministrationSystem::ReturnStatus status,
-    const QString& operationName) {
-  sendLog(AdministratorReturnStatusMatch.value(status));
-  emit operationPerformingFinished(operationName);
-  emit notifyUserAboutError(AdministratorReturnStatusMatch.value(status));
-  Mutex.unlock();
-}
-
-void AdminManager::processClientError(PersoClient::ReturnStatus status,
-                                      const QString& operationName) {
-  sendLog(ClientReturnStatusMatch.value(status));
-  emit operationPerformingFinished(operationName);
-  emit notifyUserAboutError(ClientReturnStatusMatch.value(status));
-  Mutex.unlock();
-}
-
-void AdminManager::processStickerPrinterError(
-    IStickerPrinter::ReturnStatus status,
-    const QString& operationName) {
-  sendLog(StickerPrinterReturnStatusMatch.value(status));
-  emit operationPerformingFinished(operationName);
-  emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
-  Mutex.unlock();
-}
 
 //==================================================================================

@@ -258,6 +258,24 @@ bool PostgreSqlDatabase::readLastRecord(const QString& table,
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
+                                       const SqlQueryValues& newValues) const {
+  // Проверка подключения
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog(
+        QString("Соединение с Postgres не установлено. %1.")
+            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    return false;
+  }
+
+  if (!Tables.contains(table)) {
+    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
+    return false;
+  }
+
+  return Tables.value(table)->updateRecords(newValues);
+}
+
+bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const QString& conditions,
                                        const SqlQueryValues& newValues) const {
   // Проверка подключения

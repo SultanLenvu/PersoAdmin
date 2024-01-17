@@ -5,37 +5,11 @@
 #include <QDate>
 #include <QObject>
 
-#include "Database/postgre_sql_database.h"
+#include "postgre_sql_database.h"
+#include "types.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
- public:
-  enum ReturnStatus {
-    NotExecuted,
-    ParameterError,
-    DatabaseConnectionError,
-    DatabaseTransactionError,
-    DatabaseQueryError,
-    RegisterFileError,
-    TransponderMissed,
-    BoxMissed,
-    PalletMissed,
-    OrderMissed,
-    OrderAlreadyReleased,
-    OrderNotReleased,
-    ProductionLineMissed,
-    ProductionLineLinkError,
-    ProductionLineRollbackLimit,
-    OrderRemovingError,
-    OtherOrderInProcess,
-    OrderNotInProcess,
-    MultipleActiveOrders,
-    FreeBoxMissed,
-    UnknownError,
-    Completed
-  };
-  Q_ENUM(ReturnStatus)
-
  private:
   bool LogEnable;
   QString ShipmentRegisterDir;
@@ -49,8 +23,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus connectDatabase(void);
   ReturnStatus disconnectDatabase(void);
 
-  ReturnStatus getDatabaseTable(const QString& tableName,
-                                SqlQueryValues* response);
+  ReturnStatus getTable(const QString& tableName, SqlQueryValues* response);
   ReturnStatus getCustomResponse(const QString& req, SqlQueryValues* response);
 
   ReturnStatus createNewOrder(
@@ -60,10 +33,10 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus createNewProductionLine(
       const QHash<QString, QString>* productionLineParameters);
-  ReturnStatus stopAllProductionLinesManually(void) const;
-  ReturnStatus startProductionLineManually(const QString& id,
-                                           const QString& orderId);
-  ReturnStatus stopProductionLineManually(const QString& id);
+  ReturnStatus activateAllProductionLines(void) const;
+  ReturnStatus deactivateAllProductionLines(void) const;
+  ReturnStatus activateProductionLine(const QString& id);
+  ReturnStatus deactivateProductionLine(const QString& id);
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
@@ -111,22 +84,10 @@ class AdministrationSystem : public QObject {
       const QHash<QString, QString>* productionLineParameters) const;
 
   int32_t getLastId(const QString& table) const;
-  ReturnStatus startProductionLine(const QString& id, const QString& orderId);
   bool stopAllProductionLines(void) const;
-  bool linkProductionLineWithBox(const QString& id, const QString& boxId) const;
 
-  bool startBoxProcessing(const QString& id) const;
-  bool startPalletProcessing(const QString& id) const;
   bool startOrderProcessing(const QString& id) const;
-
-  //  bool removeLastProductionLine(void) const;
-  bool stopBoxProcessing(const QString& id) const;
-  bool stopPalletProcessing(const QString& id) const;
   bool stopOrderProcessing(const QString& id) const;
-
-  bool searchFreeBox(const QString& orderId,
-                     const QString& productionLineId,
-                     SqlQueryValues& boxRecord) const;
 
   ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
 

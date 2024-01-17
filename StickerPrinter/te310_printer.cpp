@@ -79,7 +79,7 @@ IStickerPrinter::ReturnStatus TE310Printer::printTransponderSticker(
     return ParameterError;
   }
 
-  return Completed;
+  return NoError;
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printLastTransponderSticker() {
@@ -151,7 +151,7 @@ IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
   sendCommand("PRINT 1");
   closePort();
 
-  return Completed;
+  return NoError;
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
@@ -230,7 +230,7 @@ IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
 
   closePort();
 
-  return Completed;
+  return NoError;
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::exec(
@@ -253,7 +253,7 @@ IStickerPrinter::ReturnStatus TE310Printer::exec(
 
   closePort();
 
-  return Completed;
+  return NoError;
 }
 
 void TE310Printer::applySetting() {

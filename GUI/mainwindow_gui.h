@@ -74,9 +74,10 @@ class MainWindowGUI : public AbstractGUI {
   QVBoxLayout* ProductionLinesControlPanelLayout;
 
   QPushButton* CreateNewProductionLinePushButton;
-  QPushButton* StartProductionLinePushButton;
-  QPushButton* StopProductionLinePushButton;
-  QPushButton* ShutdownAllProductionLinesPushButton;
+  QPushButton* ActivateProductionLinePushButton;
+  QPushButton* ActivateAllProductionLinesPushButton;
+  QPushButton* DeactivateProductionLinePushButton;
+  QPushButton* DeactivateAllProductionLinesPushButton;
   QPushButton* EditProductionLinesPushButton;
   QSpacerItem* ProductionLinesControlPanelVS2;
 

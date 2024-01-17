@@ -8,30 +8,24 @@
 #include <QSettings>
 #include <QThread>
 
-#include "StickerPrinter/isticker_printer.h"
 #include "administration_system.h"
+#include "isticker_printer.h"
 #include "perso_client.h"
 
 class AdminManager : public QObject {
   Q_OBJECT
 
  private:
-  bool LogEnable;
+  std::unique_ptr<AdministrationSystem> Administrator;
+  QHash<ReturnStatus, QString> AdministratorReturnStatusMatch;
 
-  AdministrationSystem* Administrator;
-  QHash<AdministrationSystem::ReturnStatus, QString>
-      AdministratorReturnStatusMatch;
+  //  PersoClient* Client;
 
-  PersoClient* Client;
-  QHash<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
-
-  IStickerPrinter* StickerPrinter;
+  std::unique_ptr<IStickerPrinter> StickerPrinter;
   QHash<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
 
-  QMutex Mutex;
-
  public:
-  AdminManager(QObject* parent);
+  AdminManager(const QString& name);
   ~AdminManager();
 
  public slots:
@@ -57,11 +51,12 @@ class AdminManager : public QObject {
   void createNewProductionLine(const std::shared_ptr<QHash<QString, QString>>
                                    productionLineParameterseters,
                                SqlQueryValues* model);
-  void startProductionLine(const std::shared_ptr<QHash<QString, QString>>,
-                           SqlQueryValues* model);
-  void stopProductionLine(const std::shared_ptr<QHash<QString, QString>>,
-                          SqlQueryValues* model);
-  void stopAllProductionLines(SqlQueryValues* model);
+  void activateProductionLine(const std::shared_ptr<QHash<QString, QString>>,
+                              SqlQueryValues* model);
+  void activateAllProductionLines(SqlQueryValues* model);
+  void deactivateProductionLine(const std::shared_ptr<QHash<QString, QString>>,
+                                SqlQueryValues* model);
+  void deactivateAllProductionLines(SqlQueryValues* model);
   void showProductionLineTable(SqlQueryValues* model);
 
   // Заказчики
@@ -113,16 +108,13 @@ class AdminManager : public QObject {
  private:
   Q_DISABLE_COPY_MOVE(AdminManager)
   void loadSettings(void);
-  void sendLog(const QString& log) const;
+  void sendLog(const QString& log);
 
   void createAdministrator(void);
   void createClient(void);
   void createStickerPrinter(void);
 
-  void startOperationPerforming(const QString& operationName);
-  void finishOperationPerforming(const QString& operationName);
-
-  void processAdministratorError(AdministrationSystem::ReturnStatus status,
+  void processAdministratorError(ReturnStatus status,
                                  const QString& operationName);
   void processClientError(PersoClient::ReturnStatus status,
                           const QString& operationName);
@@ -131,10 +123,8 @@ class AdminManager : public QObject {
 
  signals:
   void logging(const QString& log);
-  void notifyUser(const QString& data);
-  void notifyUserAboutError(const QString& data);
-  void operationPerfomingStarted(const QString& operationName);
-  void operationPerformingFinished(const QString& operationName);
+  void executionStarted(const QString& operationName);
+  void executionFinished(const QString& operationName, ReturnStatus ret);
 
   void displayFirmware_signal(std::shared_ptr<QFile> firmware);
   void displayTransponderData_signal(

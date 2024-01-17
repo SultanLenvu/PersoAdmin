@@ -29,7 +29,7 @@ PersoClient::ReturnStatus PersoClient::connectToServer() {
     return ServerConnectionError;
   }
 
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::disconnectFromServer() {
@@ -40,7 +40,7 @@ PersoClient::ReturnStatus PersoClient::disconnectFromServer() {
     sendLog("Подключение не было установлено. ");
   }
 
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::requestEcho() {
@@ -524,14 +524,14 @@ PersoClient::ReturnStatus PersoClient::processEcho(void) {
   sendLog("Обработка ответа на команду Echo. ");
 
   sendLog("Команда Echo успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processAuthorization(void) {
   sendLog("Обработка ответа на команду TransponderRelease. ");
 
   sendLog("Команда Authorization успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
@@ -562,13 +562,13 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
                        CurrentResponse.value("transponder_model").toString());
 
   sendLog("Команда TransponderRelease успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
-  return Completed;
+  return NoError;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
 }
 
@@ -600,49 +600,49 @@ PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
                        CurrentResponse.value("transponder_model").toString());
 
   sendLog("Команда transponder_rerelease успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_rerelease_confirm. ");
 
   sendLog("Команда transponder_rerelease_confirm успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {
   sendLog("Обработка ответа на команду production_line_rollback. ");
 
   sendLog("Команда production_line_rollback успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintBoxSticker() {
   sendLog("Обработка ответа на команду print_box_sticker. ");
 
   sendLog("Команда print_box_sticker успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintLastBoxSticker() {
   sendLog("Обработка ответа на команду print_last_box_sticker. ");
 
   sendLog("Команда print_last_box_sticker успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintPalletSticker() {
   sendLog("Обработка ответа на команду print_pallet_sticker. ");
 
   sendLog("Команда print_pallet_sticker успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 PersoClient::ReturnStatus PersoClient::processPrintLastPalletSticker() {
   sendLog("Обработка ответа на команду print_last_pallet_sticker. ");
 
   sendLog("Команда print_last_pallet_sticker успешно выполнена. ");
-  return Completed;
+  return NoError;
 }
 
 void PersoClient::createTimers() {

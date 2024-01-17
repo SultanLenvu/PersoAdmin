@@ -22,7 +22,7 @@ class PersoClient : public QObject
   Q_OBJECT
 public:
   enum ReturnStatus {
-    Completed,
+    NoError,
     FirmwareFileSavingError,
     RequestParameterError,
     ServerConnectionError,

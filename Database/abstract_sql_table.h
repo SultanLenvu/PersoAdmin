@@ -25,6 +25,7 @@ class AbstractSqlTable : public QObject {
   virtual bool readLastRecord(SqlQueryValues& record) const = 0;
 
   // Update
+  virtual bool updateRecords(const SqlQueryValues& newValues) const = 0;
   virtual bool updateRecords(const QString& condition,
                              const SqlQueryValues& newValues) const = 0;
 

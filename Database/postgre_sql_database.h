@@ -62,6 +62,8 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual bool readLastRecord(const QString& table,
                               SqlQueryValues& record) const override;
   virtual bool updateRecords(const QString& table,
+                             const SqlQueryValues& newValues) const override;
+  virtual bool updateRecords(const QString& table,
                              const QString& conditions,
                              const SqlQueryValues& newValues) const override;
   virtual bool deleteRecords(const QString& table,
