@@ -1,10 +1,11 @@
 #include "administration_system.h"
-#include "Database/sql_query_values.h"
-#include "General/definitions.h"
-#include "Log/log_system.h"
+#include "database_query_table.h"
+#include "definitions.h"
+#include "log_system.h"
 
-AdministrationSystem::AdministrationSystem(QObject* parent) : QObject(parent) {
-  setObjectName("AdministrationSystem");
+AdministrationSystem::AdministrationSystem(const QString& name)
+    : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
 
   createDatabase();
@@ -32,12 +33,6 @@ ReturnStatus AdministrationSystem::disconnectDatabase() {
   Database->disconnect();
 
   return ReturnStatus::NoError;
-}
-
-void AdministrationSystem::createDatabase() {
-  Database = new PostgreSqlDatabase(this, "AdministratorConnection");
-  connect(Database, &AbstractSqlDatabase::logging, LogSystem::instance(),
-          &LogSystem::generate);
 }
 
 ReturnStatus AdministrationSystem::getTable(const QString& tableName,
@@ -86,7 +81,7 @@ ReturnStatus AdministrationSystem::getCustomResponse(const QString& req,
 }
 
 ReturnStatus AdministrationSystem::createNewOrder(
-    const std::shared_ptr<QHash<QString, QString>> orderParameters) {
+    const std::shared_ptr<StringDictionary> orderParameters) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
@@ -176,7 +171,7 @@ ReturnStatus AdministrationSystem::stopOrderAssembling(const QString& orderId) {
 }
 
 ReturnStatus AdministrationSystem::createNewProductionLine(
-    const QHash<QString, QString>* productionLineParameters) {
+    const StringDictionary* productionLineParameters) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
@@ -411,7 +406,7 @@ ReturnStatus AdministrationSystem::initTransportMasterKeysTable() {
 }
 
 ReturnStatus AdministrationSystem::linkIssuerWithMasterKeys(
-    const QHash<QString, QString>* linkParameters) {
+    const StringDictionary* linkParameters) {
   SqlQueryValues issuerNewValue;
 
   if (!Database->openTransaction()) {
@@ -450,9 +445,8 @@ ReturnStatus AdministrationSystem::linkIssuerWithMasterKeys(
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::getTransponderData(
-    const QString& id,
-    QHash<QString, QString>* data) {
+ReturnStatus AdministrationSystem::getTransponderData(const QString& id,
+                                                      StringDictionary* data) {
   QStringList tables{"transponders", "boxes", "pallets", "orders"};
   SqlQueryValues record;
   uint32_t quantity;
@@ -515,10 +509,10 @@ ReturnStatus AdministrationSystem::getTransponderData(
 }
 
 ReturnStatus AdministrationSystem::getBoxData(const QString& id,
-                                              QHash<QString, QString>* data) {
+                                              StringDictionary* data) {
   SqlQueryValues box;
   SqlQueryValues transponders;
-  QHash<QString, QString> transponderData;
+  StringDictionary transponderData;
 
   if (!Database->readRecords("boxes", "id + " + id, box)) {
     emit logging(QString("Получена ошибка при поиске бокса с id %1. ").arg(id));
@@ -576,9 +570,8 @@ ReturnStatus AdministrationSystem::getBoxData(const QString& id,
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::getPalletData(
-    const QString& id,
-    QHash<QString, QString>* data) {
+ReturnStatus AdministrationSystem::getPalletData(const QString& id,
+                                                 StringDictionary* data) {
   SqlQueryValues boxes;
   SqlQueryValues pallet;
   SqlQueryValues order;
@@ -739,8 +732,7 @@ ReturnStatus AdministrationSystem::rollbackProductionLine(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::releaseTransponderManually(
-    const QString& id) {
+ReturnStatus AdministrationSystem::releaseTransponder(const QString& id) {
   SqlQueryValues transponder;
   SqlQueryValues transponderNewValues;
 
@@ -780,7 +772,7 @@ ReturnStatus AdministrationSystem::releaseTransponderManually(
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::releaseBoxManually(const QString& id) {
+ReturnStatus AdministrationSystem::releaseBox(const QString& id) {
   SqlQueryValues box;
   SqlQueryValues transponderNewValues;
   SqlQueryValues boxNewValues;
@@ -830,7 +822,7 @@ ReturnStatus AdministrationSystem::releaseBoxManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::releasePalletManually(const QString& id) {
+ReturnStatus AdministrationSystem::releasePallet(const QString& id) {
   SqlQueryValues pallet;
   SqlQueryValues palletNewValue;
   SqlQueryValues boxes;
@@ -861,7 +853,7 @@ ReturnStatus AdministrationSystem::releasePalletManually(const QString& id) {
   }
 
   for (uint32_t i = 0; i < boxes.recordCount(); i++) {
-    ret = releaseBoxManually(boxes.get(i, "id"));
+    ret = releaseBox(boxes.get(i, "id"));
     if (ret != ReturnStatus::NoError) {
       sendLog(QString("Получена ошибка при возврате бокса %1")
                   .arg(boxes.get(i, "id")));
@@ -886,7 +878,7 @@ ReturnStatus AdministrationSystem::releasePalletManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::releaseOrderManually(const QString& id) {
+ReturnStatus AdministrationSystem::releaseOrder(const QString& id) {
   SqlQueryValues order;
   SqlQueryValues orderNewValues;
   SqlQueryValues pallets;
@@ -916,7 +908,7 @@ ReturnStatus AdministrationSystem::releaseOrderManually(const QString& id) {
   }
 
   for (uint32_t i = 0; i < pallets.recordCount(); i++) {
-    ret = releasePalletManually(pallets.get(i, "id"));
+    ret = releasePallet(pallets.get(i, "id"));
     if (ret != ReturnStatus::NoError) {
       sendLog(QString("Получена ошибка при возврате паллеты %1")
                   .arg(pallets.get(i, "id")));
@@ -942,8 +934,7 @@ ReturnStatus AdministrationSystem::releaseOrderManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::refundTransponderManually(
-    const QString& id) {
+ReturnStatus AdministrationSystem::refundTransponder(const QString& id) {
   SqlQueryValues transponder;
   SqlQueryValues transponderNewValues;
   SqlQueryValues boxNewValues;
@@ -983,7 +974,7 @@ ReturnStatus AdministrationSystem::refundTransponderManually(
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::refundBoxManually(const QString& id) {
+ReturnStatus AdministrationSystem::refundBox(const QString& id) {
   SqlQueryValues box;
   SqlQueryValues transponderNewValues;
   SqlQueryValues boxNewValues;
@@ -1032,7 +1023,7 @@ ReturnStatus AdministrationSystem::refundBoxManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::refundPalletManually(const QString& id) {
+ReturnStatus AdministrationSystem::refundPallet(const QString& id) {
   SqlQueryValues pallet;
   SqlQueryValues palletNewValue;
   SqlQueryValues boxes;
@@ -1062,7 +1053,7 @@ ReturnStatus AdministrationSystem::refundPalletManually(const QString& id) {
   }
 
   for (uint32_t i = 0; i < boxes.recordCount(); i++) {
-    ret = refundBoxManually(boxes.get(i, "id"));
+    ret = refundBox(boxes.get(i, "id"));
     if (ret != ReturnStatus::NoError) {
       sendLog(QString("Получена ошибка при возврате бокса %1")
                   .arg(boxes.get(i, "id")));
@@ -1088,7 +1079,7 @@ ReturnStatus AdministrationSystem::refundPalletManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::refundOrderManually(const QString& id) {
+ReturnStatus AdministrationSystem::refundOrder(const QString& id) {
   SqlQueryValues order;
   SqlQueryValues orderNewValues;
   SqlQueryValues pallets;
@@ -1119,7 +1110,7 @@ ReturnStatus AdministrationSystem::refundOrderManually(const QString& id) {
   }
 
   for (uint32_t i = 0; i < pallets.recordCount(); i++) {
-    ret = refundPalletManually(pallets.get(i, "id"));
+    ret = refundPallet(pallets.get(i, "id"));
     if (ret != ReturnStatus::NoError) {
       sendLog(QString("Получена ошибка при возврате паллеты %1")
                   .arg(pallets.get(i, "id")));
@@ -1145,8 +1136,7 @@ ReturnStatus AdministrationSystem::refundOrderManually(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::shipPallets(
-    const QHash<QString, QString>* param) {
+ReturnStatus AdministrationSystem::shipPallets(const StringDictionary* param) {
   ReturnStatus ret;
   QString ShipmentRegisterName =
       QString("sr_pallets_%1_%2.csv")
@@ -1204,7 +1194,7 @@ void AdministrationSystem::sendLog(const QString& log) const {
 }
 
 bool AdministrationSystem::addOrder(
-    const std::shared_ptr<QHash<QString, QString>> orderParameters) const {
+    const std::shared_ptr<StringDictionary> orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
@@ -1255,7 +1245,7 @@ bool AdministrationSystem::addOrder(
 
 bool AdministrationSystem::addPallets(
     const QString& orderId,
-    const std::shared_ptr<QHash<QString, QString>> orderParameters) const {
+    const std::shared_ptr<StringDictionary> orderParameters) const {
   uint32_t transponderCount =
       orderParameters->value("transponder_quantity").toInt();
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
@@ -1303,7 +1293,7 @@ bool AdministrationSystem::addPallets(
 
 bool AdministrationSystem::addBoxes(
     const QString& palletId,
-    const std::shared_ptr<QHash<QString, QString>> orderParameters,
+    const std::shared_ptr<StringDictionary> orderParameters,
     QTextStream& panSource) const {
   uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
@@ -1348,7 +1338,7 @@ bool AdministrationSystem::addBoxes(
 bool AdministrationSystem::addTransponders(
     const QString& boxId,
     const std::shared_ptr<QVector<QString>> pans,
-    const std::shared_ptr<QHash<QString, QString>> orderParameters) const {
+    const std::shared_ptr<StringDictionary> orderParameters) const {
   uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
   int32_t lastId = 0;
   SqlQueryValues newTransponders;
@@ -1376,7 +1366,7 @@ bool AdministrationSystem::addTransponders(
 }
 
 bool AdministrationSystem::addProductionLine(
-    const QHash<QString, QString>* productionLineParameters) const {
+    const StringDictionary* productionLineParameters) const {
   SqlQueryValues newProductionLine;
   int32_t lastId = 0;
 
@@ -1542,4 +1532,10 @@ ReturnStatus AdministrationSystem::shipPallet(const QString& id,
   }
 
   return ReturnStatus::NoError;
+}
+
+void AdministrationSystem::createDatabase() {
+  Database = new PostgreSqlDatabase(this, "AdministratorConnection");
+  connect(Database, &AbstractSqlDatabase::logging, LogSystem::instance(),
+          &LogSystem::generate);
 }

@@ -11,13 +11,12 @@
 class AdministrationSystem : public QObject {
   Q_OBJECT
  private:
-  bool LogEnable;
   QString ShipmentRegisterDir;
 
   PostgreSqlDatabase* Database;
 
  public:
-  explicit AdministrationSystem(QObject* parent);
+  AdministrationSystem(const QString& name);
   void applySettings(void);
 
   ReturnStatus connectDatabase(void);
@@ -26,13 +25,11 @@ class AdministrationSystem : public QObject {
   ReturnStatus getTable(const QString& tableName, SqlQueryValues* response);
   ReturnStatus getCustomResponse(const QString& req, SqlQueryValues* response);
 
-  ReturnStatus createNewOrder(
-      const std::shared_ptr<QHash<QString, QString>> orderParameters);
-  ReturnStatus startOrderAssembling(const QString& orderId);
-  ReturnStatus stopOrderAssembling(const QString& orderId);
+  ReturnStatus createNewOrder(const std::shared_ptr<StringDictionary> param);
+  ReturnStatus startOrderAssembling(const QString& id);
+  ReturnStatus stopOrderAssembling(const QString& id);
 
-  ReturnStatus createNewProductionLine(
-      const QHash<QString, QString>* productionLineParameters);
+  ReturnStatus createNewProductionLine(const StringDictionary* param);
   ReturnStatus activateAllProductionLines(void) const;
   ReturnStatus deactivateAllProductionLines(void) const;
   ReturnStatus activateProductionLine(const QString& id);
@@ -41,47 +38,44 @@ class AdministrationSystem : public QObject {
 
   ReturnStatus initIssuerTable(void);
   ReturnStatus initTransportMasterKeysTable(void);
-  ReturnStatus linkIssuerWithMasterKeys(
-      const QHash<QString, QString>* linkParameters);
+  ReturnStatus linkIssuerWithMasterKeys(const StringDictionary* linkParameters);
 
-  ReturnStatus getTransponderData(const QString& id,
-                                  QHash<QString, QString>* data);
-  ReturnStatus getBoxData(const QString& id, QHash<QString, QString>* data);
-  ReturnStatus getPalletData(const QString& id, QHash<QString, QString>* data);
+  ReturnStatus getTransponderData(const QString& id, StringDictionary* data);
+  ReturnStatus getBoxData(const QString& id, StringDictionary* data);
+  ReturnStatus getPalletData(const QString& id, StringDictionary* data);
 
   ReturnStatus rollbackProductionLine(const QString& id);
 
-  ReturnStatus releaseTransponderManually(const QString& id);
-  ReturnStatus releaseBoxManually(const QString& id);
-  ReturnStatus releasePalletManually(const QString& id);
-  ReturnStatus releaseOrderManually(const QString& id);
+  ReturnStatus releaseTransponder(const QString& id);
+  ReturnStatus releaseBox(const QString& id);
+  ReturnStatus releasePallet(const QString& id);
+  ReturnStatus releaseOrder(const QString& id);
 
-  ReturnStatus refundTransponderManually(const QString& id);
-  ReturnStatus refundBoxManually(const QString& id);
-  ReturnStatus refundPalletManually(const QString& id);
-  ReturnStatus refundOrderManually(const QString& id);
+  ReturnStatus refundTransponder(const QString& id);
+  ReturnStatus refundBox(const QString& id);
+  ReturnStatus refundPallet(const QString& id);
+  ReturnStatus refundOrder(const QString& id);
 
-  ReturnStatus shipPallets(const QHash<QString, QString>* param);
+  ReturnStatus shipPallets(const StringDictionary* param);
 
  private:
-  Q_DISABLE_COPY_MOVE(AdministrationSystem) void createDatabase(void);
+  Q_DISABLE_COPY_MOVE(AdministrationSystem)
   void loadSettings(void);
   void sendLog(const QString& log) const;
 
-  bool addOrder(
-      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
+  bool addOrder(const std::shared_ptr<StringDictionary> orderParameters) const;
   bool addPallets(
       const QString& orderId,
-      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
+      const std::shared_ptr<StringDictionary> orderParameters) const;
   bool addBoxes(const QString& palletId,
-                const std::shared_ptr<QHash<QString, QString>> orderParameters,
+                const std::shared_ptr<StringDictionary> orderParameters,
                 QTextStream& panSource) const;
   bool addTransponders(
       const QString& boxId,
       const std::shared_ptr<QVector<QString>> pans,
-      const std::shared_ptr<QHash<QString, QString>> orderParameters) const;
+      const std::shared_ptr<StringDictionary> orderParameters) const;
   bool addProductionLine(
-      const QHash<QString, QString>* productionLineParameters) const;
+      const StringDictionary* productionLineParameters) const;
 
   int32_t getLastId(const QString& table) const;
   bool stopAllProductionLines(void) const;
@@ -90,6 +84,8 @@ class AdministrationSystem : public QObject {
   bool stopOrderProcessing(const QString& id) const;
 
   ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
+
+  void createDatabase(void);
 
  signals:
   void logging(const QString& log);

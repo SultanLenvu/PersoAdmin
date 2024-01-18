@@ -22,7 +22,7 @@ ManualReleaseRefundDialog::ManualReleaseRefundDialog(QWidget* parent)
 
 ManualReleaseRefundDialog::~ManualReleaseRefundDialog() {}
 
-void ManualReleaseRefundDialog::getData(QHash<QString, QString>* data) const {
+void ManualReleaseRefundDialog::getData(StringDictionary* data) const {
   data->insert("table", MatchingTable.value(UnitChoiceComboBox->currentText()));
   data->insert("id", IdLineEdit->text());
 }

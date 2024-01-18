@@ -52,7 +52,7 @@ class InteractionSystem : public QWidget {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
-  void processCurrentDialog(QHash<QString, QString>* param);
+  void processCurrentDialog(StringDictionary* param);
 
   void createMessageMatchTable(void);
   void processReturnStatus(ReturnStatus ret);

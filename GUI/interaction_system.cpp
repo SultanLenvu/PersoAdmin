@@ -116,7 +116,7 @@ void InteractionSystem::createTimers() {
           &InteractionSystem::ODQTimerTimeout_slot);
 }
 
-void InteractionSystem::processCurrentDialog(QHash<QString, QString>* param) {
+void InteractionSystem::processCurrentDialog(StringDictionary* param) {
   if (CurrentDialog->exec() == QDialog::Rejected) {
     return;
   }

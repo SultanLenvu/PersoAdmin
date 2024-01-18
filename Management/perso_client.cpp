@@ -53,7 +53,7 @@ PersoClient::ReturnStatus PersoClient::requestEcho() {
 }
 
 PersoClient::ReturnStatus PersoClient::requestAuthorize(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Создаем запрос
   CurrentState = CreatingRequest;
 
@@ -69,9 +69,9 @@ PersoClient::ReturnStatus PersoClient::requestAuthorize(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
-    const QHash<QString, QString>* requestData,
+    const StringDictionary* requestData,
     QFile* firmware,
-    QHash<QString, QString>* responseData) {
+    StringDictionary* responseData) {
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -89,7 +89,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -105,9 +105,9 @@ PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
-    const QHash<QString, QString>* requestData,
+    const StringDictionary* requestData,
     QFile* firmware,
-    QHash<QString, QString>* responseData) {
+    StringDictionary* responseData) {
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -125,7 +125,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -141,7 +141,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
 }
 
 PersoClient::ReturnStatus PersoClient::requestProductionLineRollback(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -157,7 +157,7 @@ PersoClient::ReturnStatus PersoClient::requestProductionLineRollback(
 }
 
 PersoClient::ReturnStatus PersoClient::requestBoxStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -182,7 +182,7 @@ PersoClient::ReturnStatus PersoClient::requestBoxStickerReprint() {
 }
 
 PersoClient::ReturnStatus PersoClient::requestPalletStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -406,7 +406,7 @@ void PersoClient::createEcho(void) {
 }
 
 void PersoClient::createAuthorization(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды athorization. ");
 
   // Заголовок команды
@@ -418,7 +418,7 @@ void PersoClient::createAuthorization(
 }
 
 void PersoClient::createTransponderRelease(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды transponder_release. ");
 
   // Заголовок команды
@@ -430,7 +430,7 @@ void PersoClient::createTransponderRelease(
 }
 
 void PersoClient::createTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды transponder_release_confirm. ");
 
   // Заголовок команды
@@ -443,7 +443,7 @@ void PersoClient::createTransponderReleaseConfirm(
 }
 
 void PersoClient::createTransponderRerelease(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды transponder_rerelease. ");
 
   // Заголовок команды
@@ -456,7 +456,7 @@ void PersoClient::createTransponderRerelease(
 }
 
 void PersoClient::createTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды transponder_rerelease_confirm. ");
 
   // Заголовок команды
@@ -470,7 +470,7 @@ void PersoClient::createTransponderRereleaseConfirm(
 }
 
 void PersoClient::createProductionLineRollback(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды production_line_rollback. ");
 
   // Заголовок команды
@@ -482,7 +482,7 @@ void PersoClient::createProductionLineRollback(
 }
 
 void PersoClient::createBoxStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды print_box_sticker. ");
 
   // Заголовок команды
@@ -500,7 +500,7 @@ void PersoClient::createBoxStickerReprint() {
 }
 
 void PersoClient::createPalletStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const StringDictionary* requestData) {
   sendLog("Формирование команды print_pallet_sticker. ");
 
   // Заголовок команды

@@ -27,7 +27,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/postgre_sql_table.cpp Database/postgre_sql_table.h
     Database/sql_table_relation.cpp Database/sql_table_relation.h
     Database/abstract_sql_table.cpp Database/abstract_sql_table.h
-    Database/sql_query_values.h Database/sql_query_values.cpp
+    Database/database_query_table.h Database/database_query_table.cpp
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
@@ -48,7 +48,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
 
     General/types.h
     General/definitions.h
-    General/hash_model.cpp General/hash_model.h
+    General/hash_table_model.cpp General/hash_table_model.h
 
     Log/file_log_backend.cpp Log/file_log_backend.h
     Log/log_backend.cpp Log/log_backend.h
@@ -64,6 +64,7 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
+    Database/sql_insert_values.h Database/sql_insert_values.cpp
 )
 
 target_compile_definitions(PersoAdmin PRIVATE

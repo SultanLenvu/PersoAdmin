@@ -21,7 +21,7 @@ OrderCreationDialog::OrderCreationDialog(QWidget* parent)
 
 OrderCreationDialog::~OrderCreationDialog() {}
 
-void OrderCreationDialog::getData(QHash<QString, QString>* data) const {
+void OrderCreationDialog::getData(StringDictionary* data) const {
   data->insert("issuer_name", IssuerNameComboBox->currentText());
   data->insert("transponder_quantity", TransponderQuantityLineEdit->text());
   data->insert("box_capacity", BoxCapacityLineEdit->text());

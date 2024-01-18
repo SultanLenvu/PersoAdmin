@@ -22,7 +22,7 @@ ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
 ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
 void ProductionLineCreationDialog::getData(
-    QHash<QString, QString>* data) const {
+    StringDictionary* data) const {
   data->insert("login", LoginLineEdit->text());
   data->insert("password", PasswordLineEdit->text());
   data->insert("name", NameLineEdit->text());

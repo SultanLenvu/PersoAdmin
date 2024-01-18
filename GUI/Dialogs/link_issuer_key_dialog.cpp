@@ -22,7 +22,7 @@ LinkIssuerKeyDialog::LinkIssuerKeyDialog(QWidget* parent)
 
 LinkIssuerKeyDialog::~LinkIssuerKeyDialog() {}
 
-void LinkIssuerKeyDialog::getData(QHash<QString, QString>* data) const {
+void LinkIssuerKeyDialog::getData(StringDictionary* data) const {
   data->insert("issuer_id", IssuerIdLineEdit->text());
   data->insert("key_table",
                MatchingTable.value(KeyChoiceComboBox->currentText()));

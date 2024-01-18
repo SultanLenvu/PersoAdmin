@@ -91,7 +91,7 @@ void MainWindowKernel::transmitCustomRequestPushButton_slot() {
 }
 
 void MainWindowKernel::createNewOrderPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   OrderCreationDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -104,7 +104,7 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
 }
 
 void MainWindowKernel::startOrderAssemblingPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -117,7 +117,7 @@ void MainWindowKernel::startOrderAssemblingPushButton_slot() {
 }
 
 void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -135,7 +135,7 @@ void MainWindowKernel::updateOrderViewPushButton_slot() {
 }
 
 void MainWindowKernel::createNewProductionLinePushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   ProductionLineCreationDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -148,7 +148,7 @@ void MainWindowKernel::createNewProductionLinePushButton_slot() {
 }
 
 void MainWindowKernel::startProductionLinePushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -166,7 +166,7 @@ void MainWindowKernel::deactivateProductionLinePushButton_slot() {
 }
 
 void MainWindowKernel::stopProductionLinePushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -205,7 +205,7 @@ void MainWindowKernel::initIssuerTablePushButton_slot() {
 }
 
 void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   LinkIssuerKeyDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -222,7 +222,7 @@ void MainWindowKernel::releaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
 
@@ -234,7 +234,7 @@ void MainWindowKernel::confirmTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("ucid", AbstractGUI->UcidLineEdit->text());
@@ -247,7 +247,7 @@ void MainWindowKernel::rereleaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
@@ -260,7 +260,7 @@ void MainWindowKernel::confirmRereleaseTransponderPushButton_slot() {
 
   emit loggerClear_signal();
 
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
   param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
@@ -274,7 +274,7 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 
   emit loggerClear_signal();
 
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
   param->insert("login", AbstractGUI->LoginLineEdit2->text());
   param->insert("password", AbstractGUI->PasswordLineEdit2->text());
 
@@ -282,7 +282,7 @@ void MainWindowKernel::productionLineRollbackPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PanInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -301,7 +301,7 @@ void MainWindowKernel::printLastBoxStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PanInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -318,7 +318,7 @@ void MainWindowKernel::printLastPalletStickerOnServerPushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualReleasePushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -331,7 +331,7 @@ void MainWindowKernel::transponderManualReleasePushButton_slot() {
 }
 
 void MainWindowKernel::transponderManualRefundPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -344,7 +344,7 @@ void MainWindowKernel::transponderManualRefundPushButton_slot() {
 }
 
 void MainWindowKernel::palletShipmentPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PalletShippingDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -357,7 +357,7 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
 }
 
 void MainWindowKernel::printTransponderStickerPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -370,7 +370,7 @@ void MainWindowKernel::printTransponderStickerPushButton_slot() {
 }
 
 void MainWindowKernel::printBoxStickerPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -383,7 +383,7 @@ void MainWindowKernel::printBoxStickerPushButton_slot() {
 }
 
 void MainWindowKernel::printPalletStickerPushButton_slot() {
-  std::shared_ptr<QHash<QString, QString>> param(new QHash<QString, QString>);
+  std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
@@ -435,7 +435,7 @@ void MainWindowKernel::displayFirmware_slot(std::shared_ptr<QFile> firmware) {
 }
 
 void MainWindowKernel::displayTransponderData_slot(
-    std::shared_ptr<QHash<QString, QString>> transponderData) {
+    std::shared_ptr<StringDictionary> transponderData) {
   TransponderData->buildTransponderData(transponderData.get());
   CurrentGUI->update();
 }
@@ -872,7 +872,7 @@ void MainWindowKernel::createModels() {
 }
 
 void MainWindowKernel::createMatchingTable() {
-  MatchingTable = new QHash<QString, QString>;
+  MatchingTable = new StringDictionary;
   MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
   MatchingTable->insert("Эмитенты", "issuers");
@@ -880,9 +880,9 @@ void MainWindowKernel::createMatchingTable() {
 
 void MainWindowKernel::registerMetaType() {
   qRegisterMetaType<std::shared_ptr<QMap<QString, QString>>>(
-      "std::shared_ptr<QHash<QString, QString> >");
-  qRegisterMetaType<std::shared_ptr<QHash<QString, QString>>>(
-      "std::shared_ptr<QHash<QString, QString> >");
+      "std::shared_ptr<StringDictionary >");
+  qRegisterMetaType<std::shared_ptr<StringDictionary>>(
+      "std::shared_ptr<StringDictionary >");
   qRegisterMetaType<std::shared_ptr<QStringList>>(
       "std::shared_ptr<QStringList>");
   qRegisterMetaType<ReturnStatus>("ReturnStatus");

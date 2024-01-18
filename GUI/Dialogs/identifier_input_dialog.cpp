@@ -20,7 +20,7 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
 
 IdentifierInputDialog::~IdentifierInputDialog() {}
 
-void IdentifierInputDialog::getData(QHash<QString, QString>* data) const {
+void IdentifierInputDialog::getData(StringDictionary* data) const {
   data->insert("id", InputData->text());
 }
 

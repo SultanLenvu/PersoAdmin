@@ -17,7 +17,7 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(QHash<QString, QString>* data) const {
+void PalletShippingDialog::getData(StringDictionary* data) const {
   data->insert("first_pallet_id", FirstPalletId->text());
   data->insert("last_pallet_id", LastPalletId->text());
 }

@@ -89,7 +89,7 @@ void AdminManager::performCustomRequest(const QString& req,
 }
 
 void AdminManager::createNewOrder(
-    const std::shared_ptr<QHash<QString, QString>> orderParameters,
+    const std::shared_ptr<StringDictionary> orderParameters,
     SqlQueryValues* model) {
   emit executionStarted("createNewOrder");
 
@@ -114,7 +114,7 @@ void AdminManager::createNewOrder(
 }
 
 void AdminManager::startOrderAssembling(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("startOrderAssembling");
 
@@ -139,7 +139,7 @@ void AdminManager::startOrderAssembling(
 }
 
 void AdminManager::stopOrderAssembling(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("stopOrderAssembling");
 
@@ -168,7 +168,7 @@ void AdminManager::showOrderTable(SqlQueryValues* model) {
 }
 
 void AdminManager::createNewProductionLine(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("createNewProductionLine");
 
@@ -193,7 +193,7 @@ void AdminManager::createNewProductionLine(
 }
 
 void AdminManager::activateProductionLine(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("activateProductionLine");
 
@@ -242,7 +242,7 @@ void AdminManager::activateAllProductionLines(SqlQueryValues* model) {
 }
 
 void AdminManager::deactivateProductionLine(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("deactivateProductionLine");
 
@@ -340,7 +340,7 @@ void AdminManager::initTransportMasterKeys(SqlQueryValues* model) {
 }
 
 void AdminManager::linkIssuerWithMasterKeys(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("linkIssuerWithMasterKeys");
 
@@ -366,7 +366,7 @@ void AdminManager::linkIssuerWithMasterKeys(
 }
 
 void AdminManager::releaseTranspondersManually(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("releaseTranspondersManually");
   sendLog("Принудительный выпуск транспондеров. ");
@@ -375,13 +375,13 @@ void AdminManager::releaseTranspondersManually(
   QString table = param->value("table");
 
   if (table == "transponders") {
-    status = Administrator->releaseTransponderManually(param->value("id"));
+    status = Administrator->releaseTransponder(param->value("id"));
   } else if (table == "boxes") {
-    status = Administrator->releaseBoxManually(param->value("id"));
+    status = Administrator->releaseBox(param->value("id"));
   } else if (table == "pallets") {
-    status = Administrator->releasePalletManually(param->value("id"));
+    status = Administrator->releasePallet(param->value("id"));
   } else if (table == "orders") {
-    status = Administrator->releaseOrderManually(param->value("id"));
+    status = Administrator->releaseOrder(param->value("id"));
   } else {
     processAdministratorError(ReturnStatus::ParameterError,
                               "releaseTranspondersManually");
@@ -403,7 +403,7 @@ void AdminManager::releaseTranspondersManually(
 }
 
 void AdminManager::refundTranspondersManually(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("refundTranspondersManually");
   sendLog("Возврат транспондеров. ");
@@ -412,13 +412,13 @@ void AdminManager::refundTranspondersManually(
   QString table = param->value("table");
 
   if (table == "transponders") {
-    status = Administrator->refundTransponderManually(param->value("id"));
+    status = Administrator->refundTransponder(param->value("id"));
   } else if (table == "boxes") {
-    status = Administrator->refundBoxManually(param->value("id"));
+    status = Administrator->refundBox(param->value("id"));
   } else if (table == "pallets") {
-    status = Administrator->refundPalletManually(param->value("id"));
+    status = Administrator->refundPallet(param->value("id"));
   } else if (table == "orders") {
-    status = Administrator->refundOrderManually(param->value("id"));
+    status = Administrator->refundOrder(param->value("id"));
   } else {
     processAdministratorError(ReturnStatus::ParameterError,
                               "refundTranspondersManually");
@@ -440,7 +440,7 @@ void AdminManager::refundTranspondersManually(
 }
 
 void AdminManager::shipPallets(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("shipPallets");
   sendLog("Отгрузка паллет. ");
@@ -462,13 +462,13 @@ void AdminManager::shipPallets(
 }
 
 void AdminManager::releaseTransponder(
-    const std::shared_ptr<QHash<QString, QString>> param) {
+    const std::shared_ptr<StringDictionary> param) {
   emit executionStarted("releaseTransponder");
   sendLog("Выпуск транспондера. ");
 
   std::shared_ptr<QFile> firmware(new QFile("temp.bin"));
-  std::shared_ptr<QHash<QString, QString>> transponderData(
-      new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> transponderData(
+      new StringDictionary());
   PersoClient::ReturnStatus status = Client->requestTransponderRelease(
       param.get(), firmware.get(), transponderData.get());
   if (status != PersoClient::NoError) {
@@ -486,7 +486,7 @@ void AdminManager::releaseTransponder(
 }
 
 void AdminManager::confirmTransponderRelease(
-    const std::shared_ptr<QHash<QString, QString>> param) {
+    const std::shared_ptr<StringDictionary> param) {
   emit executionStarted("confirmTransponderRelease");
   sendLog("Подтверждение выпуска транспондера. ");
 
@@ -501,13 +501,13 @@ void AdminManager::confirmTransponderRelease(
 }
 
 void AdminManager::rereleaseTransponder(
-    const std::shared_ptr<QHash<QString, QString>> param) {
+    const std::shared_ptr<StringDictionary> param) {
   emit executionStarted("rereleaseTransponder");
   sendLog("Перевыпуск транспондера. ");
 
   std::shared_ptr<QFile> firmware(new QFile("temp.bin"));
-  std::shared_ptr<QHash<QString, QString>> transponderData(
-      new QHash<QString, QString>());
+  std::shared_ptr<StringDictionary> transponderData(
+      new StringDictionary());
   PersoClient::ReturnStatus status = Client->requestTransponderRerelease(
       param.get(), firmware.get(), transponderData.get());
   if (status != PersoClient::NoError) {
@@ -524,7 +524,7 @@ void AdminManager::rereleaseTransponder(
 }
 
 void AdminManager::confirmTransponderRerelease(
-    const std::shared_ptr<QHash<QString, QString>> param) {
+    const std::shared_ptr<StringDictionary> param) {
   emit executionStarted("confirmTransponderRerelease");
   sendLog("Подтверждение перевыпуска транспондера. ");
 
@@ -539,7 +539,7 @@ void AdminManager::confirmTransponderRerelease(
 }
 
 void AdminManager::rollbackProductionLine(
-    const std::shared_ptr<QHash<QString, QString>> param) {
+    const std::shared_ptr<StringDictionary> param) {
   emit executionStarted("rollbackProductionLine");
   sendLog("Откат производственной линии. ");
 
@@ -554,7 +554,7 @@ void AdminManager::rollbackProductionLine(
 }
 
 void AdminManager::printBoxStickerOnServer(
-    std::shared_ptr<QHash<QString, QString>> param) {
+    std::shared_ptr<StringDictionary> param) {
   emit executionStarted("printBoxStickerOnServer");
   sendLog("Печать стикера для бокса на сервере. ");
 
@@ -582,7 +582,7 @@ void AdminManager::printLastBoxStickerOnServer() {
 }
 
 void AdminManager::printPalletStickerOnServer(
-    std::shared_ptr<QHash<QString, QString>> param) {
+    std::shared_ptr<StringDictionary> param) {
   emit executionStarted("printPalletStickerOnServer");
   sendLog("Печать стикера для паллеты на сервере. ");
 
@@ -611,14 +611,14 @@ void AdminManager::printLastPalletStickerOnServer() {
 }
 
 void AdminManager::printTransponderSticker(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("printTransponderSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   ReturnStatus administratorStatus;
 
-  QHash<QString, QString> transponderData;
+  StringDictionary transponderData;
   sendLog("Запрос данных транспондера. ");
   administratorStatus =
       Administrator->getTransponderData(param->value("id"), &transponderData);
@@ -639,14 +639,14 @@ void AdminManager::printTransponderSticker(
 }
 
 void AdminManager::printBoxSticker(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("printBoxSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   ReturnStatus administratorStatus;
 
-  QHash<QString, QString> boxData;
+  StringDictionary boxData;
   sendLog("Запрос данных бокса. ");
   administratorStatus = Administrator->getBoxData(param->value("id"), &boxData);
   if (administratorStatus != ReturnStatus::NoError) {
@@ -665,14 +665,14 @@ void AdminManager::printBoxSticker(
 }
 
 void AdminManager::printPalletSticker(
-    const std::shared_ptr<QHash<QString, QString>> param,
+    const std::shared_ptr<StringDictionary> param,
     SqlQueryValues* model) {
   emit executionStarted("printPalletSticker");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   ReturnStatus administratorStatus;
 
-  QHash<QString, QString> palletData;
+  StringDictionary palletData;
   sendLog("Запрос данных паллеты. ");
   administratorStatus =
       Administrator->getPalletData(param->value("id"), &palletData);

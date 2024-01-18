@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "sql_query_values.h"
+#include "database_query_table.h"
 
 class AbstractSqlDatabase : public QObject {
   Q_OBJECT
