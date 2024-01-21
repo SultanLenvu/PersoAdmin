@@ -9,10 +9,10 @@
 class WidgetLogBackend : public LogBackend {
   Q_OBJECT
  private:
-  bool LogEnable;
+  bool Enable;
 
  public:
-  WidgetLogBackend(QObject* parent);
+  WidgetLogBackend(const QString& name);
 
   virtual void writeLogLine(const QString& str) override;
   virtual void clear() override;

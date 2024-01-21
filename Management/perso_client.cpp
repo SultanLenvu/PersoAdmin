@@ -1,4 +1,5 @@
 #include "perso_client.h"
+#include "definitions.h"
 
 PersoClient::PersoClient(QObject* parent) : QObject(parent) {
   setObjectName("PersoClient");
@@ -376,7 +377,7 @@ PersoClient::ReturnStatus PersoClient::transmitDataBlock() {
   }
 
   QVector<QString>::iterator it;
-  for (it = currentTemplate->begin(); it != currentTemplate->end(); it++) {
+  for (it = currentTemplate->begin(); it != currentTemplate->end(); ++it) {
     if (!CurrentResponse.contains(*it)) {
       return ResponseSyntaxError;
     }

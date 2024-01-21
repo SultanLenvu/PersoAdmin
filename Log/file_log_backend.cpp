@@ -1,19 +1,15 @@
 #include "file_log_backend.h"
+#include <iostream>
 
-FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
-  setObjectName("FileLogBackend");
+FileLogBackend::FileLogBackend(const QString& name) : LogBackend(name) {
   loadSettings();
   initialize();
-
-  connect(this, &FileLogBackend::notifyAboutError,
-          InteractionSystem::instance(),
-          &InteractionSystem::generateErrorMessage);
 }
 
 FileLogBackend::~FileLogBackend() {}
 
 void FileLogBackend::writeLogLine(const QString& str) {
-  if (LogEnable) {
+  if (Enable) {
     LogTextStream << str << "\n";
   }
 }
@@ -30,15 +26,15 @@ void FileLogBackend::loadSettings() {
   QSettings settings;
 
   CurrentLogDir = QApplication::applicationDirPath() + "/logs";
-  LogEnable = settings.value("log_system/file_log_enable").toBool();
+  Enable = settings.value("log_system/file_log_enable").toBool();
   LogFileMaxNumber = settings.value("log_system/log_file_max_number").toInt();
 }
 
 void FileLogBackend::initialize() {
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
-    LogEnable = false;
-    emit notifyAboutError("Не удалось создать директорию для логгирования. ");
+    Enable = false;
+    std::cout << "Не удалось создать директорию для логгирования. ";
     return;
   }
 
@@ -49,14 +45,14 @@ void FileLogBackend::initialize() {
       CurrentLogDir + "/log " +
       QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss"));
   if (!CurrentLogFile.open(QIODevice::WriteOnly)) {
-    LogEnable = false;
-    emit notifyAboutError("Не удалось открыть файл для логгирования. ");
+    Enable = false;
+    std::cout << "Не удалось открыть файл для логгирования. ";
     return;
   }
 
   removeOldestLogFiles();
 
-  LogEnable = true;
+  Enable = true;
   LogTextStream.setDevice(&CurrentLogFile);
 }
 

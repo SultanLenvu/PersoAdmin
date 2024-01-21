@@ -11,7 +11,6 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "abstract_input_dialog.h"
 #include "types.h"
 
 class InteractionSystem : public QWidget {
@@ -19,8 +18,6 @@ class InteractionSystem : public QWidget {
 
  private:
   std::unique_ptr<QProgressDialog> ProgressDialog;
-
-  std::unique_ptr<AbstractInputDialog> CurrentDialog;
 
   std::unique_ptr<QTimer> ODTimer;
   std::unique_ptr<QTimer> ODQTimer;
@@ -52,7 +49,6 @@ class InteractionSystem : public QWidget {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
-  void processCurrentDialog(StringDictionary* param);
 
   void createMessageMatchTable(void);
   void processReturnStatus(ReturnStatus ret);

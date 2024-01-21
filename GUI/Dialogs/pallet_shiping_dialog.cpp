@@ -17,9 +17,9 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(StringDictionary* data) const {
-  data->insert("first_pallet_id", FirstPalletId->text());
-  data->insert("last_pallet_id", LastPalletId->text());
+void PalletShippingDialog::getData(StringDictionary& data) const {
+  data.insert("first_pallet_id", FirstPalletId->text());
+  data.insert("last_pallet_id", LastPalletId->text());
 }
 
 AbstractInputDialog::InputDialogType PalletShippingDialog::type() const {

@@ -24,7 +24,7 @@ class StartProductionLineDialog : public AbstractInputDialog {
   explicit StartProductionLineDialog(QWidget* parent);
   ~StartProductionLineDialog();
 
-  virtual void getData(StringDictionary* data) const override;
+  virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 
   virtual void accept() override;

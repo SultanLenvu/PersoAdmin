@@ -21,20 +21,20 @@ OrderCreationDialog::OrderCreationDialog(QWidget* parent)
 
 OrderCreationDialog::~OrderCreationDialog() {}
 
-void OrderCreationDialog::getData(StringDictionary* data) const {
-  data->insert("issuer_name", IssuerNameComboBox->currentText());
-  data->insert("transponder_quantity", TransponderQuantityLineEdit->text());
-  data->insert("box_capacity", BoxCapacityLineEdit->text());
-  data->insert("pallet_capacity", PalletCapacityLineEdit->text());
-  data->insert("full_personalization",
-               FullPersonalizationCheckBox->checkState() == Qt::Checked
-                   ? "true"
-                   : "false");
-  data->insert("pan_file_path", PanFilePathLineEdit->text());
-  data->insert("transponder_model", TransponderModelLineEdit->text());
-  data->insert("accr_reference", AccrReferenceLineEdit->text());
-  data->insert("equipment_class", EquipmentClassLineEdit->text());
-  data->insert("manufacturer_id", ManufacturerIdLineEdit->text());
+void OrderCreationDialog::getData(StringDictionary& data) const {
+  data.insert("issuer_name", IssuerNameComboBox->currentText());
+  data.insert("transponder_quantity", TransponderQuantityLineEdit->text());
+  data.insert("box_capacity", BoxCapacityLineEdit->text());
+  data.insert("pallet_capacity", PalletCapacityLineEdit->text());
+  data.insert("full_personalization",
+              FullPersonalizationCheckBox->checkState() == Qt::Checked
+                  ? "true"
+                  : "false");
+  data.insert("pan_file_path", PanFilePathLineEdit->text());
+  data.insert("transponder_model", TransponderModelLineEdit->text());
+  data.insert("accr_reference", AccrReferenceLineEdit->text());
+  data.insert("equipment_class", EquipmentClassLineEdit->text());
+  data.insert("manufacturer_id", ManufacturerIdLineEdit->text());
 }
 
 AbstractInputDialog::InputDialogType OrderCreationDialog::type() const {

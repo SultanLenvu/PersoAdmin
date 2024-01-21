@@ -1,37 +1,25 @@
 #include "log_system.h"
+#include "file_log_backend.h"
+#include "global_environment.h"
+#include "widget_log_backend.h"
 
-LogSystem::LogSystem(QObject* parent) : QObject(parent) {
-  setObjectName("LogSystem");
+LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
 
-  WidgetLogger = new WidgetLogBackend(this);
-  Backends << WidgetLogger;
+  Backends.push_back(std::shared_ptr<WidgetLogBackend>(
+      new WidgetLogBackend("WidgetLogBackend")));
 
-  FileLogger = new FileLogBackend(this);
-  Backends << FileLogger;
+  Backends.push_back(
+      std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
 
-  UdpSocket = new QUdpSocket(this);
-  if (UdpListenEnable) {
-    UdpSocket->bind(UdpListenIp, UdpListenPort);
-  }
-  connect(UdpSocket, &QUdpSocket::readyRead, this,
-          &LogSystem::on_UdpSocketReadyRead_slot);
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
 LogSystem::~LogSystem() {}
 
-WidgetLogBackend* LogSystem::getWidgetLogger() {
-  return WidgetLogger;
-}
-
-LogSystem* LogSystem::instance() {
-  static LogSystem Logger(nullptr);
-  return &Logger;
-}
-
 void LogSystem::clear() {
-  for (QList<LogBackend*>::iterator it = Backends.begin(); it != Backends.end();
-       it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->clear();
   }
 }
@@ -39,8 +27,7 @@ void LogSystem::clear() {
 void LogSystem::generate(const QString& log) {
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (QList<LogBackend*>::const_iterator it = Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->writeLogLine(LogData);
   }
 }
@@ -54,8 +41,7 @@ void LogSystem::applySettings() {
     UdpSocket->bind(UdpListenIp, UdpListenPort);
   }
 
-  for (QList<LogBackend*>::const_iterator it = Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->applySettings();
   }
 }
@@ -71,9 +57,20 @@ void LogSystem::loadSettings() {
   UdpListenIp = QHostAddress(
       settings.value("log_system/udp_listen_ip").toString());
   UdpListenPort = settings.value("log_system/udp_listen_port").toUInt();
+
+  if (UdpListenEnable) {
+    createUdpSocket();
+  }
 }
 
-void LogSystem::on_UdpSocketReadyRead_slot() {
+void LogSystem::createUdpSocket() {
+  UdpSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
+  UdpSocket->bind(UdpListenIp, UdpListenPort);
+  connect(UdpSocket.get(), &QUdpSocket::readyRead, this,
+          &LogSystem::udpSocketReadyRead_slot);
+}
+
+void LogSystem::udpSocketReadyRead_slot() {
   QByteArray datagram;
   datagram.resize(UdpSocket->bytesAvailable());
 

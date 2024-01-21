@@ -26,7 +26,7 @@ class PanInputDialog : public AbstractInputDialog {
   explicit PanInputDialog(QWidget* parent);
   ~PanInputDialog();
 
-  virtual void getData(StringDictionary* data) const override;
+  virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 
   virtual void accept() override;

@@ -1,16 +1,16 @@
 #include "mainwindow_kernel.h"
-#include "Dialogs/idetifier_input_dialog.h"
-#include "Dialogs/link_issuer_key_dialog.h"
-#include "Dialogs/manual_release_refund_dialog.h"
-#include "Dialogs/order_creation_dialog.h"
-#include "Dialogs/pallet_shiping_dialog.h"
-#include "Dialogs/pan_input_dialog.h"
-#include "Dialogs/production_line_creation_dialog.h"
-#include "Dialogs/start_production_line_dialog.h"
-#include "GUI/Dialogs/settings_dialog.h"
-#include "General/definitions.h"
 #include "authorization_gui.h"
+#include "definitions.h"
+#include "idetifier_input_dialog.h"
+#include "link_issuer_key_dialog.h"
 #include "mainwindow_gui.h"
+#include "manual_release_refund_dialog.h"
+#include "order_creation_dialog.h"
+#include "pallet_shiping_dialog.h"
+#include "pan_input_dialog.h"
+#include "production_line_creation_dialog.h"
+#include "settings_dialog.h"
+#include "start_production_line_dialog.h"
 
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Считываем размеры дисплея
@@ -97,7 +97,7 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit createNewOrder_signal(param, OrderModel);
@@ -110,7 +110,7 @@ void MainWindowKernel::startOrderAssemblingPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit startOrderAssembling_signal(param, OrderModel);
@@ -123,7 +123,7 @@ void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit stopOrderAssembling_signal(param, OrderModel);
@@ -141,38 +141,38 @@ void MainWindowKernel::createNewProductionLinePushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit createNewProductionLine_signal(param, ProductionLineModel);
 }
 
-void MainWindowKernel::startProductionLinePushButton_slot() {
+void MainWindowKernel::activateProductionLinePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit activateProductionLine_signal(param, ProductionLineModel);
 }
 
-void MainWindowKernel::deactivateProductionLinePushButton_slot() {
+void MainWindowKernel::activateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
   emit activateAllProductionLines_signal(ProductionLineModel);
 }
 
-void MainWindowKernel::stopProductionLinePushButton_slot() {
+void MainWindowKernel::deactivateProductionLinePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   IdentifierInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit deactivateProductionLine_signal(param, ProductionLineModel);
@@ -211,7 +211,7 @@ void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit linkIssuerWithMasterKeys_signal(param, IssuerModel);
@@ -288,7 +288,7 @@ void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit printBoxStickerOnServer_signal(param);
@@ -307,7 +307,7 @@ void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit printPalletStickerOnServer_signal(param);
@@ -324,7 +324,7 @@ void MainWindowKernel::transponderManualReleasePushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit releaseTranspondersManually_signal(param, TransponderModel);
@@ -337,7 +337,7 @@ void MainWindowKernel::transponderManualRefundPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit refundTranspondersManually_signal(param, TransponderModel);
@@ -350,7 +350,7 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit shipPallets_signal(param, TransponderModel);
@@ -363,7 +363,7 @@ void MainWindowKernel::printTransponderStickerPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit printTransponderSticker_signal(param, StickerModel);
@@ -376,7 +376,7 @@ void MainWindowKernel::printBoxStickerPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit printBoxSticker_signal(param, StickerModel);
@@ -389,7 +389,7 @@ void MainWindowKernel::printPalletStickerPushButton_slot() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(param.get());
+  dialog.getData(*param.get());
 
   emit loggerClear_signal();
   emit printPalletSticker_signal(param, StickerModel);
@@ -410,11 +410,11 @@ void MainWindowKernel::settingsActionTrigger_slot() {
   emit loggerClear_signal();
 
   SettingsDialog dialog(this);
-  connect(&dialog, &SettingsDialog::applyNewSettings, Interactor,
+  connect(&dialog, &SettingsDialog::applyNewSettings, Interactor.get(),
           &InteractionSystem::applySettings);
-  connect(&dialog, &SettingsDialog::applyNewSettings, Logger,
+  connect(&dialog, &SettingsDialog::applyNewSettings, Logger.get(),
           &LogSystem::applySettings);
-  connect(&dialog, &SettingsDialog::applyNewSettings, Manager,
+  connect(&dialog, &SettingsDialog::applyNewSettings, Manager.get(),
           &AdminManager::applySettings);
 
   if (dialog.exec() == QDialog::Rejected) {
@@ -436,7 +436,7 @@ void MainWindowKernel::displayFirmware_slot(std::shared_ptr<QFile> firmware) {
 
 void MainWindowKernel::displayTransponderData_slot(
     std::shared_ptr<StringDictionary> transponderData) {
-  TransponderData->buildTransponderData(transponderData.get());
+  TransponderData->setData(*transponderData.get());
   CurrentGUI->update();
 }
 
@@ -649,13 +649,13 @@ void MainWindowKernel::connectMainWindowGUI() {
   connect(AbstractGUI->CreateNewProductionLinePushButton, &QPushButton::clicked,
           this, &MainWindowKernel::createNewProductionLinePushButton_slot);
   connect(AbstractGUI->ActivateProductionLinePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::startProductionLinePushButton_slot);
+          this, &MainWindowKernel::activateProductionLinePushButton_slot);
   connect(AbstractGUI->DeactivateProductionLinePushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateProductionLinePushButton_slot);
-  connect(AbstractGUI->DeactivateProductionLinePushButton,
+  connect(AbstractGUI->ActivateAllProductionLinesPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::stopProductionLinePushButton_slot);
+          &MainWindowKernel::activateAllProductionLinesPushButton_slot);
   connect(AbstractGUI->DeactivateAllProductionLinesPushButton,
           &QPushButton::clicked, this,
           &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
@@ -714,12 +714,6 @@ void MainWindowKernel::connectMainWindowGUI() {
           &QPushButton::clicked, this,
           &MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot);
 
-  // Подключаем логгер
-  connect(Logger->getWidgetLogger(), &WidgetLogBackend::displayLog_signal,
-          AbstractGUI, &MainWindowGUI::displayLog);
-  connect(Logger->getWidgetLogger(), &WidgetLogBackend::clearLogDisplay_signal,
-          AbstractGUI, &MainWindowGUI::clearLogDisplay);
-
   // Соединяем модели и представления
   AbstractGUI->DatabaseRandomModelView->setModel(RandomModel);
   AbstractGUI->OrderTableView->setModel(OrderModel);
@@ -734,130 +728,120 @@ void MainWindowKernel::connectMainWindowGUI() {
 }
 
 void MainWindowKernel::createLoggerInstance() {
-  Logger = LogSystem::instance();
-  connect(this, &MainWindowKernel::loggerClear_signal, Logger,
+  Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
+  connect(this, &MainWindowKernel::loggerClear_signal, Logger.get(),
           &LogSystem::clear);
-  connect(this, &MainWindowKernel::logging, Logger, &LogSystem::generate);
+  connect(this, &MainWindowKernel::logging, Logger.get(), &LogSystem::generate);
 
-  LoggerThread = new QThread(this);
-  connect(LoggerThread, &QThread::finished, LoggerThread,
-          &QThread::deleteLater);
+  LoggerThread = std::unique_ptr<QThread>(new QThread());
 
-  Logger->moveToThread(LoggerThread);
+  Logger->moveToThread(LoggerThread.get());
   LoggerThread->start();
 }
 
 void MainWindowKernel::createManagerInstance() {
-  Manager = new AdminManager(nullptr);
-  connect(Manager, &AdminManager::logging, Logger, &LogSystem::generate);
-  connect(Manager, &AdminManager::notifyUser, Interactor,
-          &InteractionSystem::generateMessage);
-  connect(Manager, &AdminManager::notifyUserAboutError, Interactor,
-          &InteractionSystem::generateErrorMessage, Qt::QueuedConnection);
-  connect(Manager, &AdminManager::executionStarted, Interactor,
+  Manager = std::unique_ptr<AdminManager>(new AdminManager("AdminManager"));
+  connect(Manager.get(), &AdminManager::logging, Logger.get(),
+          &LogSystem::generate);
+  connect(Manager.get(), &AdminManager::executionStarted, Interactor.get(),
           &InteractionSystem::processOperationStart);
-  connect(Manager, &AdminManager::executionFinished, Interactor,
+  connect(Manager.get(), &AdminManager::executionFinished, Interactor.get(),
           &InteractionSystem::processOperationFinish);
 
   // Подключаем функционал
-  connect(this, &MainWindowKernel::connectDatabase_signal, Manager,
+  connect(this, &MainWindowKernel::connectDatabase_signal, Manager.get(),
           &AdminManager::connectDatabase);
-  connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager,
+  connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager.get(),
           &AdminManager::disconnectDatabase);
-  connect(this, &MainWindowKernel::showDatabaseTable_signal, Manager,
+  connect(this, &MainWindowKernel::showDatabaseTable_signal, Manager.get(),
           &AdminManager::showDatabaseTable);
-  connect(this, &MainWindowKernel::performCustomRequest_signal, Manager,
+  connect(this, &MainWindowKernel::performCustomRequest_signal, Manager.get(),
           &AdminManager::performCustomRequest);
 
-  connect(this, &MainWindowKernel::createNewOrder_signal, Manager,
+  connect(this, &MainWindowKernel::createNewOrder_signal, Manager.get(),
           &AdminManager::createNewOrder);
-  connect(this, &MainWindowKernel::startOrderAssembling_signal, Manager,
+  connect(this, &MainWindowKernel::startOrderAssembling_signal, Manager.get(),
           &AdminManager::startOrderAssembling);
-  connect(this, &MainWindowKernel::stopOrderAssembling_signal, Manager,
+  connect(this, &MainWindowKernel::stopOrderAssembling_signal, Manager.get(),
           &AdminManager::stopOrderAssembling);
-  connect(this, &MainWindowKernel::showOrderTable_signal, Manager,
+  connect(this, &MainWindowKernel::showOrderTable_signal, Manager.get(),
           &AdminManager::showOrderTable);
 
-  connect(this, &MainWindowKernel::createNewProductionLine_signal, Manager,
-          &AdminManager::createNewProductionLine);
-  connect(this, &MainWindowKernel::activateProductionLine_signal, Manager,
+  connect(this, &MainWindowKernel::createNewProductionLine_signal,
+          Manager.get(), &AdminManager::createNewProductionLine);
+  connect(this, &MainWindowKernel::activateProductionLine_signal, Manager.get(),
           &AdminManager::activateProductionLine);
-  connect(this, &MainWindowKernel::activateAllProductionLines_signal, Manager,
-          &AdminManager::activateAllProductionLines);
-  connect(this, &MainWindowKernel::deactivateProductionLine_signal, Manager,
-          &AdminManager::deactivateProductionLine);
-  connect(this, &MainWindowKernel::deactivateAllProductionLines_signal, Manager,
-          &AdminManager::deactivateAllProductionLines);
-  connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
-          &AdminManager::showProductionLineTable);
-  connect(this, &MainWindowKernel::showProductionLineTable_signal, Manager,
-          &AdminManager::showProductionLineTable);
+  connect(this, &MainWindowKernel::activateAllProductionLines_signal,
+          Manager.get(), &AdminManager::activateAllProductionLines);
+  connect(this, &MainWindowKernel::deactivateProductionLine_signal,
+          Manager.get(), &AdminManager::deactivateProductionLine);
+  connect(this, &MainWindowKernel::deactivateAllProductionLines_signal,
+          Manager.get(), &AdminManager::deactivateAllProductionLines);
+  connect(this, &MainWindowKernel::showProductionLineTable_signal,
+          Manager.get(), &AdminManager::showProductionLineTable);
+  connect(this, &MainWindowKernel::showProductionLineTable_signal,
+          Manager.get(), &AdminManager::showProductionLineTable);
 
-  connect(this, &MainWindowKernel::releaseTransponder_signal, Manager,
+  connect(this, &MainWindowKernel::releaseTransponder_signal, Manager.get(),
           &AdminManager::releaseTransponder);
-  connect(this, &MainWindowKernel::confirmTransponderRelease_signal, Manager,
-          &AdminManager::confirmTransponderRelease);
-  connect(this, &MainWindowKernel::rereleaseTransponder_signal, Manager,
+  connect(this, &MainWindowKernel::confirmTransponderRelease_signal,
+          Manager.get(), &AdminManager::confirmTransponderRelease);
+  connect(this, &MainWindowKernel::rereleaseTransponder_signal, Manager.get(),
           &AdminManager::rereleaseTransponder);
-  connect(this, &MainWindowKernel::confirmTransponderRerelease_signal, Manager,
-          &AdminManager::confirmTransponderRerelease);
-  connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager,
+  connect(this, &MainWindowKernel::confirmTransponderRerelease_signal,
+          Manager.get(), &AdminManager::confirmTransponderRerelease);
+  connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager.get(),
           &AdminManager::rollbackProductionLine);
-  connect(this, &MainWindowKernel::printBoxStickerOnServer_signal, Manager,
-          &AdminManager::printBoxStickerOnServer);
-  connect(this, &MainWindowKernel::printLastBoxStickerOnServer_signal, Manager,
-          &AdminManager::printLastBoxStickerOnServer);
-  connect(this, &MainWindowKernel::printPalletStickerOnServer_signal, Manager,
-          &AdminManager::printPalletStickerOnServer);
+  connect(this, &MainWindowKernel::printBoxStickerOnServer_signal,
+          Manager.get(), &AdminManager::printBoxStickerOnServer);
+  connect(this, &MainWindowKernel::printLastBoxStickerOnServer_signal,
+          Manager.get(), &AdminManager::printLastBoxStickerOnServer);
+  connect(this, &MainWindowKernel::printPalletStickerOnServer_signal,
+          Manager.get(), &AdminManager::printPalletStickerOnServer);
   connect(this, &MainWindowKernel::printLastPalletStickerOnServer_signal,
-          Manager, &AdminManager::printLastPalletStickerOnServer);
+          Manager.get(), &AdminManager::printLastPalletStickerOnServer);
 
-  connect(this, &MainWindowKernel::releaseTranspondersManually_signal, Manager,
-          &AdminManager::releaseTranspondersManually);
-  connect(this, &MainWindowKernel::refundTranspondersManually_signal, Manager,
-          &AdminManager::refundTranspondersManually);
-  connect(this, &MainWindowKernel::shipPallets_signal, Manager,
+  connect(this, &MainWindowKernel::releaseTranspondersManually_signal,
+          Manager.get(), &AdminManager::releaseTranspondersManually);
+  connect(this, &MainWindowKernel::refundTranspondersManually_signal,
+          Manager.get(), &AdminManager::refundTranspondersManually);
+  connect(this, &MainWindowKernel::shipPallets_signal, Manager.get(),
           &AdminManager::shipPallets);
 
-  connect(this, &MainWindowKernel::initIssuers_signal, Manager,
+  connect(this, &MainWindowKernel::initIssuers_signal, Manager.get(),
           &AdminManager::initIssuers);
-  connect(this, &MainWindowKernel::initTransportMasterKeys_signal, Manager,
-          &AdminManager::initTransportMasterKeys);
-  connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal, Manager,
-          &AdminManager::linkIssuerWithMasterKeys);
+  connect(this, &MainWindowKernel::initTransportMasterKeys_signal,
+          Manager.get(), &AdminManager::initTransportMasterKeys);
+  connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal,
+          Manager.get(), &AdminManager::linkIssuerWithMasterKeys);
 
-  connect(this, &MainWindowKernel::printTransponderSticker_signal, Manager,
-          &AdminManager::printTransponderSticker);
-  connect(this, &MainWindowKernel::printBoxSticker_signal, Manager,
+  connect(this, &MainWindowKernel::printTransponderSticker_signal,
+          Manager.get(), &AdminManager::printTransponderSticker);
+  connect(this, &MainWindowKernel::printBoxSticker_signal, Manager.get(),
           &AdminManager::printBoxSticker);
-  connect(this, &MainWindowKernel::printPalletSticker_signal, Manager,
+  connect(this, &MainWindowKernel::printPalletSticker_signal, Manager.get(),
           &AdminManager::printPalletSticker);
   connect(this, &MainWindowKernel::execPrinterStickerCommandScript_signal,
-          Manager, &AdminManager::execPrinterStickerCommandScript);
+          Manager.get(), &AdminManager::execPrinterStickerCommandScript);
 
   // Запросы на отображение
-  connect(Manager, &AdminManager::displayFirmware_signal, this,
+  connect(Manager.get(), &AdminManager::displayFirmware_signal, this,
           &MainWindowKernel::displayFirmware_slot);
-  connect(Manager, &AdminManager::displayTransponderData_signal, this,
+  connect(Manager.get(), &AdminManager::displayTransponderData_signal, this,
           &MainWindowKernel::displayTransponderData_slot);
 
   // Поток
-  ManagerThread = new QThread(this);
-  connect(ManagerThread, &QThread::finished, ManagerThread,
-          &QThread::deleteLater);
-  connect(ManagerThread, &QThread::finished, Manager,
-          &AdminManager::deleteLater);
-  connect(ManagerThread, &QThread::started, Manager,
+  ManagerThread = std::unique_ptr<QThread>(new QThread());
+  connect(ManagerThread.get(), &QThread::started, Manager.get(),
           &AdminManager::insctanceThreadStarted_slot);
 
-  Manager->moveToThread(ManagerThread);
+  Manager->moveToThread(ManagerThread.get());
   ManagerThread->start();
 }
 
 void MainWindowKernel::createInteractorInstance() {
-  Interactor = InteractionSystem::instance();
-  connect(Interactor, &InteractionSystem::logging, Logger,
-          &LogSystem::generate);
+  Interactor = std::unique_ptr<InteractionSystem>(
+      new InteractionSystem("InteractionSystem"));
 }
 
 void MainWindowKernel::createModels() {
@@ -868,14 +852,13 @@ void MainWindowKernel::createModels() {
   StickerModel = new SqlQueryValues(this);
   TransponderModel = new SqlQueryValues(this);
 
-  TransponderData = new HashModel(this);
+  TransponderData = new HashTableModel(this);
 }
 
 void MainWindowKernel::createMatchingTable() {
-  MatchingTable = new StringDictionary;
-  MatchingTable->insert("Транспортные мастер ключи", "transport_master_keys");
-  MatchingTable->insert("Коммерческие мастер ключи", "commercial_master_keys");
-  MatchingTable->insert("Эмитенты", "issuers");
+  MatchingTable.insert("Транспортные мастер ключи", "transport_master_keys");
+  MatchingTable.insert("Коммерческие мастер ключи", "commercial_master_keys");
+  MatchingTable.insert("Эмитенты", "issuers");
 }
 
 void MainWindowKernel::registerMetaType() {

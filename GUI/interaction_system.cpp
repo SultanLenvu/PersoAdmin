@@ -1,6 +1,7 @@
 #include "interaction_system.h"
-
-#include "General/definitions.h"
+#include "definitions.h"
+#include "global_environment.h"
+#include "log_system.h"
 
 InteractionSystem::InteractionSystem(const QString& name) {
   setObjectName(name);
@@ -10,6 +11,11 @@ InteractionSystem::InteractionSystem(const QString& name) {
 
   // Создаем таймеры
   createTimers();
+
+  connect(this, &InteractionSystem::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
 
 InteractionSystem::~InteractionSystem() {}
@@ -99,6 +105,10 @@ void InteractionSystem::createProgressDialog() {
   ProgressDialog->close();
 }
 
+void InteractionSystem::destroyProgressDialog() {
+  ProgressDialog->close();
+}
+
 void InteractionSystem::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = std::unique_ptr<QTimer>(new QTimer());
@@ -116,58 +126,54 @@ void InteractionSystem::createTimers() {
           &InteractionSystem::ODQTimerTimeout_slot);
 }
 
-void InteractionSystem::processCurrentDialog(StringDictionary* param) {
-  if (CurrentDialog->exec() == QDialog::Rejected) {
-    return;
-  }
-
-  CurrentDialog->getData(param);
-}
-
 void InteractionSystem::createMessageMatchTable() {
   // Заполняем таблицу соответствий статусов возврата
+  MessageTable[ReturnStatus::NoError] = QString("Выполнено. ");
+
   MessageTable[ReturnStatus::ParameterError] =
       QString("Получены некорректные параметры.");
+  MessageTable[ReturnStatus::DynamicLibraryMissing] =
+      QString("Отсутствует библиотека для работы с принтером стикеров. ");
+  MessageTable[ReturnStatus::StickerPrinterConnectionError] =
+      QString("Не удалось подключиться к стикер-принтеру. ");
+  MessageTable[ReturnStatus::StickerPrintingFailed] =
+      QString("Не удалось распечать стикер. ");
+
   MessageTable[ReturnStatus::DatabaseConnectionError] =
       QString("Не удалось подключиться к базе данных. ");
   MessageTable[ReturnStatus::DatabaseTransactionError] =
       QString("Ошибка транзакции. ");
   MessageTable[ReturnStatus::DatabaseQueryError] =
       QString("Получена ошибка при выполнении запроса к базе данных.");
+
   MessageTable[ReturnStatus::RegisterFileError] =
       QString("Не удалось открыть файл-реестр для отгрузки.");
+
+  MessageTable[ReturnStatus::TransponderMissed] =
+      QString("Транспондер не найден.");
+  MessageTable[ReturnStatus::BoxMissed] = QString("Бокс не найден.");
+  MessageTable[ReturnStatus::PalletMissed] = QString("Паллета не найдена.");
+  MessageTable[ReturnStatus::OrderMissed] = QString("Заказ не найден.");
+
   MessageTable[ReturnStatus::ProductionLineMissed] =
       QString("Не удалось найти производственную линию.");
   MessageTable[ReturnStatus::ProductionLineLinkError] =
       QString("Не удалось связать производственную линию с боксом.");
   MessageTable[ReturnStatus::ProductionLineRollbackLimit] = QString(
       "Производственная линия находится на первом транспондере в боксе.");
+
   MessageTable[ReturnStatus::OrderRemovingError] =
       QString("Не удалось удалить заказ.");
   MessageTable[ReturnStatus::OtherOrderInProcess] =
       QString("В процессе сборки находится другой заказ.");
   MessageTable[ReturnStatus::OrderNotInProcess] =
       QString("Сборка заказа не была запущена.");
+
   MessageTable[ReturnStatus::MultipleActiveOrders] =
       QString("В процессе сборки находится несколько заказов.");
   MessageTable[ReturnStatus::FreeBoxMissed] =
       QString("Не удалось найти свободный бокс.");
   MessageTable[ReturnStatus::UnknownError] = QString("Неизвествная ошибка. ");
-  MessageTable[ReturnStatus::NoError] = QString("Выполнено. ");
-
-  //  StickerPrinterReturnStatusMatch.insert(
-  //      IStickerPrinter::ParameterError,
-  //      "Получены некорректные параметры для стикера.");
-  //  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
-  //                                         "Не удалось распечать стикер.");
-  //  StickerPrinterReturnStatusMatch.insert(
-  //      IStickerPrinter::LibraryMissed,
-  //      "Отсутствует библиотека для работы с принтером стикеров.");
-  //  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
-  //                                         "Не удалось подключиться к
-  //                                         принтеру.");
-  //  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::NoError,
-  //                                         "Выполнено.");
 }
 
 void InteractionSystem::processReturnStatus(ReturnStatus ret) {

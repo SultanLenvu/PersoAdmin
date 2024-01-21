@@ -1,6 +1,6 @@
 #include "hash_table_model.h"
 
-HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
+HashTableModel::HashTableModel(QObject* parent) : QAbstractTableModel(parent) {}
 
 HashTableModel::~HashTableModel() {}
 

@@ -9,7 +9,7 @@
 
 #include <QString>
 
-#include "Database/database_query_table.h"
+#include "Database/sql_query_values.h"
 #include "General/hash_table_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
@@ -22,20 +22,23 @@ class MainWindowKernel : public QMainWindow {
   QSize DesktopGeometry;
   AbstractGUI* CurrentGUI;
 
+  // Верхнее меню главного окна
+  //===========================================
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
   QAction* SettingsAction;
   QAction* AboutProgramAction;
   QAction* RequestAuthorizationGuiAction;
+  //===========================================
 
-  InteractionSystem* Interactor;
+  std::unique_ptr<InteractionSystem> Interactor;
 
-  QThread* ManagerThread;
-  AdminManager* Manager;
+  std::unique_ptr<QThread> ManagerThread;
+  std::unique_ptr<AdminManager> Manager;
 
-  QThread* LoggerThread;
-  LogSystem* Logger;
+  std::unique_ptr<QThread> LoggerThread;
+  std::unique_ptr<LogSystem> Logger;
 
   SqlQueryValues* RandomModel;
   SqlQueryValues* OrderModel;
@@ -44,9 +47,9 @@ class MainWindowKernel : public QMainWindow {
   SqlQueryValues* TransponderModel;
   SqlQueryValues* StickerModel;
 
-  HashModel* TransponderData;
+  HashTableModel* TransponderData;
 
-  StringDictionary* MatchingTable;
+  StringDictionary MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
@@ -72,10 +75,13 @@ class MainWindowKernel : public QMainWindow {
 
   // Функционал для работы с производственными линиями
   void createNewProductionLinePushButton_slot(void);
-  void startProductionLinePushButton_slot(void);
+
+  void activateProductionLinePushButton_slot(void);
+  void activateAllProductionLinesPushButton_slot(void);
+
   void deactivateProductionLinePushButton_slot(void);
-  void stopProductionLinePushButton_slot(void);
   void deactivateAllProductionLinesPushButton_slot(void);
+
   void editProductionLinesPushButton_slot(void);
   void updateProductionLineViewPushButton_slot(void);
 

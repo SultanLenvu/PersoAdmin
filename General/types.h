@@ -17,21 +17,22 @@ enum class ProductionLineState {
 
 enum class ReturnStatus {
   NoError,
+
   ParameterError,
+  DynamicLibraryMissing,
+  StickerPrinterConnectionError,
+  StickerPrintingFailed,
 
   DatabaseConnectionError,
   DatabaseTransactionError,
   DatabaseQueryError,
 
   RegisterFileError,
-  TransponderMissed,
 
+  TransponderMissed,
   BoxMissed,
   PalletMissed,
   OrderMissed,
-
-  OrderAlreadyReleased,
-  OrderNotReleased,
 
   ProductionLineMissed,
   ProductionLineLinkError,

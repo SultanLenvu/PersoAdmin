@@ -1,6 +1,6 @@
 #include <QSqlRecord>
 
-#include "database_query_table.h"
+#include "sql_query_values.h"
 
 SqlQueryValues::SqlQueryValues(QObject* parent) : QAbstractTableModel{parent} {}
 
@@ -92,7 +92,7 @@ void SqlQueryValues::extractRecords(QSqlQuery& request) {
 
 void SqlQueryValues::add(const StringDictionary& record) {
   for (StringDictionary::const_iterator it = record.constBegin();
-       it != record.constEnd(); it++) {
+       it != record.constEnd(); ++it) {
     add(it.key(), it.value());
   }
 }

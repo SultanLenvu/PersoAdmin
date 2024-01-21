@@ -1,5 +1,5 @@
-#ifndef DATABASE_QUERY_TABLE_H
-#define DATABASE_QUERY_TABLE_H
+#ifndef SQL_QUERY_VALUES_H
+#define SQL_QUERY_VALUES_H
 
 #include <QAbstractTableModel>
 #include <QHash>
@@ -55,4 +55,4 @@ class SqlQueryValues : public QAbstractTableModel {
  signals:
 };
 
-#endif  // DATABASE_QUERY_TABLE_H
+#endif  // SQL_QUERY_VALUES_H

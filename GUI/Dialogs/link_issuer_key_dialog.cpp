@@ -22,11 +22,11 @@ LinkIssuerKeyDialog::LinkIssuerKeyDialog(QWidget* parent)
 
 LinkIssuerKeyDialog::~LinkIssuerKeyDialog() {}
 
-void LinkIssuerKeyDialog::getData(StringDictionary* data) const {
-  data->insert("issuer_id", IssuerIdLineEdit->text());
-  data->insert("key_table",
-               MatchingTable.value(KeyChoiceComboBox->currentText()));
-  data->insert("key_group_id", KeyGroupLineEdit->text());
+void LinkIssuerKeyDialog::getData(StringDictionary& data) const {
+  data.insert("issuer_id", IssuerIdLineEdit->text());
+  data.insert("key_table",
+              MatchingTable.value(KeyChoiceComboBox->currentText()));
+  data.insert("key_group_id", KeyGroupLineEdit->text());
 }
 
 AbstractInputDialog::InputDialogType LinkIssuerKeyDialog::type() const {

@@ -1,14 +1,20 @@
 #include "postgre_sql_table.h"
+#include "global_environment.h"
+#include "log_system.h"
 
 PostgreSqlTable::PostgreSqlTable(const QString& name,
                                  const QString& connectionName)
-    : AbstractSqlTable(nullptr) {
-  setObjectName(name);
+    : AbstractSqlTable(name) {
   loadSettings();
 
   ConnectionName = connectionName;
   RecordMaxCount = 1000;
   CurrentOrder = "ASC";
+
+  connect(this, &PostgreSqlTable::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
 
 PostgreSqlTable::~PostgreSqlTable() {}
@@ -111,7 +117,7 @@ void PostgreSqlTable::applySettings() {
   loadSettings();
 }
 
-bool PostgreSqlTable::createRecords(const SqlQueryValues& records) const {
+bool PostgreSqlTable::createRecords(const SqlQueryValues& records) {
   if (!checkFieldNames(records)) {
     return false;
   }
@@ -138,7 +144,7 @@ bool PostgreSqlTable::createRecords(const SqlQueryValues& records) const {
   return true;
 }
 
-bool PostgreSqlTable::readRecords(SqlQueryValues& response) const {
+bool PostgreSqlTable::readRecords(SqlQueryValues& response) {
   // Создаем запрос
   QString requestText = QString("SELECT * FROM public.%1 ORDER BY %2 %3 ")
                             .arg(objectName(), PrimaryKey, CurrentOrder);
@@ -161,7 +167,7 @@ bool PostgreSqlTable::readRecords(SqlQueryValues& response) const {
 }
 
 bool PostgreSqlTable::readRecords(const QString& conditions,
-                                  SqlQueryValues& response) const {
+                                  SqlQueryValues& response) {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 WHERE %2 ORDER BY %3 %4 ")
@@ -184,7 +190,7 @@ bool PostgreSqlTable::readRecords(const QString& conditions,
   return true;
 }
 
-bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) const {
+bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) {
   // Создаем запрос
   QString requestText =
       QString("SELECT * FROM public.%1 ORDER BY %2 ASC LIMIT 1;")
@@ -203,7 +209,7 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) const {
   return true;
 }
 
-bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) const {
+bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
   if (!checkFieldNames(newValues)) {
     sendLog("Получено неизвестное имя поля таблицы. ");
     return false;
@@ -234,7 +240,7 @@ bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) const {
 }
 
 bool PostgreSqlTable::updateRecords(const QString& condition,
-                                    const SqlQueryValues& newValues) const {
+                                    const SqlQueryValues& newValues) {
   if (!checkFieldNames(newValues)) {
     sendLog("Получено неизвестное имя поля таблицы. ");
     return false;
@@ -266,7 +272,7 @@ bool PostgreSqlTable::updateRecords(const QString& condition,
   return true;
 }
 
-bool PostgreSqlTable::deleteRecords(const QString& condition) const {
+bool PostgreSqlTable::deleteRecords(const QString& condition) {
   // Создаем запрос
   QString requestText =
       QString("DELETE FROM public.%1 WHERE %2;").arg(objectName(), condition);
@@ -283,7 +289,7 @@ bool PostgreSqlTable::deleteRecords(const QString& condition) const {
   return true;
 }
 
-bool PostgreSqlTable::clear() const {
+bool PostgreSqlTable::clear() {
   // Создаем запрос
   QString requestText = QString("DELETE FROM public.%1;").arg(objectName());
 
@@ -299,7 +305,7 @@ bool PostgreSqlTable::clear() const {
   return true;
 }
 
-bool PostgreSqlTable::getRecordCount(uint32_t& count) const {
+bool PostgreSqlTable::getRecordCount(uint32_t& count) {
   // Создаем запрос
   QString requestText =
       QString("SELECT COUNT(*) FROM public.%1;").arg(objectName());
@@ -319,17 +325,12 @@ bool PostgreSqlTable::getRecordCount(uint32_t& count) const {
   return true;
 }
 
-void PostgreSqlTable::sendLog(const QString& log) const {
-  if (LogEnable) {
-    emit const_cast<PostgreSqlTable*>(this)->logging(
-        QString("Table %1 - %2").arg(objectName(), log));
-  }
+void PostgreSqlTable::sendLog(const QString& log) {
+  emit logging(QString("Table %1 - %2").arg(objectName(), log));
 }
 
 void PostgreSqlTable::loadSettings() {
   QSettings settings;
-
-  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
 bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
@@ -342,10 +343,9 @@ bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
   return true;
 }
 
-bool PostgreSqlTable::checkFieldNames(
-    const StringDictionary& record) const {
+bool PostgreSqlTable::checkFieldNames(const StringDictionary& record) const {
   for (StringDictionary::const_iterator it = record.constBegin();
-       it != record.constEnd(); it++) {
+       it != record.constEnd(); ++it) {
     if (!Columns.contains(it.key())) {
       return false;
     }

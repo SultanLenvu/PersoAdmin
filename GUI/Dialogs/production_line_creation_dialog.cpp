@@ -21,12 +21,11 @@ ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
 
 ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
-void ProductionLineCreationDialog::getData(
-    StringDictionary* data) const {
-  data->insert("login", LoginLineEdit->text());
-  data->insert("password", PasswordLineEdit->text());
-  data->insert("name", NameLineEdit->text());
-  data->insert("surname", SurnameLineEdit->text());
+void ProductionLineCreationDialog::getData(StringDictionary& data) const {
+  data.insert("login", LoginLineEdit->text());
+  data.insert("password", PasswordLineEdit->text());
+  data.insert("name", NameLineEdit->text());
+  data.insert("surname", SurnameLineEdit->text());
 }
 
 AbstractInputDialog::InputDialogType ProductionLineCreationDialog::type()

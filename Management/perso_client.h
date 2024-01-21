@@ -15,7 +15,7 @@
 #include <QTcpSocket>
 #include <QTimer>
 
-#include "General/definitions.h"
+#include "types.h"
 
 class PersoClient : public QObject
 {

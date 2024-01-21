@@ -8,8 +8,8 @@
 #include <QSettings>
 #include <QThread>
 
+#include "abstract_sticker_printer.h"
 #include "administration_system.h"
-#include "isticker_printer.h"
 #include "perso_client.h"
 #include "types.h"
 
@@ -21,9 +21,7 @@ class AdminManager : public QObject {
   QHash<ReturnStatus, QString> AdministratorReturnStatusMatch;
 
   //  PersoClient* Client;
-
-  std::unique_ptr<IStickerPrinter> StickerPrinter;
-  QHash<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
+  std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
 
  public:
   AdminManager(const QString& name);
@@ -106,13 +104,6 @@ class AdminManager : public QObject {
   void createAdministrator(void);
   void createClient(void);
   void createStickerPrinter(void);
-
-  void processAdministratorError(ReturnStatus status,
-                                 const QString& operationName);
-  void processClientError(PersoClient::ReturnStatus status,
-                          const QString& operationName);
-  void processStickerPrinterError(IStickerPrinter::ReturnStatus status,
-                                  const QString& operationName);
 
  signals:
   void logging(const QString& log);

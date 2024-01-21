@@ -20,7 +20,7 @@ PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
 
 PanInputDialog::~PanInputDialog() {}
 
-void PanInputDialog::getData(StringDictionary* data) const {
+void PanInputDialog::getData(StringDictionary& data) const {
   QString pan;
   QStringList input = StickerData->toPlainText().split("\n");
 
@@ -30,7 +30,7 @@ void PanInputDialog::getData(StringDictionary* data) const {
     pan = input.at(0);
   }
 
-  data->insert("pan", pan);
+  data.insert("pan", pan);
 }
 
 AbstractInputDialog::InputDialogType PanInputDialog::type() const {

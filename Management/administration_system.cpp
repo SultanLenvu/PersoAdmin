@@ -1,7 +1,9 @@
 #include "administration_system.h"
-#include "database_query_table.h"
 #include "definitions.h"
+#include "global_environment.h"
 #include "log_system.h"
+#include "postgre_sql_database.h"
+#include "sql_query_values.h"
 
 AdministrationSystem::AdministrationSystem(const QString& name)
     : QObject(nullptr) {
@@ -9,6 +11,11 @@ AdministrationSystem::AdministrationSystem(const QString& name)
   loadSettings();
 
   createDatabase();
+
+  connect(this, &AdministrationSystem::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
 
 void AdministrationSystem::applySettings() {
@@ -36,7 +43,7 @@ ReturnStatus AdministrationSystem::disconnectDatabase() {
 }
 
 ReturnStatus AdministrationSystem::getTable(const QString& tableName,
-                                            SqlQueryValues* response) {
+                                            SqlQueryValues& response) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
@@ -44,7 +51,7 @@ ReturnStatus AdministrationSystem::getTable(const QString& tableName,
 
   Database->setCurrentOrder(Qt::AscendingOrder);
   Database->setRecordMaxCount(0);
-  if (!Database->readRecords(tableName, *response)) {
+  if (!Database->readRecords(tableName, response)) {
     sendLog(QString("Получена ошибка при получении данных из таблицы %1. ")
                 .arg(tableName));
     Database->rollbackTransaction();
@@ -60,13 +67,13 @@ ReturnStatus AdministrationSystem::getTable(const QString& tableName,
 }
 
 ReturnStatus AdministrationSystem::getCustomResponse(const QString& req,
-                                                     SqlQueryValues* response) {
+                                                     SqlQueryValues& response) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
   }
 
-  if (!Database->execCustomRequest(req, *response)) {
+  if (!Database->execCustomRequest(req, response)) {
     sendLog("Получена ошибка при выполнении кастомного запроса. ");
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseQueryError;
@@ -81,14 +88,14 @@ ReturnStatus AdministrationSystem::getCustomResponse(const QString& req,
 }
 
 ReturnStatus AdministrationSystem::createNewOrder(
-    const std::shared_ptr<StringDictionary> orderParameters) {
+    const StringDictionary& param) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
   }
 
   sendLog("Добавление заказа. ");
-  if (!addOrder(orderParameters)) {
+  if (!addOrder(param)) {
     sendLog("Получена ошибка при добавлении заказа. ");
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseQueryError;
@@ -171,7 +178,7 @@ ReturnStatus AdministrationSystem::stopOrderAssembling(const QString& orderId) {
 }
 
 ReturnStatus AdministrationSystem::createNewProductionLine(
-    const StringDictionary* productionLineParameters) {
+    const StringDictionary& param) {
   if (!Database->openTransaction()) {
     sendLog("Получена ошибка при открытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
@@ -179,7 +186,7 @@ ReturnStatus AdministrationSystem::createNewProductionLine(
 
   // Добавляем линию производства
   sendLog("Создание новой линии производства. ");
-  if (!addProductionLine(productionLineParameters)) {
+  if (!addProductionLine(param)) {
     sendLog("Получена ошибка при добавлении производственной линии. ");
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseQueryError;
@@ -193,7 +200,7 @@ ReturnStatus AdministrationSystem::createNewProductionLine(
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::activateAllProductionLines() const {
+ReturnStatus AdministrationSystem::activateAllProductionLines() {
   SqlQueryValues productionLineNewValues;
 
   if (!Database->openTransaction()) {
@@ -209,26 +216,6 @@ ReturnStatus AdministrationSystem::activateAllProductionLines() const {
         "Получена ошибка при обновлении данных в таблице production_lines."));
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseTransactionError;
-  }
-
-  sendLog(QString("Все линии производства остановлены. "));
-  if (!Database->commitTransaction()) {
-    sendLog("Получена ошибка при закрытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-  return ReturnStatus::NoError;
-}
-
-ReturnStatus AdministrationSystem::deactivateAllProductionLines() const {
-  if (!Database->openTransaction()) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-
-  sendLog("Отключение всех производственных линий. ");
-  if (!stopAllProductionLines()) {
-    Database->rollbackTransaction();
-    return ReturnStatus::DatabaseQueryError;
   }
 
   sendLog(QString("Все линии производства остановлены. "));
@@ -291,6 +278,26 @@ ReturnStatus AdministrationSystem::deactivateProductionLine(const QString& id) {
   }
 
   sendLog(QString("Линия производства %1 остановлена. ").arg(id));
+  if (!Database->commitTransaction()) {
+    sendLog("Получена ошибка при закрытии транзакции. ");
+    return ReturnStatus::DatabaseTransactionError;
+  }
+  return ReturnStatus::NoError;
+}
+
+ReturnStatus AdministrationSystem::deactivateAllProductionLines() {
+  if (!Database->openTransaction()) {
+    sendLog("Получена ошибка при открытии транзакции. ");
+    return ReturnStatus::DatabaseTransactionError;
+  }
+
+  sendLog("Отключение всех производственных линий. ");
+  if (!stopAllProductionLines()) {
+    Database->rollbackTransaction();
+    return ReturnStatus::DatabaseQueryError;
+  }
+
+  sendLog(QString("Все линии производства остановлены. "));
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;
@@ -406,7 +413,7 @@ ReturnStatus AdministrationSystem::initTransportMasterKeysTable() {
 }
 
 ReturnStatus AdministrationSystem::linkIssuerWithMasterKeys(
-    const StringDictionary* linkParameters) {
+    const StringDictionary& param) {
   SqlQueryValues issuerNewValue;
 
   if (!Database->openTransaction()) {
@@ -415,28 +422,25 @@ ReturnStatus AdministrationSystem::linkIssuerWithMasterKeys(
     return ReturnStatus::DatabaseTransactionError;
   }
 
-  sendLog(QString("Обновление записи эмитента %1.")
-              .arg(linkParameters->value("issuer_id")));
-  if (linkParameters->value("key_table") == "transport_master_keys") {
-    issuerNewValue.add("transport_master_keys_id",
-                       linkParameters->value("key_group_id"));
+  sendLog(
+      QString("Обновление записи эмитента %1.").arg(param.value("issuer_id")));
+  if (param.value("key_table") == "transport_master_keys") {
+    issuerNewValue.add("transport_master_keys_id", param.value("key_group_id"));
   } else {
     issuerNewValue.add("commercial_master_keys_id",
-                       linkParameters->value("key_group_id"));
+                       param.value("key_group_id"));
   }
 
-  if (!Database->updateRecords("issuers",
-                               "id = " + linkParameters->value("issuer_id"),
+  if (!Database->updateRecords("issuers", "id = " + param.value("issuer_id"),
                                issuerNewValue)) {
     sendLog(QString("Получена ошибка при обновлении записи эмитента %1.")
-                .arg(linkParameters->value("issuer_id")));
+                .arg(param.value("issuer_id")));
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseQueryError;
   }
 
   sendLog(QString("Эмитент %1 успешно связан с мастер ключами %2. ")
-              .arg(linkParameters->value("issuer_id"),
-                   linkParameters->value("key_group_id")));
+              .arg(param.value("issuer_id"), param.value("key_group_id")));
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     Database->rollbackTransaction();
@@ -446,7 +450,7 @@ ReturnStatus AdministrationSystem::linkIssuerWithMasterKeys(
 }
 
 ReturnStatus AdministrationSystem::getTransponderData(const QString& id,
-                                                      StringDictionary* data) {
+                                                      StringDictionary& data) {
   QStringList tables{"transponders", "boxes", "pallets", "orders"};
   SqlQueryValues record;
   uint32_t quantity;
@@ -469,13 +473,13 @@ ReturnStatus AdministrationSystem::getTransponderData(const QString& id,
   }
 
   // Данные переносимые без изменений
-  data->insert("box_id", record.get("box_id"));
-  data->insert("pallet_id", record.get("pallet_id"));
-  data->insert("order_id", record.get("order_id"));
+  data.insert("box_id", record.get("box_id"));
+  data.insert("pallet_id", record.get("pallet_id"));
+  data.insert("order_id", record.get("order_id"));
 
   // Удаляем пробелы из названия модели
   QString tempModel = record.get("transponder_model");
-  data->insert("transponder_model", tempModel.remove(" "));
+  data.insert("transponder_model", tempModel.remove(" "));
 
   // Преобразуем в десятичный формат
   QString manufacturerId =
@@ -494,22 +498,22 @@ ReturnStatus AdministrationSystem::getTransponderData(const QString& id,
       QString("%1").arg(record.get("transponders.id"), 10, QChar('0'));
 
   // Конструируем серийный номер транспондера
-  data->insert("sn",
-               QString("%1%2%3").arg(manufacturerId, batteryInsertationDate,
-                                     extendedTransponderId));
+  data.insert("sn",
+              QString("%1%2%3").arg(manufacturerId, batteryInsertationDate,
+                                    extendedTransponderId));
 
   // Вычленяем символ F из personal_account_number
   QString tempPan = record.get("personal_account_number");
-  data->insert("pan", tempPan.remove(QChar('F')));
+  data.insert("pan", tempPan.remove(QChar('F')));
 
   // Название компании-заказчика
-  data->insert("issuer_name", record.get("issuers.name"));
+  data.insert("issuer_name", record.get("issuers.name"));
 
   return ReturnStatus::NoError;
 }
 
 ReturnStatus AdministrationSystem::getBoxData(const QString& id,
-                                              StringDictionary* data) {
+                                              StringDictionary& data) {
   SqlQueryValues box;
   SqlQueryValues transponders;
   StringDictionary transponderData;
@@ -521,8 +525,8 @@ ReturnStatus AdministrationSystem::getBoxData(const QString& id,
   }
 
   // Сохраняем данные бокса
-  data->insert("id", id);
-  data->insert("assembled_units", box.get("assembled_units"));
+  data.insert("id", id);
+  data.insert("assembled_units", box.get("assembled_units"));
 
   // Ищем транспондеры в боксе
   Database->setCurrentOrder(Qt::AscendingOrder);
@@ -536,7 +540,7 @@ ReturnStatus AdministrationSystem::getBoxData(const QString& id,
   }
 
   // Запрашиваем данные транспондера
-  if (getTransponderData(transponders.get("id"), &transponderData) !=
+  if (getTransponderData(transponders.get("id"), transponderData) !=
       ReturnStatus::NoError) {
     emit logging(
         QString("Получена ошибка при получении данных транспондера %1. ")
@@ -546,11 +550,11 @@ ReturnStatus AdministrationSystem::getBoxData(const QString& id,
   }
 
   // Сохраняем серийник первого транспондера в боксе
-  data->insert("first_transponder_sn", transponderData.value("sn"));
+  data.insert("first_transponder_sn", transponderData.value("sn"));
   transponderData.clear();
 
   // Запрашиваем данные транспондера
-  if (getTransponderData(transponders.getLast("id"), &transponderData) !=
+  if (getTransponderData(transponders.getLast("id"), transponderData) !=
       ReturnStatus::NoError) {
     emit logging(
         QString("Получена ошибка при получении данных транспондера %1. ")
@@ -561,17 +565,17 @@ ReturnStatus AdministrationSystem::getBoxData(const QString& id,
   }
 
   // Сохраняем серийник последнего транспондера в боксе
-  data->insert("last_transponder_sn", transponderData.value("sn"));
+  data.insert("last_transponder_sn", transponderData.value("sn"));
 
   // Сохраняем модель транспондера
   QString modelTemp = transponderData.value("transponder_model");
-  data->insert("transponder_model", modelTemp.remove(' '));
+  data.insert("transponder_model", modelTemp.remove(' '));
 
   return ReturnStatus::NoError;
 }
 
 ReturnStatus AdministrationSystem::getPalletData(const QString& id,
-                                                 StringDictionary* data) {
+                                                 StringDictionary& data) {
   SqlQueryValues boxes;
   SqlQueryValues pallet;
   SqlQueryValues order;
@@ -592,13 +596,13 @@ ReturnStatus AdministrationSystem::getPalletData(const QString& id,
   }
 
   // Сохраняем данные паллеты
-  data->insert("id", id);
+  data.insert("id", id);
   QStringList tempDate = pallet.get("assembling_end").split("T");
-  data->insert(
+  data.insert(
       "assembly_date",
       QDate::fromString(tempDate.first(), "yyyy-MM-dd").toString("dd.MM.yyyy"));
   QString tempModel = order.get("transponder_model");
-  data->insert("transponder_model", tempModel.remove(" "));
+  data.insert("transponder_model", tempModel.remove(" "));
 
   // Ищем боксы в паллете
   Database->setCurrentOrder(Qt::AscendingOrder);
@@ -612,14 +616,14 @@ ReturnStatus AdministrationSystem::getPalletData(const QString& id,
   }
 
   // Сохраняем идентификатор первого бокса
-  data->insert("first_box_id", boxes.get("id"));
+  data.insert("first_box_id", boxes.get("id"));
 
   // Сохраняем идентификатор последнего бокса
-  data->insert("last_box_id", boxes.getLast("id"));
+  data.insert("last_box_id", boxes.getLast("id"));
   uint32_t totalQuantity =
       pallet.get("assembled_units").toInt() * boxes.get("quantity").toInt();
 
-  data->insert("quantity", QString::number(totalQuantity));
+  data.insert("quantity", QString::number(totalQuantity));
 
   return ReturnStatus::NoError;
 }
@@ -1136,11 +1140,11 @@ ReturnStatus AdministrationSystem::refundOrder(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::shipPallets(const StringDictionary* param) {
+ReturnStatus AdministrationSystem::shipPallets(const StringDictionary& param) {
   ReturnStatus ret;
   QString ShipmentRegisterName =
       QString("sr_pallets_%1_%2.csv")
-          .arg(param->value("first_pallet_id"), param->value("last_pallet_id"));
+          .arg(param.value("first_pallet_id"), param.value("last_pallet_id"));
   QFile file(ShipmentRegisterName);
   QTextStream out(&file);
 
@@ -1157,8 +1161,8 @@ ReturnStatus AdministrationSystem::shipPallets(const StringDictionary* param) {
     return ReturnStatus::DatabaseTransactionError;
   }
 
-  for (uint32_t i = param->value("first_pallet_id").toUInt();
-       i <= param->value("last_pallet_id").toUInt(); i++) {
+  for (uint32_t i = param.value("first_pallet_id").toUInt();
+       i <= param.value("last_pallet_id").toUInt(); i++) {
     sendLog(QString("Отгрузка паллеты %1.").arg(QString::number(i)));
     ret = shipPallet(QString::number(i), out);
     if (ret != ReturnStatus::NoError) {
@@ -1183,22 +1187,16 @@ void AdministrationSystem::loadSettings() {
   QSettings settings;
 
   ShipmentRegisterDir = "/ShipmentRegisters/";
-  LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
-void AdministrationSystem::sendLog(const QString& log) const {
-  if (LogEnable) {
-    emit const_cast<AdministrationSystem*>(this)->logging(
-        QString("%1 - %2").arg(objectName(), log));
-  }
+void AdministrationSystem::sendLog(const QString& log) {
+  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
-bool AdministrationSystem::addOrder(
-    const std::shared_ptr<StringDictionary> orderParameters) const {
-  uint32_t transponderCount =
-      orderParameters->value("transponder_quantity").toInt();
-  uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
-  uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
+bool AdministrationSystem::addOrder(const StringDictionary& param) {
+  uint32_t transponderCount = param.value("transponder_quantity").toInt();
+  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
+  uint32_t boxCapacity = param.value("box_capacity").toInt();
   uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
   SqlQueryValues issuerRecord;
   SqlQueryValues orderRecord;
@@ -1207,11 +1205,10 @@ bool AdministrationSystem::addOrder(
 
   // Ищем заказчика
   if (!Database->readRecords(
-          "issuers",
-          QString("name = '%1'").arg(orderParameters->value("issuer_name")),
+          "issuers", QString("name = '%1'").arg(param.value("issuer_name")),
           issuerRecord)) {
     sendLog(QString("Получена ошибка при поиске эмитента \"%1\".")
-                .arg(orderParameters->value("issuer_name")));
+                .arg(param.value("issuer_name")));
     return false;
   }
 
@@ -1223,33 +1220,28 @@ bool AdministrationSystem::addOrder(
   newOrderValues.add("issuer_id", issuerRecord.get("id"));
   newOrderValues.add("quantity", QString::number(orderCapacity));
   newOrderValues.add("full_personalization",
-                     orderParameters->value("full_personalization"));
+                     param.value("full_personalization"));
   newOrderValues.add(
       "transponder_model",
-      orderParameters->value("transponder_model")
+      param.value("transponder_model")
           .rightJustified(TRANSPONDER_MODEL_CHAR_LENGTH, QChar(' ')));
-  newOrderValues.add("accr_reference",
-                     orderParameters->value("accr_reference"));
-  newOrderValues.add("equipment_class",
-                     orderParameters->value("equipment_class"));
-  newOrderValues.add("manufacturer_id",
-                     orderParameters->value("manufacturer_id"));
+  newOrderValues.add("accr_reference", param.value("accr_reference"));
+  newOrderValues.add("equipment_class", param.value("equipment_class"));
+  newOrderValues.add("manufacturer_id", param.value("manufacturer_id"));
   if (!Database->createRecords("orders", newOrderValues)) {
     sendLog("Получена ошибка при добавлении заказа. ");
     return false;
   }
 
   // Добавляем паллеты в заказ
-  return addPallets(newOrderValues.get("id"), orderParameters);
+  return addPallets(newOrderValues.get("id"), param);
 }
 
-bool AdministrationSystem::addPallets(
-    const QString& orderId,
-    const std::shared_ptr<StringDictionary> orderParameters) const {
-  uint32_t transponderCount =
-      orderParameters->value("transponder_quantity").toInt();
-  uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
-  uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
+bool AdministrationSystem::addPallets(const QString& orderId,
+                                      const StringDictionary& param) {
+  uint32_t transponderCount = param.value("transponder_quantity").toInt();
+  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
+  uint32_t boxCapacity = param.value("box_capacity").toInt();
   uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
   SqlQueryValues newPalletValues;
   int32_t lastId = 0;
@@ -1272,7 +1264,7 @@ bool AdministrationSystem::addPallets(
   }
 
   // Открываем PAN-файл
-  QFile panFile(orderParameters->value("pan_file_path"));
+  QFile panFile(param.value("pan_file_path"));
   if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     sendLog("Получена ошибка при открытии PAN-файла. ");
     return false;
@@ -1281,7 +1273,7 @@ bool AdministrationSystem::addPallets(
 
   // Добавляем боксы в паллеты
   for (uint32_t i = 0; i < orderCapacity; i++) {
-    if (!addBoxes(newPalletValues.get(i, "id"), orderParameters, panSource)) {
+    if (!addBoxes(newPalletValues.get(i, "id"), param, panSource)) {
       sendLog(QString("Получена ошибка при добавлении боксов в паллету %1. ")
                   .arg(newPalletValues.get(i, "id")));
       return false;
@@ -1291,12 +1283,11 @@ bool AdministrationSystem::addPallets(
   return true;
 }
 
-bool AdministrationSystem::addBoxes(
-    const QString& palletId,
-    const std::shared_ptr<StringDictionary> orderParameters,
-    QTextStream& panSource) const {
-  uint32_t palletCapacity = orderParameters->value("pallet_capacity").toInt();
-  uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
+bool AdministrationSystem::addBoxes(const QString& palletId,
+                                    const StringDictionary& param,
+                                    QTextStream& panSource) {
+  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
+  uint32_t boxCapacity = param.value("box_capacity").toInt();
   SqlQueryValues newBoxValues;
   int32_t lastId = 0;
 
@@ -1324,7 +1315,7 @@ bool AdministrationSystem::addBoxes(
       pans->append(
           panSource.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
     }
-    if (!addTransponders(newBoxValues.get(i, "id"), pans, orderParameters)) {
+    if (!addTransponders(newBoxValues.get(i, "id"), pans, param)) {
       sendLog(
           QString("Получена ошибка при добавлении транспондеров в бокса %1. ")
               .arg(newBoxValues.get(i, "id")));
@@ -1337,9 +1328,9 @@ bool AdministrationSystem::addBoxes(
 
 bool AdministrationSystem::addTransponders(
     const QString& boxId,
-    const std::shared_ptr<QVector<QString>> pans,
-    const std::shared_ptr<StringDictionary> orderParameters) const {
-  uint32_t boxCapacity = orderParameters->value("box_capacity").toInt();
+    const std::shared_ptr<QVector<QString>>& pans,
+    const StringDictionary& param) {
+  uint32_t boxCapacity = param.value("box_capacity").toInt();
   int32_t lastId = 0;
   SqlQueryValues newTransponders;
 
@@ -1365,8 +1356,7 @@ bool AdministrationSystem::addTransponders(
   return true;
 }
 
-bool AdministrationSystem::addProductionLine(
-    const StringDictionary* productionLineParameters) const {
+bool AdministrationSystem::addProductionLine(const StringDictionary& param) {
   SqlQueryValues newProductionLine;
   int32_t lastId = 0;
 
@@ -1374,11 +1364,10 @@ bool AdministrationSystem::addProductionLine(
   lastId = getLastId("production_lines");
 
   // Создаем новую линию производства
-  newProductionLine.add("login", productionLineParameters->value("login"));
-  newProductionLine.add("password",
-                        productionLineParameters->value("password"));
-  newProductionLine.add("name", productionLineParameters->value("name"));
-  newProductionLine.add("surname", productionLineParameters->value("surname"));
+  newProductionLine.add("login", param.value("login"));
+  newProductionLine.add("password", param.value("password"));
+  newProductionLine.add("name", param.value("name"));
+  newProductionLine.add("surname", param.value("surname"));
   newProductionLine.add("id", QString::number(lastId + 1));
   newProductionLine.add("box_id", "NULL");
   newProductionLine.add("in_process", "false");
@@ -1392,7 +1381,7 @@ bool AdministrationSystem::addProductionLine(
   return true;
 }
 
-int32_t AdministrationSystem::getLastId(const QString& table) const {
+int32_t AdministrationSystem::getLastId(const QString& table) {
   SqlQueryValues record;
 
   Database->setRecordMaxCount(1);
@@ -1421,7 +1410,7 @@ int32_t AdministrationSystem::getLastId(const QString& table) const {
   Database->setCurrentOrder(Qt::AscendingOrder);
 }
 
-bool AdministrationSystem::stopAllProductionLines() const {
+bool AdministrationSystem::stopAllProductionLines() {
   SqlQueryValues productionLineNewValues;
 
   productionLineNewValues.add("in_process", "false");
@@ -1439,7 +1428,7 @@ bool AdministrationSystem::stopAllProductionLines() const {
   return true;
 }
 
-bool AdministrationSystem::startOrderProcessing(const QString& id) const {
+bool AdministrationSystem::startOrderProcessing(const QString& id) {
   SqlQueryValues orderRecord;
 
   orderRecord.add("in_process", "true");
@@ -1451,7 +1440,7 @@ bool AdministrationSystem::startOrderProcessing(const QString& id) const {
   return true;
 }
 
-bool AdministrationSystem::stopOrderProcessing(const QString& id) const {
+bool AdministrationSystem::stopOrderProcessing(const QString& id) {
   SqlQueryValues order;
   SqlQueryValues orderNewValues;
 
@@ -1535,7 +1524,6 @@ ReturnStatus AdministrationSystem::shipPallet(const QString& id,
 }
 
 void AdministrationSystem::createDatabase() {
-  Database = new PostgreSqlDatabase(this, "AdministratorConnection");
-  connect(Database, &AbstractSqlDatabase::logging, LogSystem::instance(),
-          &LogSystem::generate);
+  Database = std::unique_ptr<AbstractSqlDatabase>(
+      new PostgreSqlDatabase("PostgreSqlDatabase", "AdministratorConnection"));
 }

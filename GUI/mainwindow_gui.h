@@ -207,8 +207,9 @@ class MainWindowGUI : public AbstractGUI {
   void createTransponderTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
-
   void createLog(void);
+
+  void connectDependecies(void);
 
  private slots:
   void rereleaseKeyComboBox_slot(const QString& text);

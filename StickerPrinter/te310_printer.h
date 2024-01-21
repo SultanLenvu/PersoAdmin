@@ -1,12 +1,12 @@
 #ifndef TE310PRINTER_H
 #define TE310PRINTER_H
 
+#include <QHostAddress>
 #include <QHostInfo>
 
-#include "General/definitions.h"
-#include "isticker_printer.h"
+#include "abstract_sticker_printer.h"
 
-class TE310Printer : public IStickerPrinter {
+class TE310Printer : public AbstractStickerPrinter {
   Q_OBJECT
 
  private:
@@ -15,44 +15,69 @@ class TE310Printer : public IStickerPrinter {
   typedef int (*TscOpenPort)(const char*);
   typedef int (*TscSendCommand)(const char*);
   typedef int (*TscClosePort)(void);
+#ifdef __linux__
+  typedef int (*TscOpenEthernet)(const char*, int);
+#endif /* __linux__ */
 
  private:
-  QString Name;
+#ifdef __linux__
+  QHostAddress IPAddress;
+  int Port;
+#endif /* __linux__ */
 
-  bool LibError;
   QString TscLibPath;
-  QLibrary* TscLib;
+  std::unique_ptr<QLibrary> TscLib;
 
-  StringDictionary LastTransponderSticker;
+  QHash<QString, QString> LastTransponderSticker;
+  QHash<QString, QString> LastBoxSticker;
+  QHash<QString, QString> LastPalletSticker;
 
   // Библиотечные функции
   TscAbout about;
   TscOpenPort openPort;
   TscSendCommand sendCommand;
   TscClosePort closePort;
+#ifdef __linux__
+  TscOpenEthernet openEthernet;
+#endif /* __linux__ */
 
  public:
-  explicit TE310Printer(QObject* parent, const QString& name);
+  explicit TE310Printer(const QString& name);
+#ifdef __linux__
+  explicit TE310Printer(QObject* parent, const QHostAddress& ip, int port);
+#endif /* __linux__ */
 
-  virtual bool checkConfiguration(void) override;
+  virtual bool init(void) override;
+
   virtual ReturnStatus printTransponderSticker(
-      const StringDictionary* parameters) override;
+      const StringDictionary& param) override;
   virtual ReturnStatus printLastTransponderSticker(void) override;
-  virtual ReturnStatus printBoxSticker(
-      const StringDictionary* parameters) override;
-  virtual ReturnStatus printPalletSticker(
-      const StringDictionary* parameters) override;
 
-  virtual ReturnStatus exec(const QStringList* commandScript) override;
+  virtual ReturnStatus printBoxSticker(const StringDictionary& param) override;
+  virtual ReturnStatus printLastBoxSticker(void) override;
+
+  virtual ReturnStatus printPalletSticker(
+      const StringDictionary& param) override;
+  virtual ReturnStatus printLastPalletSticker(void) override;
+
+  virtual ReturnStatus exec(const QStringList& commandScript) override;
 
   virtual void applySetting(void) override;
 
  private:
   Q_DISABLE_COPY_MOVE(TE310Printer);
   void loadSetting(void);
+  void sendLog(const QString& log);
+
   bool loadTscLib(void);
-  void printNkdSticker(const StringDictionary* parameters);
-  void printZsdSticker(const StringDictionary* parameters);
+  bool initConnectionByName();
+#ifdef __linux__
+  bool initConnectionByAddress();
+#endif /* __linux__ */
+  bool checkConfig(void);
+
+  void printNkdSticker(const StringDictionary& param);
+  void printZsdSticker(const StringDictionary& param);
 };
 
 #endif  // TE310PRINTER_H
