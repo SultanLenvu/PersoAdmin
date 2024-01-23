@@ -1,3 +1,5 @@
+#include "QNetworkDatagram"
+
 #include "log_system.h"
 #include "file_log_backend.h"
 #include "global_environment.h"
@@ -13,7 +15,16 @@ LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
   Backends.push_back(
       std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
 
+<<<<<<< Updated upstream
   GlobalEnvironment::instance()->registerObject(this);
+=======
+  UdpSocket = new QUdpSocket(this);
+  if (UdpListenEnable) {
+    UdpSocket->bind(UdpListenIp, UdpListenPort);
+  }
+  connect(UdpSocket, &QUdpSocket::readyRead, this,
+          &LogSystem::udpSocketReadyRead_slot);
+>>>>>>> Stashed changes
 }
 
 LogSystem::~LogSystem() {}
@@ -41,7 +52,11 @@ void LogSystem::applySettings() {
     UdpSocket->bind(UdpListenIp, UdpListenPort);
   }
 
+<<<<<<< Updated upstream
   for (auto it = Backends.begin(); it != Backends.end(); ++it) {
+=======
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
+>>>>>>> Stashed changes
     (*it)->applySettings();
   }
 }
@@ -63,6 +78,7 @@ void LogSystem::loadSettings() {
   }
 }
 
+<<<<<<< Updated upstream
 void LogSystem::createUdpSocket() {
   UdpSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
   UdpSocket->bind(UdpListenIp, UdpListenPort);
@@ -70,10 +86,19 @@ void LogSystem::createUdpSocket() {
           &LogSystem::udpSocketReadyRead_slot);
 }
 
+=======
+>>>>>>> Stashed changes
 void LogSystem::udpSocketReadyRead_slot() {
   QByteArray datagram;
-  datagram.resize(UdpSocket->bytesAvailable());
+  datagram.resize(UdpSocket->pendingDatagramSize());
 
   UdpSocket->readDatagram(datagram.data(), datagram.size());
-  generate(datagram);
+  generate(QString::fromUtf8(datagram));
+
+  // Другой рабочий вариант
+  //  QNetworkDatagram datagram;
+
+  //  datagram = UdpSocket->receiveDatagram();
+
+  //  generate(datagram.data());
 }

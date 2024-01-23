@@ -605,7 +605,7 @@ void MainWindowKernel::createMainWindowGUI() {
   }
   // Настраиваем размер главного окна
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
+              DesktopGeometry.width() * 0.7, DesktopGeometry.height() * 0.7);
 
   // Создаем интерфейс
   CurrentGUI = new MainWindowGUI(this);

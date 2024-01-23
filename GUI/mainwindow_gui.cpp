@@ -15,7 +15,7 @@ void MainWindowGUI::create() {
   createLog();
 
   // Настраиваем пропорции отображаемых элементов
-  MainLayout->setStretch(0, 3);
+  MainLayout->setStretch(0, 2);
   MainLayout->setStretch(1, 2);
 
   // Подключаем зависимости
