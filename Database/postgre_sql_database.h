@@ -12,7 +12,6 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   Q_OBJECT
 
  private:
-  bool LogEnable;
   QString CurrentOrder;
   uint32_t RecordMaxCount;
 
@@ -28,64 +27,69 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   QHash<QString, std::shared_ptr<PostgreSqlTable>> Tables;
 
  public:
-  explicit PostgreSqlDatabase(QObject* parent, const QString& connectionName);
+  explicit PostgreSqlDatabase(const QString& name,
+                              const QString& connectionName);
   ~PostgreSqlDatabase();
 
   // AbstractSqlDatabase interface
-  virtual void applySettings() override;
-
-  virtual bool connect() override;
-  virtual void disconnect() override;
-  virtual bool checkConnection() override;
-
-  virtual bool openTransaction() const override;
-  virtual bool commitTransaction() const override;
-  virtual bool rollbackTransaction() const override;
-
+ public:
   virtual Qt::SortOrder getCurrentOrder() const override;
   virtual void setCurrentOrder(Qt::SortOrder order) override;
 
   virtual uint32_t getRecordMaxCount(void) const override;
   virtual void setRecordMaxCount(uint32_t count) override;
 
-  virtual bool execCustomRequest(const QString& requestText,
-                                 SqlQueryValues& records) const override;
+ public:
+  virtual bool connect() override;
+  virtual void disconnect() override;
+  virtual bool checkConnection() override;
 
+  virtual bool openTransaction() override;
+  virtual bool commitTransaction() override;
+  virtual bool rollbackTransaction() override;
+
+  virtual bool execCustomRequest(const QString& requestText,
+                                 SqlQueryValues& records) override;
+
+ public:
   // Single table CRUD
   virtual bool createRecords(const QString& table,
-                             const SqlQueryValues& records) const override;
+                             const SqlQueryValues& records) override;
   virtual bool readRecords(const QString& table,
-                           SqlQueryValues& records) const override;
+                           SqlQueryValues& records) override;
   virtual bool readRecords(const QString& table,
                            const QString& conditions,
-                           SqlQueryValues& records) const override;
+                           SqlQueryValues& records) override;
   virtual bool readLastRecord(const QString& table,
-                              SqlQueryValues& record) const override;
+                              SqlQueryValues& record) override;
+  virtual bool updateRecords(const QString& table,
+                             const SqlQueryValues& newValues) override;
   virtual bool updateRecords(const QString& table,
                              const QString& conditions,
-                             const SqlQueryValues& newValues) const override;
+                             const SqlQueryValues& newValues) override;
   virtual bool deleteRecords(const QString& table,
-                             const QString& conditions) const override;
-  virtual bool clearTable(const QString& table) const override;
+                             const QString& conditions) override;
+  virtual bool clearTable(const QString& table) override;
 
   // Multi table CRUD
   virtual bool readMergedRecords(const QStringList& tables,
                                  const QString& conditions,
-                                 SqlQueryValues& records) const override;
-  virtual bool updateMergedRecords(
-      const QStringList& tables,
-      const QString& conditions,
-      const SqlQueryValues& newValues) const override;
+                                 SqlQueryValues& records) override;
+  virtual bool updateMergedRecords(const QStringList& tables,
+                                   const QString& conditions,
+                                   const SqlQueryValues& newValues) override;
   virtual bool deleteMergedRecords(const QStringList& tables,
-                                   const QString& conditions) const override;
+                                   const QString& conditions) override;
 
   // Aggregation
-  virtual bool getRecordCount(const QString& table,
-                              uint32_t& count) const override;
+  virtual bool getRecordCount(const QString& table, uint32_t& count) override;
+
+ public:
+  virtual void applySettings() override;
 
  private:
   Q_DISABLE_COPY_MOVE(PostgreSqlDatabase)
-  void sendLog(const QString& log) const;
+  void sendLog(const QString& log);
   void loadSettings(void);
 
   void createDatabaseConnection(void);

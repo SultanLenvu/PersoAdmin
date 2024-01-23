@@ -11,39 +11,35 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "Dialogs/abstract_input_dialog.h"
+#include "types.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
 
  private:
-  bool LogEnable;
-  QProgressDialog ProgressDialog;
-  uint32_t CurrentOperationStep;
+  std::unique_ptr<QProgressDialog> ProgressDialog;
 
-  std::unique_ptr<AbstractInputDialog> CurrentDialog;
+  std::unique_ptr<QTimer> ODTimer;
+  std::unique_ptr<QTimer> ODQTimer;
+  std::unique_ptr<QElapsedTimer> ODMeter;
 
-  QTimer* ODTimer;
-  QTimer* ODQTimer;
-  QElapsedTimer* ODMeter;
+  std::unordered_map<ReturnStatus, QString> MessageTable;
 
  public:
-  static InteractionSystem* instance(void);
+  InteractionSystem(const QString& name);
+  ~InteractionSystem();
 
  public slots:
-  void generateMessage(const QString& pass);
-  void getMasterPassword(QString& pass);
+  void generateMessage(const QString& text);
   void generateErrorMessage(const QString& text);
 
-  void startOperationProgressDialog(const QString& operationName);
-  void finishOperationProgressDialog(const QString& operationName);
+  void processOperationStart(const QString& operationName);
+  void processOperationFinish(const QString& operationName, ReturnStatus ret);
 
   void applySettings(void);
 
-  void invalidInput_slot(void);
-
  private:
-  explicit InteractionSystem(QWidget* window);
+  InteractionSystem();
   Q_DISABLE_COPY_MOVE(InteractionSystem)
 
  private:
@@ -53,7 +49,9 @@ class InteractionSystem : public QWidget {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
-  void processCurrentDialog(QHash<QString, QString>* param);
+
+  void createMessageMatchTable(void);
+  void processReturnStatus(ReturnStatus ret);
 
  private slots:
   void progressDialogCanceled_slot(void);

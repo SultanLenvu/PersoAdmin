@@ -5,6 +5,8 @@
 #include <QHash>
 #include <QtWidgets>
 
+#include "types.h"
+
 class AbstractInputDialog : public QDialog {
   Q_OBJECT
  public:
@@ -23,7 +25,7 @@ class AbstractInputDialog : public QDialog {
   explicit AbstractInputDialog(QWidget* parent);
   virtual ~AbstractInputDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const = 0;
+  virtual void getData(StringDictionary& data) const = 0;
   virtual InputDialogType type(void) const = 0;
 
  private:

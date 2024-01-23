@@ -66,9 +66,6 @@ void SqlQueryValues::appendToInsert(QString& queryText) const {
 }
 
 void SqlQueryValues::extractRecords(QSqlQuery& request) {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
   beginResetModel();
   Values.clear();
   Fields.clear();
@@ -93,21 +90,15 @@ void SqlQueryValues::extractRecords(QSqlQuery& request) {
   endResetModel();
 }
 
-void SqlQueryValues::add(const QHash<QString, QString>& record) {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
-  for (QHash<QString, QString>::const_iterator it = record.constBegin();
-       it != record.constEnd(); it++) {
+void SqlQueryValues::add(const StringDictionary& record) {
+  for (StringDictionary::const_iterator it = record.constBegin();
+       it != record.constEnd(); ++it) {
     add(it.key(), it.value());
   }
 }
 
 void SqlQueryValues::add(const QString& field,
                          const std::shared_ptr<QVector<QString>>& values) {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
   if (FieldIndex.contains(field)) {
     Values.at(FieldIndex.value(field))->append(*values);
   } else {
@@ -118,9 +109,6 @@ void SqlQueryValues::add(const QString& field,
 }
 
 void SqlQueryValues::add(const QString& field, const QString& value) {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
   if (FieldIndex.contains(field)) {
     Values.at(FieldIndex.value(field))->append(value);
   } else {
@@ -142,9 +130,6 @@ void SqlQueryValues::addField(const QString& field) {
 }
 
 void SqlQueryValues::clear() {
-  // Блокируем доступ
-  QMutexLocker locker(&Mutex);
-
   Values.clear();
   Fields.clear();
   FieldIndex.clear();

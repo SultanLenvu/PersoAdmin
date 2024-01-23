@@ -10,13 +10,11 @@
 
 class PostgreSqlTable : public AbstractSqlTable {
  private:
-  bool LogEnable;
-
   QString ConnectionName;
 
   QString PrimaryKey;
   QVector<QString> Columns;
-  QHash<QString, QString> Relations;
+  StringDictionary Relations;
 
   uint32_t RecordMaxCount;
   QString CurrentOrder;
@@ -36,7 +34,7 @@ class PostgreSqlTable : public AbstractSqlTable {
   void setCurrentOrder(Qt::SortOrder order);
 
   const QVector<QString>* columns() const;
-  const QHash<QString, QString>* relations() const;
+  const StringDictionary* relations() const;
 
   // AbstractSqlTable interface
  public:
@@ -44,26 +42,27 @@ class PostgreSqlTable : public AbstractSqlTable {
   virtual void applySettings() override;
 
   // CRUD
-  virtual bool createRecords(const SqlQueryValues& response) const override;
-  virtual bool readRecords(SqlQueryValues& response) const override;
+  virtual bool createRecords(const SqlQueryValues& response) override;
+  virtual bool readRecords(SqlQueryValues& response) override;
   virtual bool readRecords(const QString& conditions,
-                           SqlQueryValues& response) const override;
-  virtual bool readLastRecord(SqlQueryValues& response) const override;
+                           SqlQueryValues& response) override;
+  virtual bool readLastRecord(SqlQueryValues& response) override;
+  virtual bool updateRecords(const SqlQueryValues& newValues) override;
   virtual bool updateRecords(const QString& condition,
-                             const SqlQueryValues& newValues) const override;
-  virtual bool deleteRecords(const QString& condition) const override;
-  virtual bool clear() const override;
+                             const SqlQueryValues& newValues) override;
+  virtual bool deleteRecords(const QString& condition) override;
+  virtual bool clear() override;
 
   // Aggregation
-  virtual bool getRecordCount(uint32_t& count) const override;
+  virtual bool getRecordCount(uint32_t& count) override;
 
  private:
   Q_DISABLE_COPY_MOVE(PostgreSqlTable)
-  void sendLog(const QString& log) const;
+  void sendLog(const QString& log);
   void loadSettings(void);
 
   bool checkFieldNames(const SqlQueryValues& record) const;
-  bool checkFieldNames(const QHash<QString, QString>& record) const;
+  bool checkFieldNames(const StringDictionary& record) const;
 
  signals:
 };

@@ -20,13 +20,13 @@ class ManualReleaseRefundDialog : public AbstractInputDialog {
   QPushButton* AcceptButton;
   QPushButton* RejectButton;
 
-  QHash<QString, QString> MatchingTable;
+  StringDictionary MatchingTable;
 
  public:
   explicit ManualReleaseRefundDialog(QWidget* parent);
   ~ManualReleaseRefundDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 
   virtual void accept() override;

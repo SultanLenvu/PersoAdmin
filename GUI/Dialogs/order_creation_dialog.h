@@ -48,7 +48,7 @@ class OrderCreationDialog : public AbstractInputDialog {
   explicit OrderCreationDialog(QWidget* parent);
   ~OrderCreationDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 
   virtual void accept() override;

@@ -74,9 +74,10 @@ class MainWindowGUI : public AbstractGUI {
   QVBoxLayout* ProductionLinesControlPanelLayout;
 
   QPushButton* CreateNewProductionLinePushButton;
-  QPushButton* StartProductionLinePushButton;
-  QPushButton* StopProductionLinePushButton;
-  QPushButton* ShutdownAllProductionLinesPushButton;
+  QPushButton* ActivateProductionLinePushButton;
+  QPushButton* ActivateAllProductionLinesPushButton;
+  QPushButton* DeactivateProductionLinePushButton;
+  QPushButton* DeactivateAllProductionLinesPushButton;
   QPushButton* EditProductionLinesPushButton;
   QSpacerItem* ProductionLinesControlPanelVS2;
 
@@ -206,8 +207,9 @@ class MainWindowGUI : public AbstractGUI {
   void createTransponderTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
-
   void createLog(void);
+
+  void connectDependecies(void);
 
  private slots:
   void rereleaseKeyComboBox_slot(const QString& text);

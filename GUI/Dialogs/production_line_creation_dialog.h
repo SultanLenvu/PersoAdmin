@@ -33,7 +33,7 @@ class ProductionLineCreationDialog : public AbstractInputDialog {
   explicit ProductionLineCreationDialog(QWidget* paren);
   ~ProductionLineCreationDialog();
 
-  virtual void getData(QHash<QString, QString>* data) const override;
+  virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 
   virtual void accept() override;

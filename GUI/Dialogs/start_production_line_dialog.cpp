@@ -19,9 +19,9 @@ StartProductionLineDialog::StartProductionLineDialog(QWidget* parent)
 
 StartProductionLineDialog::~StartProductionLineDialog() {}
 
-void StartProductionLineDialog::getData(QHash<QString, QString>* data) const {
-  data->insert("production_line_id", ProductionLineIdInput->text());
-  data->insert("order_id", OrderIdInput->text());
+void StartProductionLineDialog::getData(StringDictionary& data) const {
+  data.insert("production_line_id", ProductionLineIdInput->text());
+  data.insert("order_id", OrderIdInput->text());
 }
 
 AbstractInputDialog::InputDialogType StartProductionLineDialog::type() const {

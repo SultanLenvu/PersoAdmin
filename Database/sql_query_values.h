@@ -3,26 +3,21 @@
 
 #include <QAbstractTableModel>
 #include <QHash>
-#include <QMutex>
 #include <QObject>
 #include <QSet>
 
 #include <QSqlQuery>
 #include <QVector>
 
+#include "types.h"
+
 class SqlQueryValues : public QAbstractTableModel {
   Q_OBJECT
-
- private:
-  template <typename T>
-  using SharedVector = std::shared_ptr<QVector<T>>;
 
  private:
   QVector<QString> Fields;
   QHash<QString, int32_t> FieldIndex;
   QVector<SharedVector<QString>> Values;
-
-  QMutex Mutex;
 
  public:
   explicit SqlQueryValues(QObject* parent = nullptr);
@@ -40,7 +35,7 @@ class SqlQueryValues : public QAbstractTableModel {
   void appendToInsert(QString& queryText) const;
 
   void extractRecords(QSqlQuery& request);
-  void add(const QHash<QString, QString>& record);
+  void add(const StringDictionary& record);
   void add(const QString& name, const std::shared_ptr<QVector<QString>>& values);
   void add(const QString& field, const QString& value);
   void addField(const QString& field);

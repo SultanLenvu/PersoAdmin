@@ -3,11 +3,23 @@ project(PersoAdmin VERSION 1.0 LANGUAGES C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+#========================================== INCLUSION OF QT ===========================================#
 find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Charts Gui Network PrintSupport Sql Core5Compat)
 find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 
 qt_standard_project_setup()
+#======================================================================================================#
+
+#========================================== SOURCE DIRECTORIES ===========================================#
+include_directories(Database/)
+include_directories(General/)
+include_directories(GUI/)
+include_directories(GUI/Dialogs)
+include_directories(Log/)
+include_directories(Management/)
+include_directories(StickerPrinter/)
+#======================================================================================================#
 
 add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Database/abstract_sql_database.cpp Database/abstract_sql_database.h
@@ -34,8 +46,9 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     GUI/Dialogs/link_issuer_key_dialog.h GUI/Dialogs/link_issuer_key_dialog.cpp
     GUI/Dialogs/settings_dialog.h GUI/Dialogs/settings_dialog.cpp
 
+    General/types.h
     General/definitions.h
-    General/hash_model.cpp General/hash_model.h
+    General/hash_table_model.cpp General/hash_table_model.h
 
     Log/file_log_backend.cpp Log/file_log_backend.h
     Log/log_backend.cpp Log/log_backend.h
@@ -45,12 +58,15 @@ add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
     Management/admin_manager.cpp Management/admin_manager.h
     Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
+    Management/global_environment.cpp Management/global_environment.h
 
-    StickerPrinter/isticker_printer.cpp StickerPrinter/isticker_printer.h
+    StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
+    Database/sql_insert_values.h Database/sql_insert_values.cpp
 )
+
 target_compile_definitions(PersoAdmin PRIVATE
     QT_DISABLE_DEPRECATED_BEFORE=0x060000
 )

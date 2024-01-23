@@ -10,7 +10,7 @@
 #include <QString>
 
 #include "Database/sql_query_values.h"
-#include "General/hash_model.h"
+#include "General/hash_table_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
 #include "abstract_gui.h"
@@ -22,20 +22,23 @@ class MainWindowKernel : public QMainWindow {
   QSize DesktopGeometry;
   AbstractGUI* CurrentGUI;
 
+  // Верхнее меню главного окна
+  //===========================================
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
   QAction* SettingsAction;
   QAction* AboutProgramAction;
   QAction* RequestAuthorizationGuiAction;
+  //===========================================
 
-  InteractionSystem* Interactor;
+  std::unique_ptr<InteractionSystem> Interactor;
 
-  QThread* ManagerThread;
-  AdminManager* Manager;
+  std::unique_ptr<QThread> ManagerThread;
+  std::unique_ptr<AdminManager> Manager;
 
-  QThread* LoggerThread;
-  LogSystem* Logger;
+  std::unique_ptr<QThread> LoggerThread;
+  std::unique_ptr<LogSystem> Logger;
 
   SqlQueryValues* RandomModel;
   SqlQueryValues* OrderModel;
@@ -44,9 +47,9 @@ class MainWindowKernel : public QMainWindow {
   SqlQueryValues* TransponderModel;
   SqlQueryValues* StickerModel;
 
-  HashModel* TransponderData;
+  HashTableModel* TransponderData;
 
-  QHash<QString, QString>* MatchingTable;
+  StringDictionary MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
@@ -72,9 +75,13 @@ class MainWindowKernel : public QMainWindow {
 
   // Функционал для работы с производственными линиями
   void createNewProductionLinePushButton_slot(void);
-  void startProductionLinePushButton_slot(void);
-  void stopProductionLinePushButton_slot(void);
+
+  void activateProductionLinePushButton_slot(void);
+  void activateAllProductionLinesPushButton_slot(void);
+
+  void deactivateProductionLinePushButton_slot(void);
   void deactivateAllProductionLinesPushButton_slot(void);
+
   void editProductionLinesPushButton_slot(void);
   void updateProductionLineViewPushButton_slot(void);
 
@@ -112,7 +119,7 @@ class MainWindowKernel : public QMainWindow {
   // Отображение данных
   void displayFirmware_slot(std::shared_ptr<QFile> firmware);
   void displayTransponderData_slot(
-      std::shared_ptr<QHash<QString, QString>> transponderData);
+      std::shared_ptr<StringDictionary> transponderData);
 
  private:
   Q_DISABLE_COPY_MOVE(MainWindowKernel)
@@ -148,73 +155,76 @@ class MainWindowKernel : public QMainWindow {
 
   // Заказы
   void createNewOrder_signal(
-      const std::shared_ptr<QHash<QString, QString>> orderParameterseters,
+      const std::shared_ptr<StringDictionary> orderParameterseters,
       SqlQueryValues* model);
   void startOrderAssembling_signal(
-      const std::shared_ptr<QHash<QString, QString>>,
+      const std::shared_ptr<StringDictionary>,
       SqlQueryValues* model);
-  void stopOrderAssembling_signal(const std::shared_ptr<QHash<QString, QString>>,
+  void stopOrderAssembling_signal(const std::shared_ptr<StringDictionary>,
                                   SqlQueryValues* model);
   void showOrderTable_signal(SqlQueryValues* model);
 
   // Производственные линии
   void createNewProductionLine_signal(
-      const std::shared_ptr<QHash<QString, QString>>
+      const std::shared_ptr<StringDictionary>
           productionLineParameterseters,
       SqlQueryValues* model);
-  void startProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
-                                  SqlQueryValues* model);
-  void stopProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
-                                 SqlQueryValues* model);
-  void stopAllProductionLines_signal(SqlQueryValues* model);
-  void editProductionLine_signal(const std::shared_ptr<QHash<QString, QString>>,
+  void activateProductionLine_signal(
+      const std::shared_ptr<StringDictionary>,
+      SqlQueryValues* model);
+  void activateAllProductionLines_signal(SqlQueryValues* model);
+  void deactivateProductionLine_signal(
+      const std::shared_ptr<StringDictionary>,
+      SqlQueryValues* model);
+  void deactivateAllProductionLines_signal(SqlQueryValues* model);
+  void editProductionLine_signal(const std::shared_ptr<StringDictionary>,
                                  SqlQueryValues* model);
   void showProductionLineTable_signal(SqlQueryValues* model);
 
   // Тест сервера
   void releaseTransponder_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void confirmTransponderRelease_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void rereleaseTransponder_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void confirmTransponderRerelease_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void rollbackProductionLine_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printBoxStickerOnServer_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printLastBoxStickerOnServer_signal();
   void printPalletStickerOnServer_signal(
-      const std::shared_ptr<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printLastPalletStickerOnServer_signal();
 
   // Транспондеры
   void releaseTranspondersManually_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
   void refundTranspondersManually_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
-  void shipPallets_signal(const std::shared_ptr<QHash<QString, QString>> param,
+  void shipPallets_signal(const std::shared_ptr<StringDictionary> param,
                           SqlQueryValues* model);
 
   // Заказчики
   void initIssuers_signal(SqlQueryValues* model);
   void initTransportMasterKeys_signal(SqlQueryValues* model);
   void linkIssuerWithMasterKeys_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
 
   // Принтер
   void printTransponderSticker_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
   void printBoxSticker_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
   void printPalletSticker_signal(
-      const std::shared_ptr<QHash<QString, QString>> param,
+      const std::shared_ptr<StringDictionary> param,
       SqlQueryValues* model);
   void execPrinterStickerCommandScript_signal(
       const std::shared_ptr<QStringList> commandScript);

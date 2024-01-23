@@ -1,5 +1,7 @@
 #include "mainwindow_gui.h"
-#include "General/definitions.h"
+#include "definitions.h"
+#include "global_environment.h"
+#include "widget_log_backend.h"
 
 MainWindowGUI::MainWindowGUI(QWidget* parent) : AbstractGUI(parent, Master) {
   setObjectName("MainWindowGUI");
@@ -15,6 +17,9 @@ void MainWindowGUI::create() {
   // Настраиваем пропорции отображаемых элементов
   MainLayout->setStretch(0, 3);
   MainLayout->setStretch(1, 2);
+
+  // Подключаем зависимости
+  connectDependecies();
 }
 
 void MainWindowGUI::update() {
@@ -198,16 +203,23 @@ void MainWindowGUI::createProductionLineTab() {
       new QPushButton("Создать производственную линию");
   ProductionLinesControlPanelLayout->addWidget(
       CreateNewProductionLinePushButton);
-  StartProductionLinePushButton =
+  ActivateProductionLinePushButton =
       new QPushButton("Запустить производственную линию");
-  ProductionLinesControlPanelLayout->addWidget(StartProductionLinePushButton);
-  StopProductionLinePushButton =
+  ProductionLinesControlPanelLayout->addWidget(
+      ActivateProductionLinePushButton);
+
+  ActivateAllProductionLinesPushButton =
+      new QPushButton("Запустить все производственные линии");
+  ProductionLinesControlPanelLayout->addWidget(
+      ActivateAllProductionLinesPushButton);
+  DeactivateProductionLinePushButton =
       new QPushButton("Остановить производственную линию");
-  ProductionLinesControlPanelLayout->addWidget(StopProductionLinePushButton);
-  ShutdownAllProductionLinesPushButton =
+  ProductionLinesControlPanelLayout->addWidget(
+      DeactivateProductionLinePushButton);
+  DeactivateAllProductionLinesPushButton =
       new QPushButton("Остановить все производственные линии");
   ProductionLinesControlPanelLayout->addWidget(
-      ShutdownAllProductionLinesPushButton);
+      DeactivateAllProductionLinesPushButton);
   EditProductionLinesPushButton =
       new QPushButton("Редактировать производственную линию");
   ProductionLinesControlPanelLayout->addWidget(EditProductionLinesPushButton);
@@ -493,6 +505,18 @@ void MainWindowGUI::createLog() {
   LogDisplay->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   LogDisplay->setCenterOnScroll(false);
   LogLayout->addWidget(LogDisplay);
+}
+
+void MainWindowGUI::connectDependecies() {
+  WidgetLogBackend* logger = dynamic_cast<WidgetLogBackend*>(
+      GlobalEnvironment::instance()->getObject("WidgetLogBackend"));
+
+  assert(logger);
+
+  connect(logger, &WidgetLogBackend::clearLogDisplay_signal, this,
+          &MainWindowGUI::clearLogDisplay);
+  connect(logger, &WidgetLogBackend::displayLog_signal, this,
+          &MainWindowGUI::displayLog);
 }
 
 void MainWindowGUI::rereleaseKeyComboBox_slot(const QString& text) {

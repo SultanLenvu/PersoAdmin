@@ -15,14 +15,14 @@
 #include <QTcpSocket>
 #include <QTimer>
 
-#include "General/definitions.h"
+#include "types.h"
 
 class PersoClient : public QObject
 {
   Q_OBJECT
 public:
   enum ReturnStatus {
-    Completed,
+    NoError,
     FirmwareFileSavingError,
     RequestParameterError,
     ServerConnectionError,
@@ -81,7 +81,7 @@ private:
   QJsonObject CurrentCommand;
   QJsonObject CurrentResponse;
 
-  QHash<QString, QString>* ResponseData;
+  StringDictionary* ResponseData;
   QFile* Firmware;
 
   QTimer* WaitTimer;
@@ -97,21 +97,21 @@ public:
   ReturnStatus disconnectFromServer(void);
 
   ReturnStatus requestEcho(void);
-  ReturnStatus requestAuthorize(const QHash<QString, QString>* requestData);
+  ReturnStatus requestAuthorize(const StringDictionary* requestData);
 
-  ReturnStatus requestTransponderRelease(const QHash<QString, QString>* requestData,
+  ReturnStatus requestTransponderRelease(const StringDictionary* requestData,
 					 QFile* firmware,
-					 QHash<QString, QString>* responseData);
-  ReturnStatus requestTransponderReleaseConfirm(const QHash<QString, QString>* requestData);
-  ReturnStatus requestTransponderRerelease(const QHash<QString, QString>* requestData,
+					 StringDictionary* responseData);
+  ReturnStatus requestTransponderReleaseConfirm(const StringDictionary* requestData);
+  ReturnStatus requestTransponderRerelease(const StringDictionary* requestData,
 					   QFile* firmware,
-					   QHash<QString, QString>* responseData);
-  ReturnStatus requestTransponderRereleaseConfirm(const QHash<QString, QString>* requestData);
-  ReturnStatus requestProductionLineRollback(const QHash<QString, QString>* requestData);
+					   StringDictionary* responseData);
+  ReturnStatus requestTransponderRereleaseConfirm(const StringDictionary* requestData);
+  ReturnStatus requestProductionLineRollback(const StringDictionary* requestData);
 
-  ReturnStatus requestBoxStickerPrint(const QHash<QString, QString>* requestData);
+  ReturnStatus requestBoxStickerPrint(const StringDictionary* requestData);
   ReturnStatus requestBoxStickerReprint();
-  ReturnStatus requestPalletStickerPrint(const QHash<QString, QString>* requestData);
+  ReturnStatus requestPalletStickerPrint(const StringDictionary* requestData);
   ReturnStatus requestPalletStickerReprint(void);
 
   void applySettings(void);
@@ -127,15 +127,15 @@ private:
   ReturnStatus transmitDataBlock(void);
 
   void createEcho(void);
-  void createAuthorization(const QHash<QString, QString>* requestData);
-  void createTransponderRelease(const QHash<QString, QString>* requestData);
-  void createTransponderReleaseConfirm(const QHash<QString, QString>* requestData);
-  void createTransponderRerelease(const QHash<QString, QString>* requestData);
-  void createTransponderRereleaseConfirm(const QHash<QString, QString>* requestData);
-  void createProductionLineRollback(const QHash<QString, QString>* requestData);
-  void createBoxStickerPrint(const QHash<QString, QString>* requestData);
+  void createAuthorization(const StringDictionary* requestData);
+  void createTransponderRelease(const StringDictionary* requestData);
+  void createTransponderReleaseConfirm(const StringDictionary* requestData);
+  void createTransponderRerelease(const StringDictionary* requestData);
+  void createTransponderRereleaseConfirm(const StringDictionary* requestData);
+  void createProductionLineRollback(const StringDictionary* requestData);
+  void createBoxStickerPrint(const StringDictionary* requestData);
   void createBoxStickerReprint(void);
-  void createPalletStickerPrint(const QHash<QString, QString>* requestData);
+  void createPalletStickerPrint(const StringDictionary* requestData);
   void createPalletStickerReprint(void);
 
   ReturnStatus processEcho(void);
