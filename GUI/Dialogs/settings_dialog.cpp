@@ -8,8 +8,8 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
   DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.45, DesktopGeometry.height() * 0.45,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
+  setGeometry(DesktopGeometry.width() * 0.45, DesktopGeometry.height() * 0.2,
+              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.3);
   setWindowTitle("Настройки");
 
   create();

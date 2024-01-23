@@ -10,7 +10,6 @@
 #include "pan_input_dialog.h"
 #include "production_line_creation_dialog.h"
 #include "settings_dialog.h"
-#include "start_production_line_dialog.h"
 
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Считываем размеры дисплея
@@ -734,6 +733,8 @@ void MainWindowKernel::createLoggerInstance() {
   connect(this, &MainWindowKernel::logging, Logger.get(), &LogSystem::generate);
 
   LoggerThread = std::unique_ptr<QThread>(new QThread());
+  connect(LoggerThread.get(), &QThread::started, Logger.get(),
+          &LogSystem::instanceThreadStarted);
 
   Logger->moveToThread(LoggerThread.get());
   LoggerThread->start();

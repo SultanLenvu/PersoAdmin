@@ -23,7 +23,7 @@ class LogSystem : public QObject {
   std::vector<std::shared_ptr<LogBackend>> Backends;
 
   bool UdpListenEnable;
-  std::unique_ptr<QUdpSocket> UdpSocket;
+  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
   QHostAddress UdpListenIp;
   uint32_t UdpListenPort;
 
@@ -32,6 +32,8 @@ class LogSystem : public QObject {
   ~LogSystem();
 
  public slots:
+  void instanceThreadStarted(void);
+
   void clear(void);
   void generate(const QString& log);
 
@@ -41,7 +43,7 @@ class LogSystem : public QObject {
   Q_DISABLE_COPY_MOVE(LogSystem)
   void loadSettings(void);
 
-  void createUdpSocket(void);
+  void createPersoServerLogSocket(void);
 
  private slots:
   void udpSocketReadyRead_slot();
