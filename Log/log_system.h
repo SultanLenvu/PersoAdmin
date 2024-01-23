@@ -23,7 +23,9 @@ class LogSystem : public QObject {
   std::vector<std::shared_ptr<LogBackend>> Backends;
 
   bool UdpListenEnable;
-  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
+  //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
+  // Из-за внутренних механизмов Qt лучше использовать "сырой" указатель
+  QUdpSocket* PersoServerLogSocket;
   QHostAddress UdpListenIp;
   uint32_t UdpListenPort;
 

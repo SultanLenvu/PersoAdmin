@@ -14,7 +14,16 @@ LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
   GlobalEnvironment::instance()->registerObject(this);
 }
 
-LogSystem::~LogSystem() {}
+LogSystem::~LogSystem() {
+  /*
+   * Если удалять напрямую, то ловим критическую ошибку
+   * из-за внутренних механизмов Qt
+   */
+  PersoServerLogSocket->deleteLater();
+
+  //  PersoServerLogSocket->blockSignals(true);
+  //  delete PersoServerLogSocket;
+}
 
 void LogSystem::instanceThreadStarted() {
   Backends.push_back(std::shared_ptr<WidgetLogBackend>(
@@ -23,10 +32,6 @@ void LogSystem::instanceThreadStarted() {
       std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
 
   createPersoServerLogSocket();
-
-  if (PersoServerLogSocket->thread() != QApplication::instance()->thread()) {
-    qDebug() << "Запущен в отдельном потоке.";
-  }
 }
 
 void LogSystem::clear() {
@@ -69,11 +74,13 @@ void LogSystem::loadSettings() {
 }
 
 void LogSystem::createPersoServerLogSocket() {
-  PersoServerLogSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
-  //  PersoServerLogSocket = new QUdpSocket(this);
-  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
-  connect(PersoServerLogSocket.get(), &QUdpSocket::readyRead, this,
+  //  PersoServerLogSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
+  //  connect(PersoServerLogSocket.get(), &QUdpSocket::readyRead, this,
+  //          &LogSystem::udpSocketReadyRead_slot);
+  PersoServerLogSocket = new QUdpSocket(nullptr);
+  connect(PersoServerLogSocket, &QUdpSocket::readyRead, this,
           &LogSystem::udpSocketReadyRead_slot);
+  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
 }
 
 void LogSystem::udpSocketReadyRead_slot() {
@@ -89,5 +96,11 @@ void LogSystem::udpSocketReadyRead_slot() {
 
   if (UdpListenEnable) {
     generate(QString::fromUtf8(datagram));
+  }
+
+  if (PersoServerLogSocket->thread() != QApplication::instance()->thread()) {
+    qDebug() << "Запущен в отдельном потоке.";
+  } else {
+    qDebug() << "Запущен в главном потоке.";
   }
 }
