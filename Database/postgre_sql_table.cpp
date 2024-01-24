@@ -118,10 +118,6 @@ void PostgreSqlTable::applySettings() {
 }
 
 bool PostgreSqlTable::createRecords(const SqlQueryValues& records) {
-  if (!checkFieldNames(records)) {
-    return false;
-  }
-
   // Создаем запрос
   QString requestText = QString("INSERT INTO public.%1 (").arg(objectName());
   for (int32_t i = 0; i < records.fieldCount(); i++) {
@@ -210,11 +206,6 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) {
 }
 
 bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
-  if (!checkFieldNames(newValues)) {
-    sendLog("Получено неизвестное имя поля таблицы. ");
-    return false;
-  }
-
   // Создаем запрос
   QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
   for (int32_t i = 0; i < newValues.fieldCount(); i++) {
@@ -241,11 +232,6 @@ bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
 
 bool PostgreSqlTable::updateRecords(const QString& condition,
                                     const SqlQueryValues& newValues) {
-  if (!checkFieldNames(newValues)) {
-    sendLog("Получено неизвестное имя поля таблицы. ");
-    return false;
-  }
-
   // Создаем запрос
   QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
   for (int32_t i = 0; i < newValues.fieldCount(); i++) {
@@ -333,23 +319,23 @@ void PostgreSqlTable::loadSettings() {
   QSettings settings;
 }
 
-bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
-  for (int32_t i = 0; i < records.fieldCount(); i++) {
-    if (!Columns.contains(records.fieldName(i))) {
-      return false;
-    }
-  }
+// bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
+//   for (int32_t i = 0; i < records.fieldCount(); i++) {
+//     if (!Columns.contains(records.fieldName(i))) {
+//       return false;
+//     }
+//   }
 
-  return true;
-}
+//  return true;
+//}
 
-bool PostgreSqlTable::checkFieldNames(const StringDictionary& record) const {
-  for (StringDictionary::const_iterator it = record.constBegin();
-       it != record.constEnd(); ++it) {
-    if (!Columns.contains(it.key())) {
-      return false;
-    }
-  }
+// bool PostgreSqlTable::checkFieldNames(const StringDictionary& record) const {
+//   for (StringDictionary::const_iterator it = record.constBegin();
+//        it != record.constEnd(); ++it) {
+//     if (!Columns.contains(it.key())) {
+//       return false;
+//     }
+//   }
 
-  return true;
-}
+//  return true;
+//}
