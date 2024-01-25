@@ -140,6 +140,8 @@ ReturnStatus AdministrationSystem::startOrderAssembling(const QString& id) {
   }
 
   orderNewValue.add("in_process", "true");
+  orderNewValue.add("assembling_start", QDateTime::currentDateTime().toString(
+                                            POSTGRES_TIMESTAMP_TEMPLATE));
   if (!Database->updateRecords("orders", "id = " + id, orderNewValue)) {
     sendLog(
         QString("Получена ошибка при обновлении данных заказа %1.").arg(id));
@@ -155,7 +157,8 @@ ReturnStatus AdministrationSystem::startOrderAssembling(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::stopOrderAssembling(const QString& orderId) {
+ReturnStatus AdministrationSystem::stopOrderAssembling(const QString& id) {
+  SqlQueryValues orderNewValue;
   ReturnStatus status;
 
   if (!Database->openTransaction()) {
@@ -163,13 +166,21 @@ ReturnStatus AdministrationSystem::stopOrderAssembling(const QString& orderId) {
     return ReturnStatus::DatabaseTransactionError;
   }
 
-  sendLog("Отключение всех производственных линий. ");
   if (!stopAllProductionLines()) {
+    sendLog("Получена ошибка при отключении всех производственных линий. ");
     Database->rollbackTransaction();
     return ReturnStatus::DatabaseQueryError;
   }
 
-  sendLog(QString("Сборка заказа %1 остановлена. ").arg(orderId));
+  orderNewValue.add("in_process", "false");
+  if (!Database->updateRecords("orders", QString("id = %1").arg(id),
+                               orderNewValue)) {
+    sendLog(
+        QString("Получена ошибка при обновлении данных заказа %1.").arg(id));
+    Database->rollbackTransaction();
+    return ReturnStatus::DatabaseQueryError;
+  }
+
   if (!Database->commitTransaction()) {
     sendLog("Получена ошибка при закрытии транзакции. ");
     return ReturnStatus::DatabaseTransactionError;

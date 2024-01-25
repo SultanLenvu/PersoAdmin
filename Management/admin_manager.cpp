@@ -152,12 +152,12 @@ void AdminManager::stopOrderAssembling(
 
   ReturnStatus ret;
 
-  sendLog(QString("Остановка сборки заказа %1. ").arg(param->value("id")));
   ret = Administrator->stopOrderAssembling(param->value("id"));
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("stopOrderAssembling", ret);
     return;
   }
+  sendLog(QString("Сборка заказа %1 остановлена. ").arg(param->value("id")));
 
   model->clear();
   sendLog("Отображение заказов. ");

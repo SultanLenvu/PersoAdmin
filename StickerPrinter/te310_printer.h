@@ -48,6 +48,7 @@ class TE310Printer : public AbstractStickerPrinter {
 #endif /* __linux__ */
 
   virtual bool init(void) override;
+  virtual StickerPrinterType type(void) override;
 
   virtual ReturnStatus printTransponderSticker(
       const StringDictionary& param) override;

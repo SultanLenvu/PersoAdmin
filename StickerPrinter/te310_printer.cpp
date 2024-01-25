@@ -1,20 +1,11 @@
 #include <QHostAddress>
 
-#include "global_environment.h"
-#include "log_system.h"
 #include "te310_printer.h"
 
-TE310Printer::TE310Printer(const QString& name)
-    : AbstractStickerPrinter(TE310) {
-  setObjectName(name);
+TE310Printer::TE310Printer(const QString& name) : AbstractStickerPrinter(name) {
   loadSetting();
 
   TscLib = std::unique_ptr<QLibrary>(new QLibrary(TscLibPath));
-
-  connect(this, &TE310Printer::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
 }
 
 bool TE310Printer::init() {
@@ -36,6 +27,10 @@ bool TE310Printer::init() {
 #endif /* __linux__ */
 
   return true;
+}
+
+AbstractStickerPrinter::StickerPrinterType TE310Printer::type() {
+  return TE310;
 }
 
 #ifdef __linux__

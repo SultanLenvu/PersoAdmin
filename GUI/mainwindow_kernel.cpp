@@ -742,8 +742,6 @@ void MainWindowKernel::createLoggerInstance() {
 
 void MainWindowKernel::createManagerInstance() {
   Manager = std::unique_ptr<AdminManager>(new AdminManager("AdminManager"));
-  connect(Manager.get(), &AdminManager::logging, Logger.get(),
-          &LogSystem::generate);
   connect(Manager.get(), &AdminManager::executionStarted, Interactor.get(),
           &InteractionSystem::processOperationStart);
   connect(Manager.get(), &AdminManager::executionFinished, Interactor.get(),
