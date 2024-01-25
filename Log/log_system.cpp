@@ -97,10 +97,4 @@ void LogSystem::udpSocketReadyRead_slot() {
   if (UdpListenEnable) {
     generate(QString::fromUtf8(datagram));
   }
-
-  if (PersoServerLogSocket->thread() != QApplication::instance()->thread()) {
-    qDebug() << "Запущен в отдельном потоке.";
-  } else {
-    qDebug() << "Запущен в главном потоке.";
-  }
 }
