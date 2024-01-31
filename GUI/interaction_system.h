@@ -11,44 +11,38 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "General/definitions.h"
-#include "input_dialog.h"
-#include "pallet_shiping_dialog.h"
-#include "pan_input_dialog.h"
+#include "types.h"
 
 class InteractionSystem : public QWidget {
   Q_OBJECT
 
  private:
-  bool LogEnable;
-  QProgressDialog* ProgressDialog;
-  uint32_t CurrentOperationStep;
+  std::unique_ptr<QProgressDialog> ProgressDialog;
 
-  InputDialog* CurrentDialog;
+  std::unique_ptr<QTimer> ODTimer;
+  std::unique_ptr<QTimer> ODQTimer;
+  std::unique_ptr<QElapsedTimer> ODMeter;
 
-  QTimer* ODTimer;
-  QTimer* ODQTimer;
-  QElapsedTimer* ODMeter;
+  std::unordered_map<ReturnStatus, QString> MessageTable;
 
  public:
-  static InteractionSystem* instance(void);
+  InteractionSystem(const QString& name);
+  ~InteractionSystem();
 
  public slots:
-  void generateMessage(const QString& pass);
-  void getMasterPassword(QString& pass);
+  void generateMessage(const QString& text);
   void generateErrorMessage(const QString& text);
 
-  void startOperationProgressDialog(const QString& operationName);
-  void finishOperationProgressDialog(const QString& operationName);
-
-  bool getPalletShipingParameters(QHash<QString, QString>* params);
-  bool getPan(QHash<QString, QString>* params);
+  void processOperationStart(const QString& operationName);
+  void processOperationFinish(const QString& operationName, ReturnStatus ret);
 
   void applySettings(void);
 
  private:
-  explicit InteractionSystem(QWidget* window);
-  Q_DISABLE_COPY(InteractionSystem)
+  InteractionSystem();
+  Q_DISABLE_COPY_MOVE(InteractionSystem)
+
+ private:
   void loadSettings(void);
   void sendLog(const QString& log);
 
@@ -56,11 +50,14 @@ class InteractionSystem : public QWidget {
   void destroyProgressDialog(void);
   void createTimers(void);
 
- private slots:
-  void on_ProgressDialogCanceled_slot(void);
+  void createMessageMatchTable(void);
+  void processReturnStatus(ReturnStatus ret);
 
-  void on_ODTimerTimeout_slot(void);
-  void on_ODQTimerTimeout_slot(void);
+ private slots:
+  void progressDialogCanceled_slot(void);
+
+  void ODTimerTimeout_slot(void);
+  void ODQTimerTimeout_slot(void);
 
  signals:
   void logging(const QString& log);

@@ -6,8 +6,6 @@
 
 #include "abstract_gui.h"
 
-#include "General/definitions.h"
-
 class MainWindowGUI : public AbstractGUI {
   Q_OBJECT
 
@@ -55,47 +53,12 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* OrderControlPanel;
   QVBoxLayout* OrderControlPanelLayout;
 
-  QCheckBox* FullPersonalizationCheckBox;
-  QHBoxLayout* OrderPanelSubLayout;
-  QLabel* PanFilePathLabel;
-  QLineEdit* PanFilePathLineEdit;
-  QPushButton* PanFileExplorePushButton;
-  QHBoxLayout* OrderPanelSubLayout1;
-  QLabel* IssuerNameComboLabel;
-  QComboBox* IssuerNameComboBox;
-  QHBoxLayout* OrderPanelSubLayout2;
-  QLabel* TransponderQuantityLabel;
-  QLineEdit* TransponderQuantityLineEdit;
-  QHBoxLayout* OrderPanelSubLayout3;
-  QLabel* BoxCapacityLabel;
-  QLineEdit* BoxCapacityLineEdit;
-  QHBoxLayout* OrderPanelSublayout4;
-  QLabel* PalletCapacityLabel;
-  QLineEdit* PalletCapacityLineEdit;
-  QHBoxLayout* OrderPanelSublayout5;
-  QLabel* TransponderModelLabel;
-  QLineEdit* TransponderModelLineEdit;
-  QHBoxLayout* OrderPanelSubLayout6;
-  QLabel* AccrReferenceLabel;
-  QLineEdit* AccrReferenceLineEdit;
-  QHBoxLayout* OrderPanelSubLayout7;
-  QLabel* EquipmentClassLabel;
-  QLineEdit* EquipmentClassLineEdit;
-  QHBoxLayout* OrderPanelSubLayout8;
-  QLabel* ManufacturerIdLabel;
-  QLineEdit* ManufacturerIdLineEdit;
   QPushButton* CreateNewOrderPushButton;
-  QSpacerItem* OrderControlPanelVS1;
-
-  QHBoxLayout* OrderIdLayout1;
-  QLabel* OrderIdLabel1;
-  QLineEdit* OrderIdLineEdit1;
   QPushButton* StartOrderAssemblingPushButton;
   QPushButton* StopOrderAssemblingPushButton;
-  QSpacerItem* OrderControlPanelVS2;
+  QSpacerItem* OrderControlPanelVS1;
 
   QPushButton* UpdateOrderViewPushButton;
-  QPushButton* DeleteLastOrderPushButton;
 
   QGroupBox* OrderTablePanel;
   QVBoxLayout* OrderTablePanelLayout;
@@ -110,30 +73,15 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* ProductionLinesControlPanel;
   QVBoxLayout* ProductionLinesControlPanelLayout;
 
-  QHBoxLayout* LoginLayout1;
-  QLabel* LoginLabel1;
-  QLineEdit* LoginLineEdit1;
-  QHBoxLayout* PasswordLayout1;
-  QLabel* PasswordLabel1;
-  QLineEdit* PasswordLineEdit1;
   QPushButton* CreateNewProductionLinePushButton;
-  QSpacerItem* ProductionLinesControlPanelVS1;
-
-  QHBoxLayout* OrderIdLayout2;
-  QLabel* OrderIdLabel2;
-  QLineEdit* OrderIdLineEdit2;
-  QPushButton* AllocateInactiveProductionLinesPushButton;
+  QPushButton* ActivateProductionLinePushButton;
+  QPushButton* ActivateAllProductionLinesPushButton;
+  QPushButton* DeactivateProductionLinePushButton;
+  QPushButton* DeactivateAllProductionLinesPushButton;
+  QPushButton* EditProductionLinesPushButton;
   QSpacerItem* ProductionLinesControlPanelVS2;
 
-  QHBoxLayout* BoxIdLayout;
-  QLabel* BoxIdLabel;
-  QLineEdit* BoxIdLineEdit1;
-  QPushButton* LinkProductionLinePushButton;
-  QSpacerItem* ProductionLinesControlPanelVS3;
-
-  QPushButton* DeactivateAllProductionLinesPushButton;
   QPushButton* UpdateProductionLineViewPushButton;
-  QPushButton* DeleteLastProductionLinePushButton;
 
   QGroupBox* ProductionLineTablePanel;
   QVBoxLayout* ProductionLineTableLayout;
@@ -186,9 +134,7 @@ class MainWindowGUI : public AbstractGUI {
 
   QGroupBox* TransponderControlPanel;
   QVBoxLayout* TransponderControlPanelLayout;
-  QHBoxLayout* TransponderControlPanelSublayout;
-  QComboBox* ChoiceAnyIdComboBox;
-  QLineEdit* AnyIdLineEdit;
+
   QPushButton* TransponderManualReleasePushButton;
   QPushButton* TransponderManualRefundPushButton;
   QSpacerItem* TransponderControlPanelLayoutVS;
@@ -209,19 +155,10 @@ class MainWindowGUI : public AbstractGUI {
   QGroupBox* IssuerControlPanelGroup;
   QVBoxLayout* IssuerControlPanelLayout;
 
-  QComboBox* IssuerTableChoice;
-  QPushButton* ShowIssuerTablePushButton;
   QPushButton* InitTransportMasterKeysPushButton;
   QPushButton* InitIssuerTablePushButton;
-  QSpacerItem* TransportKeyVS1;
-
-  QHBoxLayout* IssuerIdLayout1;
-  QLabel* IssuerIdLabel1;
-  QLineEdit* IssuerIdLineEdit1;
-  QHBoxLayout* MasterKeysIdLayout1;
-  QComboBox* MasterKeysChoice;
-  QLineEdit* MasterKeysLineEdit1;
   QPushButton* LinkIssuerWithKeysPushButton;
+  QSpacerItem* TransportKeyVS1;
 
   // Отображение записей
   QGroupBox* IssuerViewGroup;
@@ -236,11 +173,9 @@ class MainWindowGUI : public AbstractGUI {
 
   QGroupBox* StickerControlPanel;
   QVBoxLayout* StickerControlPanelLayout;
-  QLineEdit* TransponderIdLineEdit;
+
   QPushButton* PrintTransponderStickerPushButton;
-  QLineEdit* BoxIdLineEdit2;
   QPushButton* PrintBoxStickerPushButton;
-  QLineEdit* PalletIdLineEdit;
   QPushButton* PrintPalletStickerPushButton;
   QSpacerItem* StickerControlPanelVS;
   QPushButton* ExecStickerPrinterCommandScriptPushButton;
@@ -250,82 +185,6 @@ class MainWindowGUI : public AbstractGUI {
   QTableView* StickerDataTableView;
   QPlainTextEdit* StickerPrinterCommandScriptInput;
   //============================================================
-
-  /* Настройки админпанели */
-  //============================================================
-  QWidget* SettingsTab;
-  QHBoxLayout* SettingsMainLayout;
-  QVBoxLayout* SettingsMainSubLayout;
-  QPushButton* ApplySettingsPushButton;
-
-  QSpacerItem* SettingsHorizontalSpacer1;
-  QSpacerItem* SettingsVerticalSpacer1;
-
-  // Настройки базы данных
-  QGroupBox* DatabaseSettingsGroupBox;
-  QGridLayout* DatabaseSettingsLayout;
-  QLabel* DatabaseIpLabel;
-  QLineEdit* DatabaseIpLineEdit;
-  QLabel* DatabasePortLabel;
-  QLineEdit* DatabasePortLineEdit;
-  QLabel* DatabaseNameLabel;
-  QLineEdit* DatabaseNameLineEdit;
-  QLabel* DatabaseUserNameLabel;
-  QLineEdit* DatabaseUserNameLineEdit;
-  QLabel* DatabaseUserPasswordLabel;
-  QLineEdit* DatabaseUserPasswordLineEdit;
-  QLabel* IDatabaseControllerLogEnableLabel;
-  QCheckBox* IDatabaseControllerLogEnable;
-
-  // Настройки клиента
-  QGroupBox* PersoClientSettingsGroupBox;
-  QGridLayout* PersoClientSettingsMainLayout;
-  QLabel* PersoClientServerIdLabel;
-  QLineEdit* PersoClientServerIpLineEdit;
-  QLabel* PersoClientServerPortLabel;
-  QLineEdit* PersoClientServerPortLineEdit;
-
-  // Настройки системы логгирования
-  QGroupBox* LogSystemSettingsGroupBox;
-  QGridLayout* LogSystemSettingsLayout;
-  QLabel* LogSystemGlobalEnableLabel;
-  QCheckBox* LogSystemGlobalEnableCheckBox;
-
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
-
-  QWidget* LogSystemProxyWidget1;
-  QGridLayout* LogSystemProxyWidget1Layout;
-
-  QLabel* LogSystemDisplayEnableLabel;
-  QCheckBox* LogSystemDisplayEnableCheckBox;
-
-  QLabel* LogSystemListenPersoServerLabel;
-  QCheckBox* LogSystemListenPersoServerCheckBox;
-
-  QWidget* LogSystemProxyWidget2;
-  QGridLayout* LogSystemProxyWidget2Layout;
-  QLabel* LogSystemListenIpLabel;
-  QLineEdit* LogSystemListenIpLineEdit;
-  QLabel* LogSystemListenPortLabel;
-  QLineEdit* LogSystemListenPortLineEdit;
-
-  QLabel* LogSystemFileEnableLabel;
-  QCheckBox* LogSystemFileEnableCheckBox;
-
-  QWidget* LogSystemProxyWidget3;
-  QGridLayout* LogSystemProxyWidget3Layout;
-  QLabel* LogSystemFileMaxNumberLabel;
-  QLineEdit* LogSystemFileMaxNumberLineEdit;
-
-  // Настройки принтера
-  QGroupBox* StickerPrinterSettingsGroupBox;
-  QGridLayout* StickerPrinterSettingsMainLayout;
-  QLabel* StickerPrinterLibPathLabel;
-  QLineEdit* StickerPrinterLibPathLineEdit;
-  QPushButton* StickerPrinterLibPathPushButton;
-  QLabel* StickerPrinterNameLabel;
-  QLineEdit* StickerPrinterNameLineEdit;
 
  public:
   explicit MainWindowGUI(QWidget* parent);
@@ -338,7 +197,7 @@ class MainWindowGUI : public AbstractGUI {
   void clearLogDisplay(void);
 
  private:
-  Q_DISABLE_COPY(MainWindowGUI)
+  Q_DISABLE_COPY_MOVE(MainWindowGUI)
   void createTabs(void);
 
   void createDatabaseTab(void);
@@ -348,20 +207,12 @@ class MainWindowGUI : public AbstractGUI {
   void createTransponderTab(void);
   void createIssuerTab(void);
   void createStickerTab(void);
-  void createSettingsTab(void);
-
   void createLog(void);
 
+  void connectDependecies(void);
+
  private slots:
-  void on_PanFileExplorePushButton_slot(void);
-
-  void on_RereleaseKeyComboBox_slot(const QString& text);
-
-  void on_LogSystemEnableCheckBox_slot(int32_t state);
-  void on_LogSystemListenPersoServerCheckBox_slot(int32_t state);
-  void on_LogSystemFileEnableCheckBox_slot(int32_t state);
-
-  void on_StickerPrinterLibPathPushButton_slot(void);
+  void rereleaseKeyComboBox_slot(const QString& text);
 
  signals:
 };

@@ -1,33 +1,49 @@
 #include "pan_input_dialog.h"
+#include "General/definitions.h"
 
-PanInputDialog::PanInputDialog(QWidget* parent)
-    : InputDialog(parent, PanInput) {
+PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
   setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
+  setGeometry(DesktopGeometry.width() * 0.45, DesktopGeometry.height() * 0.45,
               DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
   setWindowTitle("Сканирование стикера");
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 PanInputDialog::~PanInputDialog() {}
 
-void PanInputDialog::getData(QHash<QString, QString>* data) const {
-  if (!data) {
+void PanInputDialog::getData(StringDictionary& data) const {
+  QString pan;
+  QStringList input = StickerData->toPlainText().split("\n");
+
+  if (input.size() == 2) {
+    pan = input.at(1);
+  } else if (input.size() == 1) {
+    pan = input.at(0);
+  }
+
+  data.insert("pan", pan);
+}
+
+AbstractInputDialog::InputDialogType PanInputDialog::type() const {
+  return PanInput;
+}
+
+void PanInputDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
     return;
   }
 
-  QString pan;
-  if (checkInput(pan)) {
-    data->insert("pan", pan);
-  } else {
-    data->clear();
-  }
+  QDialog::accept();
 }
 
 void PanInputDialog::create() {
@@ -49,7 +65,8 @@ void PanInputDialog::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PanInputDialog::checkInput(QString& pan) const {
+bool PanInputDialog::check() const {
+  QString pan;
   QStringList input = StickerData->toPlainText().split("\n");
 
   if (input.size() == 2) {

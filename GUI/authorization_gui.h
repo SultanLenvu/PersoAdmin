@@ -31,7 +31,7 @@ class AuthorizationGUI : public AbstractGUI {
   virtual void update(void) override;
 
  private:
-  Q_DISABLE_COPY(AuthorizationGUI)
+  Q_DISABLE_COPY_MOVE(AuthorizationGUI)
   void createAuthorizationMenu(void);
 
  private slots:

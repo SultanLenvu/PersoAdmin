@@ -10,20 +10,19 @@
 #include <QString>
 #include <QTextStream>
 
-#include "GUI/interaction_system.h"
 #include "log_backend.h"
 
 class FileLogBackend : public LogBackend {
   Q_OBJECT
  private:
-  bool LogEnable;
+  bool Enable;
   int32_t LogFileMaxNumber;
   QString CurrentLogDir;
   QFile CurrentLogFile;
   QTextStream LogTextStream;
 
  public:
-  explicit FileLogBackend(QObject* parent);
+  explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
   virtual void writeLogLine(const QString& str) override;
@@ -31,13 +30,10 @@ class FileLogBackend : public LogBackend {
   virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY(FileLogBackend);
+  Q_DISABLE_COPY_MOVE(FileLogBackend);
   void loadSettings(void);
   void initialize();
   void removeOldestLogFiles(void);
-
- signals:
-  void notifyAboutError(const QString& log);
 };
 
 #endif /* FILELOGBACKEND_H */

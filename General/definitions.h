@@ -15,6 +15,17 @@
 #define IP_PORT_MIN_VALUE 0
 //===============================================================
 
+/* Определения для вводимых данных */
+//===============================================================
+#define ID_MAX_LENGHT 10
+
+#define PL_LOGIN_MAX_LENGHT 20
+#define PL_PASSWORD_MAX_LENGHT 20
+
+#define PL_NAME_MAX_LENGHT 20
+#define PL_SURNAME_MAX_LENGHT 20
+//===============================================================
+
 /* Определения менеджера */
 //===============================================================
 #define SERVER_MANAGER_OPERATION_MAX_DURATION 60000
@@ -43,6 +54,7 @@
 #define TRANSPONDER_ID_START_SHIFT 1000000
 #define BOX_ID_START_SHIFT 1000000
 #define PALLET_ID_START_SHIFT 1000000
+#define ORDER_ID_START_SHIFT 0
 
 #define POSTGRES_SERVER_DEFAULT_IP "127.0.0.1"
 #define POSTGRES_SERVER_DEFAULT_PORT 5432
@@ -52,6 +64,7 @@
 
 #define POSTGRES_TIMESTAMP_DEFAULT_VALUE "2000-01-01 00:00:00"
 #define POSTGRES_TIMESTAMP_TEMPLATE "yyyy-MM-dd hh:mm:ss"
+#define POSTGRES_DATE_TEMPLATE "yyyy-MM-dd"
 //===============================================================
 
 /* Определения для генератора прошивок */
@@ -145,4 +158,4 @@
 #define BOX_STICKER_DATE_TEMPLATE "dd.MM.yyyy"
 //===============================================================
 
-#endif // DEFINITIONS_H
+#endif  // DEFINITIONS_H

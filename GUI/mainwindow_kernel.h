@@ -6,129 +6,124 @@
 #include <QMainWindow>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QSharedPointer>
+
 #include <QString>
 
-#include "Database/database_table_model.h"
-#include "General/definitions.h"
-#include "General/hash_model.h"
+#include "Database/sql_query_values.h"
+#include "General/hash_table_model.h"
 #include "Log/log_system.h"
 #include "Management/admin_manager.h"
 #include "abstract_gui.h"
-#include "authorization_gui.h"
 #include "interaction_system.h"
-#include "mainwindow_gui.h"
 
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
  private:
-   QSize DesktopGeometry;
-   AbstractGUI* CurrentGUI;
+  QSize DesktopGeometry;
+  AbstractGUI* CurrentGUI;
 
-   QMenu* ServiceMenu;
-   QMenu* HelpMenu;
+  // Верхнее меню главного окна
+  //===========================================
+  QMenu* ServiceMenu;
+  QMenu* HelpMenu;
 
-   QAction* AboutProgramAct;
-   QAction* RequestAuthorizationGUIAct;
+  QAction* SettingsAction;
+  QAction* AboutProgramAction;
+  QAction* RequestAuthorizationGuiAction;
+  //===========================================
 
-   InteractionSystem* Interactor;
+  std::unique_ptr<InteractionSystem> Interactor;
 
-   QThread* ManagerThread;
-   AdminManager* Manager;
+  std::unique_ptr<QThread> ManagerThread;
+  std::unique_ptr<AdminManager> Manager;
 
-   QThread* LoggerThread;
-   LogSystem* Logger;
+  std::unique_ptr<QThread> LoggerThread;
+  std::unique_ptr<LogSystem> Logger;
 
-   DatabaseTableModel* RandomModel;
-   DatabaseTableModel* OrderModel;
-   DatabaseTableModel* ProductionLineModel;
-   DatabaseTableModel* IssuerModel;
-   DatabaseTableModel* TransponderModel;
-   DatabaseTableModel* StickerModel;
+  SqlQueryValues* RandomModel;
+  SqlQueryValues* OrderModel;
+  SqlQueryValues* ProductionLineModel;
+  SqlQueryValues* IssuerModel;
+  SqlQueryValues* TransponderModel;
+  SqlQueryValues* StickerModel;
 
-   HashModel* TransponderData;
+  HashTableModel* TransponderData;
 
-   QHash<QString, QString>* MatchingTable;
+  StringDictionary MatchingTable;
 
  public:
   MainWindowKernel(QWidget* parent = nullptr);
   ~MainWindowKernel();
 
  public slots:
-   void requestAuthorizationGUIAct_slot(void);
+  void requestAuthorizationGUIAct_slot(void);
 
-   // Авторизация
-   void authorizePushButton_slot(void);
+  // Авторизация
+  void authorizePushButton_slot(void);
 
-   // Функционал для работы с базой данных
-   void connectDatabasePushButton_slot(void);
-   void disconnectDatabasePushButton_slot(void);
-   void showDatabaseTablePushButton_slot(void);
-   void clearDatabaseTablePushButton_slot(void);
-   void transmitCustomRequestPushButton_slot(void);
+  // Функционал для работы с базой данных
+  void connectDatabasePushButton_slot(void);
+  void disconnectDatabasePushButton_slot(void);
+  void showDatabaseTablePushButton_slot(void);
+  void transmitCustomRequestPushButton_slot(void);
 
-   // Функционал для работы с заказами
-   void createNewOrderPushButton_slot(void);
-   void startOrderAssemblingPushButton_slot(void);
-   void stopOrderAssemblingPushButton_slot(void);
-   void updateOrderViewPushButton_slot(void);
-   void deleteLastOrderPushButton_slot(void);
+  // Функционал для работы с заказами
+  void createNewOrderPushButton_slot(void);
+  void startOrderAssemblingPushButton_slot(void);
+  void stopOrderAssemblingPushButton_slot(void);
+  void updateOrderViewPushButton_slot(void);
 
-   // Функционал для работы с производственными линиями
-   void createNewProductionLinePushButton_slot(void);
-   void allocateInactiveProductionLinesPushButton_slot(void);
-   void linkProductionLinePushButton_slot(void);
-   void deactivateAllProductionLinesPushButton_slot(void);
-   void updateProductionLineViewPushButton_slot(void);
-   void deleteLastProductionLinePushButton_slot(void);
+  // Функционал для работы с производственными линиями
+  void createNewProductionLinePushButton_slot(void);
 
-   // Функционал для работы с транспортными мастер ключами
-   void showIssuerTablePushButton_slot(void);
-   void initTransportMasterKeysPushButton_slot(void);
-   void initIssuerTablePushButton_slot(void);
-   void linkIssuerWithKeysPushButton_slot(void);
+  void activateProductionLinePushButton_slot(void);
+  void activateAllProductionLinesPushButton_slot(void);
 
-   // Функционал для взаимодействия с сервером
-   void releaseTransponderPushButton_slot(void);
-   void confirmTransponderPushButton_slot(void);
-   void rereleaseTransponderPushButton_slot(void);
-   void confirmRereleaseTransponderPushButton_slot(void);
-   void productionLineRollbackPushButton_slot(void);
+  void deactivateProductionLinePushButton_slot(void);
+  void deactivateAllProductionLinesPushButton_slot(void);
 
-   void printBoxStickerOnServerPushButton_slot(void);
-   void printLastBoxStickerOnServerPushButton_slot(void);
-   void printPalletStickerOnServerPushButton_slot(void);
-   void printLastPalletStickerOnServerPushButton_slot(void);
+  void editProductionLinesPushButton_slot(void);
+  void updateProductionLineViewPushButton_slot(void);
 
-   // Функционал для выпуска, возврата и отгрузки транспондеров
-   void transponderManualReleasePushButton_slot(void);
-   void transponderManualRefundPushButton_slot(void);
-   void palletShipmentPushButton_slot(void);
+  // Функционал для работы с транспортными мастер ключами
+  void initTransportMasterKeysPushButton_slot(void);
+  void initIssuerTablePushButton_slot(void);
+  void linkIssuerWithKeysPushButton_slot(void);
 
-   // Функционал для работы с принтером стикеров
-   void printTransponderStickerPushButton_slot(void);
-   void printBoxStickerPushButton_slot(void);
-   void printPalletStickerPushButton_slot(void);
-   void execStickerPrinterCommandScriptPushButton_slot(void);
+  // Функционал для взаимодействия с сервером
+  void releaseTransponderPushButton_slot(void);
+  void confirmTransponderPushButton_slot(void);
+  void rereleaseTransponderPushButton_slot(void);
+  void confirmRereleaseTransponderPushButton_slot(void);
+  void productionLineRollbackPushButton_slot(void);
 
-   // Функционал для настройки сервера
-   void applySettingsPushButton_slot(void);
+  void printBoxStickerOnServerPushButton_slot(void);
+  void printLastBoxStickerOnServerPushButton_slot(void);
+  void printPalletStickerOnServerPushButton_slot(void);
+  void printLastPalletStickerOnServerPushButton_slot(void);
 
-   // Отображение данных
-   void displayFirmware_slot(QSharedPointer<QFile> firmware);
-   void displayTransponderData_slot(QSharedPointer<QHash<QString, QString>> transponderData);
+  // Функционал для выпуска, возврата и отгрузки транспондеров
+  void transponderManualReleasePushButton_slot(void);
+  void transponderManualRefundPushButton_slot(void);
+  void palletShipmentPushButton_slot(void);
+
+  // Функционал для работы с принтером стикеров
+  void printTransponderStickerPushButton_slot(void);
+  void printBoxStickerPushButton_slot(void);
+  void printPalletStickerPushButton_slot(void);
+  void execStickerPrinterCommandScriptPushButton_slot(void);
+
+  // Функционал для настройки сервера
+  void settingsActionTrigger_slot(void);
+
+  // Отображение данных
+  void displayFirmware_slot(std::shared_ptr<QFile> firmware);
+  void displayTransponderData_slot(
+      std::shared_ptr<StringDictionary> transponderData);
 
  private:
-  Q_DISABLE_COPY(MainWindowKernel)
+  Q_DISABLE_COPY_MOVE(MainWindowKernel)
   void loadSettings(void) const;
-  void saveSettings(void) const;
-  bool checkAuthorizationData(void) const;
-  bool checkNewSettings(void) const;
-  bool checkNewOrderInput(void) const;
-  bool checkNewProductionLineInput(void) const;
-  bool checkReleaseTransponderInput(void) const;
-  bool checkConfirmRereleaseTransponderInput(void) const;
-  bool checkLinkIssuerInput(void) const;
 
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню
@@ -148,8 +143,6 @@ class MainWindowKernel : public QMainWindow {
   void registerMetaType(void);
 
  signals:
-  void applySettings_signal();
-
   // Логгер
   void loggerClear_signal(void);
   void logging(const QString& log);
@@ -157,79 +150,83 @@ class MainWindowKernel : public QMainWindow {
   // База данных
   void connectDatabase_signal(void);
   void disconnectDatabase_signal(void);
-  void showDatabaseTable_signal(const QString& name, DatabaseTableModel* model);
-  void clearDatabaseTable_signal(const QString& name,
-                                 DatabaseTableModel* model);
-
-  void performCustomRequest_signal(const QString& req,
-                                   DatabaseTableModel* model);
+  void showDatabaseTable_signal(const QString& name, SqlQueryValues* model);
+  void performCustomRequest_signal(const QString& req, SqlQueryValues* model);
 
   // Заказы
   void createNewOrder_signal(
-      const QSharedPointer<QHash<QString, QString>> orderParameterseters,
-      DatabaseTableModel* model);
-  void startOrderAssembling_signal(const QString& orderId,
-                                   DatabaseTableModel* model);
-  void stopOrderAssembling_signal(const QString& orderId,
-                                  DatabaseTableModel* model);
-  void deleteLastOrder_signal(DatabaseTableModel* model);
-  void showOrderTable_signal(DatabaseTableModel* model);
+      const std::shared_ptr<StringDictionary> orderParameterseters,
+      SqlQueryValues* model);
+  void startOrderAssembling_signal(
+      const std::shared_ptr<StringDictionary>,
+      SqlQueryValues* model);
+  void stopOrderAssembling_signal(const std::shared_ptr<StringDictionary>,
+                                  SqlQueryValues* model);
+  void showOrderTable_signal(SqlQueryValues* model);
 
   // Производственные линии
   void createNewProductionLine_signal(
-      const QSharedPointer<QHash<QString, QString>>
+      const std::shared_ptr<StringDictionary>
           productionLineParameterseters,
-      DatabaseTableModel* model);
-  void allocateInactiveProductionLines_signal(const QString& orderId,
-                                              DatabaseTableModel* model);
-  void shutdownAllProductionLines_signal(DatabaseTableModel* model);
-  void deleteLastProductionLine_signal(DatabaseTableModel* model);
-  void showProductionLineTable_signal(DatabaseTableModel* model);
-  void linkProductionLineWithBox_signal(
-      const QSharedPointer<QHash<QString, QString>> linkParameters,
-      DatabaseTableModel* model);
+      SqlQueryValues* model);
+  void activateProductionLine_signal(
+      const std::shared_ptr<StringDictionary>,
+      SqlQueryValues* model);
+  void activateAllProductionLines_signal(SqlQueryValues* model);
+  void deactivateProductionLine_signal(
+      const std::shared_ptr<StringDictionary>,
+      SqlQueryValues* model);
+  void deactivateAllProductionLines_signal(SqlQueryValues* model);
+  void editProductionLine_signal(const std::shared_ptr<StringDictionary>,
+                                 SqlQueryValues* model);
+  void showProductionLineTable_signal(SqlQueryValues* model);
 
   // Тест сервера
   void releaseTransponder_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void confirmTransponderRelease_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void rereleaseTransponder_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void confirmTransponderRerelease_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void rollbackProductionLine_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printBoxStickerOnServer_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printLastBoxStickerOnServer_signal();
   void printPalletStickerOnServer_signal(
-      const QSharedPointer<QHash<QString, QString>> param);
+      const std::shared_ptr<StringDictionary> param);
   void printLastPalletStickerOnServer_signal();
 
   // Транспондеры
   void releaseTranspondersManually_signal(
-      const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
   void refundTranspondersManually_signal(
-      const QSharedPointer<QHash<QString, QString>> param,
-      DatabaseTableModel* model);
-  void shipPallets_signal(const QSharedPointer<QHash<QString, QString>> param,
-                          DatabaseTableModel* model);
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
+  void shipPallets_signal(const std::shared_ptr<StringDictionary> param,
+                          SqlQueryValues* model);
 
   // Заказчики
-  void initIssuers_signal(DatabaseTableModel* model);
-  void initTransportMasterKeys_signal(DatabaseTableModel* model);
+  void initIssuers_signal(SqlQueryValues* model);
+  void initTransportMasterKeys_signal(SqlQueryValues* model);
   void linkIssuerWithMasterKeys_signal(
-      DatabaseTableModel* model,
-      const QSharedPointer<QHash<QString, QString>> Parameterseters);
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
 
   // Принтер
-  void printTransponderSticker_signal(const QString& id,
-                                      DatabaseTableModel* model);
-  void printBoxSticker_signal(const QString& id, DatabaseTableModel* model);
-  void printPalletSticker_signal(const QString& id, DatabaseTableModel* model);
+  void printTransponderSticker_signal(
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
+  void printBoxSticker_signal(
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
+  void printPalletSticker_signal(
+      const std::shared_ptr<StringDictionary> param,
+      SqlQueryValues* model);
   void execPrinterStickerCommandScript_signal(
-      const QSharedPointer<QStringList> commandScript);
+      const std::shared_ptr<QStringList> commandScript);
 };
 #endif  // MAINWINDOWKERNEL_H

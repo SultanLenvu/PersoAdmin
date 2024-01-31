@@ -1,37 +1,41 @@
-#include "log_system.h"
+#include "QNetworkDatagram"
 
-LogSystem::LogSystem(QObject* parent) : QObject(parent) {
-  setObjectName("LogSystem");
+#include "log_system.h"
+#include "file_log_backend.h"
+#include "global_environment.h"
+#include "widget_log_backend.h"
+
+LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
 
-  WidgetLogger = new WidgetLogBackend(this);
-  Backends << WidgetLogger;
+  //  instanceThreadStarted();
 
-  FileLogger = new FileLogBackend(this);
-  Backends << FileLogger;
-
-  UdpSocket = new QUdpSocket(this);
-  if (UdpListenEnable) {
-    UdpSocket->bind(UdpListenIp, UdpListenPort);
-  }
-  connect(UdpSocket, &QUdpSocket::readyRead, this,
-          &LogSystem::on_UdpSocketReadyRead_slot);
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
-LogSystem::~LogSystem() {}
+LogSystem::~LogSystem() {
+  /*
+   * Если удалять напрямую, то ловим критическую ошибку
+   * из-за внутренних механизмов Qt
+   */
+  PersoServerLogSocket->deleteLater();
 
-WidgetLogBackend* LogSystem::getWidgetLogger() {
-  return WidgetLogger;
+  //  PersoServerLogSocket->blockSignals(true);
+  //  delete PersoServerLogSocket;
 }
 
-LogSystem* LogSystem::instance() {
-  static LogSystem Logger(nullptr);
-  return &Logger;
+void LogSystem::instanceThreadStarted() {
+  Backends.push_back(std::shared_ptr<WidgetLogBackend>(
+      new WidgetLogBackend("WidgetLogBackend")));
+  Backends.push_back(
+      std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
+
+  createPersoServerLogSocket();
 }
 
 void LogSystem::clear() {
-  for (QList<LogBackend*>::iterator it = Backends.begin(); it != Backends.end();
-       it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->clear();
   }
 }
@@ -39,8 +43,7 @@ void LogSystem::clear() {
 void LogSystem::generate(const QString& log) {
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (QList<LogBackend*>::const_iterator it = Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->writeLogLine(LogData);
   }
 }
@@ -49,13 +52,10 @@ void LogSystem::applySettings() {
   generate("LogSystem - Применение новых настроек. ");
   loadSettings();
 
-  UdpSocket->abort();
-  if (UdpListenEnable) {
-    UdpSocket->bind(UdpListenIp, UdpListenPort);
-  }
+  PersoServerLogSocket->abort();
+  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
 
-  for (QList<LogBackend*>::const_iterator it = Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->applySettings();
   }
 }
@@ -73,10 +73,28 @@ void LogSystem::loadSettings() {
   UdpListenPort = settings.value("log_system/udp_listen_port").toUInt();
 }
 
-void LogSystem::on_UdpSocketReadyRead_slot() {
-  QByteArray datagram;
-  datagram.resize(UdpSocket->bytesAvailable());
+void LogSystem::createPersoServerLogSocket() {
+  //  PersoServerLogSocket = std::unique_ptr<QUdpSocket>(new QUdpSocket());
+  //  connect(PersoServerLogSocket.get(), &QUdpSocket::readyRead, this,
+  //          &LogSystem::udpSocketReadyRead_slot);
+  PersoServerLogSocket = new QUdpSocket(nullptr);
+  connect(PersoServerLogSocket, &QUdpSocket::readyRead, this,
+          &LogSystem::udpSocketReadyRead_slot);
+  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
+}
 
-  UdpSocket->readDatagram(datagram.data(), datagram.size());
-  generate(datagram);
+void LogSystem::udpSocketReadyRead_slot() {
+  QByteArray datagram;
+  datagram.resize(PersoServerLogSocket->pendingDatagramSize());
+
+  PersoServerLogSocket->readDatagram(datagram.data(), datagram.size());
+
+  // Другой рабочий вариант
+  //  QNetworkDatagram datagram;
+  //  datagram = PersoServerLogSocket->receiveDatagram();
+  //  generate(datagram.data());
+
+  if (UdpListenEnable) {
+    generate(QString::fromUtf8(datagram));
+  }
 }

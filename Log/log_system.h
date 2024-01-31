@@ -10,9 +10,7 @@
 #include <QTime>
 #include <QUdpSocket>
 
-#include "Log/file_log_backend.h"
-#include "Log/log_backend.h"
-#include "Log/widget_log_backend.h"
+#include "log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -22,33 +20,35 @@ class LogSystem : public QObject {
 
  private:
   QString SavePath;
-  QList<LogBackend*> Backends;
-  WidgetLogBackend* WidgetLogger;
-  FileLogBackend* FileLogger;
+  std::vector<std::shared_ptr<LogBackend>> Backends;
 
   bool UdpListenEnable;
-  QUdpSocket* UdpSocket;
+  //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
+  // Из-за внутренних механизмов Qt лучше использовать "сырой" указатель
+  QUdpSocket* PersoServerLogSocket;
   QHostAddress UdpListenIp;
   uint32_t UdpListenPort;
 
  public:
+  LogSystem(const QString& name);
   ~LogSystem();
-  WidgetLogBackend* getWidgetLogger();
-  static LogSystem* instance(void);
 
  public slots:
+  void instanceThreadStarted(void);
+
   void clear(void);
   void generate(const QString& log);
 
   void applySettings(void);
 
  private:
-  LogSystem(QObject* parent);
-  Q_DISABLE_COPY(LogSystem)
+  Q_DISABLE_COPY_MOVE(LogSystem)
   void loadSettings(void);
 
+  void createPersoServerLogSocket(void);
+
  private slots:
-  void on_UdpSocketReadyRead_slot();
+  void udpSocketReadyRead_slot();
 };
 
 //==================================================================================

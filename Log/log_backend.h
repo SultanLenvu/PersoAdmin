@@ -8,7 +8,7 @@ class LogBackend: public QObject {
  Q_OBJECT
 
  public:
-  LogBackend(QObject* parent);
+  LogBackend(const QString& name);
   virtual ~LogBackend();
 
   virtual void writeLogLine(const QString& str) = 0;
@@ -16,7 +16,7 @@ class LogBackend: public QObject {
   virtual void applySettings(void) = 0;
 
  private:
-  Q_DISABLE_COPY(LogBackend);
+  Q_DISABLE_COPY_MOVE(LogBackend);
 };
 
 #endif /* LOGBACKEND_H */

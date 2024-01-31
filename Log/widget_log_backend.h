@@ -9,17 +9,17 @@
 class WidgetLogBackend : public LogBackend {
   Q_OBJECT
  private:
-  bool LogEnable;
+  bool Enable;
 
  public:
-  WidgetLogBackend(QObject* parent);
+  WidgetLogBackend(const QString& name);
 
   virtual void writeLogLine(const QString& str) override;
   virtual void clear() override;
   virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY(WidgetLogBackend);
+  Q_DISABLE_COPY_MOVE(WidgetLogBackend);
   void loadSettings(void);
 
  signals:

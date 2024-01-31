@@ -5,131 +5,87 @@
 #include <QDate>
 #include <QObject>
 
-#include "Database/database_controller.h"
-#include "Database/database_table_model.h"
-#include "Database/postgres_controller.h"
-#include "Log/log_system.h"
+#include "abstract_sql_database.h"
+#include "types.h"
 
 class AdministrationSystem : public QObject {
   Q_OBJECT
- public:
-  enum ReturnStatus {
-    NotExecuted,
-    ParameterError,
-    DatabaseConnectionError,
-    DatabaseTransactionError,
-    DatabaseQueryError,
-    ShipmentRegisterError,
-    LogicError,
-    UnknownError,
-    Completed
-  };
-  Q_ENUM(ReturnStatus)
-
  private:
-  bool LogEnable;
   QString ShipmentRegisterDir;
 
-  QHash<QString, QString> CurrentTransponder;
-  QHash<QString, QString> CurrentBox;
-  QHash<QString, QString> CurrentPallet;
-  QHash<QString, QString> CurrentOrder;
-  QHash<QString, QString> CurrentIssuer;
-
-  PostgresController* Database;
+  std::unique_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit AdministrationSystem(QObject* parent);
+  AdministrationSystem(const QString& name);
   void applySettings(void);
 
   ReturnStatus connectDatabase(void);
   ReturnStatus disconnectDatabase(void);
 
-  ReturnStatus clearDatabaseTable(const QString& tableName);
-  ReturnStatus getDatabaseTable(const QString& tableName,
-                                DatabaseTableModel* buffer);
-  ReturnStatus getCustomResponse(const QString& req,
-                                 DatabaseTableModel* buffer);
+  ReturnStatus getTable(const QString& tableName, SqlQueryValues& response);
+  ReturnStatus getCustomResponse(const QString& req, SqlQueryValues& response);
 
-  ReturnStatus createNewOrder(
-      const QSharedPointer<QHash<QString, QString> > orderParameters);
-  ReturnStatus startOrderAssembling(const QString& orderId);
-  ReturnStatus stopOrderAssembling(const QString& orderId);
-  ReturnStatus deleteLastOrder(void);
+  ReturnStatus createNewOrder(const StringDictionary& param);
+  ReturnStatus startOrderAssembling(const QString& id);
+  ReturnStatus stopOrderAssembling(const QString& id);
 
-  ReturnStatus createNewProductionLine(
-      const QHash<QString, QString>* productionLineParameters);
-  ReturnStatus allocateInactiveProductionLines(const QString& orderId);
-  ReturnStatus linkProductionLineWithBox(
-      const QHash<QString, QString>* linkParameters);
-  ReturnStatus shutdownAllProductionLines(void);
+  ReturnStatus createNewProductionLine(const StringDictionary& param);
+  ReturnStatus activateProductionLine(const QString& id);
+  ReturnStatus activateAllProductionLines(void);
+  ReturnStatus deactivateProductionLine(const QString& id);
+  ReturnStatus deactivateAllProductionLines(void);
+
   ReturnStatus deleteLastProductionLine(void);
 
   ReturnStatus initIssuerTable(void);
   ReturnStatus initTransportMasterKeysTable(void);
-  ReturnStatus linkIssuerWithMasterKeys(
-      const QHash<QString, QString>* linkParameters);
+  ReturnStatus linkIssuerWithMasterKeys(const StringDictionary& param);
 
-  ReturnStatus getTransponderData(const QString& id,
-                                  QHash<QString, QString>* data);
-  ReturnStatus getBoxData(const QString& id, QHash<QString, QString>* data);
-  ReturnStatus getPalletData(const QString& id, QHash<QString, QString>* data);
+  ReturnStatus getTransponderData(const QString& id, StringDictionary& data);
+  ReturnStatus getBoxData(const QString& id, StringDictionary& data);
+  ReturnStatus getPalletData(const QString& id, StringDictionary& data);
 
   ReturnStatus rollbackProductionLine(const QString& id);
 
-  ReturnStatus releaseTranspondersManually(const QString& table,
-                                           const QString& id);
-  ReturnStatus refundTranspondersManually(const QString& table,
-                                          const QString& id);
-  ReturnStatus shipPallets(const QHash<QString, QString>* param);
+  ReturnStatus releaseTransponder(const QString& id);
+  ReturnStatus releaseBox(const QString& id);
+  ReturnStatus releasePallet(const QString& id);
+  ReturnStatus releaseOrder(const QString& id);
+
+  ReturnStatus refundTransponder(const QString& id);
+  ReturnStatus refundBox(const QString& id);
+  ReturnStatus refundPallet(const QString& id);
+  ReturnStatus refundOrder(const QString& id);
+
+  ReturnStatus shipPallets(const StringDictionary& param);
 
  private:
-  Q_DISABLE_COPY(AdministrationSystem) void createDatabaseController(void);
+  Q_DISABLE_COPY_MOVE(AdministrationSystem)
   void loadSettings(void);
-  void sendLog(const QString& log) const;
+  void sendLog(const QString& log);
 
-  bool getCurrentContext(const QString& id);
+  bool addOrder(const StringDictionary& param);
+  bool addPallets(const QString& orderId, const StringDictionary& param);
+  bool addBoxes(const QString& palletId,
+                const StringDictionary& param,
+                QTextStream& panSource);
+  bool addTransponders(const QString& boxId,
+                       const std::shared_ptr<QVector<QString>>& pans,
+                       const StringDictionary& param);
+  bool addProductionLine(const StringDictionary& param);
 
-  bool addOrder(
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
-  bool addPallets(
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
-  bool addBoxes(
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
-  bool addTransponders(
-      const QSharedPointer<QHash<QString, QString> > orderParameters) const;
-  bool addProductionLine(
-      const QHash<QString, QString>* productionLineParameters) const;
+  int32_t getLastId(const QString& table);
+  bool stopAllProductionLines(void);
 
-  bool startBoxProcessing(const QString& id,
-                          const QString& productionLineId) const;
-  bool startPalletProcessing(const QString& id) const;
-  bool startOrderProcessing(const QString& id) const;
+  bool startOrderProcessing(const QString& id);
+  bool stopOrderProcessing(const QString& id);
 
-  bool removeLastProductionLine(void) const;
-  bool stopBoxProcessing(const QString& id) const;
-  bool stopPalletProcessing(const QString& id) const;
-  bool stopOrderProcessing(const QString& id) const;
+  ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
 
-  bool searchBoxForProductionLine(const QString& orderId,
-                                  const QString& productionLineId,
-                                  QHash<QString, QString>& boxRecord) const;
-
-  ReturnStatus releaseTransponderManually(const QString& id);
-  ReturnStatus releaseBoxManually(const QString& id);
-  ReturnStatus releasePalletManually(const QString& id);
-  ReturnStatus releaseOrderManually(const QString& id);
-
-  ReturnStatus refundTransponderManually(const QString& id);
-  ReturnStatus refundBoxManually(const QString& id);
-  ReturnStatus refundPalletManually(const QString& id);
-  ReturnStatus refundOrderManually(const QString& id);
-
-  ReturnStatus shipTransponder(const QString& id, QFile* reg);
-  ReturnStatus shipPallet(const QString& id, QFile* reg);
+  void createDatabase(void);
 
  signals:
-  void logging(const QString& log) const;
+  void logging(const QString& log);
 };
 
 #endif  // ORDERCREATIONSYSTEM_H

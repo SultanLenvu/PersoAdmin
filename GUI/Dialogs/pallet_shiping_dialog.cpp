@@ -1,26 +1,38 @@
 #include "pallet_shiping_dialog.h"
 
 PalletShippingDialog::PalletShippingDialog(QWidget* parent)
-    : InputDialog(parent, PalletShipping) {
+    : AbstractInputDialog(parent) {
   setObjectName("PalletShippingDialog");
-  setWindowTitle("Отгрузка");
 
-  DesktopGeometry = QApplication::screens().first()->size();
+  setWindowTitle("Отгрузка");
+  DesktopGeometry = QApplication::primaryScreen()->size();
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
               DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.05);
 
   create();
+
+  adjustSize();
+  setFixedHeight(size().height());
 }
 
 PalletShippingDialog::~PalletShippingDialog() {}
 
-void PalletShippingDialog::getData(QHash<QString, QString>* data) const {
-  if (checkInput()) {
-    data->insert("first_pallet_id", FirstPalletId->text());
-    data->insert("last_pallet_id", LastPalletId->text());
-  } else {
-    data->clear();
+void PalletShippingDialog::getData(StringDictionary& data) const {
+  data.insert("first_pallet_id", FirstPalletId->text());
+  data.insert("last_pallet_id", LastPalletId->text());
+}
+
+AbstractInputDialog::InputDialogType PalletShippingDialog::type() const {
+  return PalletShipping;
+}
+
+void PalletShippingDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.", QMessageBox::Ok);
+    return;
   }
+
+  QDialog::accept();
 }
 
 void PalletShippingDialog::create() {
@@ -51,7 +63,7 @@ void PalletShippingDialog::create() {
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-bool PalletShippingDialog::checkInput() const {
+bool PalletShippingDialog::check() const {
   if ((FirstPalletId->text().toUInt() == 0) ||
       (LastPalletId->text().toUInt() == 0)) {
     return false;
