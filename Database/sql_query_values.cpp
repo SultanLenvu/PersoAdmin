@@ -163,7 +163,7 @@ QVariant SqlQueryValues::data(const QModelIndex& index, int role) const {
 QVariant SqlQueryValues::headerData(int section,
                                     Qt::Orientation orientation,
                                     int role) const {
-  if (section > Fields.size()) {
+  if (section >= Fields.size()) {
     return QVariant();
   }
 
