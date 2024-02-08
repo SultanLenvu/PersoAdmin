@@ -19,9 +19,8 @@ class PSObject : public QObject
  private:
   PSObject();
   Q_DISABLE_COPY_MOVE(PSObject)
-  void connectDependencies(void);
 
-  virtual void loadSettings();
+  void connectDependencies(void);
 
  signals:
   void logging(const QString& log);

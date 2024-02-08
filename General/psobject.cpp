@@ -11,9 +11,6 @@ PSObject::PSObject(const QString& name) : QObject{nullptr} {
 PSObject::~PSObject() {}
 
 void PSObject::applySettings() {
-  sendLog("Применение новых настроек.");
-
-  loadSettings();
 }
 
 void PSObject::sendLog(const QString& log) {
@@ -29,5 +26,3 @@ void PSObject::connectDependencies() {
 
   connect(this, &PSObject::logging, ls, &LogSystem::generate);
 }
-
-void PSObject::loadSettings() {}

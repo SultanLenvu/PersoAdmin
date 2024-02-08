@@ -71,6 +71,7 @@ add_executable(PersoAdmin WIN32
     Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
+    Management/production_manager.cpp Management/production_manager.h
 
     ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
