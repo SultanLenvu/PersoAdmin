@@ -25,7 +25,7 @@ class FileLogBackend : public LogBackend {
   explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
-  virtual void writeLogLine(const QString& str) override;
+  virtual void writeLogMessage(const QString& str) override;
   virtual void clear() override;
   virtual void applySettings() override;
 

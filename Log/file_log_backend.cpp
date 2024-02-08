@@ -8,7 +8,7 @@ FileLogBackend::FileLogBackend(const QString& name) : LogBackend(name) {
 
 FileLogBackend::~FileLogBackend() {}
 
-void FileLogBackend::writeLogLine(const QString& str) {
+void FileLogBackend::writeLogMessage(const QString& str) {
   if (Enable) {
     LogTextStream << str << "\n";
   }

@@ -169,7 +169,7 @@ void InteractionSystem::createMessageMatchTable() {
   MessageTable[ReturnStatus::OrderNotInProcess] =
       QString("Сборка заказа не была запущена.");
 
-  MessageTable[ReturnStatus::MultipleActiveOrders] =
+  MessageTable[ReturnStatus::OrderMultiplyAssembly] =
       QString("В процессе сборки находится несколько заказов.");
   MessageTable[ReturnStatus::FreeBoxMissed] =
       QString("Не удалось найти свободный бокс.");

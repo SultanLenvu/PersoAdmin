@@ -11,7 +11,7 @@ class LogBackend: public QObject {
   LogBackend(const QString& name);
   virtual ~LogBackend();
 
-  virtual void writeLogLine(const QString& str) = 0;
+  virtual void writeLogMessage(const QString& str) = 0;
   virtual void clear(void) = 0;
   virtual void applySettings(void) = 0;
 

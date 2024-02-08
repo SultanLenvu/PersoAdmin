@@ -1,10 +1,10 @@
-#include "GUI/mainwindow_kernel.h"
+#include "GUI/gui_kernel.h"
 
 #include <QApplication>
 
 int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
-  MainWindowKernel w;
+  GuiKernel w;
   w.show();
   return a.exec();
 }

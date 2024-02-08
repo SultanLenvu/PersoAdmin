@@ -14,58 +14,93 @@ qt_standard_project_setup()
 #========================================== SOURCE DIRECTORIES ===========================================#
 include_directories(Database/)
 include_directories(General/)
+include_directories(Functors/)
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
 include_directories(Log/)
 include_directories(Management/)
 include_directories(StickerPrinter/)
+include_directories(ServerConnection/)
+include_directories(ServerConnection/Commands)
 #======================================================================================================#
 
-add_executable(PersoAdmin WIN32 MACOSX_BUNDLE
+add_executable(PersoAdmin WIN32
     Database/abstract_sql_database.cpp Database/abstract_sql_database.h
     Database/postgre_sql_database.cpp Database/postgre_sql_database.h
     Database/postgre_sql_table.cpp Database/postgre_sql_table.h
     Database/sql_table_relation.cpp Database/sql_table_relation.h
     Database/abstract_sql_table.cpp Database/abstract_sql_table.h
     Database/sql_query_values.h Database/sql_query_values.cpp
+    Database/sql_insert_values.h Database/sql_insert_values.cpp
+
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
-    GUI/mainwindow_kernel.cpp GUI/mainwindow_kernel.h
+    GUI/gui_kernel.cpp GUI/gui_kernel.h
 
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/pallet_shiping_dialog.cpp GUI/Dialogs/pallet_shiping_dialog.h
     GUI/Dialogs/pan_input_dialog.cpp GUI/Dialogs/pan_input_dialog.h
-    GUI/Dialogs/idetifier_input_dialog.h GUI/Dialogs/identifier_input_dialog.cpp
+    GUI/Dialogs/string_input_dialog.h GUI/Dialogs/string_input_dialog.cpp
     GUI/Dialogs/production_line_creation_dialog.h GUI/Dialogs/production_line_creation_dialog.cpp
     GUI/Dialogs/order_creation_dialog.h GUI/Dialogs/order_creation_dialog.cpp
-    GUI/Dialogs/start_production_line_dialog.h GUI/Dialogs/start_production_line_dialog.cpp
     GUI/Dialogs/manual_release_refund_dialog.h GUI/Dialogs/manual_release_refund_dialog.cpp
     GUI/Dialogs/link_issuer_key_dialog.h GUI/Dialogs/link_issuer_key_dialog.cpp
     GUI/Dialogs/settings_dialog.h GUI/Dialogs/settings_dialog.cpp
+    GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
+    GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
 
     General/types.h
     General/definitions.h
     General/hash_table_model.cpp General/hash_table_model.h
+    General/psobject.cpp General/psobject.h
+
+    Functors/abstract_string_checker.h Functors/abstract_string_checker.cpp
+    Functors/ucid_checker.h Functors/ucid_checker.cpp
+    Functors/numeric_string_checker.h Functors/numeric_string_checker.cpp
 
     Log/file_log_backend.cpp Log/file_log_backend.h
     Log/log_backend.cpp Log/log_backend.h
     Log/log_system.cpp Log/log_system.h
     Log/widget_log_backend.cpp Log/widget_log_backend.h
 
+    Management/abstract_manager.h Management/abstract_manager.cpp
     Management/admin_manager.cpp Management/admin_manager.h
     Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
 
+    ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
+    ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
+    ServerConnection/Commands/abstract_client_command.cpp ServerConnection/Commands/abstract_client_command.h
+    ServerConnection/Commands/complete_current_box.cpp ServerConnection/Commands/complete_current_box.h
+    ServerConnection/Commands/confirm_transponder_release.cpp ServerConnection/Commands/confirm_transponder_release.h
+    ServerConnection/Commands/confirm_transponder_rerelease.cpp ServerConnection/Commands/confirm_transponder_rerelease.h
+    ServerConnection/Commands/echo.cpp ServerConnection/Commands/echo.h ServerConnection/Commands/get_current_box_data.cpp
+    ServerConnection/Commands/get_current_box_data.h ServerConnection/Commands/get_current_transponder_data.cpp
+    ServerConnection/Commands/get_current_transponder_data.h ServerConnection/Commands/get_production_line_data.cpp
+    ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_transponder_data.cpp
+    ServerConnection/Commands/get_transponder_data.h ServerConnection/Commands/launch_production_line.cpp
+    ServerConnection/Commands/launch_production_line.h ServerConnection/Commands/print_box_sticker.cpp
+    ServerConnection/Commands/print_box_sticker.h ServerConnection/Commands/print_last_box_sticker.cpp
+    ServerConnection/Commands/print_last_box_sticker.h ServerConnection/Commands/print_last_pallet_sticker.cpp
+    ServerConnection/Commands/print_last_pallet_sticker.h ServerConnection/Commands/print_pallet_sticker.cpp
+    ServerConnection/Commands/print_pallet_sticker.h ServerConnection/Commands/refund_current_box.cpp
+    ServerConnection/Commands/refund_current_box.h ServerConnection/Commands/release_transponder.cpp
+    ServerConnection/Commands/release_transponder.h ServerConnection/Commands/request_box.cpp
+    ServerConnection/Commands/request_box.h ServerConnection/Commands/rerelease_transponder.cpp
+    ServerConnection/Commands/rerelease_transponder.h ServerConnection/Commands/rollback_transponder.cpp
+    ServerConnection/Commands/rollback_transponder.h ServerConnection/Commands/shutdown_production_line.cpp
+    ServerConnection/Commands/shutdown_production_line.h
+
     StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    Database/sql_insert_values.h Database/sql_insert_values.cpp
-)
+    GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
+    )
 
 target_compile_definitions(PersoAdmin PRIVATE
     QT_DISABLE_DEPRECATED_BEFORE=0x060000

@@ -13,11 +13,13 @@ class AbstractInputDialog : public QDialog {
   enum InputDialogType {
     PalletShipping,
     PanInput,
-    IdentifierInput,
+    StringInput,
     ProductionLineCreation,
     StartProductionLine,
     OrderCreation,
     ManualReleaseRefund,
+    TransponderStickerScan,
+    Authorization,
   };
   Q_ENUM(InputDialogType);
 

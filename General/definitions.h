@@ -69,6 +69,7 @@
 
 /* Определения для генератора прошивок */
 //===============================================================
+#define SERIAL_NUMBER_DS_CHAR_LENGTH 16
 #define UCID_CHAR_LENGTH 32
 #define TRANSPONDER_SERIAL_NUMBER_CHAR_LENGTH 10
 #define PAN_CHAR_LENGTH 19
@@ -156,6 +157,57 @@
 /* Определения для принтера стикеров */
 //===============================================================
 #define BOX_STICKER_DATE_TEMPLATE "dd.MM.yyyy"
+//===============================================================
+
+/* Определения для команд клиента */
+//===============================================================
+#define COMMAND_ECHO_RESPONSE_SIZE 3
+#define COMMAND_LAUNCHPRODUCTIONLINE_RESPONSE_SIZE 2
+#define COMMAND_SHUTDOWNPRODUCTIONLINE_RESPONSE_SIZE 2
+#define COMMAND_GETNPRODUCTIONLINEDATA_RESPONSE_SIZE 9
+
+#define COMMAND_REQUESTBOX_RESPONSE_SIZE 2
+#define COMMAND_GETCURRENTBOXDATA_RESPONSE_SIZE 12
+#define COMMAND_REFUNDBOX_RESPONSE_SIZE 2
+#define COMMAND_COMPLETECURRENTBOX_RESPONSE_SIZE 2
+
+#define COMMAND_RELEASETRANSPONDER_RESPONSE_SIZE 3
+#define COMMAND_CONFIRMTRANSPONDERRELEASE_RESPONSE_SIZE 2
+#define COMMAND_RERELEASETRANSPONDER_RESPONSE_SIZE 3
+#define COMMAND_CONFIRMTRANSPONDERRERELEASE_RESPONSE_SIZE 2
+#define COMMAND_ROLLBACKTRANSPONDER_RESPONSE_SIZE 2
+
+#define COMMAND_GETCURRENTTRANSPONDERDATA_RESPONSE_SIZE 8
+#define COMMAND_GETTRANSPONDERDATA_RESPONSE_SIZE 8
+
+#define COMMAND_PRINTBOXSTICKER_RESPONSE_SIZE 2
+#define COMMAND_PRINTLASTBOXSTICKER_RESPONSE_SIZE 2
+#define COMMAND_PRINTPALLETSTICKER_RESPONSE_SIZE 2
+#define COMMAND_PRINTLASTPALLETSTICKER_RESPONSE_SIZE 2
+
+#define COMMAND_ECHO_NAME "echo"
+#define COMMAND_LAUNCHPRODUCTIONLINE_NAME "launch_production_line"
+#define COMMAND_SHUTDOWNPRODUCTIONLINE_NAME "shutdown_production_line"
+#define COMMAND_GETPRODUCTIONLINEDATA_NAME "get_production_line_data"
+
+#define COMMAND_REQUESTBOX_NAME "request_box"
+#define COMMAND_GETCURRENTBOXDATA_NAME "get_current_box_data"
+#define COMMAND_REFUNDCURRENTBOX_NAME "refund_current_box"
+#define COMMAND_COMPLETECURRENTBOX_NAME "complete_current_box"
+
+#define COMMAND_RELEASETRANSPONDER_NAME "release_transponder"
+#define COMMAND_CONFIRMTRANSPONDERRELEASE_NAME "confirm_transponder_release"
+#define COMMAND_RERELEASETRANSPONDER_NAME "rerelease_transponder"
+#define COMMAND_CONFIRMTRANSPONDERRERELEASE_NAME "confirm_transponder_rerelease"
+#define COMMAND_ROLLBACKTRANSPONDER_NAME "rollback_transponder"
+
+#define COMMAND_GETCURRENTTRANSPONDERDATA_NAME "get_current_transponder_data"
+#define COMMAND_GETTRANSPONDERDATA_NAME "get_transponder_data"
+
+#define COMMAND_PRINTBOXSTICKER_NAME "print_box_sticker"
+#define COMMAND_PRINTLASTBOXSTICKER_NAME "print_last_box_sticker"
+#define COMMAND_PRINTPALLETSTICKER_NAME "print_pallet_sticker"
+#define COMMAND_PRINTLASTPALLETSTICKER_NAME "print_last_pallet_sticker"
 //===============================================================
 
 #endif  // DEFINITIONS_H

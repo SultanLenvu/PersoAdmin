@@ -14,7 +14,7 @@ class WidgetLogBackend : public LogBackend {
  public:
   WidgetLogBackend(const QString& name);
 
-  virtual void writeLogLine(const QString& str) override;
+  virtual void writeLogMessage(const QString& str) override;
   virtual void clear() override;
   virtual void applySettings() override;
 

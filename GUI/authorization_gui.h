@@ -8,7 +8,7 @@
 #include "General/definitions.h"
 #include "abstract_gui.h"
 
-class AuthorizationGUI : public AbstractGUI {
+class AuthorizationGUI : public AbstractGui {
   Q_OBJECT
  public:
   QGroupBox* AuthorizationMenuGroup;

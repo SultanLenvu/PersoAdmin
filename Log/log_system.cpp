@@ -5,11 +5,8 @@
 #include "global_environment.h"
 #include "widget_log_backend.h"
 
-LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
-  setObjectName(name);
+LogSystem::LogSystem(const QString& name) : PSObject(name) {
   loadSettings();
-
-  //  instanceThreadStarted();
 
   GlobalEnvironment::instance()->registerObject(this);
 }
@@ -25,29 +22,6 @@ LogSystem::~LogSystem() {
   //  delete PersoServerLogSocket;
 }
 
-void LogSystem::instanceThreadStarted() {
-  Backends.push_back(std::shared_ptr<WidgetLogBackend>(
-      new WidgetLogBackend("WidgetLogBackend")));
-  Backends.push_back(
-      std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
-
-  createPersoServerLogSocket();
-}
-
-void LogSystem::clear() {
-  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
-    (*it)->clear();
-  }
-}
-
-void LogSystem::generate(const QString& log) {
-  QTime time = QDateTime::currentDateTime().time();
-  QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
-    (*it)->writeLogLine(LogData);
-  }
-}
-
 void LogSystem::applySettings() {
   generate("LogSystem - Применение новых настроек. ");
   loadSettings();
@@ -57,6 +31,26 @@ void LogSystem::applySettings() {
 
   for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->applySettings();
+  }
+}
+
+void LogSystem::instanceThreadStarted() {
+  Backends.push_back(std::shared_ptr<WidgetLogBackend>(
+      new WidgetLogBackend("WidgetLogBackend")));
+  Backends.push_back(
+      std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
+
+  createPersoServerLogSocket();
+}
+
+void LogSystem::generate(const QString& log) {
+  QTime time = QDateTime::currentDateTime().time();
+
+  QString LogMessage =
+      QString("%1 - %2").arg(time.toString("hh:mm:ss.zzz"), log);
+
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
+    (*it)->writeLogMessage(LogMessage);
   }
 }
 

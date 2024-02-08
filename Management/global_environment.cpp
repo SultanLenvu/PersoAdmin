@@ -9,8 +9,10 @@ GlobalEnvironment* GlobalEnvironment::instance() {
 }
 
 void GlobalEnvironment::registerObject(QObject* obj) {
-  GlobalObjects[obj->objectName()] = obj;
+  QString name = obj->objectName();
+  assert(!GlobalObjects.contains(name));
 
+  GlobalObjects[name] = obj;
   connect(obj, &QObject::destroyed, this,
           &GlobalEnvironment::onRegisteredObjectDeleted);
 }

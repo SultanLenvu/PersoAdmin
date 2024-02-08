@@ -17,11 +17,11 @@ enum class ProductionLineState {
 
 enum class ReturnStatus {
   NoError,
-
   ParameterError,
+  SyntaxError,
+  ConsistencyViolation,
+  FileOpenError,
   DynamicLibraryMissing,
-  StickerPrinterConnectionError,
-  StickerPrintingFailed,
 
   DatabaseConnectionError,
   DatabaseTransactionError,
@@ -29,21 +29,68 @@ enum class ReturnStatus {
 
   RegisterFileError,
 
-  TransponderMissed,
-  BoxMissed,
-  PalletMissed,
-  OrderMissed,
-
   ProductionLineMissed,
   ProductionLineLinkError,
   ProductionLineRollbackLimit,
 
+  OrderMissed,
   OrderRemovingError,
   OtherOrderInProcess,
   OrderNotInProcess,
+  IssuerMissed,
+  MasterKeysMissed,
 
-  MultipleActiveOrders,
+  ServerConnectionError,
+  ServerConnectionMissed,
+  ServerNotResponding,
+  ServerDataTransmittingError,
+  ServerResponseSyntaxError,
+  ServerResponseDataBlockError,
+  ServerResponseProcessingError,
+
+  ClientCommandParamError,
+  ServerInternalError,
+
+  ProductionContextNotValid,
+
+  OrderMultiplyAssembly,
+  OrderInProcessMissed,
+  OrderCompletelyAssembled,
+
+  BoxMissed,
+  BoxAlreadyRequested,
   FreeBoxMissed,
+  BoxIsEmty,
+  BoxOverflow,
+  BoxCompletelyAssembled,
+  BoxNotCompletelyAssembled,
+
+  PalletMissed,
+  PalletIsEmpty,
+  PalletOverflow,
+
+  TransponderMissed,
+  TransponderIncorrectRerelease,
+  TransponderIdenticalUcidError,
+  TransponderRollbackLimit,
+
+  ProductionLineContextNotAuthorized,
+  ProductionLineNotLaunched,
+  ProductionLineLaunchError,
+  ProductionLineAlreadyLaunched,
+  ProductionLineAlreadyInProcess,
+  ProductionLineNotActive,
+  ProductionLineCompleted,
+  ProductionLineNotInProcess,
+
+  StickerPrintingFailed,
+  StickerPrinterDriverMissed,
+  StickerPrinterLibraryMissing,
+  StickerPrinterInitError,
+  StickerPrinterConnectionError,
+  StickerPrintError,
+  LastStickerMissed,
+
   UnknownError,
 };
 

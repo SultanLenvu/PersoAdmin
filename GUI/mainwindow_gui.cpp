@@ -3,7 +3,7 @@
 #include "global_environment.h"
 #include "widget_log_backend.h"
 
-MainWindowGUI::MainWindowGUI(QWidget* parent) : AbstractGUI(parent, Master) {
+MainWindowGUI::MainWindowGUI(QWidget* parent) : AbstractGui(parent, Master) {
   setObjectName("MainWindowGUI");
 }
 

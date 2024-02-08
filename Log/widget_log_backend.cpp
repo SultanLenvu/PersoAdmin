@@ -7,7 +7,7 @@ WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
   GlobalEnvironment::instance()->registerObject(this);
 }
 
-void WidgetLogBackend::writeLogLine(const QString& str) {
+void WidgetLogBackend::writeLogMessage(const QString& str) {
   if (Enable) {
     emit displayLog_signal(str);
   }

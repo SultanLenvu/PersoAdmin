@@ -11,11 +11,12 @@
 #include <QUdpSocket>
 
 #include "log_backend.h"
+#include "psobject.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public QObject {
+class LogSystem : public PSObject {
   Q_OBJECT
 
  private:
@@ -33,13 +34,13 @@ class LogSystem : public QObject {
   LogSystem(const QString& name);
   ~LogSystem();
 
+ public:  // PSObject interface
+  virtual void applySettings(void) override;
+
  public slots:
   void instanceThreadStarted(void);
 
-  void clear(void);
   void generate(const QString& log);
-
-  void applySettings(void);
 
  private:
   Q_DISABLE_COPY_MOVE(LogSystem)

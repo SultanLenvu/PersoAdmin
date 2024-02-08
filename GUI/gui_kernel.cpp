@@ -1,7 +1,7 @@
-#include "mainwindow_kernel.h"
+#include "gui_kernel.h"
 #include "authorization_gui.h"
 #include "definitions.h"
-#include "idetifier_input_dialog.h"
+#include "string_input_dialog.h"
 #include "link_issuer_key_dialog.h"
 #include "mainwindow_gui.h"
 #include "manual_release_refund_dialog.h"
@@ -11,7 +11,7 @@
 #include "production_line_creation_dialog.h"
 #include "settings_dialog.h"
 
-MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
+GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
@@ -43,7 +43,7 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   registerMetaType();
 }
 
-MainWindowKernel::~MainWindowKernel() {
+GuiKernel::~GuiKernel() {
   ManagerThread->quit();
   ManagerThread->wait();
 
@@ -51,45 +51,45 @@ MainWindowKernel::~MainWindowKernel() {
   LoggerThread->wait();
 }
 
-void MainWindowKernel::requestAuthorizationGUIAct_slot() {
+void GuiKernel::requestAuthorizationGUIAct_slot() {
   createAuthorazationGUI();
 }
 
-void MainWindowKernel::authorizePushButton_slot() {
+void GuiKernel::authorizePushButton_slot() {
   createMainWindowGUI();
 
   emit connectDatabase_signal();
 }
 
-void MainWindowKernel::connectDatabasePushButton_slot() {
+void GuiKernel::connectDatabasePushButton_slot() {
   emit loggerClear_signal();
 
   emit connectDatabase_signal();
 }
 
-void MainWindowKernel::disconnectDatabasePushButton_slot() {
+void GuiKernel::disconnectDatabasePushButton_slot() {
   emit loggerClear_signal();
 
   emit disconnectDatabase_signal();
 }
 
-void MainWindowKernel::showDatabaseTablePushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::showDatabaseTablePushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   emit loggerClear_signal();
 
-  emit showDatabaseTable_signal(AbstractGUI->DatabaseTableChoice->currentText(),
+  emit showDatabaseTable_signal(AbstractGui->DatabaseTableChoice->currentText(),
                                 RandomModel);
 }
 
-void MainWindowKernel::transmitCustomRequestPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::transmitCustomRequestPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
   emit loggerClear_signal();
 
-  emit performCustomRequest_signal(AbstractGUI->CustomRequestLineEdit->text(),
+  emit performCustomRequest_signal(AbstractGui->CustomRequestLineEdit->text(),
                                    RandomModel);
 }
 
-void MainWindowKernel::createNewOrderPushButton_slot() {
+void GuiKernel::createNewOrderPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   OrderCreationDialog dialog(this);
@@ -102,10 +102,10 @@ void MainWindowKernel::createNewOrderPushButton_slot() {
   emit createNewOrder_signal(param, OrderModel);
 }
 
-void MainWindowKernel::startOrderAssemblingPushButton_slot() {
+void GuiKernel::startOrderAssemblingPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -115,10 +115,10 @@ void MainWindowKernel::startOrderAssemblingPushButton_slot() {
   emit startOrderAssembling_signal(param, OrderModel);
 }
 
-void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
+void GuiKernel::stopOrderAssemblingPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -128,12 +128,12 @@ void MainWindowKernel::stopOrderAssemblingPushButton_slot() {
   emit stopOrderAssembling_signal(param, OrderModel);
 }
 
-void MainWindowKernel::updateOrderViewPushButton_slot() {
+void GuiKernel::updateOrderViewPushButton_slot() {
   emit loggerClear_signal();
   emit showDatabaseTable_signal("orders", OrderModel);
 }
 
-void MainWindowKernel::createNewProductionLinePushButton_slot() {
+void GuiKernel::createNewProductionLinePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   ProductionLineCreationDialog dialog(this);
@@ -146,10 +146,10 @@ void MainWindowKernel::createNewProductionLinePushButton_slot() {
   emit createNewProductionLine_signal(param, ProductionLineModel);
 }
 
-void MainWindowKernel::activateProductionLinePushButton_slot() {
+void GuiKernel::activateProductionLinePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -159,15 +159,15 @@ void MainWindowKernel::activateProductionLinePushButton_slot() {
   emit activateProductionLine_signal(param, ProductionLineModel);
 }
 
-void MainWindowKernel::activateAllProductionLinesPushButton_slot() {
+void GuiKernel::activateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
   emit activateAllProductionLines_signal(ProductionLineModel);
 }
 
-void MainWindowKernel::deactivateProductionLinePushButton_slot() {
+void GuiKernel::deactivateProductionLinePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -177,33 +177,33 @@ void MainWindowKernel::deactivateProductionLinePushButton_slot() {
   emit deactivateProductionLine_signal(param, ProductionLineModel);
 }
 
-void MainWindowKernel::deactivateAllProductionLinesPushButton_slot() {
+void GuiKernel::deactivateAllProductionLinesPushButton_slot() {
   emit loggerClear_signal();
   emit deactivateAllProductionLines_signal(ProductionLineModel);
 }
 
-void MainWindowKernel::editProductionLinesPushButton_slot() {
+void GuiKernel::editProductionLinesPushButton_slot() {
   emit loggerClear_signal();
 }
 
-void MainWindowKernel::updateProductionLineViewPushButton_slot() {
+void GuiKernel::updateProductionLineViewPushButton_slot() {
   emit loggerClear_signal();
   emit showDatabaseTable_signal("production_lines", ProductionLineModel);
 }
 
-void MainWindowKernel::initTransportMasterKeysPushButton_slot() {
+void GuiKernel::initTransportMasterKeysPushButton_slot() {
   emit loggerClear_signal();
 
   emit initTransportMasterKeys_signal(IssuerModel);
 }
 
-void MainWindowKernel::initIssuerTablePushButton_slot() {
+void GuiKernel::initIssuerTablePushButton_slot() {
   emit loggerClear_signal();
 
   emit initIssuers_signal(IssuerModel);
 }
 
-void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
+void GuiKernel::linkIssuerWithKeysPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
   LinkIssuerKeyDialog dialog(this);
@@ -216,71 +216,71 @@ void MainWindowKernel::linkIssuerWithKeysPushButton_slot() {
   emit linkIssuerWithMasterKeys_signal(param, IssuerModel);
 }
 
-void MainWindowKernel::releaseTransponderPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::releaseTransponderPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<StringDictionary> param(new StringDictionary());
-  param->insert("login", AbstractGUI->LoginLineEdit2->text());
-  param->insert("password", AbstractGUI->PasswordLineEdit2->text());
+  param->insert("login", AbstractGui->LoginLineEdit2->text());
+  param->insert("password", AbstractGui->PasswordLineEdit2->text());
 
   emit releaseTransponder_signal(param);
 }
 
-void MainWindowKernel::confirmTransponderPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::confirmTransponderPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<StringDictionary> param(new StringDictionary());
-  param->insert("login", AbstractGUI->LoginLineEdit2->text());
-  param->insert("password", AbstractGUI->PasswordLineEdit2->text());
-  param->insert("ucid", AbstractGUI->UcidLineEdit->text());
+  param->insert("login", AbstractGui->LoginLineEdit2->text());
+  param->insert("password", AbstractGui->PasswordLineEdit2->text());
+  param->insert("ucid", AbstractGui->UcidLineEdit->text());
 
   emit confirmTransponderRelease_signal(param);
 }
 
-void MainWindowKernel::rereleaseTransponderPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::rereleaseTransponderPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<StringDictionary> param(new StringDictionary());
-  param->insert("login", AbstractGUI->LoginLineEdit2->text());
-  param->insert("password", AbstractGUI->PasswordLineEdit2->text());
-  param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
+  param->insert("login", AbstractGui->LoginLineEdit2->text());
+  param->insert("password", AbstractGui->PasswordLineEdit2->text());
+  param->insert("pan", AbstractGui->RereleaseKeyLineEdit->text());
 
   emit rereleaseTransponder_signal(param);
 }
 
-void MainWindowKernel::confirmRereleaseTransponderPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::confirmRereleaseTransponderPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<StringDictionary> param(new StringDictionary());
-  param->insert("login", AbstractGUI->LoginLineEdit2->text());
-  param->insert("password", AbstractGUI->PasswordLineEdit2->text());
-  param->insert("pan", AbstractGUI->RereleaseKeyLineEdit->text());
-  param->insert("ucid", AbstractGUI->UcidLineEdit->text());
+  param->insert("login", AbstractGui->LoginLineEdit2->text());
+  param->insert("password", AbstractGui->PasswordLineEdit2->text());
+  param->insert("pan", AbstractGui->RereleaseKeyLineEdit->text());
+  param->insert("ucid", AbstractGui->UcidLineEdit->text());
 
   emit confirmTransponderRerelease_signal(param);
 }
 
-void MainWindowKernel::productionLineRollbackPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::productionLineRollbackPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<StringDictionary> param(new StringDictionary());
-  param->insert("login", AbstractGUI->LoginLineEdit2->text());
-  param->insert("password", AbstractGUI->PasswordLineEdit2->text());
+  param->insert("login", AbstractGui->LoginLineEdit2->text());
+  param->insert("password", AbstractGui->PasswordLineEdit2->text());
 
   emit rollbackProductionLine_signal(param);
 }
 
-void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
+void GuiKernel::printBoxStickerOnServerPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PanInputDialog dialog(this);
@@ -293,13 +293,13 @@ void MainWindowKernel::printBoxStickerOnServerPushButton_slot() {
   emit printBoxStickerOnServer_signal(param);
 }
 
-void MainWindowKernel::printLastBoxStickerOnServerPushButton_slot() {
+void GuiKernel::printLastBoxStickerOnServerPushButton_slot() {
   emit loggerClear_signal();
 
   emit printLastBoxStickerOnServer_signal();
 }
 
-void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
+void GuiKernel::printPalletStickerOnServerPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PanInputDialog dialog(this);
@@ -312,11 +312,11 @@ void MainWindowKernel::printPalletStickerOnServerPushButton_slot() {
   emit printPalletStickerOnServer_signal(param);
 }
 
-void MainWindowKernel::printLastPalletStickerOnServerPushButton_slot() {
+void GuiKernel::printLastPalletStickerOnServerPushButton_slot() {
   emit printLastPalletStickerOnServer_signal();
 }
 
-void MainWindowKernel::transponderManualReleasePushButton_slot() {
+void GuiKernel::transponderManualReleasePushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog(this);
@@ -329,7 +329,7 @@ void MainWindowKernel::transponderManualReleasePushButton_slot() {
   emit releaseTranspondersManually_signal(param, TransponderModel);
 }
 
-void MainWindowKernel::transponderManualRefundPushButton_slot() {
+void GuiKernel::transponderManualRefundPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog(this);
@@ -342,7 +342,7 @@ void MainWindowKernel::transponderManualRefundPushButton_slot() {
   emit refundTranspondersManually_signal(param, TransponderModel);
 }
 
-void MainWindowKernel::palletShipmentPushButton_slot() {
+void GuiKernel::palletShipmentPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   PalletShippingDialog dialog(this);
@@ -355,10 +355,10 @@ void MainWindowKernel::palletShipmentPushButton_slot() {
   emit shipPallets_signal(param, TransponderModel);
 }
 
-void MainWindowKernel::printTransponderStickerPushButton_slot() {
+void GuiKernel::printTransponderStickerPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -368,10 +368,10 @@ void MainWindowKernel::printTransponderStickerPushButton_slot() {
   emit printTransponderSticker_signal(param, StickerModel);
 }
 
-void MainWindowKernel::printBoxStickerPushButton_slot() {
+void GuiKernel::printBoxStickerPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -381,10 +381,10 @@ void MainWindowKernel::printBoxStickerPushButton_slot() {
   emit printBoxSticker_signal(param, StickerModel);
 }
 
-void MainWindowKernel::printPalletStickerPushButton_slot() {
+void GuiKernel::printPalletStickerPushButton_slot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  IdentifierInputDialog dialog(this);
+  StringInputDialog dialog(this);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -394,18 +394,18 @@ void MainWindowKernel::printPalletStickerPushButton_slot() {
   emit printPalletSticker_signal(param, StickerModel);
 }
 
-void MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::execStickerPrinterCommandScriptPushButton_slot() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   emit loggerClear_signal();
 
   std::shared_ptr<QStringList> commandScript(new QStringList(
-      AbstractGUI->StickerPrinterCommandScriptInput->toPlainText().split(
+      AbstractGui->StickerPrinterCommandScriptInput->toPlainText().split(
           "\n")));
   emit execPrinterStickerCommandScript_signal(commandScript);
 }
 
-void MainWindowKernel::settingsActionTrigger_slot() {
+void GuiKernel::settingsActionTrigger_slot() {
   emit loggerClear_signal();
 
   SettingsDialog dialog(this);
@@ -421,19 +421,19 @@ void MainWindowKernel::settingsActionTrigger_slot() {
   }
 }
 
-void MainWindowKernel::displayFirmware_slot(std::shared_ptr<QFile> firmware) {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::displayFirmware_slot(std::shared_ptr<QFile> firmware) {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   if (!firmware.get()->open(QIODevice::ReadOnly)) {
     Interactor->generateErrorMessage(
         "Не удалось открыть файл прошивки для отображения.");
   }
-  AbstractGUI->AssembledFirmwareView->setPlainText(
+  AbstractGui->AssembledFirmwareView->setPlainText(
       firmware.get()->readAll().toHex());
   firmware.get()->close();
 }
 
-void MainWindowKernel::displayTransponderData_slot(
+void GuiKernel::displayTransponderData_slot(
     std::shared_ptr<StringDictionary> transponderData) {
   TransponderData->setData(*transponderData.get());
   CurrentGUI->update();
@@ -443,7 +443,7 @@ void MainWindowKernel::displayTransponderData_slot(
  * Приватные методы
  */
 
-void MainWindowKernel::loadSettings() const {
+void GuiKernel::loadSettings() const {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
@@ -451,12 +451,12 @@ void MainWindowKernel::loadSettings() const {
   QSettings::setDefaultFormat(QSettings::IniFormat);
 }
 
-// bool MainWindowKernel::checkReleaseTransponderInput() const {
-//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+// bool GuiKernel::checkReleaseTransponderInput() const {
+//   MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 //   QRegularExpression regex("[A-Fa-f0-9]+");
-//   QString login = AbstractGUI->LoginLineEdit2->text();
-//   QString pass = AbstractGUI->PasswordLineEdit2->text();
-//   QString ucid = AbstractGUI->UcidLineEdit->text();
+//   QString login = AbstractGui->LoginLineEdit2->text();
+//   QString pass = AbstractGui->PasswordLineEdit2->text();
+//   QString ucid = AbstractGui->UcidLineEdit->text();
 
 //  if (ucid.size() != UCID_CHAR_LENGTH) {
 //    return false;
@@ -478,15 +478,15 @@ void MainWindowKernel::loadSettings() const {
 //  return true;
 //}
 
-// bool MainWindowKernel::checkConfirmRereleaseTransponderInput() const {
-//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+// bool GuiKernel::checkConfirmRereleaseTransponderInput() const {
+//   MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 //   QRegularExpression ucidRegex("[A-Fa-f0-9]+");
 //   QRegularExpression panRegex("[0-9]+");
-//   QString choice = AbstractGUI->RereleaseKeyComboBox->currentText();
-//   QString input = AbstractGUI->RereleaseKeyLineEdit->text();
-//   QString ucid = AbstractGUI->UcidLineEdit->text();
-//   QString login = AbstractGUI->LoginLineEdit2->text();
-//   QString pass = AbstractGUI->PasswordLineEdit2->text();
+//   QString choice = AbstractGui->RereleaseKeyComboBox->currentText();
+//   QString input = AbstractGui->RereleaseKeyLineEdit->text();
+//   QString ucid = AbstractGui->UcidLineEdit->text();
+//   QString login = AbstractGui->LoginLineEdit2->text();
+//   QString pass = AbstractGui->PasswordLineEdit2->text();
 
 //  if ((login.size() == 0) || (login.size() > 20)) {
 //    return false;
@@ -525,10 +525,10 @@ void MainWindowKernel::loadSettings() const {
 //  return true;
 //}
 
-// bool MainWindowKernel::checkLinkIssuerInput() const {
-//   MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
-//   QString issuerId = AbstractGUI->IssuerIdLineEdit1->text();
-//   QString masterKeysId = AbstractGUI->MasterKeysLineEdit1->text();
+// bool GuiKernel::checkLinkIssuerInput() const {
+//   MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+//   QString issuerId = AbstractGui->IssuerIdLineEdit1->text();
+//   QString masterKeysId = AbstractGui->MasterKeysLineEdit1->text();
 
 //  if (issuerId.toInt() == 0) {
 //    return false;
@@ -541,7 +541,7 @@ void MainWindowKernel::loadSettings() const {
 //  return true;
 //}
 
-void MainWindowKernel::createTopMenu() {
+void GuiKernel::createTopMenu() {
   menuBar()->clear();
   createTopMenuActions();
 
@@ -553,23 +553,23 @@ void MainWindowKernel::createTopMenu() {
   HelpMenu->addAction(AboutProgramAction);
 }
 
-void MainWindowKernel::createTopMenuActions() {
+void GuiKernel::createTopMenuActions() {
   SettingsAction = new QAction("Настройки");
   SettingsAction->setStatusTip("Открыть меню настроек");
   connect(SettingsAction, &QAction::triggered, this,
-          &MainWindowKernel::settingsActionTrigger_slot);
+          &GuiKernel::settingsActionTrigger_slot);
 
   RequestAuthorizationGuiAction = new QAction("Авторизация");
   RequestAuthorizationGuiAction->setStatusTip(
       "Закрыть текущий интерфейс и создать начальный интерфейс");
   connect(RequestAuthorizationGuiAction, &QAction::triggered, this,
-          &MainWindowKernel::requestAuthorizationGUIAct_slot);
+          &GuiKernel::requestAuthorizationGUIAct_slot);
 
   AboutProgramAction = new QAction("О программе", this);
   AboutProgramAction->setStatusTip("Показать сведения о программе");
 }
 
-void MainWindowKernel::createAuthorazationGUI() {
+void GuiKernel::createAuthorazationGUI() {
   // Удаляем предыдущий интерфейс
   if (CurrentGUI) {
     CurrentGUI->hide();
@@ -589,14 +589,14 @@ void MainWindowKernel::createAuthorazationGUI() {
   connectAuthorizationGUI();
 }
 
-void MainWindowKernel::connectAuthorizationGUI() {
-  AuthorizationGUI* AbstractGUI = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
+void GuiKernel::connectAuthorizationGUI() {
+  AuthorizationGUI* AbstractGui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
-  connect(AbstractGUI->AuthorizePushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::authorizePushButton_slot);
+  connect(AbstractGui->AuthorizePushButton, &QPushButton::clicked, this,
+          &GuiKernel::authorizePushButton_slot);
 }
 
-void MainWindowKernel::createMainWindowGUI() {
+void GuiKernel::createMainWindowGUI() {
   // Удаляем предыдущий интерфейс
   if (CurrentGUI) {
     CurrentGUI->hide();
@@ -618,119 +618,119 @@ void MainWindowKernel::createMainWindowGUI() {
   connectMainWindowGUI();
 }
 
-void MainWindowKernel::connectMainWindowGUI() {
-  MainWindowGUI* AbstractGUI = dynamic_cast<MainWindowGUI*>(CurrentGUI);
+void GuiKernel::connectMainWindowGUI() {
+  MainWindowGUI* AbstractGui = dynamic_cast<MainWindowGUI*>(CurrentGUI);
 
   // База данных
-  connect(AbstractGUI->ConnectDatabasePushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::connectDatabasePushButton_slot);
-  connect(AbstractGUI->DisconnectDatabasePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::disconnectDatabasePushButton_slot);
-  connect(AbstractGUI->ShowDatabaseTablePushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::showDatabaseTablePushButton_slot);
-  connect(AbstractGUI->InitIssuerTablePushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::initIssuerTablePushButton_slot);
+  connect(AbstractGui->ConnectDatabasePushButton, &QPushButton::clicked, this,
+          &GuiKernel::connectDatabasePushButton_slot);
+  connect(AbstractGui->DisconnectDatabasePushButton, &QPushButton::clicked,
+          this, &GuiKernel::disconnectDatabasePushButton_slot);
+  connect(AbstractGui->ShowDatabaseTablePushButton, &QPushButton::clicked, this,
+          &GuiKernel::showDatabaseTablePushButton_slot);
+  connect(AbstractGui->InitIssuerTablePushButton, &QPushButton::clicked, this,
+          &GuiKernel::initIssuerTablePushButton_slot);
 
-  connect(AbstractGUI->TransmitCustomRequestPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::transmitCustomRequestPushButton_slot);
+  connect(AbstractGui->TransmitCustomRequestPushButton, &QPushButton::clicked,
+          this, &GuiKernel::transmitCustomRequestPushButton_slot);
 
   // Заказы
-  connect(AbstractGUI->CreateNewOrderPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::createNewOrderPushButton_slot);
-  connect(AbstractGUI->StartOrderAssemblingPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::startOrderAssemblingPushButton_slot);
-  connect(AbstractGUI->StopOrderAssemblingPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::stopOrderAssemblingPushButton_slot);
-  connect(AbstractGUI->UpdateOrderViewPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::updateOrderViewPushButton_slot);
+  connect(AbstractGui->CreateNewOrderPushButton, &QPushButton::clicked, this,
+          &GuiKernel::createNewOrderPushButton_slot);
+  connect(AbstractGui->StartOrderAssemblingPushButton, &QPushButton::clicked,
+          this, &GuiKernel::startOrderAssemblingPushButton_slot);
+  connect(AbstractGui->StopOrderAssemblingPushButton, &QPushButton::clicked,
+          this, &GuiKernel::stopOrderAssemblingPushButton_slot);
+  connect(AbstractGui->UpdateOrderViewPushButton, &QPushButton::clicked, this,
+          &GuiKernel::updateOrderViewPushButton_slot);
 
   // Производственные линии
-  connect(AbstractGUI->CreateNewProductionLinePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::createNewProductionLinePushButton_slot);
-  connect(AbstractGUI->ActivateProductionLinePushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::activateProductionLinePushButton_slot);
-  connect(AbstractGUI->DeactivateProductionLinePushButton,
+  connect(AbstractGui->CreateNewProductionLinePushButton, &QPushButton::clicked,
+          this, &GuiKernel::createNewProductionLinePushButton_slot);
+  connect(AbstractGui->ActivateProductionLinePushButton, &QPushButton::clicked,
+          this, &GuiKernel::activateProductionLinePushButton_slot);
+  connect(AbstractGui->DeactivateProductionLinePushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::deactivateProductionLinePushButton_slot);
-  connect(AbstractGUI->ActivateAllProductionLinesPushButton,
+          &GuiKernel::deactivateProductionLinePushButton_slot);
+  connect(AbstractGui->ActivateAllProductionLinesPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::activateAllProductionLinesPushButton_slot);
-  connect(AbstractGUI->DeactivateAllProductionLinesPushButton,
+          &GuiKernel::activateAllProductionLinesPushButton_slot);
+  connect(AbstractGui->DeactivateAllProductionLinesPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::deactivateAllProductionLinesPushButton_slot);
-  connect(AbstractGUI->UpdateProductionLineViewPushButton,
+          &GuiKernel::deactivateAllProductionLinesPushButton_slot);
+  connect(AbstractGui->UpdateProductionLineViewPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::updateProductionLineViewPushButton_slot);
+          &GuiKernel::updateProductionLineViewPushButton_slot);
 
   // Эмитенты
-  connect(AbstractGUI->InitTransportMasterKeysPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::initTransportMasterKeysPushButton_slot);
-  connect(AbstractGUI->LinkIssuerWithKeysPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::linkIssuerWithKeysPushButton_slot);
+  connect(AbstractGui->InitTransportMasterKeysPushButton, &QPushButton::clicked,
+          this, &GuiKernel::initTransportMasterKeysPushButton_slot);
+  connect(AbstractGui->LinkIssuerWithKeysPushButton, &QPushButton::clicked,
+          this, &GuiKernel::linkIssuerWithKeysPushButton_slot);
 
   // Тест сервера
-  connect(AbstractGUI->ReleaseTransponderPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::releaseTransponderPushButton_slot);
-  connect(AbstractGUI->ConfirmTransponderPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::confirmTransponderPushButton_slot);
-  connect(AbstractGUI->RereleaseTransponderPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::rereleaseTransponderPushButton_slot);
-  connect(AbstractGUI->ConfirmRereleaseTransponderPushButton,
+  connect(AbstractGui->ReleaseTransponderPushButton, &QPushButton::clicked,
+          this, &GuiKernel::releaseTransponderPushButton_slot);
+  connect(AbstractGui->ConfirmTransponderPushButton, &QPushButton::clicked,
+          this, &GuiKernel::confirmTransponderPushButton_slot);
+  connect(AbstractGui->RereleaseTransponderPushButton, &QPushButton::clicked,
+          this, &GuiKernel::rereleaseTransponderPushButton_slot);
+  connect(AbstractGui->ConfirmRereleaseTransponderPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::confirmRereleaseTransponderPushButton_slot);
-  connect(AbstractGUI->ProductionLineRollbackPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::productionLineRollbackPushButton_slot);
+          &GuiKernel::confirmRereleaseTransponderPushButton_slot);
+  connect(AbstractGui->ProductionLineRollbackPushButton, &QPushButton::clicked,
+          this, &GuiKernel::productionLineRollbackPushButton_slot);
 
-  connect(AbstractGUI->PrintBoxStickerOnServerPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::printBoxStickerOnServerPushButton_slot);
-  connect(AbstractGUI->PrintLastBoxStickerOnServerPushButton,
+  connect(AbstractGui->PrintBoxStickerOnServerPushButton, &QPushButton::clicked,
+          this, &GuiKernel::printBoxStickerOnServerPushButton_slot);
+  connect(AbstractGui->PrintLastBoxStickerOnServerPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::printLastBoxStickerOnServerPushButton_slot);
-  connect(AbstractGUI->PrintPalletStickerOnServerPushButton,
+          &GuiKernel::printLastBoxStickerOnServerPushButton_slot);
+  connect(AbstractGui->PrintPalletStickerOnServerPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::printPalletStickerOnServerPushButton_slot);
-  connect(AbstractGUI->PrintLastPalletStickerOnServerPushButton,
+          &GuiKernel::printPalletStickerOnServerPushButton_slot);
+  connect(AbstractGui->PrintLastPalletStickerOnServerPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::printLastPalletStickerOnServerPushButton_slot);
+          &GuiKernel::printLastPalletStickerOnServerPushButton_slot);
 
   // Транспондеры
-  connect(AbstractGUI->TransponderManualReleasePushButton,
+  connect(AbstractGui->TransponderManualReleasePushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::transponderManualReleasePushButton_slot);
-  connect(AbstractGUI->TransponderManualRefundPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::transponderManualRefundPushButton_slot);
-  connect(AbstractGUI->PalletShipmentPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::palletShipmentPushButton_slot);
+          &GuiKernel::transponderManualReleasePushButton_slot);
+  connect(AbstractGui->TransponderManualRefundPushButton, &QPushButton::clicked,
+          this, &GuiKernel::transponderManualRefundPushButton_slot);
+  connect(AbstractGui->PalletShipmentPushButton, &QPushButton::clicked, this,
+          &GuiKernel::palletShipmentPushButton_slot);
 
   // Стикеры
-  connect(AbstractGUI->PrintTransponderStickerPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::printTransponderStickerPushButton_slot);
-  connect(AbstractGUI->PrintBoxStickerPushButton, &QPushButton::clicked, this,
-          &MainWindowKernel::printBoxStickerPushButton_slot);
-  connect(AbstractGUI->PrintPalletStickerPushButton, &QPushButton::clicked,
-          this, &MainWindowKernel::printPalletStickerPushButton_slot);
-  connect(AbstractGUI->ExecStickerPrinterCommandScriptPushButton,
+  connect(AbstractGui->PrintTransponderStickerPushButton, &QPushButton::clicked,
+          this, &GuiKernel::printTransponderStickerPushButton_slot);
+  connect(AbstractGui->PrintBoxStickerPushButton, &QPushButton::clicked, this,
+          &GuiKernel::printBoxStickerPushButton_slot);
+  connect(AbstractGui->PrintPalletStickerPushButton, &QPushButton::clicked,
+          this, &GuiKernel::printPalletStickerPushButton_slot);
+  connect(AbstractGui->ExecStickerPrinterCommandScriptPushButton,
           &QPushButton::clicked, this,
-          &MainWindowKernel::execStickerPrinterCommandScriptPushButton_slot);
+          &GuiKernel::execStickerPrinterCommandScriptPushButton_slot);
 
   // Соединяем модели и представления
-  AbstractGUI->DatabaseRandomModelView->setModel(RandomModel);
-  AbstractGUI->OrderTableView->setModel(OrderModel);
-  AbstractGUI->ProductionLineTableView->setModel(ProductionLineModel);
-  AbstractGUI->IssuerTableView->setModel(IssuerModel);
-  AbstractGUI->StickerDataTableView->setModel(StickerModel);
-  AbstractGUI->TransponderTableView->setModel(TransponderModel);
+  AbstractGui->DatabaseRandomModelView->setModel(RandomModel);
+  AbstractGui->OrderTableView->setModel(OrderModel);
+  AbstractGui->ProductionLineTableView->setModel(ProductionLineModel);
+  AbstractGui->IssuerTableView->setModel(IssuerModel);
+  AbstractGui->StickerDataTableView->setModel(StickerModel);
+  AbstractGui->TransponderTableView->setModel(TransponderModel);
 
-  AbstractGUI->TransponderDataTableView->setModel(TransponderData);
+  AbstractGui->TransponderDataTableView->setModel(TransponderData);
 
   // Связываем отображения графиков с логикой их формирования
 }
 
-void MainWindowKernel::createLoggerInstance() {
+void GuiKernel::createLoggerInstance() {
   Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
-  connect(this, &MainWindowKernel::loggerClear_signal, Logger.get(),
+  connect(this, &GuiKernel::loggerClear_signal, Logger.get(),
           &LogSystem::clear);
-  connect(this, &MainWindowKernel::logging, Logger.get(), &LogSystem::generate);
+  connect(this, &GuiKernel::logging, Logger.get(), &LogSystem::generate);
 
   LoggerThread = std::unique_ptr<QThread>(new QThread());
   connect(LoggerThread.get(), &QThread::started, Logger.get(),
@@ -740,7 +740,7 @@ void MainWindowKernel::createLoggerInstance() {
   LoggerThread->start();
 }
 
-void MainWindowKernel::createManagerInstance() {
+void GuiKernel::createManagerInstance() {
   Manager = std::unique_ptr<AdminManager>(new AdminManager("AdminManager"));
   connect(Manager.get(), &AdminManager::executionStarted, Interactor.get(),
           &InteractionSystem::processOperationStart);
@@ -748,86 +748,86 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::processOperationFinish);
 
   // Подключаем функционал
-  connect(this, &MainWindowKernel::connectDatabase_signal, Manager.get(),
+  connect(this, &GuiKernel::connectDatabase_signal, Manager.get(),
           &AdminManager::connectDatabase);
-  connect(this, &MainWindowKernel::disconnectDatabase_signal, Manager.get(),
+  connect(this, &GuiKernel::disconnectDatabase_signal, Manager.get(),
           &AdminManager::disconnectDatabase);
-  connect(this, &MainWindowKernel::showDatabaseTable_signal, Manager.get(),
+  connect(this, &GuiKernel::showDatabaseTable_signal, Manager.get(),
           &AdminManager::showDatabaseTable);
-  connect(this, &MainWindowKernel::performCustomRequest_signal, Manager.get(),
+  connect(this, &GuiKernel::performCustomRequest_signal, Manager.get(),
           &AdminManager::performCustomRequest);
 
-  connect(this, &MainWindowKernel::createNewOrder_signal, Manager.get(),
+  connect(this, &GuiKernel::createNewOrder_signal, Manager.get(),
           &AdminManager::createNewOrder);
-  connect(this, &MainWindowKernel::startOrderAssembling_signal, Manager.get(),
+  connect(this, &GuiKernel::startOrderAssembling_signal, Manager.get(),
           &AdminManager::startOrderAssembling);
-  connect(this, &MainWindowKernel::stopOrderAssembling_signal, Manager.get(),
+  connect(this, &GuiKernel::stopOrderAssembling_signal, Manager.get(),
           &AdminManager::stopOrderAssembling);
-  connect(this, &MainWindowKernel::showOrderTable_signal, Manager.get(),
+  connect(this, &GuiKernel::showOrderTable_signal, Manager.get(),
           &AdminManager::showOrderTable);
 
-  connect(this, &MainWindowKernel::createNewProductionLine_signal,
-          Manager.get(), &AdminManager::createNewProductionLine);
-  connect(this, &MainWindowKernel::activateProductionLine_signal, Manager.get(),
+  connect(this, &GuiKernel::createNewProductionLine_signal, Manager.get(),
+          &AdminManager::createNewProductionLine);
+  connect(this, &GuiKernel::activateProductionLine_signal, Manager.get(),
           &AdminManager::activateProductionLine);
-  connect(this, &MainWindowKernel::activateAllProductionLines_signal,
-          Manager.get(), &AdminManager::activateAllProductionLines);
-  connect(this, &MainWindowKernel::deactivateProductionLine_signal,
-          Manager.get(), &AdminManager::deactivateProductionLine);
-  connect(this, &MainWindowKernel::deactivateAllProductionLines_signal,
-          Manager.get(), &AdminManager::deactivateAllProductionLines);
-  connect(this, &MainWindowKernel::showProductionLineTable_signal,
-          Manager.get(), &AdminManager::showProductionLineTable);
-  connect(this, &MainWindowKernel::showProductionLineTable_signal,
-          Manager.get(), &AdminManager::showProductionLineTable);
+  connect(this, &GuiKernel::activateAllProductionLines_signal, Manager.get(),
+          &AdminManager::activateAllProductionLines);
+  connect(this, &GuiKernel::deactivateProductionLine_signal, Manager.get(),
+          &AdminManager::deactivateProductionLine);
+  connect(this, &GuiKernel::deactivateAllProductionLines_signal, Manager.get(),
+          &AdminManager::deactivateAllProductionLines);
+  connect(this, &GuiKernel::showProductionLineTable_signal, Manager.get(),
+          &AdminManager::showProductionLineTable);
+  connect(this, &GuiKernel::showProductionLineTable_signal, Manager.get(),
+          &AdminManager::showProductionLineTable);
 
-  connect(this, &MainWindowKernel::releaseTransponder_signal, Manager.get(),
+  connect(this, &GuiKernel::releaseTransponder_signal, Manager.get(),
           &AdminManager::releaseTransponder);
-  connect(this, &MainWindowKernel::confirmTransponderRelease_signal,
-          Manager.get(), &AdminManager::confirmTransponderRelease);
-  connect(this, &MainWindowKernel::rereleaseTransponder_signal, Manager.get(),
+  connect(this, &GuiKernel::confirmTransponderRelease_signal, Manager.get(),
+          &AdminManager::confirmTransponderRelease);
+  connect(this, &GuiKernel::rereleaseTransponder_signal, Manager.get(),
           &AdminManager::rereleaseTransponder);
-  connect(this, &MainWindowKernel::confirmTransponderRerelease_signal,
-          Manager.get(), &AdminManager::confirmTransponderRerelease);
-  connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager.get(),
+  connect(this, &GuiKernel::confirmTransponderRerelease_signal, Manager.get(),
+          &AdminManager::confirmTransponderRerelease);
+  connect(this, &GuiKernel::rollbackProductionLine_signal, Manager.get(),
           &AdminManager::rollbackProductionLine);
-  connect(this, &MainWindowKernel::printBoxStickerOnServer_signal,
-          Manager.get(), &AdminManager::printBoxStickerOnServer);
-  connect(this, &MainWindowKernel::printLastBoxStickerOnServer_signal,
-          Manager.get(), &AdminManager::printLastBoxStickerOnServer);
-  connect(this, &MainWindowKernel::printPalletStickerOnServer_signal,
-          Manager.get(), &AdminManager::printPalletStickerOnServer);
-  connect(this, &MainWindowKernel::printLastPalletStickerOnServer_signal,
+  connect(this, &GuiKernel::printBoxStickerOnServer_signal, Manager.get(),
+          &AdminManager::printBoxStickerOnServer);
+  connect(this, &GuiKernel::printLastBoxStickerOnServer_signal, Manager.get(),
+          &AdminManager::printLastBoxStickerOnServer);
+  connect(this, &GuiKernel::printPalletStickerOnServer_signal, Manager.get(),
+          &AdminManager::printPalletStickerOnServer);
+  connect(this, &GuiKernel::printLastPalletStickerOnServer_signal,
           Manager.get(), &AdminManager::printLastPalletStickerOnServer);
 
-  connect(this, &MainWindowKernel::releaseTranspondersManually_signal,
-          Manager.get(), &AdminManager::releaseTranspondersManually);
-  connect(this, &MainWindowKernel::refundTranspondersManually_signal,
-          Manager.get(), &AdminManager::refundTranspondersManually);
-  connect(this, &MainWindowKernel::shipPallets_signal, Manager.get(),
+  connect(this, &GuiKernel::releaseTranspondersManually_signal, Manager.get(),
+          &AdminManager::releaseTranspondersManually);
+  connect(this, &GuiKernel::refundTranspondersManually_signal, Manager.get(),
+          &AdminManager::refundTranspondersManually);
+  connect(this, &GuiKernel::shipPallets_signal, Manager.get(),
           &AdminManager::shipPallets);
 
-  connect(this, &MainWindowKernel::initIssuers_signal, Manager.get(),
+  connect(this, &GuiKernel::initIssuers_signal, Manager.get(),
           &AdminManager::initIssuers);
-  connect(this, &MainWindowKernel::initTransportMasterKeys_signal,
-          Manager.get(), &AdminManager::initTransportMasterKeys);
-  connect(this, &MainWindowKernel::linkIssuerWithMasterKeys_signal,
-          Manager.get(), &AdminManager::linkIssuerWithMasterKeys);
+  connect(this, &GuiKernel::initTransportMasterKeys_signal, Manager.get(),
+          &AdminManager::initTransportMasterKeys);
+  connect(this, &GuiKernel::linkIssuerWithMasterKeys_signal, Manager.get(),
+          &AdminManager::linkIssuerWithMasterKeys);
 
-  connect(this, &MainWindowKernel::printTransponderSticker_signal,
-          Manager.get(), &AdminManager::printTransponderSticker);
-  connect(this, &MainWindowKernel::printBoxSticker_signal, Manager.get(),
+  connect(this, &GuiKernel::printTransponderSticker_signal, Manager.get(),
+          &AdminManager::printTransponderSticker);
+  connect(this, &GuiKernel::printBoxSticker_signal, Manager.get(),
           &AdminManager::printBoxSticker);
-  connect(this, &MainWindowKernel::printPalletSticker_signal, Manager.get(),
+  connect(this, &GuiKernel::printPalletSticker_signal, Manager.get(),
           &AdminManager::printPalletSticker);
-  connect(this, &MainWindowKernel::execPrinterStickerCommandScript_signal,
+  connect(this, &GuiKernel::execPrinterStickerCommandScript_signal,
           Manager.get(), &AdminManager::execPrinterStickerCommandScript);
 
   // Запросы на отображение
   connect(Manager.get(), &AdminManager::displayFirmware_signal, this,
-          &MainWindowKernel::displayFirmware_slot);
+          &GuiKernel::displayFirmware_slot);
   connect(Manager.get(), &AdminManager::displayTransponderData_signal, this,
-          &MainWindowKernel::displayTransponderData_slot);
+          &GuiKernel::displayTransponderData_slot);
 
   // Поток
   ManagerThread = std::unique_ptr<QThread>(new QThread());
@@ -838,12 +838,12 @@ void MainWindowKernel::createManagerInstance() {
   ManagerThread->start();
 }
 
-void MainWindowKernel::createInteractorInstance() {
+void GuiKernel::createInteractorInstance() {
   Interactor = std::unique_ptr<InteractionSystem>(
       new InteractionSystem("InteractionSystem"));
 }
 
-void MainWindowKernel::createModels() {
+void GuiKernel::createModels() {
   RandomModel = new SqlQueryValues(this);
   OrderModel = new SqlQueryValues(this);
   ProductionLineModel = new SqlQueryValues(this);
@@ -854,13 +854,13 @@ void MainWindowKernel::createModels() {
   TransponderData = new HashTableModel(this);
 }
 
-void MainWindowKernel::createMatchingTable() {
+void GuiKernel::createMatchingTable() {
   MatchingTable.insert("Транспортные мастер ключи", "transport_master_keys");
   MatchingTable.insert("Коммерческие мастер ключи", "commercial_master_keys");
   MatchingTable.insert("Эмитенты", "issuers");
 }
 
-void MainWindowKernel::registerMetaType() {
+void GuiKernel::registerMetaType() {
   qRegisterMetaType<std::shared_ptr<QMap<QString, QString>>>(
       "std::shared_ptr<StringDictionary >");
   qRegisterMetaType<std::shared_ptr<StringDictionary>>(

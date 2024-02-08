@@ -1025,6 +1025,8 @@ ReturnStatus AdministrationSystem::refundBox(const QString& id) {
   boxNewValues.add("assembled_units", "0");
   boxNewValues.add("assembling_start", "NULL");
   boxNewValues.add("assembling_end", "NULL");
+  boxNewValues.add("completed", "false");
+  boxNewValues.add("production_line_id", "NULL");
   if (!Database->updateRecords("boxes", "id = " + id, boxNewValues)) {
     sendLog(QString("Получена ошибка при изменении данных бокса %1. ").arg(id));
     return ReturnStatus::DatabaseQueryError;
@@ -1426,7 +1428,6 @@ bool AdministrationSystem::stopAllProductionLines() {
 
   productionLineNewValues.add("in_process", "false");
   productionLineNewValues.add("launched", "false");
-  productionLineNewValues.add("completed", "false");
   productionLineNewValues.add("active", "false");
   productionLineNewValues.add("box_id", "NULL");
   productionLineNewValues.add("transponder_id", "NULL");

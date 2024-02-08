@@ -6,7 +6,7 @@
 
 #include "abstract_gui.h"
 
-class MainWindowGUI : public AbstractGUI {
+class MainWindowGUI : public AbstractGui {
   Q_OBJECT
 
  public:
@@ -24,7 +24,7 @@ class MainWindowGUI : public AbstractGUI {
   QWidget* DatabaseTab;
   QHBoxLayout* DatabaseMainLayout;
 
-  // Панель упралвения БД
+  // Панель управления БД
   QGroupBox* DatabaseControlPanelGroup;
   QVBoxLayout* DatabaseControlPanelLayout;
 
@@ -88,7 +88,7 @@ class MainWindowGUI : public AbstractGUI {
   QTableView* ProductionLineTableView;
   //============================================================
 
-  /* Интерфейс для теста сервера */
+  /* Интерфейс персо клиента */
   //============================================================
   QWidget* ServerTab;
   QHBoxLayout* ServerTabMainLayout;
@@ -125,6 +125,10 @@ class MainWindowGUI : public AbstractGUI {
   QVBoxLayout* TransponderDisplayLayout;
   QTableView* TransponderDataTableView;
   QPlainTextEdit* AssembledFirmwareView;
+  //============================================================
+
+  /* Интерфейс персо клиента */
+  //============================================================
   //============================================================
 
   /* Интерфейс для управления транспондерами */

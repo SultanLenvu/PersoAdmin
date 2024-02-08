@@ -16,11 +16,11 @@
 #include "abstract_gui.h"
 #include "interaction_system.h"
 
-class MainWindowKernel : public QMainWindow {
+class GuiKernel : public QMainWindow {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
-  AbstractGUI* CurrentGUI;
+  AbstractGui* CurrentGUI;
 
   // Верхнее меню главного окна
   //===========================================
@@ -52,8 +52,8 @@ class MainWindowKernel : public QMainWindow {
   StringDictionary MatchingTable;
 
  public:
-  MainWindowKernel(QWidget* parent = nullptr);
-  ~MainWindowKernel();
+  GuiKernel(QWidget* parent = nullptr);
+  ~GuiKernel();
 
  public slots:
   void requestAuthorizationGUIAct_slot(void);
@@ -85,11 +85,6 @@ class MainWindowKernel : public QMainWindow {
   void editProductionLinesPushButton_slot(void);
   void updateProductionLineViewPushButton_slot(void);
 
-  // Функционал для работы с транспортными мастер ключами
-  void initTransportMasterKeysPushButton_slot(void);
-  void initIssuerTablePushButton_slot(void);
-  void linkIssuerWithKeysPushButton_slot(void);
-
   // Функционал для взаимодействия с сервером
   void releaseTransponderPushButton_slot(void);
   void confirmTransponderPushButton_slot(void);
@@ -101,11 +96,6 @@ class MainWindowKernel : public QMainWindow {
   void printLastBoxStickerOnServerPushButton_slot(void);
   void printPalletStickerOnServerPushButton_slot(void);
   void printLastPalletStickerOnServerPushButton_slot(void);
-
-  // Функционал для выпуска, возврата и отгрузки транспондеров
-  void transponderManualReleasePushButton_slot(void);
-  void transponderManualRefundPushButton_slot(void);
-  void palletShipmentPushButton_slot(void);
 
   // Функционал для работы с принтером стикеров
   void printTransponderStickerPushButton_slot(void);
@@ -122,7 +112,7 @@ class MainWindowKernel : public QMainWindow {
       std::shared_ptr<StringDictionary> transponderData);
 
  private:
-  Q_DISABLE_COPY_MOVE(MainWindowKernel)
+  Q_DISABLE_COPY_MOVE(GuiKernel)
   void loadSettings(void) const;
 
   void createTopMenu(void);  // Создание верхнего меню

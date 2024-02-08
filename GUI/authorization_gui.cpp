@@ -1,7 +1,7 @@
 #include "authorization_gui.h"
 
 AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : AbstractGUI(parent, InitialConfiguration) {
+    : AbstractGui(parent, InitialConfiguration) {
   setObjectName("AuthorizationGUI");
 }
 

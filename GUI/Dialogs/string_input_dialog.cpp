@@ -1,15 +1,8 @@
-#include "idetifier_input_dialog.h"
+#include "string_input_dialog.h"
 
-IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
+StringInputDialog::StringInputDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
-  setObjectName("IdentifierInputDialog");
-
-  // Считываем размеры дисплея
-  DesktopGeometry = QApplication::primaryScreen()->size();
-
   // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.45, DesktopGeometry.height() * 0.45,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
   setWindowTitle("Ввод данных");
 
   create();
@@ -18,31 +11,44 @@ IdentifierInputDialog::IdentifierInputDialog(QWidget* parent)
   setFixedHeight(size().height());
 }
 
-IdentifierInputDialog::~IdentifierInputDialog() {}
+StringInputDialog::~StringInputDialog() {}
 
-void IdentifierInputDialog::getData(StringDictionary& data) const {
+void StringInputDialog::getData(StringDictionary& data) const {
   data.insert("id", InputData->text());
 }
 
-AbstractInputDialog::InputDialogType IdentifierInputDialog::type() const {
-  return IdentifierInput;
+AbstractInputDialog::InputDialogType StringInputDialog::type() const {
+  return StringInput;
 }
 
-void IdentifierInputDialog::accept() {
-  if (!check()) {
+void StringInputDialog::accept() {
+  if (!Checker) {
+    QDialog::accept();
+    return;
+  }
+
+  if (!(*Checker)(InputData->text().toStdString())) {
     QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
                           QMessageBox::Ok);
-    return;
   }
 
   QDialog::accept();
 }
 
-void IdentifierInputDialog::create() {
+void StringInputDialog::setLabelText(const QString& text) {
+  MainLabel->setText(text);
+}
+
+void StringInputDialog::setChecker(
+    std::unique_ptr<AbstractStringChecker> checker) {
+  Checker = std::move(checker);
+}
+
+void StringInputDialog::create() {
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
-  MainLabel = new QLabel("Идентификатор: ");
+  MainLabel = new QLabel("Данные: ");
   MainLayout->addWidget(MainLabel, 0, 0, 1, 1);
 
   InputData = new QLineEdit();
@@ -58,12 +64,4 @@ void IdentifierInputDialog::create() {
   RejectButton = new QPushButton("Отмена");
   ButtonLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
-}
-
-bool IdentifierInputDialog::check() const {
-  if (InputData->text().toUInt() == 0) {
-    return false;
-  }
-
-  return true;
 }
