@@ -10,8 +10,10 @@ AbstractGuiSubkernel::AbstractGuiSubkernel(const QString& name)
 AbstractGuiSubkernel::~AbstractGuiSubkernel() {}
 
 void AbstractGuiSubkernel::connectDependecies() {
-  connect(this, &AbstractGuiSubkernel::clearLogDisplay_signal,
-          dynamic_cast<WidgetLogBackend*>(
-              GlobalEnvironment::instance()->getObject("FileLogBackend")),
+  WidgetLogBackend* wlb = dynamic_cast<WidgetLogBackend*>(
+      GlobalEnvironment::instance()->getObject("FileLogBackend"));
+  assert(wlb);
+
+  connect(this, &AbstractGuiSubkernel::clearLogDisplay_signal, wlb,
           &WidgetLogBackend::clear);
 }

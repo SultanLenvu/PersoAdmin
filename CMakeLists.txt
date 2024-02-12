@@ -16,6 +16,7 @@ include_directories(Database/)
 include_directories(General/)
 include_directories(Functors/)
 include_directories(GUI/)
+include_directories(GUI/Subkernels)
 include_directories(GUI/Dialogs)
 include_directories(Log/)
 include_directories(Management/)
@@ -33,12 +34,18 @@ add_executable(PersoAdmin WIN32
     Database/sql_query_values.h Database/sql_query_values.cpp
     Database/sql_insert_values.h Database/sql_insert_values.cpp
 
-
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
+
+    GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
+    GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
+    GUI/Subkernels/production_line_gui_subkernel.h GUI/Subkernels/production_line_gui_subkernel.cpp
+    GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
+    GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
+    GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
 
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/pallet_shiping_dialog.cpp GUI/Dialogs/pallet_shiping_dialog.h
@@ -100,7 +107,7 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
+    GUI/Subkernels/database_gui_subkernel.h GUI/Subkernels/database_gui_subkernel.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
