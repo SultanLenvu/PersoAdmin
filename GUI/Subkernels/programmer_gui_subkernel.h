@@ -3,10 +3,15 @@
 
 #include "abstract_gui_subkernel.h"
 
-class ProgrammerGuiSubkernel : public AbstractGuiSubkernel
-{
+class ProgrammerGuiSubkernel final : public AbstractGuiSubkernel {
+  Q_OBJECT
+
  public:
-  ProgrammerGuiSubkernel();
+  explicit ProgrammerGuiSubkernel(const QString& name);
+  ~ProgrammerGuiSubkernel();
+
+ private:
+  void connectDependecies(void);
 };
 
 #endif // PROGRAMMERGUISUBKERNEL_H

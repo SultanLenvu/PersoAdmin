@@ -11,9 +11,10 @@
 #include <QSettings>
 #include <QTimer>
 
+#include "psobject.h"
 #include "types.h"
 
-class InteractionSystem : public QWidget {
+class InteractionSystem : public PSObject {
   Q_OBJECT
 
  private:
@@ -29,6 +30,11 @@ class InteractionSystem : public QWidget {
   InteractionSystem(const QString& name);
   ~InteractionSystem();
 
+  // PSObject interface
+ public slots:
+  virtual void applySettings(void) override;
+
+  // Own
  public slots:
   void generateMessage(const QString& text);
   void generateErrorMessage(const QString& text);
@@ -36,15 +42,8 @@ class InteractionSystem : public QWidget {
   void processOperationStart(const QString& operationName);
   void processOperationFinish(const QString& operationName, ReturnStatus ret);
 
-  void applySettings(void);
-
- private:
-  InteractionSystem();
-  Q_DISABLE_COPY_MOVE(InteractionSystem)
-
  private:
   void loadSettings(void);
-  void sendLog(const QString& log);
 
   void createProgressDialog(void);
   void destroyProgressDialog(void);
@@ -60,7 +59,6 @@ class InteractionSystem : public QWidget {
   void ODQTimerTimeout_slot(void);
 
  signals:
-  void logging(const QString& log);
   void abortCurrentOperation(void);
 };
 

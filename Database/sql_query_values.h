@@ -11,17 +11,20 @@
 
 #include "types.h"
 
-class SqlQueryValues : public QAbstractTableModel {
-  Q_OBJECT
-
+class SqlQueryValues final {
  private:
   QVector<QString> Fields;
   QHash<QString, int32_t> FieldIndex;
   QVector<SharedVector<QString>> Values;
 
  public:
-  explicit SqlQueryValues(QObject* parent = nullptr);
+  explicit SqlQueryValues();
   ~SqlQueryValues();
+
+  SqlQueryValues(const SqlQueryValues& other);
+  SqlQueryValues(SqlQueryValues&& other) noexcept;
+  SqlQueryValues& operator=(const SqlQueryValues& other);
+  SqlQueryValues& operator=(SqlQueryValues&& other) noexcept;
 
   QString fieldName(uint32_t i) const;
   QString get(uint32_t record, const QString& field) const;
@@ -40,19 +43,6 @@ class SqlQueryValues : public QAbstractTableModel {
   void add(const QString& field, const QString& value);
   void addField(const QString& field);
   void clear();
-
-  // Интерфейс модели
- public:
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index, int role) const override;
-  QVariant headerData(int section,
-                      Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-
- private:
-  Q_DISABLE_COPY_MOVE(SqlQueryValues)
- signals:
 };
 
 #endif  // SQL_QUERY_VALUES_H

@@ -69,7 +69,7 @@ class AdminManager : public QObject {
       SqlQueryValues* model);
   void refundTranspondersManually(const std::shared_ptr<StringDictionary> param,
                                   SqlQueryValues* model);
-  void shipPallets(const std::shared_ptr<StringDictionary> param,
+  void generateShipmentRegister(const std::shared_ptr<StringDictionary> param,
                    SqlQueryValues* model);
 
   // Клиент

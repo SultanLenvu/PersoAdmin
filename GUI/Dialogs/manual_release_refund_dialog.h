@@ -23,7 +23,7 @@ class ManualReleaseRefundDialog : public AbstractInputDialog {
   StringDictionary MatchingTable;
 
  public:
-  explicit ManualReleaseRefundDialog(QWidget* parent);
+  explicit ManualReleaseRefundDialog(QWidget* parent = nullptr);
   ~ManualReleaseRefundDialog();
 
   virtual void getData(StringDictionary& data) const override;

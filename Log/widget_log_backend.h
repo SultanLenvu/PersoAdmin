@@ -6,20 +6,28 @@
 
 #include "Log/log_backend.h"
 
-class WidgetLogBackend : public LogBackend {
+class WidgetLogBackend final : public LogBackend {
   Q_OBJECT
  private:
   bool Enable;
 
  public:
   WidgetLogBackend(const QString& name);
+  ~WidgetLogBackend();
 
-  virtual void writeLogMessage(const QString& str) override;
-  virtual void clear() override;
+  // PSObject interface
+ public:
   virtual void applySettings() override;
 
+  // LogBackend interface
+ public:
+  virtual void writeLogMessage(const QString& str) override;
+
+  // Own
+ public:
+  void clear();
+
  private:
-  Q_DISABLE_COPY_MOVE(WidgetLogBackend);
   void loadSettings(void);
 
  signals:

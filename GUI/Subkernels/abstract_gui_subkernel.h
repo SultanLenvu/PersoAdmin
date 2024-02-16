@@ -13,7 +13,7 @@ class AbstractGuiSubkernel : public PSObject {
   void connectDependecies(void);
 
  signals:
-  void clearLogDisplay_signal(void);
+  void clearLogDisplay(void);
 };
 
 #endif // ABSTRACT_GUI_SUBKERNEL_H

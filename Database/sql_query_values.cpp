@@ -2,9 +2,37 @@
 
 #include "sql_query_values.h"
 
-SqlQueryValues::SqlQueryValues(QObject* parent) : QAbstractTableModel{parent} {}
+SqlQueryValues::SqlQueryValues() {}
 
 SqlQueryValues::~SqlQueryValues() {}
+
+SqlQueryValues::SqlQueryValues(const SqlQueryValues& other)
+    : Fields(other.Fields),
+      FieldIndex(other.FieldIndex),
+      Values(other.Values) {}
+
+SqlQueryValues::SqlQueryValues(SqlQueryValues&& other) noexcept
+    : Fields(std::move(other.Fields)),
+      FieldIndex(std::move(other.FieldIndex)),
+      Values(std::move(other.Values)) {}
+
+SqlQueryValues& SqlQueryValues::operator=(const SqlQueryValues& other) {
+  if (this != &other) {
+    Fields = other.Fields;
+    FieldIndex = other.FieldIndex;
+    Values = other.Values;
+  }
+  return *this;
+}
+
+SqlQueryValues& SqlQueryValues::operator=(SqlQueryValues&& other) noexcept {
+  if (this != &other) {
+    Fields = std::move(other.Fields);
+    FieldIndex = std::move(other.FieldIndex);
+    Values = std::move(other.Values);
+  }
+  return *this;
+}
 
 QString SqlQueryValues::fieldName(uint32_t i) const {
   return Fields.at(i);
@@ -66,7 +94,6 @@ void SqlQueryValues::appendToInsert(QString& queryText) const {
 }
 
 void SqlQueryValues::extractRecords(QSqlQuery& request) {
-  beginResetModel();
   Values.clear();
   Fields.clear();
   FieldIndex.clear();
@@ -86,8 +113,6 @@ void SqlQueryValues::extractRecords(QSqlQuery& request) {
       Values[i]->append(request.value(i).toString());
     }
   }
-
-  endResetModel();
 }
 
 void SqlQueryValues::add(const StringDictionary& record) {
@@ -133,46 +158,4 @@ void SqlQueryValues::clear() {
   Values.clear();
   Fields.clear();
   FieldIndex.clear();
-}
-
-int SqlQueryValues::rowCount(const QModelIndex& parent) const {
-  if ((Values.size() == 0) || (!Values.first())) {
-    return 0;
-  }
-
-  return Values.first()->size();
-}
-
-int SqlQueryValues::columnCount(const QModelIndex& parent) const {
-  return Fields.size();
-}
-
-QVariant SqlQueryValues::data(const QModelIndex& index, int role) const {
-  if (index.column() > Fields.size())
-    return QVariant();
-
-  if (index.row() > Values.first()->size())
-    return QVariant();
-
-  if (role == Qt::DisplayRole) {
-    return Values.at(index.column())->at(index.row());
-  } else
-    return QVariant();
-}
-
-QVariant SqlQueryValues::headerData(int section,
-                                    Qt::Orientation orientation,
-                                    int role) const {
-  if (section >= Fields.size()) {
-    return QVariant();
-  }
-
-  if (role != Qt::DisplayRole)
-    return QVariant();
-
-  if (orientation == Qt::Horizontal) {
-    return Fields.at(section);
-  } else {
-    return QVariant();
-  }
 }

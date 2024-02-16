@@ -12,14 +12,14 @@ class HashTableModel : public QAbstractTableModel {
  private:
   std::shared_ptr<StringDictionary> MatchTable;
 
-  QVector<QVariant> Values;
-  QVector<QVariant> Headers;
+  std::unordered_map<int, QString> Converter;
+  std::shared_ptr<StringDictionary> Data;
 
  public:
-  HashTableModel(QObject* parent);
+  HashTableModel();
   ~HashTableModel();
 
-  void setData(const StringDictionary& table);
+  void setData(std::shared_ptr<StringDictionary> match);
   void setMatchTable(std::shared_ptr<StringDictionary> match);
   void clear(void);
   bool isEmpty(void) const;
@@ -31,9 +31,6 @@ class HashTableModel : public QAbstractTableModel {
   QVariant headerData(int section,
                       Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const override;
-
- private:
-  Q_DISABLE_COPY_MOVE(HashTableModel);
 };
 
 #endif  // HASH_TABLE_MODEL_H

@@ -1153,7 +1153,7 @@ ReturnStatus AdministrationSystem::refundOrder(const QString& id) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus AdministrationSystem::shipPallets(const StringDictionary& param) {
+ReturnStatus AdministrationSystem::generateShipmentRegister(const StringDictionary& param) {
   ReturnStatus ret;
   QString ShipmentRegisterName =
       QString("sr_pallets_%1_%2.csv")

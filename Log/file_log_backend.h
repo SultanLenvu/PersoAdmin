@@ -16,21 +16,25 @@ class FileLogBackend : public LogBackend {
   Q_OBJECT
  private:
   bool Enable;
-  int32_t LogFileMaxNumber;
-  QString CurrentLogDir;
-  QFile CurrentLogFile;
-  QTextStream LogTextStream;
+  int32_t FileMaxNumber;
+  QDir CurrentDir;
+  QFile CurrentFile;
+  QTextStream FileStream;
 
  public:
   explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
+  // PSObject interface
+ public:
+  virtual void applySettings(void) override;
+
+  // LogBackend interface
+ public:
   virtual void writeLogMessage(const QString& str) override;
-  virtual void clear() override;
-  virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY_MOVE(FileLogBackend);
+  Q_DISABLE_COPY(FileLogBackend);
   void loadSettings(void);
   void initialize();
   void removeOldestLogFiles(void);

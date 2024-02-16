@@ -24,7 +24,7 @@ class LinkIssuerKeyDialog : public AbstractInputDialog {
   StringDictionary MatchingTable;
 
  public:
-  explicit LinkIssuerKeyDialog(QWidget* parent);
+  explicit LinkIssuerKeyDialog(QWidget* parent = nullptr);
   ~LinkIssuerKeyDialog();
 
   virtual void getData(StringDictionary& data) const override;

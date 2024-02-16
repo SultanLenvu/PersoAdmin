@@ -24,7 +24,7 @@ class AbstractInputDialog : public QDialog {
   Q_ENUM(InputDialogType);
 
  public:
-  explicit AbstractInputDialog(QWidget* parent);
+  explicit AbstractInputDialog(QWidget* parent = nullptr);
   virtual ~AbstractInputDialog();
 
   virtual void getData(StringDictionary& data) const = 0;

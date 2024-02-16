@@ -21,7 +21,7 @@ class StringInputDialog : public AbstractInputDialog {
   std::unique_ptr<AbstractStringChecker> Checker;
 
  public:
-  explicit StringInputDialog(QWidget* parent);
+  explicit StringInputDialog(QWidget* parent = nullptr);
   ~StringInputDialog();
 
  public:  // AbstractInputDialog interface

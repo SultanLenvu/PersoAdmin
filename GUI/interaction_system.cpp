@@ -1,31 +1,21 @@
 #include "interaction_system.h"
 #include "definitions.h"
-#include "global_environment.h"
-#include "log_system.h"
 
-InteractionSystem::InteractionSystem(const QString& name) {
-  setObjectName(name);
+InteractionSystem::InteractionSystem(const QString& name) : PSObject{name} {
   loadSettings();
 
   createMessageMatchTable();
-
-  // Создаем таймеры
   createTimers();
-
-  connect(this, &InteractionSystem::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
 }
 
 InteractionSystem::~InteractionSystem() {}
 
 void InteractionSystem::generateMessage(const QString& text) {
-  QMessageBox::information(this, "Сообщение", text, QMessageBox::Ok);
+  QMessageBox::information(nullptr, "Сообщение", text, QMessageBox::Ok);
 }
 
 void InteractionSystem::generateErrorMessage(const QString& text) {
-  QMessageBox::critical(this, "Ошибка", text, QMessageBox::Ok);
+  QMessageBox::critical(nullptr, "Ошибка", text, QMessageBox::Ok);
 }
 
 void InteractionSystem::processOperationStart(const QString& operationName) {
@@ -86,10 +76,6 @@ void InteractionSystem::applySettings() {
 
 void InteractionSystem::loadSettings() {
   QSettings settings;
-}
-
-void InteractionSystem::sendLog(const QString& log) {
-  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 void InteractionSystem::createProgressDialog() {
@@ -204,5 +190,3 @@ void InteractionSystem::ODQTimerTimeout_slot() {
     ProgressDialog->setValue(++cvalue);
   }
 }
-
-InteractionSystem::InteractionSystem() {}

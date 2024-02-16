@@ -1,12 +1,12 @@
-#ifndef ProductionManager_H
-#define ProductionManager_H
+#ifndef PERSOSERVERMANAGER_H
+#define PERSOSERVERMANAGER_H
 
 #include <QFile>
 
 #include "abstract_manager.h"
 #include "abstract_server_connection.h"
 
-class ProductionManager : public AbstractManager {
+class PersoServerManager : public AbstractManager {
   Q_OBJECT
 
  private:  
@@ -19,25 +19,29 @@ class ProductionManager : public AbstractManager {
   StringDictionary TransponderData;
 
  public:
-  explicit ProductionManager(const QString& name);
-  ~ProductionManager();
+  explicit PersoServerManager(const QString& name);
+  ~PersoServerManager();
 
   // AbstractManager interface
  public:
-  virtual void onInstanceThreadStarted(void) override;
   virtual Type type() const override;
+
+ public slots:
+  virtual void onInstanceThreadStarted(void) override;
   virtual void applySettings(void) override;
 
+  // Own
  public:
-  void connectToServer(void);
-  void disconnectFromServer(void);
+  void connect(void);
+  void disconnect(void);
+
+  void echo(void);
+  void logOn(const std::shared_ptr<StringDictionary> param);
+  void logOut(void);
+
   void launchProductionLine(const std::shared_ptr<StringDictionary> param);
   void shutdownProductionLine(void);
   void getProductionLineData(void);
-
-  void logOnServer(const std::shared_ptr<StringDictionary> param);
-  void logOutServer(void);
-  void echoServer(void);
 
   void requestBox(void);
   void getCurrentBoxData(void);
@@ -73,4 +77,4 @@ class ProductionManager : public AbstractManager {
                                       ReturnStatus& ret);
 };
 
-#endif  // ProductionManager_H
+#endif  // PERSOSERVERMANAGER_H

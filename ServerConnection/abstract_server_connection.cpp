@@ -15,14 +15,9 @@ AbstractServerConnection::~AbstractServerConnection() {}
 AbstractServerConnection::AbstractServerConnection() : QObject{nullptr} {}
 
 void AbstractServerConnection::connectDepedencies() {
-  QObject* ls = GlobalEnvironment::instance()->getObject("LogSystem");
-  assert(ls);
-  QObject* gk = GlobalEnvironment::instance()->getObject("GuiKernel");
-  assert(gk);
+  LogSystem* ls = static_cast<LogSystem*>(
+      GlobalEnvironment::instance()->getObject("LogSystem"));
 
-  QObject::connect(this, &AbstractServerConnection::logging,
-                   dynamic_cast<LogSystem*>(ls), &LogSystem::generate);
-  //  QObject::connect(this, &AbstractServerConnection::disconnected,
-  //                   dynamic_cast<GuiKernel*>(gk),
-  //                   &GuiKernel::onServerDisconnected);
+  QObject::connect(this, &AbstractServerConnection::logging, ls,
+                   &LogSystem::generate);
 }

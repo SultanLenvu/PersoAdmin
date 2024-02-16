@@ -1,20 +1,19 @@
 #include "authorization_gui.h"
+#include "definitions.h"
 
-AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : AbstractGui(parent, InitialConfiguration) {
+AuthorizationGUI::AuthorizationGUI(QWidget* parent) : QWidget(parent) {
   setObjectName("AuthorizationGUI");
+  create();
 }
+
+AuthorizationGUI::~AuthorizationGUI() {}
 
 void AuthorizationGUI::create() {
-  // Создаем панель управления
+  MainLayout = new QHBoxLayout();
+  setLayout(MainLayout);
+
   createAuthorizationMenu();
-
-  // Настраиваем пропорции
-  MainLayout->setStretch(0, 1);
-  MainLayout->setStretch(1, 3);
 }
-
-void AuthorizationGUI::update() {}
 
 void AuthorizationGUI::createAuthorizationMenu() {
   QSettings settings;

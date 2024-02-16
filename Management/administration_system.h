@@ -57,7 +57,7 @@ class AdministrationSystem : public QObject {
   ReturnStatus refundPallet(const QString& id);
   ReturnStatus refundOrder(const QString& id);
 
-  ReturnStatus shipPallets(const StringDictionary& param);
+  ReturnStatus generateShipmentRegister(const StringDictionary& param);
 
  private:
   Q_DISABLE_COPY_MOVE(AdministrationSystem)

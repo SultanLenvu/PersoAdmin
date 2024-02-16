@@ -2,13 +2,10 @@
 
 #include "log_system.h"
 #include "file_log_backend.h"
-#include "global_environment.h"
 #include "widget_log_backend.h"
 
 LogSystem::LogSystem(const QString& name) : PSObject(name) {
   loadSettings();
-
-  GlobalEnvironment::instance()->registerObject(this);
 }
 
 LogSystem::~LogSystem() {
@@ -35,10 +32,8 @@ void LogSystem::applySettings() {
 }
 
 void LogSystem::instanceThreadStarted() {
-  Backends.push_back(std::shared_ptr<WidgetLogBackend>(
-      new WidgetLogBackend("WidgetLogBackend")));
-  Backends.push_back(
-      std::shared_ptr<FileLogBackend>(new FileLogBackend("FileLogBackend")));
+  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
+  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
 
   createPersoServerLogSocket();
 }

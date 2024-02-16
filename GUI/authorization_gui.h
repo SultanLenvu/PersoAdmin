@@ -5,12 +5,11 @@
 #include <QSettings>
 #include <QtWidgets>
 
-#include "General/definitions.h"
-#include "abstract_gui.h"
-
-class AuthorizationGUI : public AbstractGui {
+class AuthorizationGUI final : public QWidget {
   Q_OBJECT
  public:
+  QHBoxLayout* MainLayout;
+
   QGroupBox* AuthorizationMenuGroup;
   QGridLayout* AuthorizationMenuLayout;
 
@@ -26,15 +25,11 @@ class AuthorizationGUI : public AbstractGui {
 
  public:
   explicit AuthorizationGUI(QWidget* parent);
-
-  virtual void create(void) override;
-  virtual void update(void) override;
+  ~AuthorizationGUI();
 
  private:
-  Q_DISABLE_COPY_MOVE(AuthorizationGUI)
+  void create(void);
   void createAuthorizationMenu(void);
-
- private slots:
 };
 
 #endif  // AbstractGUI_AUTHORIZATION_H

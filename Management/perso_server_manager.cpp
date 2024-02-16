@@ -1,32 +1,33 @@
+#include "perso_server_manager.h"
+
 #include <QDir>
 #include <QSettings>
 
 #include "perso_server_connection.h"
-#include "production_manager.h"
 
-ProductionManager::ProductionManager(const QString& name)
+PersoServerManager::PersoServerManager(const QString& name)
     : AbstractManager{name} {
   loadSettings();
 }
 
-ProductionManager::~ProductionManager() {}
+PersoServerManager::~PersoServerManager() {}
 
-void ProductionManager::onInstanceThreadStarted() {
+void PersoServerManager::onInstanceThreadStarted() {
   createServerConnection();
 }
 
-AbstractManager::Type ProductionManager::type() const {
-  return Type::Production;
+AbstractManager::Type PersoServerManager::type() const {
+  return Type::PersoServer;
 }
 
-void ProductionManager::applySettings() {
+void PersoServerManager::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
 
   Server->applySettings();
 }
 
-void ProductionManager::connectToServer() {
+void PersoServerManager::connect() {
   initOperation("connectToServer");
 
   ReturnStatus ret;
@@ -39,7 +40,7 @@ void ProductionManager::connectToServer() {
   completeOperation("connectToServer");
 }
 
-void ProductionManager::disconnectFromServer() {
+void PersoServerManager::disconnect() {
   initOperation("connectToServer");
 
   Server->disconnect();
@@ -47,7 +48,7 @@ void ProductionManager::disconnectFromServer() {
   completeOperation("connectToServer");
 }
 
-void ProductionManager::launchProductionLine(
+void PersoServerManager::launchProductionLine(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("launchProductionLine");
 
@@ -71,7 +72,7 @@ void ProductionManager::launchProductionLine(
   completeOperation("launchProductionLine");
 }
 
-void ProductionManager::shutdownProductionLine() {
+void PersoServerManager::shutdownProductionLine() {
   initOperation("shutdownProductionLine");
 
   Server->shutdownProductionLine();
@@ -82,7 +83,7 @@ void ProductionManager::shutdownProductionLine() {
   completeOperation("shutdownProductionLine");
 }
 
-void ProductionManager::getProductionLineData() {
+void PersoServerManager::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret;
@@ -99,8 +100,7 @@ void ProductionManager::getProductionLineData() {
   completeOperation("getProductionLineData");
 }
 
-void ProductionManager::logOnServer(
-    const std::shared_ptr<StringDictionary> param) {
+void PersoServerManager::logOn(const std::shared_ptr<StringDictionary> param) {
   initOperation("logOnServer");
 
   ReturnStatus ret;
@@ -136,7 +136,7 @@ void ProductionManager::logOnServer(
   completeOperation("logOnServer");
 }
 
-void ProductionManager::logOutServer() {
+void PersoServerManager::logOut() {
   initOperation("logOutServer");
 
   if (Server->isConnected()) {
@@ -147,7 +147,7 @@ void ProductionManager::logOutServer() {
   completeOperation("logOutServer");
 }
 
-void ProductionManager::echoServer() {
+void PersoServerManager::echo() {
   initOperation("echoServer");
 
   ReturnStatus ret;
@@ -160,7 +160,7 @@ void ProductionManager::echoServer() {
   completeOperation("echoServer");
 }
 
-void ProductionManager::requestBox() {
+void PersoServerManager::requestBox() {
   initOperation("requestBox");
 
   ReturnStatus ret;
@@ -207,7 +207,7 @@ void ProductionManager::requestBox() {
   completeOperation("requestBox");
 }
 
-void ProductionManager::getCurrentBoxData() {
+void PersoServerManager::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
   ReturnStatus ret = Server->getCurrentBoxData(BoxData);
@@ -224,7 +224,7 @@ void ProductionManager::getCurrentBoxData() {
   completeOperation("getCurrentBoxData");
 }
 
-void ProductionManager::refundCurrentBox() {
+void PersoServerManager::refundCurrentBox() {
   initOperation("refundCurrentBox");
 
   ReturnStatus ret;
@@ -253,7 +253,7 @@ void ProductionManager::refundCurrentBox() {
   completeOperation("refundCurrentBox");
 }
 
-void ProductionManager::completeCurrentBox() {
+void PersoServerManager::completeCurrentBox() {
   initOperation("completeCurrentBox");
 
   ReturnStatus ret;
@@ -282,7 +282,7 @@ void ProductionManager::completeCurrentBox() {
   completeOperation("completeCurrentBox");
 }
 
-void ProductionManager::releaseTransponder() {
+void PersoServerManager::releaseTransponder() {
   initOperation("releaseTransponder");
 
   ReturnStatus ret;
@@ -342,7 +342,7 @@ void ProductionManager::releaseTransponder() {
   completeOperation("releaseTransponder");
 }
 
-void ProductionManager::rereleaseTransponder(
+void PersoServerManager::rereleaseTransponder(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("rereleaseTransponder");
   sendLog("Выпуск транспондера. ");
@@ -391,7 +391,7 @@ void ProductionManager::rereleaseTransponder(
   completeOperation("rereleaseTransponder");
 }
 
-void ProductionManager::rollbackTransponder() {
+void PersoServerManager::rollbackTransponder() {
   initOperation("rollbackTransponder");
   sendLog("Откат производственной линии. ");
 
@@ -432,7 +432,7 @@ void ProductionManager::rollbackTransponder() {
   completeOperation("rollbackTransponder");
 }
 
-void ProductionManager::getCurrentTransponderData() {
+void PersoServerManager::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret;
@@ -449,7 +449,7 @@ void ProductionManager::getCurrentTransponderData() {
   completeOperation("getCurrentTransponderData");
 }
 
-void ProductionManager::getTransponderData(
+void PersoServerManager::getTransponderData(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("getTransponderData");
 
@@ -467,7 +467,7 @@ void ProductionManager::getTransponderData(
   completeOperation("getTransponderData");
 }
 
-void ProductionManager::printBoxSticker(
+void PersoServerManager::printBoxSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printBoxSticker");
 
@@ -481,7 +481,7 @@ void ProductionManager::printBoxSticker(
   completeOperation("printBoxSticker");
 }
 
-void ProductionManager::printLastBoxSticker() {
+void PersoServerManager::printLastBoxSticker() {
   initOperation("printLastBoxSticker");
 
   ReturnStatus ret;
@@ -494,7 +494,7 @@ void ProductionManager::printLastBoxSticker() {
   completeOperation("printLastBoxSticker");
 }
 
-void ProductionManager::printPalletSticker(
+void PersoServerManager::printPalletSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printPalletSticker");
 
@@ -508,7 +508,7 @@ void ProductionManager::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void ProductionManager::printLastPalletSticker() {
+void PersoServerManager::printLastPalletSticker() {
   initOperation("printLastPalletSticker");
 
   ReturnStatus ret;
@@ -521,7 +521,7 @@ void ProductionManager::printLastPalletSticker() {
   completeOperation("printLastPalletSticker");
 }
 
-void ProductionManager::onServerDisconnected() {
+void PersoServerManager::onServerDisconnected() {
   ProductionLineData.clear();
   emit displayProductionLineData_signal(ProductionLineData);
 
@@ -532,9 +532,9 @@ void ProductionManager::onServerDisconnected() {
   emit displayTransponderData_signal(TransponderData);
 }
 
-void ProductionManager::loadSettings() {}
+void PersoServerManager::loadSettings() {}
 
-ReturnStatus ProductionManager::checkConfig() {
+ReturnStatus PersoServerManager::checkConfig() {
   sendLog("Проверка конфигурации.");
 
   ReturnStatus ret = ReturnStatus::NoError;
@@ -543,12 +543,10 @@ ReturnStatus ProductionManager::checkConfig() {
   return ret;
 }
 
-void ProductionManager::createServerConnection() {
+void PersoServerManager::createServerConnection() {
   Server = std::unique_ptr<AbstractServerConnection>(
       new PersoServerConnection("PersoServerConnection"));
 
-  connect(Server.get(), &AbstractServerConnection::disconnected, this,
-          &ProductionManager::onServerDisconnected);
+  QObject::connect(Server.get(), &AbstractServerConnection::disconnected, this,
+                   &PersoServerManager::onServerDisconnected);
 }
-
-void AbstractManager::connectDependencies() {}

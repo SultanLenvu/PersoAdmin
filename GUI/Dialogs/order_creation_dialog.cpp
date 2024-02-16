@@ -3,8 +3,6 @@
 
 OrderCreationDialog::OrderCreationDialog(QWidget* parent)
     : AbstractInputDialog(parent) {
-  setObjectName("OrderCreationDialog");
-
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 

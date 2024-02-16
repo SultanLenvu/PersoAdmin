@@ -85,7 +85,7 @@ class SettingsDialog : public QDialog {
   QPushButton* RejectPushButton;
 
  public:
-  explicit SettingsDialog(QWidget* parent);
+  explicit SettingsDialog(QWidget* parent = nullptr);
   ~SettingsDialog();
 
   virtual void accept(void) override;

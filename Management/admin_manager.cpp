@@ -445,25 +445,25 @@ void AdminManager::refundTranspondersManually(
   emit executionFinished("refundTranspondersManually", ReturnStatus::NoError);
 }
 
-void AdminManager::shipPallets(const std::shared_ptr<StringDictionary> param,
+void AdminManager::generateShipmentRegister(const std::shared_ptr<StringDictionary> param,
                                SqlQueryValues* model) {
-  emit executionStarted("shipPallets");
+  emit executionStarted("generateShipmentRegister");
   sendLog("Отгрузка паллет. ");
 
   ReturnStatus ret;
-  ret = Administrator->shipPallets(*param.get());
+  ret = Administrator->generateShipmentRegister(*param.get());
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("shipPallets", ret);
+    emit executionFinished("generateShipmentRegister", ret);
     return;
   }
 
   ret = Administrator->getTable("pallets", *model);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("shipPallets", ret);
+    emit executionFinished("generateShipmentRegister", ret);
     return;
   }
 
-  emit executionFinished("shipPallets", ReturnStatus::NoError);
+  emit executionFinished("generateShipmentRegister", ReturnStatus::NoError);
 }
 
 void AdminManager::releaseTransponder(

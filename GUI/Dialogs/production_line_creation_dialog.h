@@ -30,7 +30,7 @@ class ProductionLineCreationDialog : public AbstractInputDialog {
   QSpacerItem* VerticalSpacer;
 
  public:
-  explicit ProductionLineCreationDialog(QWidget* paren);
+  explicit ProductionLineCreationDialog(QWidget* parent = nullptr);
   ~ProductionLineCreationDialog();
 
   virtual void getData(StringDictionary& data) const override;

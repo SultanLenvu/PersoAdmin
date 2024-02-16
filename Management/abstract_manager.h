@@ -8,7 +8,10 @@ class AbstractManager : public PSObject {
   Q_OBJECT
  public:
   enum Type {
-    Production,
+    Database,
+    Order,
+    ProductionLine,
+    PersoServer,
     Programmer,
     StickerPrinter,
   };
@@ -18,8 +21,12 @@ class AbstractManager : public PSObject {
   explicit AbstractManager(const QString& name);
   virtual ~AbstractManager();
 
-  virtual void onInstanceThreadStarted(void) = 0;
+ public:
   virtual Type type() const = 0;
+
+ public slots:
+  virtual void onInstanceThreadStarted(void) = 0;
+  virtual void applySettings() = 0;
 
  protected:
   virtual void initOperation(const QString& name);

@@ -4,6 +4,7 @@
 
 PSObject::PSObject(const QString& name) : QObject{nullptr} {
   setObjectName(name);
+  GlobalEnvironment::instance()->registerObject(this);
 
   connectDependencies();
 }
@@ -20,9 +21,8 @@ void PSObject::sendLog(const QString& log) {
 PSObject::PSObject() {}
 
 void PSObject::connectDependencies() {
-  LogSystem* ls = dynamic_cast<LogSystem*>(
+  LogSystem* ls = static_cast<LogSystem*>(
       GlobalEnvironment::instance()->getObject("LogSystem"));
-  assert(ls);
 
   connect(this, &PSObject::logging, ls, &LogSystem::generate);
 }

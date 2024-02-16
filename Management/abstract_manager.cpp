@@ -4,8 +4,6 @@
 
 AbstractManager::AbstractManager(const QString& name) : PSObject{name} {
   connectDependencies();
-
-  GlobalEnvironment::instance()->registerObject(this);
 }
 
 AbstractManager::~AbstractManager() {}
@@ -27,9 +25,8 @@ void AbstractManager::completeOperation(const QString& name) {
 }
 
 void AbstractManager::connectDependencies() {
-  InteractionSystem* is = dynamic_cast<InteractionSystem*>(
+  InteractionSystem* is = static_cast<InteractionSystem*>(
       GlobalEnvironment::instance()->getObject("InteractionSystem"));
-  assert(is);
 
   connect(this, &AbstractManager::executionStarted, is,
           &InteractionSystem::processOperationStart);

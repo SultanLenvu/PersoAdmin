@@ -24,7 +24,7 @@ class PalletShippingDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit PalletShippingDialog(QWidget* parent);
+  explicit PalletShippingDialog(QWidget* parent = nullptr);
   ~PalletShippingDialog();
 
   virtual void getData(StringDictionary& data) const override;

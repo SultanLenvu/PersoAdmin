@@ -45,7 +45,7 @@ class OrderCreationDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit OrderCreationDialog(QWidget* parent);
+  explicit OrderCreationDialog(QWidget* parent = nullptr);
   ~OrderCreationDialog();
 
   virtual void getData(StringDictionary& data) const override;

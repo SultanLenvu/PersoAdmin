@@ -1,11 +1,12 @@
+#include <QSettings>
+
 #include "widget_log_backend.h"
-#include "global_environment.h"
 
 WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
   loadSettings();
-
-  GlobalEnvironment::instance()->registerObject(this);
 }
+
+WidgetLogBackend::~WidgetLogBackend() {}
 
 void WidgetLogBackend::writeLogMessage(const QString& str) {
   if (Enable) {
@@ -13,14 +14,14 @@ void WidgetLogBackend::writeLogMessage(const QString& str) {
   }
 }
 
+void WidgetLogBackend::applySettings() {
+  loadSettings();
+}
+
 void WidgetLogBackend::clear() {
   if (Enable) {
     emit clearLogDisplay_signal();
   }
-}
-
-void WidgetLogBackend::applySettings() {
-  loadSettings();
 }
 
 void WidgetLogBackend::loadSettings() {
