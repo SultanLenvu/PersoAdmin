@@ -1,9 +1,9 @@
 #include "postgre_sql_database.h"
-#include "Log/log_system.h"
+#include "definitions.h"
 
 PostgreSqlDatabase::PostgreSqlDatabase(const QString& name)
     : AbstractSqlDatabase{name} {
-  ConnectionName = name + "Connection";
+  ConnectionName = QString("%1%2").arg(name, "Connection");
 
   loadSettings();
 }
@@ -185,146 +185,42 @@ bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
 
 bool PostgreSqlDatabase::createRecords(const QString& table,
                                        const SqlQueryValues& records) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->createRecords(records);
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      SqlQueryValues& response) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->readRecords(response);
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      const QString& conditions,
                                      SqlQueryValues& response) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->readRecords(conditions, response);
 }
 
 bool PostgreSqlDatabase::readLastRecord(const QString& table,
                                         SqlQueryValues& record) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->readLastRecord(record);
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const SqlQueryValues& newValues) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->updateRecords(newValues);
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const QString& conditions,
                                        const SqlQueryValues& newValues) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->updateRecords(conditions, newValues);
 }
 
 bool PostgreSqlDatabase::deleteRecords(const QString& table,
                                        const QString& condition) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->deleteRecords(condition);
 }
 
 bool PostgreSqlDatabase::clearTable(const QString& table) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->clear();
 }
 
@@ -393,18 +289,6 @@ bool PostgreSqlDatabase::updateMergedRecords(
     const QStringList& tables,
     const QString& conditions,
     const SqlQueryValues& newValues) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!checkTableNames(tables)) {
-    sendLog("Получено неизвестное имя таблицы.");
-    return false;
-  }
 
   //  UPDATE transponders
   //  SET awaiting_confirmation = true
@@ -452,18 +336,6 @@ bool PostgreSqlDatabase::updateMergedRecords(
 
 bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
                                              const QString& conditions) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!checkTableNames(tables)) {
-    sendLog("Получено неизвестное имя таблицы.");
-    return false;
-  }
 
   // Создаем запрос
   QString requestText =
@@ -494,30 +366,39 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
 
 bool PostgreSqlDatabase::getRecordCount(const QString& table,
                                         uint32_t& count) const {
-  // Проверка подключения
-  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
-    return false;
-  }
-
-  if (!Tables.contains(table)) {
-    sendLog(QString("Таблица %1 отсутствует в базе.").arg(table));
-    return false;
-  }
-
   return Tables.value(table)->getRecordCount(count);
+}
+
+bool PostgreSqlDatabase::getLastId(const QString& table, int32_t& id) const {
+  SqlQueryValues record;
+  id = 0;
+
+  if (!readLastRecord(table, record)) {
+    sendLog(
+        QString("Получена ошибка при поиске последней записи в таблице '%1'. ")
+            .arg(table));
+    return false;
+  }
+  if (record.isEmpty()) {
+    if (table == "transponders") {
+      id = TRANSPONDER_ID_START_SHIFT;
+    }
+    if (table == "boxes") {
+      id = BOX_ID_START_SHIFT;
+    }
+    if (table == "pallets") {
+      id = PALLET_ID_START_SHIFT;
+    }
+    return true;
+  }
+
+  id = record.get("id").toInt();
+  return true;
 }
 
 /*
  *   Приватные методы
  */
-
-void PostgreSqlDatabase::sendLog(const QString& log) const {
-  emit const_cast<PostgreSqlDatabase*>(this)->logging(objectName() + " - " +
-                                                      log);
-}
 
 void PostgreSqlDatabase::loadSettings() {
   // Загружаем настройки
@@ -556,8 +437,8 @@ bool PostgreSqlDatabase::init() {
 }
 
 bool PostgreSqlDatabase::createTable(const QString& name) {
-  std::shared_ptr<PostgreSqlTable> table(
-      new PostgreSqlTable(name, ConnectionName));
+  std::shared_ptr<PostgreSqlTable> table(new PostgreSqlTable(
+      QString("PostgreSQL table '%1'").arg(name), name, ConnectionName));
   if (!table->init()) {
     sendLog(
         QString("Получена ошибка при инициализации таблицы '%1'").arg(name));

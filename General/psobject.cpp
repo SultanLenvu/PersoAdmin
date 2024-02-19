@@ -14,7 +14,7 @@ PSObject::~PSObject() {}
 void PSObject::applySettings() {
 }
 
-void PSObject::sendLog(const QString& log) {
+void PSObject::sendLog(const QString& log) const {
   emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 

@@ -10,6 +10,7 @@
 
 class PostgreSqlTable : public AbstractSqlTable {
  private:
+  QString TableName;
   QString ConnectionName;
 
   QString PrimaryKey;
@@ -20,26 +21,18 @@ class PostgreSqlTable : public AbstractSqlTable {
   QString CurrentOrder;
 
  public:
-  explicit PostgreSqlTable(const QString& name, const QString& connectionName);
+  explicit PostgreSqlTable(const QString& name,
+                           const QString& tableName,
+                           const QString& connectionName);
   ~PostgreSqlTable();
 
-  // Accessors
-  QString getPrimaryKey() const;
-  void setPrimaryKey(const QString& newPrimaryKey);
-
-  uint32_t getRecordMaxCount() const;
-  void setRecordMaxCount(uint32_t newRecordMaxCount);
-
-  Qt::SortOrder getCurrentOrder() const;
-  void setCurrentOrder(Qt::SortOrder order);
-
-  const QVector<QString>* columns() const;
-  const StringDictionary* relations() const;
+  // PSObject interface
+ public:
+  virtual void applySettings() override;
 
   // AbstractSqlTable interface
  public:
   virtual bool init() override;
-  virtual void applySettings() override;
 
   // CRUD
   virtual bool createRecords(const SqlQueryValues& response) override;
@@ -56,9 +49,21 @@ class PostgreSqlTable : public AbstractSqlTable {
   // Aggregation
   virtual bool getRecordCount(uint32_t& count) override;
 
+  // Own
+ public:
+  QString getPrimaryKey() const;
+  void setPrimaryKey(const QString& newPrimaryKey);
+
+  uint32_t getRecordMaxCount() const;
+  void setRecordMaxCount(uint32_t newRecordMaxCount);
+
+  Qt::SortOrder getCurrentOrder() const;
+  void setCurrentOrder(Qt::SortOrder order);
+
+  const QVector<QString>* columns() const;
+  const StringDictionary* relations() const;
+
  private:
-  Q_DISABLE_COPY_MOVE(PostgreSqlTable)
-  void sendLog(const QString& log);
   void loadSettings(void);
 
   bool checkFieldNames(const SqlQueryValues& record) const;

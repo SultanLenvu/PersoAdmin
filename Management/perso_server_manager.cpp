@@ -16,10 +16,6 @@ void PersoServerManager::onInstanceThreadStarted() {
   createServerConnection();
 }
 
-AbstractManager::Type PersoServerManager::type() const {
-  return Type::PersoServer;
-}
-
 void PersoServerManager::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();

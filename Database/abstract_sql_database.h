@@ -1,18 +1,15 @@
 #ifndef ABSTRACTSQLDATABASE_H
 #define ABSTRACTSQLDATABASE_H
 
-#include <QObject>
-
+#include "psobject.h"
 #include "sql_query_values.h"
 
-class AbstractSqlDatabase : public QObject {
+class AbstractSqlDatabase : public PSObject {
   Q_OBJECT
 
  public:
   explicit AbstractSqlDatabase(const QString& name);
   virtual ~AbstractSqlDatabase();
-
-  virtual void applySettings() = 0;
 
   virtual bool connect(void) = 0;
   virtual void disconnect(void) = 0;
@@ -63,12 +60,10 @@ class AbstractSqlDatabase : public QObject {
   // Aggregation
   virtual bool getRecordCount(const QString& table, uint32_t& count) const = 0;
 
- private:
-  AbstractSqlDatabase();
-  Q_DISABLE_COPY_MOVE(AbstractSqlDatabase)
+  // Misc
+  virtual bool getLastId(const QString& table, int32_t& id) const = 0;
 
  signals:
-  void logging(const QString& log);
   void disconnected(void);
 };
 

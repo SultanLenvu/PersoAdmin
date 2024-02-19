@@ -12,9 +12,6 @@ class ProgrammerManager : public AbstractManager
   ~ProgrammerManager();
 
   // AbstractManager interface
- public:
-  virtual Type type() const override;
-
  public slots:
   virtual void onInstanceThreadStarted() override;
   virtual void applySettings() override;

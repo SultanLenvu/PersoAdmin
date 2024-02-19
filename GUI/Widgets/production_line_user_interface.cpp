@@ -79,4 +79,6 @@ void ProductionLineUserInterface::connectDependencies() {
           &ProductionLineGuiSubkernel::deactivateAll);
   connect(GetPushButton, &QPushButton::clicked, pls,
           &ProductionLineGuiSubkernel::get);
+
+  DataTableView->setModel(pls->productionLines());
 }

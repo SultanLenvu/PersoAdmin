@@ -125,9 +125,12 @@ void GuiKernel::createGuiSubkernels() {
 }
 
 void GuiKernel::createManagersInstance() {
-  Managers.emplace_back(new DatabaseManager("DatabaseManager"));
-  Managers.emplace_back(new OrderManager("OrderManager"));
-  Managers.emplace_back(new ProductionLineManager("ProductionLineManager"));
+  std::unique_ptr<DatabaseManager> dm(new DatabaseManager("DatabaseManager"));
+
+  Managers.emplace_back(new OrderManager("OrderManager", dm->database()));
+  Managers.emplace_back(
+      new ProductionLineManager("ProductionLineManager", dm->database()));
+  Managers.push_back(std::move(dm));
   Managers.emplace_back(new PersoServerManager("PersoServerManager"));
   Managers.emplace_back(new ProgrammerManager("ProgrammerManager"));
   Managers.emplace_back(new StickerPrinterManager("StickerPrinterManager"));

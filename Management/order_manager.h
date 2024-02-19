@@ -12,7 +12,8 @@ class OrderManager : public AbstractManager
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit OrderManager(const QString& name);
+  explicit OrderManager(const QString& name,
+                        std::shared_ptr<AbstractSqlDatabase> database);
   ~OrderManager();
 
   // AbstractManager interface
@@ -20,25 +21,23 @@ class OrderManager : public AbstractManager
   virtual void onInstanceThreadStarted() override;
   virtual void applySettings() override;
 
-  // OrderManager interface
- public:
-  void setDatabase(std::shared_ptr<AbstractSqlDatabase> database);
-
   // Own
  public slots:
   void create(const std::shared_ptr<StringDictionary> param);
   void startAssembling(const std::shared_ptr<StringDictionary> param);
   void stopAssembling(const std::shared_ptr<StringDictionary> param);
+  void generateShipmentRegister(const std::shared_ptr<StringDictionary> param);
 
   void release(const std::shared_ptr<StringDictionary> param);
   void refund(const std::shared_ptr<StringDictionary> param);
-  void generateShipmentRegister(const std::shared_ptr<StringDictionary> param);
 
   void initTransportMasterKeys(void);
   void initIssuers(void);
   void linkIssuerWithKeys(const std::shared_ptr<StringDictionary> param);
 
  private:
+  void loadSettings(void);
+
   bool addOrder(const StringDictionary& param);
   bool addPallets(const QString& orderId, const StringDictionary& param);
   bool addBoxes(const QString& palletId,
@@ -48,19 +47,17 @@ class OrderManager : public AbstractManager
                        const std::shared_ptr<QVector<QString>>& pans,
                        const StringDictionary& param);
 
-  bool stopAllProductionLines(void);
+  ReturnStatus releaseTransponder(const QString& id);
+  ReturnStatus releaseBox(const QString& id);
+  ReturnStatus releasePallet(const QString& id);
+  ReturnStatus releaseOrder(const QString& id);
 
-  bool releaseTransponder(const QString& id);
-  bool releaseBox(const QString& id);
-  bool releasePallet(const QString& id);
-  bool releaseOrder(const QString& id);
+  ReturnStatus refundTransponder(const QString& id);
+  ReturnStatus refundBox(const QString& id);
+  ReturnStatus refundPallet(const QString& id);
+  ReturnStatus refundOrder(const QString& id);
 
-  bool refundTransponder(const QString& id);
-  bool refundBox(const QString& id);
-  bool refundPallet(const QString& id);
-  bool refundOrder(const QString& id);
-
-  int32_t getLastId(const QString& table);
+  ReturnStatus shipPallet(const QString& id, QTextStream& registerOut);
 };
 
 #endif // ORDERMANAGER_H

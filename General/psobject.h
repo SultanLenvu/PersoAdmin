@@ -14,7 +14,7 @@ class PSObject : public QObject
   virtual void applySettings(void);
 
  protected:
-  void sendLog(const QString& log);
+  void sendLog(const QString& log) const;
 
  private:
   PSObject();
@@ -23,7 +23,7 @@ class PSObject : public QObject
   void connectDependencies(void);
 
  signals:
-  void logging(const QString& log);
+  void logging(const QString& log) const;
 };
 
 #endif // PSOBJECT_H

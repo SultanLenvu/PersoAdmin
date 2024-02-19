@@ -5,10 +5,6 @@ ProgrammerManager::ProgrammerManager(const QString& name)
 
 ProgrammerManager::~ProgrammerManager() {}
 
-AbstractManager::Type ProgrammerManager::type() const {
-  return Programmer;
-}
-
 void ProgrammerManager::onInstanceThreadStarted() {}
 
 void ProgrammerManager::applySettings() {}

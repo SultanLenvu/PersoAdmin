@@ -15,7 +15,7 @@ class ProductionLineGuiSubkernel final : public AbstractGuiSubkernel {
   ~ProductionLineGuiSubkernel();
 
  public:
-  const SqlResponseModel* productionLines(void) const;
+  SqlResponseModel* productionLines(void) const;
 
  public slots:  // Слоты для сигналов от GUI
   void create(void);
@@ -27,7 +27,7 @@ class ProductionLineGuiSubkernel final : public AbstractGuiSubkernel {
   void get(void);
 
  public slots:  // Слоты для сигналов от менеджеров
-  void display(std::shared_ptr<SqlQueryValues> productionLines);
+  void display(std::shared_ptr<SqlQueryValues> data);
 
  private:
   void connectDependecies(void);

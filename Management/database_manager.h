@@ -29,13 +29,21 @@ class DatabaseManager final : public AbstractManager {
   void getTable(const QString& name);
   void execCustomRequest(const QString& req);
 
+  void getTransponderData(const std::shared_ptr<StringDictionary> param);
+  void getBoxData(const std::shared_ptr<StringDictionary> param);
+  void getPalletData(const std::shared_ptr<StringDictionary> param);
+
  private:
   void createDatabase(void);
 
   void loadSettings(void);
-  void createOperationNames(void);
+
+  bool generateTransponderData(const QString& id, StringDictionary& data);
+  bool generateBoxData(const QString& id, StringDictionary& data);
+  bool generatePalletData(const QString& id, StringDictionary& data);
 
  signals:
+  void dataReady(const std::shared_ptr<StringDictionary> data);
   void responseReady(const std::shared_ptr<SqlQueryValues> response);
 };
 

@@ -3,9 +3,10 @@
 
 #include <QObject>
 
+#include "psobject.h"
 #include "sql_query_values.h"
 
-class AbstractSqlTable : public QObject {
+class AbstractSqlTable : public PSObject {
   Q_OBJECT
 
  public:
@@ -36,12 +37,7 @@ class AbstractSqlTable : public QObject {
   // Aggregation
   virtual bool getRecordCount(uint32_t& count) = 0;
 
- private:
-  AbstractSqlTable();
-  Q_DISABLE_COPY_MOVE(AbstractSqlTable)
-
  signals:
-  void logging(const QString& log);
 };
 
 #endif  // ABSTRACTSQLTABLE_H

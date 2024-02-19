@@ -23,9 +23,6 @@ class PersoServerManager : public AbstractManager {
   ~PersoServerManager();
 
   // AbstractManager interface
- public:
-  virtual Type type() const override;
-
  public slots:
   virtual void onInstanceThreadStarted(void) override;
   virtual void applySettings(void) override;

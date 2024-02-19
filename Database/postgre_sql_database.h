@@ -30,6 +30,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   ~PostgreSqlDatabase();
 
   // AbstractSqlDatabase interface
+ public:
   virtual void applySettings() override;
 
   virtual bool connect() override;
@@ -83,9 +84,10 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual bool getRecordCount(const QString& table,
                               uint32_t& count) const override;
 
+  // Misc
+  virtual bool getLastId(const QString& table, int32_t& id) const override;
+
  private:
-  Q_DISABLE_COPY_MOVE(PostgreSqlDatabase)
-  void sendLog(const QString& log) const;
   void loadSettings(void);
 
   void createDatabaseConnection(void);

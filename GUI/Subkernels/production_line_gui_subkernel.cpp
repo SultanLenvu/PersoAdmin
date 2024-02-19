@@ -12,7 +12,7 @@ ProductionLineGuiSubkernel::ProductionLineGuiSubkernel(const QString& name)
 
 ProductionLineGuiSubkernel::~ProductionLineGuiSubkernel() {}
 
-const SqlResponseModel* ProductionLineGuiSubkernel::productionLines() const {
+SqlResponseModel* ProductionLineGuiSubkernel::productionLines() const {
   return ProductionLines.get();
 }
 
@@ -76,8 +76,9 @@ void ProductionLineGuiSubkernel::get() {
   emit get_signal("production_lines");
 }
 
-void ProductionLineGuiSubkernel::display(
-    std::shared_ptr<SqlQueryValues> productionLines) {}
+void ProductionLineGuiSubkernel::display(std::shared_ptr<SqlQueryValues> data) {
+  ProductionLines->setResponse(data);
+}
 
 void ProductionLineGuiSubkernel::connectDependecies() {
   ProductionLineManager* om = static_cast<ProductionLineManager*>(
@@ -85,6 +86,7 @@ void ProductionLineGuiSubkernel::connectDependecies() {
   DatabaseManager* dm = static_cast<DatabaseManager*>(
       GlobalEnvironment::instance()->getObject("DatabaseManager"));
 
+  // К менеджерам
   connect(this, &ProductionLineGuiSubkernel::create_signal, om,
           &ProductionLineManager::create);
   connect(this, &ProductionLineGuiSubkernel::activate_signal, om,
@@ -100,4 +102,8 @@ void ProductionLineGuiSubkernel::connectDependecies() {
 
   connect(this, &ProductionLineGuiSubkernel::get_signal, dm,
           &DatabaseManager::getTable);
+
+  // От менеджеров
+  connect(dm, &DatabaseManager::responseReady, this,
+          &ProductionLineGuiSubkernel::display);
 }

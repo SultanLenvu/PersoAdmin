@@ -47,6 +47,7 @@ add_executable(PersoAdmin WIN32
     GUI/Subkernels/production_line_gui_subkernel.h GUI/Subkernels/production_line_gui_subkernel.cpp
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
+    GUI/Subkernels/database_gui_subkernel.h GUI/Subkernels/database_gui_subkernel.cpp
 
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/pallet_shiping_dialog.cpp GUI/Dialogs/pallet_shiping_dialog.h
@@ -60,10 +61,17 @@ add_executable(PersoAdmin WIN32
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
 
+    GUI/Widgets/order_user_interface.h GUI/Widgets/order_user_interface.cpp
+    GUI/Widgets/database_user_interface.h GUI/Widgets/database_user_interface.cpp
+    GUI/Widgets/production_line_user_interface.h GUI/Widgets/production_line_user_interface.cpp
+    GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
+    GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
+
     General/types.h
     General/definitions.h
     General/sql_response_model.cpp General/sql_response_model.h
     General/psobject.cpp General/psobject.h
+    General/hash_table_model.cpp General/hash_table_model.h
 
     Functors/abstract_string_checker.h Functors/abstract_string_checker.cpp
     Functors/ucid_checker.h Functors/ucid_checker.cpp
@@ -75,11 +83,14 @@ add_executable(PersoAdmin WIN32
     Log/widget_log_backend.cpp Log/widget_log_backend.h
 
     Management/abstract_manager.h Management/abstract_manager.cpp
-    Management/admin_manager.cpp Management/admin_manager.h
-    Management/administration_system.cpp Management/administration_system.h
     Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
     Management/perso_server_manager.cpp Management/perso_server_manager.h
+    Management/database_manager.h Management/database_manager.cpp
+    Management/order_manager.h Management/order_manager.cpp
+    Management/production_line_manager.h Management/production_line_manager.cpp
+    Management/programmer_manager.h Management/programmer_manager.cpp
+    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
 
     ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
@@ -108,18 +119,6 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    GUI/Subkernels/database_gui_subkernel.h GUI/Subkernels/database_gui_subkernel.cpp
-    GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
-    General/hash_table_model.cpp General/hash_table_model.h
-    Management/database_manager.h Management/database_manager.cpp
-    Management/order_manager.h Management/order_manager.cpp
-    Management/production_line_manager.h Management/production_line_manager.cpp
-    Management/programmer_manager.h Management/programmer_manager.cpp
-    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
-    GUI/Widgets/order_user_interface.h GUI/Widgets/order_user_interface.cpp
-    GUI/Widgets/database_user_interface.h GUI/Widgets/database_user_interface.cpp
-    GUI/Widgets/production_line_user_interface.h GUI/Widgets/production_line_user_interface.cpp
-    GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
