@@ -1,20 +1,14 @@
 #include "postgre_sql_table.h"
-#include "global_environment.h"
-#include "log_system.h"
 
 PostgreSqlTable::PostgreSqlTable(const QString& name,
                                  const QString& connectionName)
     : AbstractSqlTable(name) {
+  ConnectionName = connectionName;
+
   loadSettings();
 
-  ConnectionName = connectionName;
   RecordMaxCount = 1000;
   CurrentOrder = "ASC";
-
-  connect(this, &PostgreSqlTable::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
 }
 
 PostgreSqlTable::~PostgreSqlTable() {}
@@ -118,6 +112,10 @@ void PostgreSqlTable::applySettings() {
 }
 
 bool PostgreSqlTable::createRecords(const SqlQueryValues& records) {
+  if (!checkFieldNames(records)) {
+    return false;
+  }
+
   // Создаем запрос
   QString requestText = QString("INSERT INTO public.%1 (").arg(objectName());
   for (int32_t i = 0; i < records.fieldCount(); i++) {
@@ -151,7 +149,6 @@ bool PostgreSqlTable::readRecords(SqlQueryValues& response) {
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -175,7 +172,6 @@ bool PostgreSqlTable::readRecords(const QString& conditions,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -194,7 +190,7 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) {
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -206,6 +202,11 @@ bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) {
 }
 
 bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
+  if (!checkFieldNames(newValues)) {
+    sendLog("Получено неизвестное имя поля таблицы. ");
+    return false;
+  }
+
   // Создаем запрос
   QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
   for (int32_t i = 0; i < newValues.fieldCount(); i++) {
@@ -217,10 +218,11 @@ bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
     }
   }
   requestText.chop(2);
+  requestText += ";";
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -232,6 +234,11 @@ bool PostgreSqlTable::updateRecords(const SqlQueryValues& newValues) {
 
 bool PostgreSqlTable::updateRecords(const QString& condition,
                                     const SqlQueryValues& newValues) {
+  if (!checkFieldNames(newValues)) {
+    sendLog("Получено неизвестное имя поля таблицы. ");
+    return false;
+  }
+
   // Создаем запрос
   QString requestText = QString("UPDATE public.%1 SET ").arg(objectName());
   for (int32_t i = 0; i < newValues.fieldCount(); i++) {
@@ -248,7 +255,7 @@ bool PostgreSqlTable::updateRecords(const QString& condition,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -265,7 +272,7 @@ bool PostgreSqlTable::deleteRecords(const QString& condition) {
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -281,7 +288,7 @@ bool PostgreSqlTable::clear() {
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -298,7 +305,7 @@ bool PostgreSqlTable::getRecordCount(uint32_t& count) {
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -315,27 +322,26 @@ void PostgreSqlTable::sendLog(const QString& log) {
   emit logging(QString("Table %1 - %2").arg(objectName(), log));
 }
 
-void PostgreSqlTable::loadSettings() {
-  QSettings settings;
+void PostgreSqlTable::loadSettings() {}
+
+bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
+  for (int32_t i = 0; i < records.fieldCount(); i++) {
+    if (!Columns.contains(records.fieldName(i))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-// bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
-//   for (int32_t i = 0; i < records.fieldCount(); i++) {
-//     if (!Columns.contains(records.fieldName(i))) {
-//       return false;
-//     }
-//   }
+bool PostgreSqlTable::checkFieldNames(
+    const StringDictionary& record) const {
+  for (StringDictionary::const_iterator it = record.constBegin();
+       it != record.constEnd(); it++) {
+    if (!Columns.contains(it.key())) {
+      return false;
+    }
+  }
 
-//  return true;
-//}
-
-// bool PostgreSqlTable::checkFieldNames(const StringDictionary& record) const {
-//   for (StringDictionary::const_iterator it = record.constBegin();
-//        it != record.constEnd(); ++it) {
-//     if (!Columns.contains(it.key())) {
-//       return false;
-//     }
-//   }
-
-//  return true;
-//}
+  return true;
+}

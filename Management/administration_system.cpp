@@ -2,8 +2,6 @@
 #include "definitions.h"
 #include "global_environment.h"
 #include "log_system.h"
-#include "postgre_sql_database.h"
-#include "sql_query_values.h"
 
 AdministrationSystem::AdministrationSystem(const QString& name)
     : QObject(nullptr) {
@@ -16,75 +14,6 @@ AdministrationSystem::AdministrationSystem(const QString& name)
           dynamic_cast<LogSystem*>(
               GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);
-}
-
-void AdministrationSystem::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-  Database->applySettings();
-}
-
-ReturnStatus AdministrationSystem::connectDatabase() {
-  sendLog("Подключение к базе данных. ");
-  if (!Database->connect()) {
-    sendLog("Не удалось установить соединение с базой данных. ");
-    return ReturnStatus::DatabaseConnectionError;
-  }
-
-  Database->setRecordMaxCount(10000);
-  return ReturnStatus::NoError;
-}
-
-ReturnStatus AdministrationSystem::disconnectDatabase() {
-  sendLog("Отключение от базы данных. ");
-  Database->disconnect();
-
-  return ReturnStatus::NoError;
-}
-
-ReturnStatus AdministrationSystem::getTable(const QString& tableName,
-                                            SqlQueryValues& response) {
-  if (!Database->openTransaction()) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-
-  Database->setCurrentOrder(Qt::AscendingOrder);
-  Database->setRecordMaxCount(0);
-  if (!Database->readRecords(tableName, response)) {
-    sendLog(QString("Получена ошибка при получении данных из таблицы %1. ")
-                .arg(tableName));
-    Database->rollbackTransaction();
-    return ReturnStatus::DatabaseQueryError;
-  }
-
-  sendLog(QString("Данные из таблицы %1 успешно получены. ").arg(tableName));
-  if (!Database->commitTransaction()) {
-    sendLog("Получена ошибка при закрытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-  return ReturnStatus::NoError;
-}
-
-ReturnStatus AdministrationSystem::getCustomResponse(const QString& req,
-                                                     SqlQueryValues& response) {
-  if (!Database->openTransaction()) {
-    sendLog("Получена ошибка при открытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-
-  if (!Database->execCustomRequest(req, response)) {
-    sendLog("Получена ошибка при выполнении кастомного запроса. ");
-    Database->rollbackTransaction();
-    return ReturnStatus::DatabaseQueryError;
-  }
-
-  sendLog("Кастомный запрос успешно выполнен. ");
-  if (!Database->commitTransaction()) {
-    sendLog("Получена ошибка при закрытии транзакции. ");
-    return ReturnStatus::DatabaseTransactionError;
-  }
-  return ReturnStatus::NoError;
 }
 
 ReturnStatus AdministrationSystem::createNewOrder(
@@ -1202,173 +1131,6 @@ void AdministrationSystem::loadSettings() {
   ShipmentRegisterDir = "/ShipmentRegisters/";
 }
 
-void AdministrationSystem::sendLog(const QString& log) {
-  emit logging(QString("%1 - %2").arg(objectName(), log));
-}
-
-bool AdministrationSystem::addOrder(const StringDictionary& param) {
-  uint32_t transponderCount = param.value("transponder_quantity").toInt();
-  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
-  uint32_t boxCapacity = param.value("box_capacity").toInt();
-  uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
-  SqlQueryValues issuerRecord;
-  SqlQueryValues orderRecord;
-  SqlQueryValues newOrderValues;
-  int32_t lastId = 0;
-
-  // Ищем заказчика
-  if (!Database->readRecords(
-          "issuers", QString("name = '%1'").arg(param.value("issuer_name")),
-          issuerRecord)) {
-    sendLog(QString("Получена ошибка при поиске эмитента \"%1\".")
-                .arg(param.value("issuer_name")));
-    return false;
-  }
-
-  // Получаем последний идентификатор заказа
-  lastId = getLastId("orders");
-
-  // Формируем новую запись
-  newOrderValues.add("id", QString::number(lastId + 1));
-  newOrderValues.add("issuer_id", issuerRecord.get("id"));
-  newOrderValues.add("quantity", QString::number(orderCapacity));
-  newOrderValues.add("full_personalization",
-                     param.value("full_personalization"));
-  newOrderValues.add(
-      "transponder_model",
-      param.value("transponder_model")
-          .rightJustified(TRANSPONDER_MODEL_CHAR_LENGTH, QChar(' ')));
-  newOrderValues.add("accr_reference", param.value("accr_reference"));
-  newOrderValues.add("equipment_class", param.value("equipment_class"));
-  newOrderValues.add("manufacturer_id", param.value("manufacturer_id"));
-  if (!Database->createRecords("orders", newOrderValues)) {
-    sendLog("Получена ошибка при добавлении заказа. ");
-    return false;
-  }
-
-  // Добавляем паллеты в заказ
-  return addPallets(newOrderValues.get("id"), param);
-}
-
-bool AdministrationSystem::addPallets(const QString& orderId,
-                                      const StringDictionary& param) {
-  uint32_t transponderCount = param.value("transponder_quantity").toInt();
-  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
-  uint32_t boxCapacity = param.value("box_capacity").toInt();
-  uint32_t orderCapacity = transponderCount / (palletCapacity * boxCapacity);
-  SqlQueryValues newPalletValues;
-  int32_t lastId = 0;
-
-  // Получаем идентификатор последней палеты
-  lastId = getLastId("pallets");
-
-  // Формируем новые записи
-  for (uint32_t i = 1; i <= orderCapacity; i++) {
-    newPalletValues.add("id", QString::number(lastId + i));
-    newPalletValues.add("quantity", QString::number(palletCapacity));
-    newPalletValues.add("order_id", orderId);
-  }
-
-  // Добавляем новые палеты
-  if (!Database->createRecords("pallets", newPalletValues)) {
-    sendLog(QString("Получена ошибка при добавлении палет в заказ %1. ")
-                .arg(orderId));
-    return false;
-  }
-
-  // Открываем PAN-файл
-  QFile panFile(param.value("pan_file_path"));
-  if (!panFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    sendLog("Получена ошибка при открытии PAN-файла. ");
-    return false;
-  }
-  QTextStream panSource(&panFile);
-
-  // Добавляем боксы в паллеты
-  for (uint32_t i = 0; i < orderCapacity; i++) {
-    if (!addBoxes(newPalletValues.get(i, "id"), param, panSource)) {
-      sendLog(QString("Получена ошибка при добавлении боксов в паллету %1. ")
-                  .arg(newPalletValues.get(i, "id")));
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool AdministrationSystem::addBoxes(const QString& palletId,
-                                    const StringDictionary& param,
-                                    QTextStream& panSource) {
-  uint32_t palletCapacity = param.value("pallet_capacity").toInt();
-  uint32_t boxCapacity = param.value("box_capacity").toInt();
-  SqlQueryValues newBoxValues;
-  int32_t lastId = 0;
-
-  // Получаем идентификатор последнего добавленного бокса
-  lastId = getLastId("boxes");
-
-  // Создаем боксы
-  for (uint32_t i = 1; i <= palletCapacity; i++) {
-    newBoxValues.add("id", QString::number(lastId + i));
-    newBoxValues.add("quantity", QString::number(boxCapacity));
-    newBoxValues.add("pallet_id", palletId);
-  }
-
-  // Добавляем новые записи
-  if (!Database->createRecords("boxes", newBoxValues)) {
-    sendLog(QString("Получена ошибка при добавлении боксов в паллету %1.")
-                .arg(palletId));
-    return false;
-  }
-
-  for (uint32_t i = 0; i < palletCapacity; i++) {
-    // Считываем PAN'ы
-    std::shared_ptr<QVector<QString>> pans(new QVector<QString>());
-    for (int32_t j = 0; j < boxCapacity && !panSource.atEnd(); j++) {
-      pans->append(
-          panSource.readLine().leftJustified(FULL_PAN_CHAR_LENGTH, QChar('F')));
-    }
-    if (!addTransponders(newBoxValues.get(i, "id"), pans, param)) {
-      sendLog(
-          QString("Получена ошибка при добавлении транспондеров в бокса %1. ")
-              .arg(newBoxValues.get(i, "id")));
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool AdministrationSystem::addTransponders(
-    const QString& boxId,
-    const std::shared_ptr<QVector<QString>>& pans,
-    const StringDictionary& param) {
-  uint32_t boxCapacity = param.value("box_capacity").toInt();
-  int32_t lastId = 0;
-  SqlQueryValues newTransponders;
-
-  // Получаем идентификатор незаполненного бокса
-  lastId = getLastId("transponders");
-
-  // Создаем новые транспондеры
-  newTransponders.add("personal_account_number", pans);
-  for (uint32_t i = 1; i <= boxCapacity; i++) {
-    // Формируем новую запись
-    newTransponders.add("id", QString::number(lastId + i));
-    newTransponders.add("release_counter", "0");
-    newTransponders.add("box_id", boxId);
-  }
-
-  // Добавляем новые записи
-  if (!Database->createRecords("transponders", newTransponders)) {
-    sendLog(QString("Получена ошибка при добавлении транспондеров в бокс %1.")
-                .arg(boxId));
-    return false;
-  }
-
-  return true;
-}
-
 bool AdministrationSystem::addProductionLine(const StringDictionary& param) {
   SqlQueryValues newProductionLine;
   int32_t lastId = 0;
@@ -1392,35 +1154,6 @@ bool AdministrationSystem::addProductionLine(const StringDictionary& param) {
   }
 
   return true;
-}
-
-int32_t AdministrationSystem::getLastId(const QString& table) {
-  SqlQueryValues record;
-
-  Database->setRecordMaxCount(1);
-  Database->setCurrentOrder(Qt::DescendingOrder);
-  if (!Database->readRecords(table, record)) {
-    sendLog(
-        QString("Получена ошибка при поиске последней записи в таблице '%1'. ")
-            .arg(table));
-    return false;
-  }
-  if (record.isEmpty()) {
-    if (table == "transponders") {
-      return TRANSPONDER_ID_START_SHIFT;
-    }
-    if (table == "boxes") {
-      return BOX_ID_START_SHIFT;
-    }
-    if (table == "pallets") {
-      return PALLET_ID_START_SHIFT;
-    }
-    return 0;
-  } else {
-    return record.get("id").toInt();
-  }
-  Database->setRecordMaxCount(0);
-  Database->setCurrentOrder(Qt::AscendingOrder);
 }
 
 bool AdministrationSystem::stopAllProductionLines() {
@@ -1533,9 +1266,4 @@ ReturnStatus AdministrationSystem::shipPallet(const QString& id,
   }
 
   return ReturnStatus::NoError;
-}
-
-void AdministrationSystem::createDatabase() {
-  Database = std::unique_ptr<AbstractSqlDatabase>(
-      new PostgreSqlDatabase("PostgreSqlDatabase", "AdministratorConnection"));
 }

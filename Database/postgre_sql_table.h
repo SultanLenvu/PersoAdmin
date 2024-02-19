@@ -61,8 +61,8 @@ class PostgreSqlTable : public AbstractSqlTable {
   void sendLog(const QString& log);
   void loadSettings(void);
 
-  //  bool checkFieldNames(const SqlQueryValues& record) const;
-  //  bool checkFieldNames(const StringDictionary& record) const;
+  bool checkFieldNames(const SqlQueryValues& record) const;
+  bool checkFieldNames(const StringDictionary& record) const;
 
  signals:
 };

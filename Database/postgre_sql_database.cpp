@@ -1,18 +1,11 @@
 #include "postgre_sql_database.h"
-#include "global_environment.h"
-#include "log_system.h"
+#include "Log/log_system.h"
 
-PostgreSqlDatabase::PostgreSqlDatabase(const QString& name,
-                                       const QString& connectionName)
+PostgreSqlDatabase::PostgreSqlDatabase(const QString& name)
     : AbstractSqlDatabase{name} {
+  ConnectionName = name + "Connection";
+
   loadSettings();
-
-  ConnectionName = connectionName;
-
-  QObject::connect(this, &PostgreSqlDatabase::logging,
-                   dynamic_cast<LogSystem*>(
-                       GlobalEnvironment::instance()->getObject("LogSystem")),
-                   &LogSystem::generate);
 }
 
 PostgreSqlDatabase::~PostgreSqlDatabase() {
@@ -30,42 +23,6 @@ void PostgreSqlDatabase::applySettings() {
 
     sendLog("Создание нового подключения к базе данных. ");
     createDatabaseConnection();
-  }
-}
-
-Qt::SortOrder PostgreSqlDatabase::getCurrentOrder() const {
-  if (CurrentOrder == "ASC") {
-    return Qt::AscendingOrder;
-  }
-
-  return Qt::DescendingOrder;
-}
-
-void PostgreSqlDatabase::setCurrentOrder(Qt::SortOrder order) {
-  if (order == Qt::AscendingOrder) {
-    CurrentOrder = "ASC";
-  } else {
-    CurrentOrder = "DESC";
-  }
-
-  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
-           Tables.constBegin();
-       it != Tables.constEnd(); ++it) {
-    it.value()->setCurrentOrder(order);
-  }
-}
-
-uint32_t PostgreSqlDatabase::getRecordMaxCount() const {
-  return RecordMaxCount;
-}
-
-void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
-  RecordMaxCount = count;
-
-  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
-           Tables.constBegin();
-       it != Tables.constEnd(); ++it) {
-    it.value()->setRecordMaxCount(count);
   }
 }
 
@@ -105,21 +62,22 @@ void PostgreSqlDatabase::disconnect() {
   }
 }
 
-bool PostgreSqlDatabase::checkConnection() {
+bool PostgreSqlDatabase::isConnected() {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     return false;
   }
 
-  QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  if (request.exec(";")) {
-    return true;
-  } else {
-    sendLog(request.lastError().text());
-    return false;
-  }
+  //  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  //  if (!request.exec("")) {
+  //    sendLog(request.lastError().text());
+  //    sendLog("Получена ошибка при выполнении тестового запроса.");
+  //    return false;
+  //  }
+
+  return true;
 }
 
-bool PostgreSqlDatabase::openTransaction() {
+bool PostgreSqlDatabase::openTransaction() const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -128,14 +86,14 @@ bool PostgreSqlDatabase::openTransaction() {
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
   if (!request.exec("BEGIN;")) {
     sendLog(request.lastError().text());
-    sendLog("Получена ошибка при открытии транзакции");
+    sendLog("Получена ошибка при открытии транзакции.");
     return false;
   }
 
   return true;
 }
 
-bool PostgreSqlDatabase::commitTransaction() {
+bool PostgreSqlDatabase::commitTransaction() const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -151,7 +109,7 @@ bool PostgreSqlDatabase::commitTransaction() {
   return true;
 }
 
-bool PostgreSqlDatabase::rollbackTransaction() {
+bool PostgreSqlDatabase::rollbackTransaction() const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -167,8 +125,44 @@ bool PostgreSqlDatabase::rollbackTransaction() {
   return true;
 }
 
+Qt::SortOrder PostgreSqlDatabase::getCurrentOrder() const {
+  if (CurrentOrder == "ASC") {
+    return Qt::AscendingOrder;
+  }
+
+  return Qt::DescendingOrder;
+}
+
+void PostgreSqlDatabase::setCurrentOrder(Qt::SortOrder order) {
+  if (order == Qt::AscendingOrder) {
+    CurrentOrder = "ASC";
+  } else {
+    CurrentOrder = "DESC";
+  }
+
+  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
+           Tables.constBegin();
+       it != Tables.constEnd(); it++) {
+    it.value()->setCurrentOrder(order);
+  }
+}
+
+uint32_t PostgreSqlDatabase::getRecordMaxCount() const {
+  return RecordMaxCount;
+}
+
+void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
+  RecordMaxCount = count;
+
+  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
+           Tables.constBegin();
+       it != Tables.constEnd(); it++) {
+    it.value()->setRecordMaxCount(count);
+  }
+}
+
 bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
-                                           SqlQueryValues& response) {
+                                           SqlQueryValues& response) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
     return false;
@@ -190,7 +184,7 @@ bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
 }
 
 bool PostgreSqlDatabase::createRecords(const QString& table,
-                                       const SqlQueryValues& records) {
+                                       const SqlQueryValues& records) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -208,7 +202,7 @@ bool PostgreSqlDatabase::createRecords(const QString& table,
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
-                                     SqlQueryValues& response) {
+                                     SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -227,7 +221,7 @@ bool PostgreSqlDatabase::readRecords(const QString& table,
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      const QString& conditions,
-                                     SqlQueryValues& response) {
+                                     SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -245,7 +239,7 @@ bool PostgreSqlDatabase::readRecords(const QString& table,
 }
 
 bool PostgreSqlDatabase::readLastRecord(const QString& table,
-                                        SqlQueryValues& record) {
+                                        SqlQueryValues& record) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -263,7 +257,7 @@ bool PostgreSqlDatabase::readLastRecord(const QString& table,
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
-                                       const SqlQueryValues& newValues) {
+                                       const SqlQueryValues& newValues) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -282,7 +276,7 @@ bool PostgreSqlDatabase::updateRecords(const QString& table,
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const QString& conditions,
-                                       const SqlQueryValues& newValues) {
+                                       const SqlQueryValues& newValues) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -300,7 +294,7 @@ bool PostgreSqlDatabase::updateRecords(const QString& table,
 }
 
 bool PostgreSqlDatabase::deleteRecords(const QString& table,
-                                       const QString& condition) {
+                                       const QString& condition) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -317,7 +311,7 @@ bool PostgreSqlDatabase::deleteRecords(const QString& table,
   return Tables.value(table)->deleteRecords(condition);
 }
 
-bool PostgreSqlDatabase::clearTable(const QString& table) {
+bool PostgreSqlDatabase::clearTable(const QString& table) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -336,7 +330,7 @@ bool PostgreSqlDatabase::clearTable(const QString& table) {
 
 bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
                                            const QString& conditions,
-                                           SqlQueryValues& response) {
+                                           SqlQueryValues& response) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -353,7 +347,7 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   // Создаем запрос
   QString requestText;
   if (response.fieldCount() == 0) {
-    requestText += QString("SELECT * FROM public.%1 ").arg(tables.first());
+    requestText += QString("SELECT %1.* FROM public.%1 ").arg(tables.first());
   } else {
     requestText += "SELECT ";
     for (int32_t i = 0; i < response.fieldCount(); i++) {
@@ -374,9 +368,9 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   }
 
   requestText +=
-      QString("WHERE %1 ORDER BY %2 %3 ")
-          .arg(conditions, Tables.value(tables.first())->getPrimaryKey(),
-               CurrentOrder);
+      QString("WHERE %1 ORDER BY %2.%3 %4 ")
+          .arg(conditions, tables.first(),
+               Tables.value(tables.first())->getPrimaryKey(), CurrentOrder);
   if (RecordMaxCount > 0) {
     requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
   }
@@ -384,7 +378,7 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -395,9 +389,10 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   return true;
 }
 
-bool PostgreSqlDatabase::updateMergedRecords(const QStringList& tables,
-                                             const QString& conditions,
-                                             const SqlQueryValues& newValues) {
+bool PostgreSqlDatabase::updateMergedRecords(
+    const QStringList& tables,
+    const QString& conditions,
+    const SqlQueryValues& newValues) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -446,7 +441,6 @@ bool PostgreSqlDatabase::updateMergedRecords(const QStringList& tables,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -457,7 +451,7 @@ bool PostgreSqlDatabase::updateMergedRecords(const QStringList& tables,
 }
 
 bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
-                                             const QString& conditions) {
+                                             const QString& conditions) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -488,7 +482,7 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
 
   // Выполняем запрос
   QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  request.setForwardOnly(true);
+
   if (!request.exec(requestText)) {
     sendLog(request.lastError().text());
     sendLog("Отправленный запрос: " + requestText);
@@ -498,7 +492,8 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
   return true;
 }
 
-bool PostgreSqlDatabase::getRecordCount(const QString& table, uint32_t& count) {
+bool PostgreSqlDatabase::getRecordCount(const QString& table,
+                                        uint32_t& count) const {
   // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog(
@@ -519,8 +514,9 @@ bool PostgreSqlDatabase::getRecordCount(const QString& table, uint32_t& count) {
  *   Приватные методы
  */
 
-void PostgreSqlDatabase::sendLog(const QString& log) {
-  emit logging(QString("%1 - %2").arg(objectName(), log));
+void PostgreSqlDatabase::sendLog(const QString& log) const {
+  emit const_cast<PostgreSqlDatabase*>(this)->logging(objectName() + " - " +
+                                                      log);
 }
 
 void PostgreSqlDatabase::loadSettings() {
@@ -575,7 +571,7 @@ bool PostgreSqlDatabase::createTable(const QString& name) {
 
 bool PostgreSqlDatabase::checkTableNames(const QStringList& names) const {
   for (QStringList::const_iterator it = names.constBegin();
-       it != names.constEnd(); ++it) {
+       it != names.constEnd(); it++) {
     if (!Tables.contains(*it)) {
       return false;
     }

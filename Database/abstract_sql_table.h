@@ -37,6 +37,7 @@ class AbstractSqlTable : public QObject {
   virtual bool getRecordCount(uint32_t& count) = 0;
 
  private:
+  AbstractSqlTable();
   Q_DISABLE_COPY_MOVE(AbstractSqlTable)
 
  signals:
