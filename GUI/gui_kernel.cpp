@@ -92,7 +92,7 @@ void GuiKernel::createTopMenuActions() {
 void GuiKernel::createMainWindowGui() {
   // Настраиваем размер главного окна
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.7, DesktopGeometry.height() * 0.7);
+              DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
 
   // Создаем интерфейс
   setCentralWidget(new MainWindowGui());
@@ -125,12 +125,9 @@ void GuiKernel::createGuiSubkernels() {
 }
 
 void GuiKernel::createManagersInstance() {
-  std::unique_ptr<DatabaseManager> dm(new DatabaseManager("DatabaseManager"));
-
-  Managers.emplace_back(new OrderManager("OrderManager", dm->database()));
-  Managers.emplace_back(
-      new ProductionLineManager("ProductionLineManager", dm->database()));
-  Managers.push_back(std::move(dm));
+  Managers.emplace_back(new DatabaseManager("DatabaseManager"));
+  Managers.emplace_back(new OrderManager("OrderManager"));
+  Managers.emplace_back(new ProductionLineManager("ProductionLineManager"));
   Managers.emplace_back(new PersoServerManager("PersoServerManager"));
   Managers.emplace_back(new ProgrammerManager("ProgrammerManager"));
   Managers.emplace_back(new StickerPrinterManager("StickerPrinterManager"));

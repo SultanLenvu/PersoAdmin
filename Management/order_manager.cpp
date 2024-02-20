@@ -2,13 +2,14 @@
 #include <QFile>
 #include <QSettings>
 
+#include "database_manager.h"
 #include "definitions.h"
+#include "global_environment.h"
 #include "order_manager.h"
 
-OrderManager::OrderManager(const QString& name,
-                           std::shared_ptr<AbstractSqlDatabase> database)
-    : AbstractManager(name), Database(database) {
+OrderManager::OrderManager(const QString& name) : AbstractManager(name) {
   loadSettings();
+  connectDependencies();
 }
 
 OrderManager::~OrderManager() {}
@@ -21,7 +22,13 @@ void OrderManager::applySettings() {
   loadSettings();
 }
 
+void OrderManager::applyDatabase(
+    std::shared_ptr<AbstractSqlDatabase> database) {
+  Database = database;
+}
+
 void OrderManager::create(const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("create");
 
   if (!Database->openTransaction()) {
@@ -46,6 +53,7 @@ void OrderManager::create(const std::shared_ptr<StringDictionary> param) {
 
 void OrderManager::startAssembling(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("startAssembling");
 
   if (!Database->openTransaction()) {
@@ -96,6 +104,7 @@ void OrderManager::startAssembling(
 
 void OrderManager::stopAssembling(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("stopAssembling");
 
   if (!Database->openTransaction()) {
@@ -124,6 +133,7 @@ void OrderManager::stopAssembling(
 
 void OrderManager::generateShipmentRegister(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("generateShipmentRegister");
 
   ReturnStatus ret;
@@ -160,6 +170,7 @@ void OrderManager::generateShipmentRegister(
 }
 
 void OrderManager::release(const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("release");
 
   if (!Database->openTransaction()) {
@@ -198,6 +209,7 @@ void OrderManager::release(const std::shared_ptr<StringDictionary> param) {
 }
 
 void OrderManager::refund(const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("refund");
 
   if (!Database->openTransaction()) {
@@ -236,6 +248,7 @@ void OrderManager::refund(const std::shared_ptr<StringDictionary> param) {
 }
 
 void OrderManager::initTransportMasterKeys() {
+  assert(Database);
   initOperation("initTransportMasterKeys");
 
   SqlQueryValues transportKeys;
@@ -276,6 +289,7 @@ void OrderManager::initTransportMasterKeys() {
 }
 
 void OrderManager::initIssuers() {
+  assert(Database);
   initOperation("initIssuers");
 
   SqlQueryValues newValues;
@@ -330,6 +344,7 @@ void OrderManager::initIssuers() {
 
 void OrderManager::linkIssuerWithKeys(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("linkIssuerWithKeys");
 
   SqlQueryValues issuerNewValue;
@@ -361,6 +376,14 @@ void OrderManager::loadSettings() {
   QSettings settings;
 
   ShipmentRegisterDir = "/ShipmentRegisters/";
+}
+
+void OrderManager::connectDependencies() {
+  DatabaseManager* dm = static_cast<DatabaseManager*>(
+      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+
+  connect(dm, &DatabaseManager::databaseCreated, this,
+          &OrderManager::applyDatabase);
 }
 
 bool OrderManager::addOrder(const StringDictionary& param) {

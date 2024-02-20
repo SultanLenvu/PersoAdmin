@@ -10,8 +10,7 @@ class ProductionLineManager : public AbstractManager {
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit ProductionLineManager(const QString& name,
-                                 std::shared_ptr<AbstractSqlDatabase> database);
+  explicit ProductionLineManager(const QString& name);
   ~ProductionLineManager();
 
   // AbstractManager interface
@@ -21,6 +20,8 @@ class ProductionLineManager : public AbstractManager {
 
   // Own
  public slots:
+  void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
+
   void create(const std::shared_ptr<StringDictionary> param);
 
   void activate(const std::shared_ptr<StringDictionary> param);
@@ -31,10 +32,10 @@ class ProductionLineManager : public AbstractManager {
 
   void edit(const std::shared_ptr<StringDictionary> param);
   void remove(const std::shared_ptr<StringDictionary> param);
-  void get(const QString& name);
 
  private:
   void loadSettings(void);
+  void connectDependencies(void);
 
   bool addProductionLine(const StringDictionary& param);
   bool stopAllProductionLines(void);

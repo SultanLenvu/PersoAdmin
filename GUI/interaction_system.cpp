@@ -88,7 +88,7 @@ void InteractionSystem::createProgressDialog() {
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->setAutoClose(false);
   ProgressDialog->setValue(0);
-  ProgressDialog->close();
+  ProgressDialog->show();
 }
 
 void InteractionSystem::destroyProgressDialog() {
@@ -186,7 +186,7 @@ void InteractionSystem::ODTimerTimeout_slot() {
 void InteractionSystem::ODQTimerTimeout_slot() {
   int32_t cvalue = ProgressDialog->value();
 
-  if (cvalue < 100) {
+  if (cvalue < 99) {
     ProgressDialog->setValue(++cvalue);
   }
 }

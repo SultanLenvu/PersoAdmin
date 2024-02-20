@@ -11,9 +11,9 @@ class PersoServerGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  private:
-  std::unique_ptr<HashTableModel> ProductionLine;
-  std::unique_ptr<HashTableModel> Box;
-  std::unique_ptr<HashTableModel> Transponder;
+  HashTableModel ProductionLine;
+  HashTableModel Box;
+  HashTableModel Transponder;
 
   QPlainTextEdit* FirmwareDisplay;
 
@@ -22,9 +22,9 @@ class PersoServerGuiSubkernel final : public AbstractGuiSubkernel {
   ~PersoServerGuiSubkernel();
 
  public:
-  HashTableModel* productionLine(void);
-  HashTableModel* box(void);
-  HashTableModel* transponder(void);
+  HashTableModel& productionLine(void);
+  HashTableModel& box(void);
+  HashTableModel& transponder(void);
 
  public:
   void setFirmwareDisplay(QPlainTextEdit* firmwareDisplay);

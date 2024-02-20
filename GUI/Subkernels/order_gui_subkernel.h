@@ -1,4 +1,4 @@
-﻿#ifndef ORDERGUISUBKERNEL_H
+#ifndef ORDERGUISUBKERNEL_H
 #define ORDERGUISUBKERNEL_H
 
 #include "abstract_gui_subkernel.h"
@@ -8,14 +8,14 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  private:
-  std::unique_ptr<SqlResponseModel> Orders;
+  SqlResponseModel Orders;
 
  public:
   explicit OrderGuiSubkernel(const QString& name);
   ~OrderGuiSubkernel();
 
  public:
-  const SqlResponseModel* orders(void) const;
+  SqlResponseModel& orders(void);
 
  public slots:  // Слоты для сигналов от GUI
   void create(void);

@@ -47,7 +47,8 @@ void FileLogBackend::initialize() {
     return;
   }
 
-  removeOldestLogFiles();
+  // !!! Опасно !!!
+  //  removeOldestLogFiles();
 
   CurrentFile.setFileName(
       CurrentDir.path() +

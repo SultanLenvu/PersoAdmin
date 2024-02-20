@@ -23,7 +23,7 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   QString UserName;
   QString UserPassword;
 
-  QHash<QString, std::shared_ptr<PostgreSqlTable>> Tables;
+  std::unordered_map<QString, std::unique_ptr<PostgreSqlTable>> Tables;
 
  public:
   explicit PostgreSqlDatabase(const QString& name);

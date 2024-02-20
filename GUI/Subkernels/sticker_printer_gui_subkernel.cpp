@@ -56,7 +56,7 @@ void StickerPrinterGuiSubkernel::execCommandScript(
 }
 
 void StickerPrinterGuiSubkernel::connectDependecies() {
-  StickerPrinterManager* spm = static_cast<StickerPrinterManager*>(
+  const StickerPrinterManager* spm = static_cast<const StickerPrinterManager*>(
       GlobalEnvironment::instance()->getObject("StickerPrinterManager"));
 
   connect(this, &StickerPrinterGuiSubkernel::printTransponderSticker_signal,

@@ -16,7 +16,7 @@ void MainWindowGui::create() {
   createLog();
 
   MainLayout->setStretch(0, 2);
-  MainLayout->setStretch(1, 2);
+  MainLayout->setStretch(1, 1);
 }
 
 void MainWindowGui::displayLog(const QString& data) {

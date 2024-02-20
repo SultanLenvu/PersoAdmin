@@ -111,4 +111,6 @@ void OrderUserInterface::connectDependencies() {
           &OrderGuiSubkernel::initTransportMasterKeys);
   connect(LinkIssuerWithKeysPushButton, &QPushButton::clicked, ogs,
           &OrderGuiSubkernel::linkIssuerWithKeys);
+
+  OrderTableView->setModel(&ogs->orders());
 }

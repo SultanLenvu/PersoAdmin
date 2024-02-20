@@ -62,8 +62,10 @@ void StickerPrinterUserInterface::createDataDisplayGroup() {
 }
 
 void StickerPrinterUserInterface::connectDependencies() {
-  StickerPrinterGuiSubkernel* pls = static_cast<StickerPrinterGuiSubkernel*>(
-      GlobalEnvironment::instance()->getObject("StickerPrinterGuiSubkernel"));
+  const StickerPrinterGuiSubkernel* pls =
+      static_cast<const StickerPrinterGuiSubkernel*>(
+          GlobalEnvironment::instance()->getObject(
+              "StickerPrinterGuiSubkernel"));
 
   connect(PrintTransponderStickerPushButton, &QPushButton::clicked, pls,
           &StickerPrinterGuiSubkernel::printTransponderSticker);

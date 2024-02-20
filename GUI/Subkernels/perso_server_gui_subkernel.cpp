@@ -4,25 +4,23 @@
 #include "string_input_dialog.h"
 
 PersoServerGuiSubkernel::PersoServerGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel(name) {
-  connectDependecies();
+    : AbstractGuiSubkernel(name), FirmwareDisplay(nullptr) {
   createModels();
-
-  FirmwareDisplay = nullptr;
+  connectDependecies();
 }
 
 PersoServerGuiSubkernel::~PersoServerGuiSubkernel() {}
 
-HashTableModel* PersoServerGuiSubkernel::productionLine() {
-  return ProductionLine.get();
+HashTableModel& PersoServerGuiSubkernel::productionLine() {
+  return ProductionLine;
 }
 
-HashTableModel* PersoServerGuiSubkernel::box() {
-  return Box.get();
+HashTableModel& PersoServerGuiSubkernel::box() {
+  return Box;
 }
 
-HashTableModel* PersoServerGuiSubkernel::transponder() {
-  return Transponder.get();
+HashTableModel& PersoServerGuiSubkernel::transponder() {
+  return Transponder;
 }
 
 void PersoServerGuiSubkernel::setFirmwareDisplay(
@@ -102,17 +100,17 @@ void PersoServerGuiSubkernel::printLastPalletSticker() {
 
 void PersoServerGuiSubkernel::displayProductionLineData(
     const std::shared_ptr<StringDictionary> data) {
-  ProductionLine->setData(data);
+  ProductionLine.setData(data);
 }
 
 void PersoServerGuiSubkernel::displayBoxData(
     const std::shared_ptr<StringDictionary> data) {
-  Box->setData(data);
+  Box.setData(data);
 }
 
 void PersoServerGuiSubkernel::displayTransponderData(
     const std::shared_ptr<StringDictionary> data) {
-  Transponder->setData(data);
+  Transponder.setData(data);
 }
 
 void PersoServerGuiSubkernel::displayFirmware(
@@ -125,59 +123,71 @@ void PersoServerGuiSubkernel::displayFirmware(
 }
 
 void PersoServerGuiSubkernel::connectDependecies() {
-  PersoServerManager* om = static_cast<PersoServerManager*>(
+  const PersoServerManager* psm = static_cast<const PersoServerManager*>(
       GlobalEnvironment::instance()->getObject("PersoServerManager"));
 
-  QObject::connect(this, &PersoServerGuiSubkernel::connect_signal, om,
+  // К менеджерам
+  QObject::connect(this, &PersoServerGuiSubkernel::connect_signal, psm,
                    &PersoServerManager::connect);
-  QObject::connect(this, &PersoServerGuiSubkernel::disconnect_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::disconnect_signal, psm,
                    &PersoServerManager::disconnect);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::echo_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::echo_signal, psm,
                    &PersoServerManager::echo);
-  QObject::connect(this, &PersoServerGuiSubkernel::logOn_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::logOn_signal, psm,
                    &PersoServerManager::logOn);
-  QObject::connect(this, &PersoServerGuiSubkernel::logOut_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::logOut_signal, psm,
                    &PersoServerManager::logOut);
 
   QObject::connect(this, &PersoServerGuiSubkernel::launchProductionLine_signal,
-                   om, &PersoServerManager::launchProductionLine);
+                   psm, &PersoServerManager::launchProductionLine);
   QObject::connect(this,
-                   &PersoServerGuiSubkernel::shutdownProductionLine_signal, om,
+                   &PersoServerGuiSubkernel::shutdownProductionLine_signal, psm,
                    &PersoServerManager::shutdownProductionLine);
   QObject::connect(this, &PersoServerGuiSubkernel::getProductionLineData_signal,
-                   om, &PersoServerManager::getProductionLineData);
+                   psm, &PersoServerManager::getProductionLineData);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::requestBox_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::requestBox_signal, psm,
                    &PersoServerManager::requestBox);
-  QObject::connect(this, &PersoServerGuiSubkernel::getCurrentBoxData_signal, om,
-                   &PersoServerManager::getCurrentBoxData);
-  QObject::connect(this, &PersoServerGuiSubkernel::refundCurrentBox_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::getCurrentBoxData_signal,
+                   psm, &PersoServerManager::getCurrentBoxData);
+  QObject::connect(this, &PersoServerGuiSubkernel::refundCurrentBox_signal, psm,
                    &PersoServerManager::refundCurrentBox);
   QObject::connect(this, &PersoServerGuiSubkernel::completeCurrentBox_signal,
-                   om, &PersoServerManager::completeCurrentBox);
+                   psm, &PersoServerManager::completeCurrentBox);
 
   QObject::connect(this, &PersoServerGuiSubkernel::releaseTransponder_signal,
-                   om, &PersoServerManager::releaseTransponder);
+                   psm, &PersoServerManager::releaseTransponder);
   QObject::connect(this, &PersoServerGuiSubkernel::rereleaseTransponder_signal,
-                   om, &PersoServerManager::rereleaseTransponder);
+                   psm, &PersoServerManager::rereleaseTransponder);
   QObject::connect(this, &PersoServerGuiSubkernel::rollbackTransponder_signal,
-                   om, &PersoServerManager::rollbackTransponder);
+                   psm, &PersoServerManager::rollbackTransponder);
   QObject::connect(this,
                    &PersoServerGuiSubkernel::getCurrentTransponderData_signal,
-                   om, &PersoServerManager::getCurrentTransponderData);
+                   psm, &PersoServerManager::getCurrentTransponderData);
   QObject::connect(this, &PersoServerGuiSubkernel::getTransponderData_signal,
-                   om, &PersoServerManager::getTransponderData);
+                   psm, &PersoServerManager::getTransponderData);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::printBoxSticker_signal, om,
+  QObject::connect(this, &PersoServerGuiSubkernel::printBoxSticker_signal, psm,
                    &PersoServerManager::printBoxSticker);
   QObject::connect(this, &PersoServerGuiSubkernel::printLastBoxSticker_signal,
-                   om, &PersoServerManager::printLastBoxSticker);
+                   psm, &PersoServerManager::printLastBoxSticker);
   QObject::connect(this, &PersoServerGuiSubkernel::printPalletSticker_signal,
-                   om, &PersoServerManager::printPalletSticker);
+                   psm, &PersoServerManager::printPalletSticker);
   QObject::connect(this,
-                   &PersoServerGuiSubkernel::printLastPalletSticker_signal, om,
+                   &PersoServerGuiSubkernel::printLastPalletSticker_signal, psm,
                    &PersoServerManager::printLastPalletSticker);
+
+  // От менеджеров
+  QObject::connect(psm, &PersoServerManager::productionLineDataReady, this,
+                   &PersoServerGuiSubkernel::displayProductionLineData);
+  QObject::connect(psm, &PersoServerManager::boxDataReady, this,
+                   &PersoServerGuiSubkernel::displayBoxData);
+  QObject::connect(psm, &PersoServerManager::transponderDataReady, this,
+                   &PersoServerGuiSubkernel::displayTransponderData);
+
+  QObject::connect(psm, &PersoServerManager::transponderDataReady, this,
+                   &PersoServerGuiSubkernel::displayTransponderData);
 }
 
 void PersoServerGuiSubkernel::createModels() {
@@ -190,8 +200,7 @@ void PersoServerGuiSubkernel::createModels() {
   plMatchTable->insert("transponder_id", "Идентификатор транспондера");
   plMatchTable->insert("box_id", "Идентификатор бокса");
 
-  ProductionLine = std::unique_ptr<HashTableModel>(new HashTableModel());
-  ProductionLine->setMatchTable(plMatchTable);
+  ProductionLine.setMatchTable(plMatchTable);
 
   std::shared_ptr<StringDictionary> tMatchTable(new StringDictionary());
   tMatchTable->insert("transponder_sn", "Серийный номер");
@@ -201,8 +210,7 @@ void PersoServerGuiSubkernel::createModels() {
   tMatchTable->insert("transponder_release_counter", "Количество выпусков");
   tMatchTable->insert("issuer_name", "Заказчик");
 
-  Transponder = std::unique_ptr<HashTableModel>(new HashTableModel());
-  Transponder->setMatchTable(tMatchTable);
+  Transponder.setMatchTable(tMatchTable);
 
   std::shared_ptr<StringDictionary> bMatchTable(new StringDictionary());
   bMatchTable = std::shared_ptr<StringDictionary>(new StringDictionary());
@@ -220,6 +228,5 @@ void PersoServerGuiSubkernel::createModels() {
   bMatchTable->insert("pallet_id", "ID паллеты");
   bMatchTable->insert("production_line_id", "ID производственной линии");
 
-  Box = std::unique_ptr<HashTableModel>(new HashTableModel());
-  Box->setMatchTable(bMatchTable);
+  Box.setMatchTable(bMatchTable);
 }

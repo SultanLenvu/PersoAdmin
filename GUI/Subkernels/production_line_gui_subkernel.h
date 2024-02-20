@@ -15,7 +15,7 @@ class ProductionLineGuiSubkernel final : public AbstractGuiSubkernel {
   ~ProductionLineGuiSubkernel();
 
  public:
-  SqlResponseModel* productionLines(void) const;
+  SqlResponseModel* productionLines(void);
 
  public slots:  // Слоты для сигналов от GUI
   void create(void);

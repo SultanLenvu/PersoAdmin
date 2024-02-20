@@ -21,7 +21,7 @@ void PSObject::sendLog(const QString& log) const {
 PSObject::PSObject() {}
 
 void PSObject::connectDependencies() {
-  LogSystem* ls = static_cast<LogSystem*>(
+  const LogSystem* ls = static_cast<const LogSystem*>(
       GlobalEnvironment::instance()->getObject("LogSystem"));
 
   connect(this, &PSObject::logging, ls, &LogSystem::generate);

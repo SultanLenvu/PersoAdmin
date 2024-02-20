@@ -12,8 +12,7 @@ class OrderManager : public AbstractManager
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit OrderManager(const QString& name,
-                        std::shared_ptr<AbstractSqlDatabase> database);
+  explicit OrderManager(const QString& name);
   ~OrderManager();
 
   // AbstractManager interface
@@ -23,6 +22,8 @@ class OrderManager : public AbstractManager
 
   // Own
  public slots:
+  void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
+
   void create(const std::shared_ptr<StringDictionary> param);
   void startAssembling(const std::shared_ptr<StringDictionary> param);
   void stopAssembling(const std::shared_ptr<StringDictionary> param);
@@ -37,6 +38,7 @@ class OrderManager : public AbstractManager
 
  private:
   void loadSettings(void);
+  void connectDependencies(void);
 
   bool addOrder(const StringDictionary& param);
   bool addPallets(const QString& orderId, const StringDictionary& param);

@@ -60,6 +60,8 @@ void PostgreSqlDatabase::disconnect() {
   } else {
     sendLog("Соединение с Postgres отключено. ");
   }
+
+  Tables.clear();
 }
 
 bool PostgreSqlDatabase::isConnected() {
@@ -67,12 +69,12 @@ bool PostgreSqlDatabase::isConnected() {
     return false;
   }
 
-  //  QSqlQuery request(QSqlDatabase::database(ConnectionName));
-  //  if (!request.exec("")) {
-  //    sendLog(request.lastError().text());
-  //    sendLog("Получена ошибка при выполнении тестового запроса.");
-  //    return false;
-  //  }
+  QSqlQuery request(QSqlDatabase::database(ConnectionName));
+  if (!request.exec("")) {
+    sendLog(request.lastError().text());
+    sendLog("Получена ошибка при выполнении тестового запроса.");
+    return false;
+  }
 
   return true;
 }
@@ -140,10 +142,8 @@ void PostgreSqlDatabase::setCurrentOrder(Qt::SortOrder order) {
     CurrentOrder = "DESC";
   }
 
-  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
-           Tables.constBegin();
-       it != Tables.constEnd(); it++) {
-    it.value()->setCurrentOrder(order);
+  for (auto it1 = Tables.cbegin(), it2 = Tables.cend(); it1 != it2; ++it1) {
+    it1->second->setCurrentOrder(order);
   }
 }
 
@@ -154,10 +154,8 @@ uint32_t PostgreSqlDatabase::getRecordMaxCount() const {
 void PostgreSqlDatabase::setRecordMaxCount(uint32_t count) {
   RecordMaxCount = count;
 
-  for (QHash<QString, std::shared_ptr<PostgreSqlTable>>::const_iterator it =
-           Tables.constBegin();
-       it != Tables.constEnd(); it++) {
-    it.value()->setRecordMaxCount(count);
+  for (auto it = Tables.cbegin(); it != Tables.cend(); it++) {
+    it->second->setRecordMaxCount(count);
   }
 }
 
@@ -185,53 +183,125 @@ bool PostgreSqlDatabase::execCustomRequest(const QString& requestText,
 
 bool PostgreSqlDatabase::createRecords(const QString& table,
                                        const SqlQueryValues& records) const {
-  return Tables.value(table)->createRecords(records);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->createRecords(records);
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      SqlQueryValues& response) const {
-  return Tables.value(table)->readRecords(response);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->readRecords(response);
 }
 
 bool PostgreSqlDatabase::readRecords(const QString& table,
                                      const QString& conditions,
                                      SqlQueryValues& response) const {
-  return Tables.value(table)->readRecords(conditions, response);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->readRecords(conditions, response);
 }
 
 bool PostgreSqlDatabase::readLastRecord(const QString& table,
                                         SqlQueryValues& record) const {
-  return Tables.value(table)->readLastRecord(record);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->readLastRecord(record);
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const SqlQueryValues& newValues) const {
-  return Tables.value(table)->updateRecords(newValues);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->updateRecords(newValues);
 }
 
 bool PostgreSqlDatabase::updateRecords(const QString& table,
                                        const QString& conditions,
                                        const SqlQueryValues& newValues) const {
-  return Tables.value(table)->updateRecords(conditions, newValues);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->updateRecords(conditions, newValues);
 }
 
 bool PostgreSqlDatabase::deleteRecords(const QString& table,
                                        const QString& condition) const {
-  return Tables.value(table)->deleteRecords(condition);
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (Tables.count(table) == 0) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
+  return Tables.at(table)->deleteRecords(condition);
 }
 
 bool PostgreSqlDatabase::clearTable(const QString& table) const {
-  return Tables.value(table)->clear();
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  return Tables.at(table)->clear();
 }
 
 bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
                                            const QString& conditions,
                                            SqlQueryValues& response) const {
-  // Проверка подключения
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
-    sendLog(
-        QString("Соединение с Postgres не установлено. %1.")
-            .arg(QSqlDatabase::database(ConnectionName).lastError().text()));
+    sendLog("Соединение с Postgres не установлено. ");
     return false;
   }
 
@@ -255,18 +325,17 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
   }
 
   for (int32_t i = 1; i < tables.size(); i++) {
-    requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i), tables.at(i - 1),
-                            Tables.value(tables.at(i - 1))
-                                ->relations()
-                                ->value(tables.at(i)),
-                            Tables.value(tables.at(i))->getPrimaryKey());
+    requestText +=
+        QString("JOIN %1 ON %2.%3 = %1.%4 ")
+            .arg(tables.at(i), tables.at(i - 1),
+                 Tables.at(tables.at(i - 1))->relations()->value(tables.at(i)),
+                 Tables.at(tables.at(i))->getPrimaryKey());
   }
 
   requestText +=
       QString("WHERE %1 ORDER BY %2.%3 %4 ")
           .arg(conditions, tables.first(),
-               Tables.value(tables.first())->getPrimaryKey(), CurrentOrder);
+               Tables.at(tables.first())->getPrimaryKey(), CurrentOrder);
   if (RecordMaxCount > 0) {
     requestText += QString("LIMIT %1").arg(QString::number(RecordMaxCount));
   }
@@ -289,6 +358,15 @@ bool PostgreSqlDatabase::updateMergedRecords(
     const QStringList& tables,
     const QString& conditions,
     const SqlQueryValues& newValues) const {
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
+
+  if (!checkTableNames(tables)) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
 
   //  UPDATE transponders
   //  SET awaiting_confirmation = true
@@ -312,14 +390,13 @@ bool PostgreSqlDatabase::updateMergedRecords(
   requestText.chop(2);
   requestText +=
       QString(" WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
-          .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
+          .arg(tables.first(), Tables.at(tables.first())->getPrimaryKey());
   for (int32_t i = 1; i < tables.size(); i++) {
-    requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i), tables.at(i - 1),
-                            Tables.value(tables.at(i - 1))
-                                ->relations()
-                                ->value(tables.at(i)),
-                            Tables.value(tables.at(i))->getPrimaryKey());
+    requestText +=
+        QString("JOIN %1 ON %2.%3 = %1.%4 ")
+            .arg(tables.at(i), tables.at(i - 1),
+                 Tables.at(tables.at(i - 1))->relations()->value(tables.at(i)),
+                 Tables.at(tables.at(i))->getPrimaryKey());
   }
   requestText += QString(" WHERE %1);").arg(conditions);
 
@@ -336,19 +413,26 @@ bool PostgreSqlDatabase::updateMergedRecords(
 
 bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
                                              const QString& conditions) const {
+  if (!QSqlDatabase::database(ConnectionName).isOpen()) {
+    sendLog("Соединение с Postgres не установлено. ");
+    return false;
+  }
 
-  // Создаем запрос
+  if (!checkTableNames(tables)) {
+    sendLog("Получено неизвестное имя таблицы.");
+    return false;
+  }
+
   QString requestText =
       QString(
           "DELETE FROM public.%1 WHERE %1.%2 IN (SELECT %1.%2 FROM public.%1 ")
-          .arg(tables.first(), Tables.value(tables.first())->getPrimaryKey());
+          .arg(tables.first(), Tables.at(tables.first())->getPrimaryKey());
   for (int32_t i = 1; i < tables.size(); i++) {
-    requestText += QString("JOIN %1 ON %2.%3 = %1.%4 ")
-                       .arg(tables.at(i), tables.at(i - 1),
-                            Tables.value(tables.at(i - 1))
-                                ->relations()
-                                ->value(tables.at(i)),
-                            Tables.value(tables.at(i))->getPrimaryKey());
+    requestText +=
+        QString("JOIN %1 ON %2.%3 = %1.%4 ")
+            .arg(tables.at(i), tables.at(i - 1),
+                 Tables.at(tables.at(i - 1))->relations()->value(tables.at(i)),
+                 Tables.at(tables.at(i))->getPrimaryKey());
   }
   requestText += QString(" WHERE %1);").arg(conditions);
 
@@ -366,7 +450,7 @@ bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
 
 bool PostgreSqlDatabase::getRecordCount(const QString& table,
                                         uint32_t& count) const {
-  return Tables.value(table)->getRecordCount(count);
+  return Tables.at(table)->getRecordCount(count);
 }
 
 bool PostgreSqlDatabase::getLastId(const QString& table, int32_t& id) const {
@@ -437,7 +521,7 @@ bool PostgreSqlDatabase::init() {
 }
 
 bool PostgreSqlDatabase::createTable(const QString& name) {
-  std::shared_ptr<PostgreSqlTable> table(new PostgreSqlTable(
+  std::unique_ptr<PostgreSqlTable> table(new PostgreSqlTable(
       QString("PostgreSQL table '%1'").arg(name), name, ConnectionName));
   if (!table->init()) {
     sendLog(
@@ -445,15 +529,14 @@ bool PostgreSqlDatabase::createTable(const QString& name) {
     return false;
   }
 
-  Tables.insert(name, table);
+  Tables[name] = std::move(table);
 
   return true;
 }
 
 bool PostgreSqlDatabase::checkTableNames(const QStringList& names) const {
-  for (QStringList::const_iterator it = names.constBegin();
-       it != names.constEnd(); it++) {
-    if (!Tables.contains(*it)) {
+  for (auto it1 = names.cbegin(), it2 = names.cend(); it1 != it2; ++it1) {
+    if (Tables.count(*it1) == 0) {
       return false;
     }
   }

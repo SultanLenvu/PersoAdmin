@@ -6,7 +6,10 @@
 #include "perso_server_connection.h"
 
 PersoServerManager::PersoServerManager(const QString& name)
-    : AbstractManager{name} {
+    : AbstractManager{name},
+      ProductionLineData(new StringDictionary()),
+      BoxData(new StringDictionary()),
+      TransponderData(new StringDictionary()) {
   loadSettings();
 }
 
@@ -55,15 +58,15 @@ void PersoServerManager::launchProductionLine(
     return;
   }
 
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayBoxData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit boxDataReady(ProductionLineData);
     processOperationError("logOnServer", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   completeOperation("launchProductionLine");
 }
@@ -73,8 +76,8 @@ void PersoServerManager::shutdownProductionLine() {
 
   Server->shutdownProductionLine();
 
-  ProductionLineData.clear();
-  emit displayBoxData_signal(ProductionLineData);
+  ProductionLineData->clear();
+  emit boxDataReady(ProductionLineData);
 
   completeOperation("shutdownProductionLine");
 }
@@ -83,15 +86,15 @@ void PersoServerManager::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret;
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayProductionLineData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit productionLineDataReady(ProductionLineData);
     processOperationError("getProductionLineData", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   completeOperation("getProductionLineData");
 }
@@ -118,15 +121,15 @@ void PersoServerManager::logOn(const std::shared_ptr<StringDictionary> param) {
     return;
   }
 
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayBoxData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit boxDataReady(ProductionLineData);
     processOperationError("logOnServer", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   emit authorizationCompleted();
   completeOperation("logOnServer");
@@ -167,37 +170,37 @@ void PersoServerManager::requestBox() {
     return;
   }
 
-  ret = Server->getCurrentBoxData(BoxData);
+  ret = Server->getCurrentBoxData(*BoxData);
   if (ret != ReturnStatus::NoError) {
-    BoxData.clear();
-    emit displayBoxData_signal(BoxData);
+    BoxData->clear();
+    emit boxDataReady(BoxData);
     processOperationError("requestBox", ret);
     return;
   }
 
-  emit displayBoxData_signal(BoxData);
+  emit boxDataReady(BoxData);
 
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayBoxData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit boxDataReady(ProductionLineData);
     processOperationError("requestBox", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   // Если в боксе есть собранные транспондеры
-  if (BoxData.value("box_assembled_units").toInt() > 0) {
-    ret = Server->getCurrentTransponderData(TransponderData);
+  if (BoxData->value("box_assembled_units").toInt() > 0) {
+    ret = Server->getCurrentTransponderData(*TransponderData);
     if (ret != ReturnStatus::NoError) {
-      TransponderData.clear();
-      emit displayTransponderData_signal(TransponderData);
+      TransponderData->clear();
+      emit transponderDataReady(TransponderData);
       processOperationError("requestBox", ret);
       return;
     }
 
-    emit displayTransponderData_signal(TransponderData);
+    emit transponderDataReady(TransponderData);
   }
 
   completeOperation("requestBox");
@@ -206,16 +209,16 @@ void PersoServerManager::requestBox() {
 void PersoServerManager::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
-  ReturnStatus ret = Server->getCurrentBoxData(BoxData);
+  ReturnStatus ret = Server->getCurrentBoxData(*BoxData);
   if (ret != ReturnStatus::NoError) {
-    BoxData.clear();
-    emit displayBoxData_signal(BoxData);
+    BoxData->clear();
+    emit boxDataReady(BoxData);
     processOperationError("getCurrentBoxData", ret);
     sendLog("Не удалось получить данные текущего бокса. ");
     return;
   }
 
-  emit displayBoxData_signal(BoxData);
+  emit boxDataReady(BoxData);
 
   completeOperation("getCurrentBoxData");
 }
@@ -230,21 +233,21 @@ void PersoServerManager::refundCurrentBox() {
     return;
   }
 
-  BoxData.clear();
-  emit displayBoxData_signal(BoxData);
+  BoxData->clear();
+  emit boxDataReady(BoxData);
 
-  TransponderData.clear();
-  emit displayTransponderData_signal(TransponderData);
+  TransponderData->clear();
+  emit transponderDataReady(TransponderData);
 
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayBoxData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit boxDataReady(ProductionLineData);
     processOperationError("logOnServer", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   completeOperation("refundCurrentBox");
 }
@@ -259,21 +262,21 @@ void PersoServerManager::completeCurrentBox() {
     return;
   }
 
-  BoxData.clear();
-  emit displayBoxData_signal(BoxData);
+  BoxData->clear();
+  emit boxDataReady(BoxData);
 
-  TransponderData.clear();
-  emit displayTransponderData_signal(TransponderData);
+  TransponderData->clear();
+  emit transponderDataReady(TransponderData);
 
-  ret = Server->getProductionLineData(ProductionLineData);
+  ret = Server->getProductionLineData(*ProductionLineData);
   if (ret != ReturnStatus::NoError) {
-    ProductionLineData.clear();
-    emit displayBoxData_signal(ProductionLineData);
+    ProductionLineData->clear();
+    emit boxDataReady(ProductionLineData);
     processOperationError("logOnServer", ret);
     return;
   }
 
-  emit displayProductionLineData_signal(ProductionLineData);
+  emit productionLineDataReady(ProductionLineData);
 
   completeOperation("completeCurrentBox");
 }
@@ -304,31 +307,31 @@ void PersoServerManager::releaseTransponder() {
   sendLog(QString("Выпуск транспондера подтвержден."));
 
   // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(BoxData);
+  ret = Server->getCurrentBoxData(*BoxData);
   if (ret != ReturnStatus::NoError) {
-    BoxData.clear();
-    emit displayBoxData_signal(BoxData);
+    BoxData->clear();
+    emit boxDataReady(BoxData);
     processOperationError("getCurrentBoxData", ret);
     return;
   }
 
-  emit displayBoxData_signal(BoxData);
+  emit boxDataReady(BoxData);
 
   // Запрашиваем данные выпущенного транспондера
-  ret = Server->getCurrentTransponderData(TransponderData);
+  ret = Server->getCurrentTransponderData(*TransponderData);
   if (ret != ReturnStatus::NoError) {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
+    TransponderData->clear();
+    emit transponderDataReady(TransponderData);
     processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Данные выпускаемого транспондера получены."));
 
-  emit displayTransponderData_signal(TransponderData);
+  emit transponderDataReady(TransponderData);
 
   // Печатаем стикер
   ret = ReturnStatus::StickerPrinterConnectionError;
-  emit printTransponderSticker_signal(TransponderData, ret);
+  emit printTransponderSticker_signal(*TransponderData, ret);
   if (ret != ReturnStatus::NoError) {
     processOperationError("releaseTransponder", ret);
     return;
@@ -366,19 +369,19 @@ void PersoServerManager::rereleaseTransponder(
 
   // Запрашиваем данные перевыпущенного транспондера
   requestParam.remove("transponder_ucid");
-  ret = Server->getTransponderData(requestParam, TransponderData);
+  ret = Server->getTransponderData(requestParam, *TransponderData);
   if (ret != ReturnStatus::NoError) {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
+    TransponderData->clear();
+    emit transponderDataReady(TransponderData);
     processOperationError("releaseTransponder", ret);
     return;
   }
 
   // Запрашиваем отображение данных транспондера
-  emit displayTransponderData_signal(TransponderData);
+  emit transponderDataReady(TransponderData);
 
   // Печатаем стикер
-  emit printTransponderSticker_signal(TransponderData, ret);
+  emit printTransponderSticker_signal(*TransponderData, ret);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
@@ -399,30 +402,30 @@ void PersoServerManager::rollbackTransponder() {
   }
 
   // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(BoxData);
+  ret = Server->getCurrentBoxData(*BoxData);
   if (ret != ReturnStatus::NoError) {
-    BoxData.clear();
-    emit displayBoxData_signal(BoxData);
+    BoxData->clear();
+    emit boxDataReady(BoxData);
     processOperationError("rollbackTransponder", ret);
     return;
   }
 
-  emit displayBoxData_signal(BoxData);
+  emit boxDataReady(BoxData);
 
   // Если в боксе есть собранные транспондеры
-  if (BoxData.value("box_assembled_units").toInt() > 0) {
-    ret = Server->getCurrentTransponderData(TransponderData);
+  if (BoxData->value("box_assembled_units").toInt() > 0) {
+    ret = Server->getCurrentTransponderData(*TransponderData);
     if (ret != ReturnStatus::NoError) {
-      TransponderData.clear();
-      emit displayTransponderData_signal(TransponderData);
+      TransponderData->clear();
+      emit transponderDataReady(TransponderData);
       processOperationError("rollbackTransponder", ret);
       return;
     }
 
-    emit displayTransponderData_signal(TransponderData);
+    emit transponderDataReady(TransponderData);
   } else {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
+    TransponderData->clear();
+    emit transponderDataReady(TransponderData);
   }
 
   completeOperation("rollbackTransponder");
@@ -432,15 +435,15 @@ void PersoServerManager::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret;
-  ret = Server->getCurrentTransponderData(TransponderData);
+  ret = Server->getCurrentTransponderData(*TransponderData);
   if (ret != ReturnStatus::NoError) {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
+    TransponderData->clear();
+    emit transponderDataReady(TransponderData);
     processOperationError("getCurrentTransponderData", ret);
     return;
   }
 
-  emit displayTransponderData_signal(TransponderData);
+  emit transponderDataReady(TransponderData);
 
   completeOperation("getCurrentTransponderData");
 }
@@ -450,15 +453,15 @@ void PersoServerManager::getTransponderData(
   initOperation("getTransponderData");
 
   ReturnStatus ret;
-  ret = Server->getTransponderData(*param, TransponderData);
+  ret = Server->getTransponderData(*param, *TransponderData);
   if (ret != ReturnStatus::NoError) {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
+    TransponderData->clear();
+    emit transponderDataReady(TransponderData);
     processOperationError("getTransponderData", ret);
     return;
   }
 
-  emit displayTransponderData_signal(TransponderData);
+  emit transponderDataReady(TransponderData);
 
   completeOperation("getTransponderData");
 }
@@ -518,14 +521,14 @@ void PersoServerManager::printLastPalletSticker() {
 }
 
 void PersoServerManager::onServerDisconnected() {
-  ProductionLineData.clear();
-  emit displayProductionLineData_signal(ProductionLineData);
+  ProductionLineData->clear();
+  emit productionLineDataReady(ProductionLineData);
 
-  BoxData.clear();
-  emit displayBoxData_signal(BoxData);
+  BoxData->clear();
+  emit boxDataReady(BoxData);
 
-  TransponderData.clear();
-  emit displayTransponderData_signal(TransponderData);
+  TransponderData->clear();
+  emit transponderDataReady(TransponderData);
 }
 
 void PersoServerManager::loadSettings() {}

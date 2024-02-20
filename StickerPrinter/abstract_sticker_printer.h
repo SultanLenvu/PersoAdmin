@@ -7,23 +7,22 @@
 #include <QSettings>
 #include <QtPrintSupport/QPrinterInfo>
 
+#include "psobject.h"
 #include "types.h"
 
-class AbstractStickerPrinter : public QObject {
+class AbstractStickerPrinter : public PSObject {
   Q_OBJECT
- public:
-  enum StickerPrinterType {
-    Unknown,
-    TE310,
-  };
-  Q_ENUM(StickerPrinterType);
-
  public:
   AbstractStickerPrinter(const QString& name);
   virtual ~AbstractStickerPrinter();
 
+  // PSObject interface
+ public slots:
+  virtual void applySetting(void) = 0;
+
+  // Own
+ public slots:
   virtual ReturnStatus checkConfig(void) = 0;
-  virtual StickerPrinterType type(void) = 0;
 
   virtual ReturnStatus printTransponderSticker(
       const StringDictionary& param) = 0;
@@ -37,13 +36,7 @@ class AbstractStickerPrinter : public QObject {
 
   virtual ReturnStatus exec(const QStringList& commandScript) = 0;
 
-  virtual void applySetting(void) = 0;
-
- private:
-  Q_DISABLE_COPY_MOVE(AbstractStickerPrinter);
-
  signals:
-  void logging(const QString& log);
 };
 
 #endif  // ISTICKERPRINTER_H

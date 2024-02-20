@@ -136,6 +136,8 @@ void DatabaseManager::getPalletData(
 void DatabaseManager::createDatabase() {
   Database = std::shared_ptr<AbstractSqlDatabase>(
       new PostgreSqlDatabase("PostgreSqlDatabase"));
+
+  emit databaseCreated(Database);
 }
 
 void DatabaseManager::loadSettings() {

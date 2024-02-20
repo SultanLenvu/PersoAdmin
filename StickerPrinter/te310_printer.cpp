@@ -30,10 +30,6 @@ ReturnStatus TE310Printer::checkConfig() {
   return ReturnStatus::NoError;
 }
 
-AbstractStickerPrinter::StickerPrinterType TE310Printer::type() {
-  return TE310;
-}
-
 ReturnStatus TE310Printer::printTransponderSticker(
     const StringDictionary& param) {
   sendLog(QString("Печать стикера для транспондера."));

@@ -1,10 +1,11 @@
 #include "production_line_manager.h"
+#include "database_manager.h"
+#include "global_environment.h"
 
-ProductionLineManager::ProductionLineManager(
-    const QString& name,
-    std::shared_ptr<AbstractSqlDatabase> database)
-    : AbstractManager(name), Database(database) {
+ProductionLineManager::ProductionLineManager(const QString& name)
+    : AbstractManager(name) {
   loadSettings();
+  connectDependencies();
 }
 
 ProductionLineManager::~ProductionLineManager() {}
@@ -17,8 +18,14 @@ void ProductionLineManager::applySettings() {
   loadSettings();
 }
 
+void ProductionLineManager::applyDatabase(
+    std::shared_ptr<AbstractSqlDatabase> database) {
+  Database = database;
+}
+
 void ProductionLineManager::create(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("create");
 
   if (!Database->openTransaction()) {
@@ -42,6 +49,7 @@ void ProductionLineManager::create(
 
 void ProductionLineManager::activate(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("activate");
 
   if (!Database->openTransaction()) {
@@ -68,6 +76,7 @@ void ProductionLineManager::activate(
 }
 
 void ProductionLineManager::activateAll() {
+  assert(Database);
   initOperation("activateAll");
 
   if (!Database->openTransaction()) {
@@ -95,6 +104,7 @@ void ProductionLineManager::activateAll() {
 
 void ProductionLineManager::deactivate(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("deactivate");
 
   if (!Database->openTransaction()) {
@@ -126,6 +136,7 @@ void ProductionLineManager::deactivate(
 }
 
 void ProductionLineManager::deactivateAll() {
+  assert(Database);
   initOperation("deactivateAll");
 
   if (!Database->openTransaction()) {
@@ -151,6 +162,7 @@ void ProductionLineManager::deactivateAll() {
 
 void ProductionLineManager::edit(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("edit");
 
   if (!Database->openTransaction()) {
@@ -168,6 +180,7 @@ void ProductionLineManager::edit(
 
 void ProductionLineManager::remove(
     const std::shared_ptr<StringDictionary> param) {
+  assert(Database);
   initOperation("remove");
 
   if (!Database->openTransaction()) {
@@ -189,13 +202,15 @@ void ProductionLineManager::remove(
   completeOperation("remove");
 }
 
-void ProductionLineManager::get(const QString& name) {
-  initOperation("get");
-
-  completeOperation("get");
-}
-
 void ProductionLineManager::loadSettings() {}
+
+void ProductionLineManager::connectDependencies() {
+  DatabaseManager* dm = static_cast<DatabaseManager*>(
+      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+
+  connect(dm, &DatabaseManager::databaseCreated, this,
+          &ProductionLineManager::applyDatabase);
+}
 
 bool ProductionLineManager::addProductionLine(const StringDictionary& param) {
   SqlQueryValues newProductionLine;

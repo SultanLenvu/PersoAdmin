@@ -25,7 +25,7 @@ void AbstractManager::completeOperation(const QString& name) {
 }
 
 void AbstractManager::connectDependencies() {
-  InteractionSystem* is = static_cast<InteractionSystem*>(
+  const InteractionSystem* is = static_cast<const InteractionSystem*>(
       GlobalEnvironment::instance()->getObject("InteractionSystem"));
 
   connect(this, &AbstractManager::executionStarted, is,

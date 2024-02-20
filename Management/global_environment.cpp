@@ -14,7 +14,8 @@ void GlobalEnvironment::registerObject(QObject* obj) {
 
   GlobalObjects[name] = obj;
   connect(obj, &QObject::destroyed, this,
-          &GlobalEnvironment::onRegisteredObjectDeleted);
+          &GlobalEnvironment::onRegosteredObjectDestroyed,
+          Qt::BlockingQueuedConnection);
 }
 
 QObject* GlobalEnvironment::getObject(const QString& name) {
@@ -27,6 +28,6 @@ QObject* GlobalEnvironment::getObject(const QString& name) {
 
 GlobalEnvironment::GlobalEnvironment() {}
 
-void GlobalEnvironment::onRegisteredObjectDeleted() {
+void GlobalEnvironment::onRegosteredObjectDestroyed() {
   GlobalObjects.remove(sender()->objectName());
 }

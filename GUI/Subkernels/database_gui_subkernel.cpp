@@ -4,10 +4,8 @@
 #include "global_environment.h"
 
 DatabaseGuiSubkernel::DatabaseGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel(name) {
+    : AbstractGuiSubkernel(name), ResponseModel(new SqlResponseModel()) {
   connectDependecies();
-
-  ResponseModel = std::unique_ptr<SqlResponseModel>(new SqlResponseModel());
 }
 
 DatabaseGuiSubkernel::~DatabaseGuiSubkernel() {}
@@ -44,7 +42,7 @@ void DatabaseGuiSubkernel::displaySqlResponse(
 }
 
 void DatabaseGuiSubkernel::connectDependecies() {
-  DatabaseManager* dm = static_cast<DatabaseManager*>(
+  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
       GlobalEnvironment::instance()->getObject("DatabaseManager"));
 
   QObject::connect(this, &DatabaseGuiSubkernel::connect_signal, dm,

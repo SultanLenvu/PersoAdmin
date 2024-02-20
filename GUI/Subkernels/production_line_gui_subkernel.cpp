@@ -6,13 +6,13 @@
 #include "string_input_dialog.h"
 
 ProductionLineGuiSubkernel::ProductionLineGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel(name) {
+    : AbstractGuiSubkernel(name), ProductionLines(new SqlResponseModel()) {
   connectDependecies();
 }
 
 ProductionLineGuiSubkernel::~ProductionLineGuiSubkernel() {}
 
-SqlResponseModel* ProductionLineGuiSubkernel::productionLines() const {
+SqlResponseModel* ProductionLineGuiSubkernel::productionLines() {
   return ProductionLines.get();
 }
 
@@ -81,9 +81,9 @@ void ProductionLineGuiSubkernel::display(std::shared_ptr<SqlQueryValues> data) {
 }
 
 void ProductionLineGuiSubkernel::connectDependecies() {
-  ProductionLineManager* om = static_cast<ProductionLineManager*>(
+  const ProductionLineManager* om = static_cast<const ProductionLineManager*>(
       GlobalEnvironment::instance()->getObject("ProductionLineManager"));
-  DatabaseManager* dm = static_cast<DatabaseManager*>(
+  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
       GlobalEnvironment::instance()->getObject("DatabaseManager"));
 
   // К менеджерам

@@ -12,14 +12,12 @@
 OrderGuiSubkernel::OrderGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name) {
   connectDependecies();
-
-  Orders = std::unique_ptr<SqlResponseModel>(new SqlResponseModel());
 }
 
 OrderGuiSubkernel::~OrderGuiSubkernel() {}
 
-const SqlResponseModel* OrderGuiSubkernel::orders() const {
-  return Orders.get();
+SqlResponseModel& OrderGuiSubkernel::orders() {
+  return Orders;
 }
 
 void OrderGuiSubkernel::create() {
@@ -130,32 +128,35 @@ void OrderGuiSubkernel::linkIssuerWithKeys() {
 }
 
 void OrderGuiSubkernel::display(std::shared_ptr<SqlQueryValues> orders) {
-  Orders->setResponse(orders);
+  Orders.setResponse(orders);
 }
 
 void OrderGuiSubkernel::connectDependecies() {
-  OrderManager* om = static_cast<OrderManager*>(
+  const OrderManager* om = static_cast<const OrderManager*>(
       GlobalEnvironment::instance()->getObject("OrderManager"));
-  DatabaseManager* dm = static_cast<DatabaseManager*>(
+  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
       GlobalEnvironment::instance()->getObject("DatabaseManager"));
 
+  // К менеджерам
   connect(this, &OrderGuiSubkernel::create_signal, om, &OrderManager::create);
   connect(this, &OrderGuiSubkernel::startAssembling_signal, om,
           &OrderManager::startAssembling);
   connect(this, &OrderGuiSubkernel::stopAssembling_signal, om,
           &OrderManager::stopAssembling);
-
-  connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseManager::getTable);
-
   connect(this, &OrderGuiSubkernel::release_signal, om, &OrderManager::release);
   connect(this, &OrderGuiSubkernel::refund_signal, om, &OrderManager::refund);
   connect(this, &OrderGuiSubkernel::shipPallets_signal, om,
           &OrderManager::generateShipmentRegister);
-
   connect(this, &OrderGuiSubkernel::initIssuers_signal, om,
           &OrderManager::initIssuers);
   connect(this, &OrderGuiSubkernel::initTransportMasterKeys_signal, om,
           &OrderManager::initTransportMasterKeys);
   connect(this, &OrderGuiSubkernel::linkIssuerWithKeys_signal, om,
           &OrderManager::linkIssuerWithKeys);
+
+  connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseManager::getTable);
+
+  // От менеджеров
+  connect(dm, &DatabaseManager::responseReady, this,
+          &OrderGuiSubkernel::display);
 }

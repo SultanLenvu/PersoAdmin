@@ -1,16 +1,17 @@
-#ifndef ABSTARCTPERSOCLIENT_H
-#define ABSTARCTPERSOCLIENT_H
+#ifndef ABSTARCTSERVERCONNECTION_H
+#define ABSTARCTSERVERCONNECTION_H
 
-#include <QObject>
-
+#include "psobject.h"
 #include "types.h"
 
-class AbstractServerConnection : public QObject {
+class AbstractServerConnection : public PSObject {
   Q_OBJECT
  public:
   explicit AbstractServerConnection(const QString& name);
   virtual ~AbstractServerConnection();
 
+  // Own
+ public:
   virtual ReturnStatus connect(void) = 0;
   virtual void disconnect(void) = 0;
   virtual bool isConnected(void) = 0;
@@ -44,17 +45,11 @@ class AbstractServerConnection : public QObject {
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 
-  virtual void applySettings(void) = 0;
-
  private:
-  AbstractServerConnection();
-  Q_DISABLE_COPY_MOVE(AbstractServerConnection)
-
   void connectDepedencies(void);
 
  signals:
-  void logging(const QString& log);
   void disconnected(void);
 };
 
-#endif  // ABSTARCTPERSOCLIENT_H
+#endif  // ABSTARCTSERVERCONNECTION_H

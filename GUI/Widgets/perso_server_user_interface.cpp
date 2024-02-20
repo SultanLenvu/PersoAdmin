@@ -218,8 +218,8 @@ void PersoServerUserInterface::connectDependencies() {
                    &QPushButton::clicked, psgs,
                    &PersoServerGuiSubkernel::printLastPalletSticker);
 
-  ProductionLineDataView->setModel(psgs->productionLine());
-  BoxDataView->setModel(psgs->box());
-  TransponderDataView->setModel(psgs->transponder());
+  ProductionLineDataView->setModel(&psgs->productionLine());
+  BoxDataView->setModel(&psgs->box());
+  TransponderDataView->setModel(&psgs->transponder());
   psgs->setFirmwareDisplay(AssembledFirmwareView);
 }

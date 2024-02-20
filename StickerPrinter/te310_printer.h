@@ -41,8 +41,13 @@ class TE310Printer : public AbstractStickerPrinter {
  public:
   explicit TE310Printer(const QString& name);
 
+  // PSObject interface
+ public slots:
+  virtual void applySetting(void) override;
+
+  // AbstractStickerPrinter interface
+ public slots:
   virtual ReturnStatus checkConfig(void) override;
-  virtual StickerPrinterType type(void) override;
 
   virtual ReturnStatus printTransponderSticker(
       const StringDictionary& param) override;
@@ -56,8 +61,6 @@ class TE310Printer : public AbstractStickerPrinter {
   virtual ReturnStatus printLastPalletSticker(void) override;
 
   virtual ReturnStatus exec(const QStringList& commandScript) override;
-
-  virtual void applySetting(void) override;
 
  private:
   Q_DISABLE_COPY_MOVE(TE310Printer);

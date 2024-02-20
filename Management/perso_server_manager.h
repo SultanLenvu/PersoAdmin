@@ -14,9 +14,9 @@ class PersoServerManager : public AbstractManager {
 
   std::unique_ptr<QFile> Firmware;
 
-  StringDictionary ProductionLineData;
-  StringDictionary BoxData;
-  StringDictionary TransponderData;
+  std::shared_ptr<StringDictionary> ProductionLineData;
+  std::shared_ptr<StringDictionary> BoxData;
+  std::shared_ptr<StringDictionary> TransponderData;
 
  public:
   explicit PersoServerManager(const QString& name);
@@ -65,9 +65,11 @@ class PersoServerManager : public AbstractManager {
   void createServerConnection(void);
 
  signals:
-  void displayProductionLineData_signal(const StringDictionary& data);
-  void displayTransponderData_signal(const StringDictionary& data);
-  void displayBoxData_signal(const StringDictionary& data);
+  void productionLineDataReady(const std::shared_ptr<StringDictionary> data);
+  void transponderDataReady(const std::shared_ptr<StringDictionary> data);
+  void boxDataReady(const std::shared_ptr<StringDictionary> data);
+  void firwareReady(const std::shared_ptr<QByteArray> firmware);
+
   void authorizationCompleted(void);
 
   void printTransponderSticker_signal(const StringDictionary& data,

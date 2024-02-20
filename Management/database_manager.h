@@ -45,6 +45,7 @@ class DatabaseManager final : public AbstractManager {
  signals:
   void dataReady(const std::shared_ptr<StringDictionary> data);
   void responseReady(const std::shared_ptr<SqlQueryValues> response);
+  void databaseCreated(std::shared_ptr<AbstractSqlDatabase> database);
 };
 
 #endif  // DATABASEMANAGER_H
