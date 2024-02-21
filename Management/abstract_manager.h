@@ -4,7 +4,7 @@
 #include "psobject.h"
 #include "types.h"
 
-class AbstractManager : public PSObject {
+class AbstractManager : public PObject {
   Q_OBJECT
  public:
   explicit AbstractManager(const QString& name);
@@ -12,7 +12,6 @@ class AbstractManager : public PSObject {
 
  public slots:
   virtual void onInstanceThreadStarted(void) = 0;
-  virtual void applySettings() = 0;
 
  protected:
   virtual void initOperation(const QString& name);

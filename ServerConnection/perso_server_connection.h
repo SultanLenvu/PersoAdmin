@@ -100,12 +100,10 @@ class PersoServerConnection : public AbstractServerConnection {
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
 
-  virtual void applySettings(void) override;
-
  private:
   Q_DISABLE_COPY_MOVE(PersoServerConnection)
-  void loadSettings(void);
-  void sendLog(const QString& log);
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
   ReturnStatus processCurrentCommand(const StringDictionary& param,
                                      StringDictionary& result);

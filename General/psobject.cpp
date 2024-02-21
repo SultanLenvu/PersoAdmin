@@ -2,27 +2,24 @@
 #include "global_environment.h"
 #include "log_system.h"
 
-PSObject::PSObject(const QString& name) : QObject{nullptr} {
+PObject::PObject(const QString& name) : QObject{nullptr} {
   setObjectName(name);
   GlobalEnvironment::instance()->registerObject(this);
 
   connectDependencies();
 }
 
-PSObject::~PSObject() {}
+PObject::~PObject() {}
 
-void PSObject::applySettings() {
-}
-
-void PSObject::sendLog(const QString& log) const {
+void PObject::sendLog(const QString& log) const {
   emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
-PSObject::PSObject() {}
+PObject::PObject() {}
 
-void PSObject::connectDependencies() {
+void PObject::connectDependencies() {
   const LogSystem* ls = static_cast<const LogSystem*>(
       GlobalEnvironment::instance()->getObject("LogSystem"));
 
-  connect(this, &PSObject::logging, ls, &LogSystem::generate);
+  connect(this, &PObject::logging, ls, &LogSystem::generate);
 }

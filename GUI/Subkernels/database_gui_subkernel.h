@@ -18,14 +18,16 @@ class DatabaseGuiSubkernel final : public AbstractGuiSubkernel {
  public:
   SqlResponseModel* responseModel(void);
 
- public slots:  // Слоты для GUI
+  // Слоты для GUI
+ public slots:
   void connect(void);
   void disconnect(void);
   void getTable(const QString& name);
   void execCustomRequest(void);
 
- public slots:  // Слоты для менеджеров
-  void displaySqlResponse(std::shared_ptr<SqlQueryValues> response);
+  // Слоты для менеджеров
+ public slots:
+  void display(std::shared_ptr<SqlQueryValues> response);
 
  private:
   void connectDependecies(void);

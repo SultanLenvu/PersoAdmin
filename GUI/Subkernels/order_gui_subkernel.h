@@ -17,7 +17,8 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
  public:
   SqlResponseModel& orders(void);
 
- public slots:  // Слоты для сигналов от GUI
+  // Слоты для сигналов от GUI
+ public slots:
   void create(void);
   void startAssembling(void);
   void stopAssembling(void);
@@ -31,7 +32,8 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
   void initIssuers(void);
   void linkIssuerWithKeys(void);
 
- public slots:  // Слоты для сигналов от менеджеров
+  // Слоты для сигналов от менеджеров
+ public slots:
   void display(std::shared_ptr<SqlQueryValues> orders);
 
  private:

@@ -6,7 +6,7 @@
 #include "psobject.h"
 #include "sql_query_values.h"
 
-class AbstractSqlTable : public PSObject {
+class AbstractSqlTable : public PObject {
   Q_OBJECT
 
  public:

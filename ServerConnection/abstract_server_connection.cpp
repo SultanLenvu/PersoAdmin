@@ -1,7 +1,7 @@
 #include "abstract_server_connection.h"
 
 AbstractServerConnection::AbstractServerConnection(const QString& name)
-    : PSObject{name} {
+    : PObject{name} {
   connectDepedencies();
 }
 

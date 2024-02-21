@@ -10,13 +10,6 @@ void DatabaseManager::onInstanceThreadStarted() {
   createDatabase();
 }
 
-void DatabaseManager::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-
-  Database->applySettings();
-}
-
 std::shared_ptr<AbstractSqlDatabase> DatabaseManager::database() {
   return Database;
 }
@@ -133,15 +126,15 @@ void DatabaseManager::getPalletData(
   completeOperation("getPalletData");
 }
 
+void DatabaseManager::loadSettings() {
+  Database->applySettings();
+}
+
 void DatabaseManager::createDatabase() {
   Database = std::shared_ptr<AbstractSqlDatabase>(
       new PostgreSqlDatabase("PostgreSqlDatabase"));
 
   emit databaseCreated(Database);
-}
-
-void DatabaseManager::loadSettings() {
-  QSettings settings;
 }
 
 bool DatabaseManager::generateTransponderData(const QString& id,

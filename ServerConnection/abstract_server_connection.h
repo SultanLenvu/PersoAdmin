@@ -4,7 +4,7 @@
 #include "psobject.h"
 #include "types.h"
 
-class AbstractServerConnection : public PSObject {
+class AbstractServerConnection : public PObject {
   Q_OBJECT
  public:
   explicit AbstractServerConnection(const QString& name);

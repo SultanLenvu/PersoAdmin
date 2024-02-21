@@ -17,7 +17,7 @@ void StickerPrinterGuiSubkernel::printTransponderSticker() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit printTransponderSticker_signal(param);
@@ -30,7 +30,7 @@ void StickerPrinterGuiSubkernel::printBoxSticker() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit printBoxSticker_signal(param);
@@ -43,7 +43,7 @@ void StickerPrinterGuiSubkernel::printPalletSticker() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit printPalletSticker_signal(param);

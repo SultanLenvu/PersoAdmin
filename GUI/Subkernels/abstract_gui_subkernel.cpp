@@ -3,7 +3,7 @@
 #include "widget_log_backend.h"
 
 AbstractGuiSubkernel::AbstractGuiSubkernel(const QString& name)
-    : PSObject{name} {
+    : PObject{name} {
   connectDependecies();
 }
 

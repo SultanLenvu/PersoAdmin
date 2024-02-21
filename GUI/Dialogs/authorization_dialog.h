@@ -28,7 +28,7 @@ class AuthorizationDialog : public AbstractInputDialog {
   QSpacerItem* MainLayoutVS;
 
  public:
-  explicit AuthorizationDialog(QWidget* parent);
+  explicit AuthorizationDialog(QWidget* parent = nullptr);
   ~AuthorizationDialog();
 
   // AbstractInputDialog interface

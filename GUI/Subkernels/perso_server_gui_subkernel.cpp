@@ -1,5 +1,7 @@
 #include "perso_server_gui_subkernel.h"
+#include "authorization_dialog.h"
 #include "global_environment.h"
+#include "numeric_string_checker.h"
 #include "perso_server_manager.h"
 #include "string_input_dialog.h"
 
@@ -28,39 +30,126 @@ void PersoServerGuiSubkernel::setFirmwareDisplay(
   FirmwareDisplay = firmwareDisplay;
 }
 
-void PersoServerGuiSubkernel::connect() {}
+void PersoServerGuiSubkernel::connect() {
+  emit clearLogDisplay();
+  emit connect_signal();
+}
 
-void PersoServerGuiSubkernel::disconnect() {}
+void PersoServerGuiSubkernel::disconnect() {
+  emit clearLogDisplay();
+  emit disconnect_signal();
+}
 
-void PersoServerGuiSubkernel::echo() {}
+void PersoServerGuiSubkernel::echo() {
+  emit clearLogDisplay();
+  emit echo_signal();
+}
 
-void PersoServerGuiSubkernel::logOn() {}
+void PersoServerGuiSubkernel::logOn() {
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-void PersoServerGuiSubkernel::logOut() {}
+  AuthorizationDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(*param);
 
-void PersoServerGuiSubkernel::launchProductionLine() {}
+  emit clearLogDisplay();
+  emit logOn_signal(param);
+}
 
-void PersoServerGuiSubkernel::shutdownProductionLine() {}
+void PersoServerGuiSubkernel::logOut() {
+  emit clearLogDisplay();
+  emit logOut_signal();
+}
 
-void PersoServerGuiSubkernel::getProductionLineData() {}
+void PersoServerGuiSubkernel::launchProductionLine() {
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-void PersoServerGuiSubkernel::requestBox() {}
+  AuthorizationDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(*param);
 
-void PersoServerGuiSubkernel::getCurrentBoxData() {}
+  emit clearLogDisplay();
+  emit launchProductionLine_signal(param);
+}
 
-void PersoServerGuiSubkernel::refundCurrentBox() {}
+void PersoServerGuiSubkernel::shutdownProductionLine() {
+  emit clearLogDisplay();
+  emit shutdownProductionLine_signal();
+}
 
-void PersoServerGuiSubkernel::completeCurrentBox() {}
+void PersoServerGuiSubkernel::getProductionLineData() {
+  emit clearLogDisplay();
+  emit getProductionLineData_signal();
+}
 
-void PersoServerGuiSubkernel::releaseTransponder() {}
+void PersoServerGuiSubkernel::requestBox() {
+  emit clearLogDisplay();
+  emit requestBox_signal();
+}
 
-void PersoServerGuiSubkernel::rereleaseTransponder() {}
+void PersoServerGuiSubkernel::getCurrentBoxData() {
+  emit clearLogDisplay();
+  emit getCurrentBoxData_signal();
+}
 
-void PersoServerGuiSubkernel::rollbackTransponder() {}
+void PersoServerGuiSubkernel::refundCurrentBox() {
+  emit clearLogDisplay();
+  emit refundCurrentBox_signal();
+}
 
-void PersoServerGuiSubkernel::getCurrentTransponderData() {}
+void PersoServerGuiSubkernel::completeCurrentBox() {
+  emit clearLogDisplay();
+  emit completeCurrentBox_signal();
+}
 
-void PersoServerGuiSubkernel::getTransponderData() {}
+void PersoServerGuiSubkernel::releaseTransponder() {
+  emit clearLogDisplay();
+  emit releaseTransponder_signal();
+}
+
+void PersoServerGuiSubkernel::rereleaseTransponder() {
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
+
+  StringInputDialog dialog;
+  NumericStringChecker checker;
+  dialog.setChecker(&checker);
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(*param);
+
+  emit clearLogDisplay();
+  emit rereleaseTransponder_signal(param);
+}
+
+void PersoServerGuiSubkernel::rollbackTransponder() {
+  emit clearLogDisplay();
+  emit rollbackTransponder_signal();
+}
+
+void PersoServerGuiSubkernel::getCurrentTransponderData() {
+  emit clearLogDisplay();
+  emit getCurrentTransponderData_signal();
+}
+
+void PersoServerGuiSubkernel::getTransponderData() {
+  std::shared_ptr<StringDictionary> param(new StringDictionary());
+
+  StringInputDialog dialog;
+  NumericStringChecker checker;
+  dialog.setChecker(&checker);
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(*param);
+
+  emit clearLogDisplay();
+  emit getTransponderData_signal(param);
+}
 
 void PersoServerGuiSubkernel::printBoxSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
@@ -69,7 +158,7 @@ void PersoServerGuiSubkernel::printBoxSticker() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit printBoxSticker_signal(param);
@@ -87,7 +176,7 @@ void PersoServerGuiSubkernel::printPalletSticker() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit printPalletSticker_signal(param);

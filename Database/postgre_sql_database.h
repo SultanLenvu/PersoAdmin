@@ -31,8 +31,6 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
 
   // AbstractSqlDatabase interface
  public:
-  virtual void applySettings() override;
-
   virtual bool connect() override;
   virtual void disconnect() override;
   virtual bool isConnected() override;

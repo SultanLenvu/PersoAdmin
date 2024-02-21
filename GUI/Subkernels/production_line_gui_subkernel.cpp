@@ -23,7 +23,7 @@ void ProductionLineGuiSubkernel::create() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit create_signal(param);
@@ -36,7 +36,7 @@ void ProductionLineGuiSubkernel::activate() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit activate_signal(param);
@@ -54,7 +54,7 @@ void ProductionLineGuiSubkernel::deactivate() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit deactivate_signal(param);

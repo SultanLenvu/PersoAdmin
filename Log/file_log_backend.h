@@ -25,7 +25,7 @@ class FileLogBackend : public LogBackend {
   explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
-  // PSObject interface
+  // PObject interface
  public:
   virtual void applySettings(void) override;
 

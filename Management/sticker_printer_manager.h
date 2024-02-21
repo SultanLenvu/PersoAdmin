@@ -17,7 +17,6 @@ class StickerPrinterManager : public AbstractManager
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-  virtual void applySettings() override;
 
   // Own
  public slots:
@@ -27,7 +26,9 @@ class StickerPrinterManager : public AbstractManager
   void execCommandScript(const std::shared_ptr<QStringList> script);
 
  private:
-  void loadSettings(void);
+  Q_DISABLE_COPY_MOVE(StickerPrinterManager)
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 };
 
 #endif // STICKERPRINTERMANAGER_H

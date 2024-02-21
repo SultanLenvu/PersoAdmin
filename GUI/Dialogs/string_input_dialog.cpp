@@ -1,7 +1,7 @@
 #include "string_input_dialog.h"
 
 StringInputDialog::StringInputDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+    : AbstractInputDialog(parent), Checker(nullptr) {
   // Создаем диалоговое окно
   setWindowTitle("Ввод данных");
 
@@ -39,9 +39,8 @@ void StringInputDialog::setLabelText(const QString& text) {
   MainLabel->setText(text);
 }
 
-void StringInputDialog::setChecker(
-    std::unique_ptr<AbstractStringChecker> checker) {
-  Checker = std::move(checker);
+void StringInputDialog::setChecker(AbstractStringChecker* checker) {
+  Checker = checker;
 }
 
 void StringInputDialog::create() {

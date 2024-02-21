@@ -5,7 +5,7 @@
 #include <QJsonDocument>
 
 AbstractClientCommand::AbstractClientCommand(const QString& name)
-    : PSObject{name} {
+    : PObject{name} {
   createCrtMap();
   createCrtLogMap();
 }

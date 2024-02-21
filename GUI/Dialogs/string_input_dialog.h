@@ -18,7 +18,7 @@ class StringInputDialog : public AbstractInputDialog {
   QPushButton* AcceptButton;
   QPushButton* RejectButton;
 
-  std::unique_ptr<AbstractStringChecker> Checker;
+  AbstractStringChecker* Checker;
 
  public:
   explicit StringInputDialog(QWidget* parent = nullptr);
@@ -32,7 +32,7 @@ class StringInputDialog : public AbstractInputDialog {
 
  public:
   void setLabelText(const QString& text);
-  void setChecker(std::unique_ptr<AbstractStringChecker> checker);
+  void setChecker(AbstractStringChecker* checker);
 
  private:
   Q_DISABLE_COPY_MOVE(StringInputDialog);

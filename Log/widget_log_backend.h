@@ -15,10 +15,6 @@ class WidgetLogBackend final : public LogBackend {
   WidgetLogBackend(const QString& name);
   ~WidgetLogBackend();
 
-  // PSObject interface
- public:
-  virtual void applySettings() override;
-
   // LogBackend interface
  public:
   virtual void writeLogMessage(const QString& str) override;
@@ -28,7 +24,9 @@ class WidgetLogBackend final : public LogBackend {
   void clear();
 
  private:
-  void loadSettings(void);
+  Q_DISABLE_COPY_MOVE(WidgetLogBackend)
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
  signals:
   void displayLog_signal(const QString& log);

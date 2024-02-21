@@ -77,13 +77,13 @@ void SettingsDialog::create() {
   PersoClientServerIdLabel =
       new QLabel("IP адрес или URL сервера персонализации");
   PersoClientMainLayout->addWidget(PersoClientServerIdLabel, 0, 0, 1, 1);
-  PersoClientServerIpLineEdit =
-      new QLineEdit(Settings.value("perso_client/server_ip").toString());
+  PersoClientServerIpLineEdit = new QLineEdit(
+      Settings.value("perso_server_connection/server_ip").toString());
   PersoClientMainLayout->addWidget(PersoClientServerIpLineEdit, 0, 1, 1, 1);
   PersoClientServerPortLabel = new QLabel("Порт сервера персонализации");
   PersoClientMainLayout->addWidget(PersoClientServerPortLabel, 1, 0, 1, 1);
-  PersoClientServerPortLineEdit =
-      new QLineEdit(Settings.value("perso_client/server_port").toString());
+  PersoClientServerPortLineEdit = new QLineEdit(
+      Settings.value("perso_server_connection/server_port").toString());
   PersoClientMainLayout->addWidget(PersoClientServerPortLineEdit, 1, 1, 1, 1);
 
   // Настройки логгера
@@ -103,16 +103,9 @@ void SettingsDialog::create() {
   connect(LogSystemGlobalEnableCheckBox, &QCheckBox::stateChanged, this,
           &SettingsDialog::logSystemEnableCheckBox_slot);
 
-  LogSystemExtendedEnableLabel = new QLabel("Расширенное логгирование");
-  LogSystemLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1, 1);
-  LogSystemExtendedEnableCheckBox = new QCheckBox();
-  LogSystemExtendedEnableCheckBox->setCheckState(
-      Settings.value("log_system/extended_enable").toBool() ? Qt::Checked
-                                                            : Qt::Unchecked);
-  LogSystemLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1, 1, 1);
-
   LogSystemProxyWidget1 = new QWidget();
-  LogSystemLayout->addWidget(LogSystemProxyWidget1, 2, 0, 1, 2);
+  LogSystemLayout->addWidget(LogSystemProxyWidget1, LogSystemLayout->rowCount(),
+                             0, 1, 2);
   if (!LogSystemGlobalEnableCheckBox->isChecked()) {
     LogSystemProxyWidget1->hide();
   }
@@ -143,7 +136,8 @@ void SettingsDialog::create() {
           &SettingsDialog::logSystemListenPersoServerCheckBox_slot);
 
   LogSystemProxyWidget2 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2, 3, 0, 1, 2);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget2,
+                                         LogSystemLayout->rowCount(), 0, 1, 2);
   if (!LogSystemListenPersoServerCheckBox->isChecked()) {
     LogSystemProxyWidget2->hide();
   }
@@ -176,22 +170,13 @@ void SettingsDialog::create() {
           &SettingsDialog::logSystemFileEnableCheckBox_slot);
 
   LogSystemProxyWidget3 = new QWidget();
-  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3, 5, 0, 1, 2);
+  LogSystemProxyWidget1Layout->addWidget(LogSystemProxyWidget3,
+                                         LogSystemLayout->rowCount(), 0, 1, 2);
   if (!LogSystemFileEnableCheckBox->isChecked()) {
     LogSystemProxyWidget3->hide();
   }
   LogSystemProxyWidget3Layout = new QGridLayout();
   LogSystemProxyWidget3->setLayout(LogSystemProxyWidget3Layout);
-
-  LogSystemFileMaxNumberLabel =
-      new QLabel("Максимальное количество лог-файлов");
-  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLabel, 0, 0, 1,
-                                         1);
-  LogSystemFileMaxNumberLineEdit = new QLineEdit(
-      Settings.value("log_system/log_file_max_number").toString());
-  LogSystemFileMaxNumberLineEdit->setMaxLength(10);
-  LogSystemProxyWidget3Layout->addWidget(LogSystemFileMaxNumberLineEdit, 0, 1,
-                                         1, 1);
 
   // Настройки принтера стикеров
   StickerPrinterGroupBox = new QGroupBox(QString("Стикер-принтер"));
@@ -273,10 +258,6 @@ bool SettingsDialog::check() const {
     if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
       return false;
     }
-
-    if (LogSystemFileMaxNumberLineEdit->text().toInt() == 0) {
-      return false;
-    }
   }
 
   info.setFile(StickerPrinterLibPathLineEdit->text());
@@ -293,10 +274,7 @@ void SettingsDialog::save() {
                     LogSystemGlobalEnableCheckBox->checkState() == Qt::Checked
                         ? true
                         : false);
-  Settings.setValue("log_system/extended_enable",
-                    LogSystemExtendedEnableCheckBox->checkState() == Qt::Checked
-                        ? true
-                        : false);
+
   Settings.setValue("log_system/display_log_enable",
                     LogSystemDisplayEnableCheckBox->checkState() == Qt::Checked
                         ? true
@@ -304,8 +282,6 @@ void SettingsDialog::save() {
   Settings.setValue(
       "log_system/file_log_enable",
       LogSystemFileEnableCheckBox->checkState() == Qt::Checked ? true : false);
-  Settings.setValue("log_system/log_file_max_number",
-                    LogSystemFileMaxNumberLineEdit->text());
   Settings.setValue(
       "log_system/udp_listen_enable",
       LogSystemListenPersoServerCheckBox->checkState() == Qt::Checked ? true
@@ -316,9 +292,9 @@ void SettingsDialog::save() {
                     LogSystemListenPortLineEdit->text().toInt());
 
   // Настройки клиента
-  Settings.setValue("perso_client/server_ip",
+  Settings.setValue("perso_server_connection/server_ip",
                     PersoClientServerIpLineEdit->text());
-  Settings.setValue("perso_client/server_port",
+  Settings.setValue("perso_server_connection/server_port",
                     PersoClientServerPortLineEdit->text());
 
   // Настройки контроллера базы данных

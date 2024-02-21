@@ -26,7 +26,7 @@ class PostgreSqlTable : public AbstractSqlTable {
                            const QString& connectionName);
   ~PostgreSqlTable();
 
-  // PSObject interface
+  // PObject interface
  public:
   virtual void applySettings() override;
 

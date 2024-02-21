@@ -43,9 +43,6 @@ class SettingsDialog : public QDialog {
   QLabel* LogSystemGlobalEnableLabel;
   QCheckBox* LogSystemGlobalEnableCheckBox;
 
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
-
   QWidget* LogSystemProxyWidget1;
   QGridLayout* LogSystemProxyWidget1Layout;
 
@@ -67,8 +64,6 @@ class SettingsDialog : public QDialog {
 
   QWidget* LogSystemProxyWidget3;
   QGridLayout* LogSystemProxyWidget3Layout;
-  QLabel* LogSystemFileMaxNumberLabel;
-  QLineEdit* LogSystemFileMaxNumberLineEdit;
 
   // Настройки принтера
   QGroupBox* StickerPrinterGroupBox;

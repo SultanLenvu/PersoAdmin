@@ -72,6 +72,7 @@ add_executable(PersoAdmin WIN32
     General/sql_response_model.cpp General/sql_response_model.h
     General/psobject.cpp General/psobject.h
     General/hash_table_model.cpp General/hash_table_model.h
+    General/configurable_object.h General/configurable_object.cpp
 
     Functors/abstract_string_checker.h Functors/abstract_string_checker.cpp
     Functors/ucid_checker.h Functors/ucid_checker.cpp
@@ -83,7 +84,7 @@ add_executable(PersoAdmin WIN32
     Log/widget_log_backend.cpp Log/widget_log_backend.h
 
     Management/abstract_manager.h Management/abstract_manager.cpp
-    Management/perso_client.cpp Management/perso_client.h
+
     Management/global_environment.cpp Management/global_environment.h
     Management/perso_server_manager.cpp Management/perso_server_manager.h
     Management/database_manager.h Management/database_manager.cpp
@@ -119,6 +120,7 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
+    GUI/Subkernels/abstract_manager_signal_handler.h GUI/Subkernels/abstract_manager_signal_handler.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE

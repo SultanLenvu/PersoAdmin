@@ -41,7 +41,7 @@ class TE310Printer : public AbstractStickerPrinter {
  public:
   explicit TE310Printer(const QString& name);
 
-  // PSObject interface
+  // PObject interface
  public slots:
   virtual void applySetting(void) override;
 

@@ -1,24 +1,20 @@
-#ifndef PSOBJECT_H
-#define PSOBJECT_H
+#ifndef POBJECT_H
+#define POBJECT_H
 
 #include <QObject>
 
-class PSObject : public QObject
-{
+class PObject : public QObject {
   Q_OBJECT
  public:
-  explicit PSObject(const QString& name);
-  virtual ~PSObject();
-
- public slots:
-  virtual void applySettings(void);
+  explicit PObject(const QString& name);
+  virtual ~PObject();
 
  protected:
   void sendLog(const QString& log) const;
 
  private:
-  PSObject();
-  Q_DISABLE_COPY_MOVE(PSObject)
+  PObject();
+  Q_DISABLE_COPY_MOVE(PObject)
 
   void connectDependencies(void);
 
@@ -26,4 +22,4 @@ class PSObject : public QObject
   void logging(const QString& log) const;
 };
 
-#endif // PSOBJECT_H
+#endif  // POBJECT_H

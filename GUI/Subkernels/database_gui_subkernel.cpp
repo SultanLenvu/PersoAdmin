@@ -36,8 +36,7 @@ void DatabaseGuiSubkernel::execCustomRequest() {
   emit clearLogDisplay();
 }
 
-void DatabaseGuiSubkernel::displaySqlResponse(
-    std::shared_ptr<SqlQueryValues> response) {
+void DatabaseGuiSubkernel::display(std::shared_ptr<SqlQueryValues> response) {
   ResponseModel->setResponse(response);
 }
 
@@ -45,6 +44,7 @@ void DatabaseGuiSubkernel::connectDependecies() {
   const DatabaseManager* dm = static_cast<const DatabaseManager*>(
       GlobalEnvironment::instance()->getObject("DatabaseManager"));
 
+  // К менеджерам
   QObject::connect(this, &DatabaseGuiSubkernel::connect_signal, dm,
                    &DatabaseManager::connect);
   QObject::connect(this, &DatabaseGuiSubkernel::disconnect_signal, dm,
@@ -53,4 +53,8 @@ void DatabaseGuiSubkernel::connectDependecies() {
                    &DatabaseManager::getTable);
   QObject::connect(this, &DatabaseGuiSubkernel::execCustomRequest_signal, dm,
                    &DatabaseManager::execCustomRequest);
+
+  // От менеджеров
+  QObject::connect(dm, &DatabaseManager::responseReady, this,
+                   &DatabaseGuiSubkernel::display);
 }

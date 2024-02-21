@@ -4,7 +4,7 @@
 #include "file_log_backend.h"
 #include "widget_log_backend.h"
 
-LogSystem::LogSystem(const QString& name) : PSObject(name) {
+LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
   loadSettings();
 }
 

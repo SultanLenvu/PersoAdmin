@@ -1,22 +1,15 @@
-#ifndef INTERACTION_SYSTEM_H
-#define INTERACTION_SYSTEM_H
+#ifndef ABSTRACTMANAGERSIGNALHANDLER_H
+#define ABSTRACTMANAGERSIGNALHANDLER_H
 
 #include <QElapsedTimer>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QObject>
-#include <QProgressBar>
 #include <QProgressDialog>
-#include <QSettings>
 #include <QTimer>
 
-#include "psobject.h"
+#include "abstract_gui_subkernel.h"
 #include "types.h"
 
-class InteractionSystem : public PObject {
+class AbstractManagerSignalHandler : public AbstractGuiSubkernel {
   Q_OBJECT
-
  private:
   std::unique_ptr<QProgressDialog> ProgressDialog;
 
@@ -27,18 +20,19 @@ class InteractionSystem : public PObject {
   std::unordered_map<ReturnStatus, QString> MessageTable;
 
  public:
-  InteractionSystem(const QString& name);
-  ~InteractionSystem();
+  explicit AbstractManagerSignalHandler(const QString& name);
+  virtual ~AbstractManagerSignalHandler();
 
   // Own
  public slots:
-  void generateMessage(const QString& text);
-  void generateErrorMessage(const QString& text);
-
-  void processOperationStart(const QString& operationName);
-  void processOperationFinish(const QString& operationName, ReturnStatus ret);
+  virtual void processOperationStart(const QString& operationName);
+  virtual void processOperationFinish(const QString& operationName,
+                                      ReturnStatus ret);
 
  private:
+  Q_DISABLE_COPY_MOVE(AbstractManagerSignalHandler)
+  virtual void loadSettings(void) override;
+
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
@@ -56,4 +50,4 @@ class InteractionSystem : public PObject {
   void abortCurrentOperation(void);
 };
 
-#endif  // INTERACTION_SYSTEM_H
+#endif  // ABSTRACTMANAGERSIGNALHANDLER_H

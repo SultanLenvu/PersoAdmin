@@ -17,7 +17,6 @@ class DatabaseManager final : public AbstractManager {
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-  virtual void applySettings() override;
 
   // Own
  public:
@@ -34,9 +33,8 @@ class DatabaseManager final : public AbstractManager {
   void getPalletData(const std::shared_ptr<StringDictionary> param);
 
  private:
+  virtual void loadSettings(void) override;
   void createDatabase(void);
-
-  void loadSettings(void);
 
   bool generateTransponderData(const QString& id, StringDictionary& data);
   bool generateBoxData(const QString& id, StringDictionary& data);

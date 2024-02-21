@@ -3,7 +3,7 @@
 
 #include "psobject.h"
 
-class LogBackend : public PSObject {
+class LogBackend : public PObject {
   Q_OBJECT
 
  public:

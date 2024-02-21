@@ -18,7 +18,6 @@ class OrderManager : public AbstractManager
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-  virtual void applySettings() override;
 
   // Own
  public slots:
@@ -37,7 +36,8 @@ class OrderManager : public AbstractManager
   void linkIssuerWithKeys(const std::shared_ptr<StringDictionary> param);
 
  private:
-  void loadSettings(void);
+  Q_DISABLE_COPY_MOVE(OrderManager)
+  virtual void loadSettings(void) override;
   void connectDependencies(void);
 
   bool addOrder(const StringDictionary& param);

@@ -2,7 +2,7 @@
 #include "global_environment.h"
 #include "interaction_system.h"
 
-AbstractManager::AbstractManager(const QString& name) : PSObject{name} {
+AbstractManager::AbstractManager(const QString& name) : PObject{name} {
   connectDependencies();
 }
 

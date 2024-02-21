@@ -3,7 +3,7 @@
 
 StickerPrinterManager::StickerPrinterManager(const QString& name)
     : AbstractManager(name) {
-  loadSettings();
+  doLoadSettings();
 }
 
 StickerPrinterManager::~StickerPrinterManager() {}
@@ -11,14 +11,6 @@ StickerPrinterManager::~StickerPrinterManager() {}
 void StickerPrinterManager::onInstanceThreadStarted() {
   StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
       new TE310Printer("StickerPrinter"));
-}
-
-void StickerPrinterManager::applySettings() {
-  sendLog("Применение новых настроек.");
-
-  loadSettings();
-
-  StickerPrinter->applySetting();
 }
 
 void StickerPrinterManager::printTransponderSticker(
@@ -73,4 +65,10 @@ void StickerPrinterManager::execCommandScript(
   completeOperation("execCommandScript");
 }
 
-void StickerPrinterManager::loadSettings() {}
+void StickerPrinterManager::loadSettings() {
+  doLoadSettings();
+}
+
+void StickerPrinterManager::doLoadSettings() {
+  StickerPrinter->applySetting();
+}

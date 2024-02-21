@@ -6,7 +6,7 @@
 #include "psobject.h"
 #include "types.h"
 
-class AbstractClientCommand : public PSObject {
+class AbstractClientCommand : public PObject {
   Q_OBJECT
 
   enum CommandReturnStatus {

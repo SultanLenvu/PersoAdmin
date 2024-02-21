@@ -3,7 +3,7 @@
 
 #include "psobject.h"
 
-class AbstractGuiSubkernel : public PSObject {
+class AbstractGuiSubkernel : public PObject {
   Q_OBJECT
  public:
   explicit AbstractGuiSubkernel(const QString& name);

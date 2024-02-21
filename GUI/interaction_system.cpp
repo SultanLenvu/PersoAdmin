@@ -1,7 +1,7 @@
 #include "interaction_system.h"
 #include "definitions.h"
 
-InteractionSystem::InteractionSystem(const QString& name) : PSObject{name} {
+InteractionSystem::InteractionSystem(const QString& name) : PObject{name} {
   loadSettings();
 
   createMessageMatchTable();
@@ -65,18 +65,9 @@ void InteractionSystem::processOperationFinish(const QString& operationName,
   processReturnStatus(ret);
 }
 
-void InteractionSystem::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-}
-
 /*
  * Приватные методы
  */
-
-void InteractionSystem::loadSettings() {
-  QSettings settings;
-}
 
 void InteractionSystem::createProgressDialog() {
   ProgressDialog = std::unique_ptr<QProgressDialog>(new QProgressDialog());
@@ -166,10 +157,16 @@ void InteractionSystem::processReturnStatus(ReturnStatus ret) {
   if (ret == ReturnStatus::NoError) {
     QMessageBox::information(nullptr, "Сообщение", MessageTable[ret],
                              QMessageBox::Ok);
-  } else {
-    QMessageBox::critical(nullptr, "Ошибка", MessageTable[ret],
-                          QMessageBox::Ok);
+    return;
   }
+  if (MessageTable.count(ret) == 0) {
+    QMessageBox::critical(nullptr, "Ошибка",
+                          "Получен неизвестный статус возврата.",
+                          QMessageBox::Ok);
+    return;
+  }
+
+  QMessageBox::critical(nullptr, "Ошибка", MessageTable[ret], QMessageBox::Ok);
 }
 
 void InteractionSystem::progressDialogCanceled_slot() {

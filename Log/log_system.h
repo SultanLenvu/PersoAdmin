@@ -10,13 +10,13 @@
 #include <QTime>
 #include <QUdpSocket>
 
+#include "configurable_object.h"
 #include "log_backend.h"
-#include "psobject.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public PSObject {
+class LogSystem : public ConfigurableObject {
   Q_OBJECT
 
  private:
@@ -34,9 +34,6 @@ class LogSystem : public PSObject {
   LogSystem(const QString& name);
   ~LogSystem();
 
- public:  // PSObject interface
-  virtual void applySettings(void) override;
-
  public slots:
   void instanceThreadStarted(void);
 
@@ -44,7 +41,8 @@ class LogSystem : public PSObject {
 
  private:
   Q_DISABLE_COPY_MOVE(LogSystem)
-  void loadSettings(void);
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
   void createPersoServerLogSocket(void);
 

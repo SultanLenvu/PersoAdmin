@@ -10,13 +10,13 @@
 #include "psobject.h"
 #include "types.h"
 
-class AbstractStickerPrinter : public PSObject {
+class AbstractStickerPrinter : public PObject {
   Q_OBJECT
  public:
   AbstractStickerPrinter(const QString& name);
   virtual ~AbstractStickerPrinter();
 
-  // PSObject interface
+  // PObject interface
  public slots:
   virtual void applySetting(void) = 0;
 

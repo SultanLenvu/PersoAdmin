@@ -27,7 +27,7 @@ void OrderGuiSubkernel::create() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit create_signal(param);
@@ -41,7 +41,7 @@ void OrderGuiSubkernel::startAssembling() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit startAssembling_signal(param);
@@ -54,7 +54,7 @@ void OrderGuiSubkernel::stopAssembling() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit stopAssembling_signal(param);
@@ -72,7 +72,7 @@ void OrderGuiSubkernel::release() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit release_signal(param);
@@ -85,7 +85,7 @@ void OrderGuiSubkernel::refund() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit refund_signal(param);
@@ -98,7 +98,7 @@ void OrderGuiSubkernel::generateShipmentRegister() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit shipPallets_signal(param);
@@ -121,7 +121,7 @@ void OrderGuiSubkernel::linkIssuerWithKeys() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param.get());
+  dialog.getData(*param);
 
   emit clearLogDisplay();
   emit linkIssuerWithKeys_signal(param);

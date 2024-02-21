@@ -24,18 +24,13 @@
 #include "shutdown_production_line.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
-    : AbstractServerConnection(name) {
-  ReceivedDataBlockSize = 0;
+    : AbstractServerConnection(name),
+      PersoServerPort(0),
+      ReceivedDataBlockSize(0) {
+  doLoadSettings();
 
-  loadSettings();
-
-  // Создаем сокет
   createSocket();
-
-  // Создаем таймеры
   createTimers();
-
-  // Создаем команды
   createCommands();
 }
 
@@ -260,21 +255,16 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
   return ret;
 }
 
-void PersoServerConnection::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
+void PersoServerConnection::loadSettings() {
+  doLoadSettings();
 }
 
-void PersoServerConnection::loadSettings() {
+void PersoServerConnection::doLoadSettings() {
   QSettings settings;
 
   PersoServerAddress =
       QHostAddress(settings.value("perso_server_connection/ip").toString());
   PersoServerPort = settings.value("perso_server_connection/port").toInt();
-}
-
-void PersoServerConnection::sendLog(const QString& log) {
-  emit logging(objectName() + " - " + log);
 }
 
 ReturnStatus PersoServerConnection::processCurrentCommand(

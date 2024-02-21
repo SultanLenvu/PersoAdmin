@@ -13,19 +13,6 @@ PostgreSqlDatabase::~PostgreSqlDatabase() {
   QSqlDatabase::removeDatabase(ConnectionName);
 }
 
-void PostgreSqlDatabase::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-
-  if (QSqlDatabase::database(ConnectionName).isValid()) {
-    sendLog("Удаление предыущего подключения к базе данных. ");
-    QSqlDatabase::removeDatabase(ConnectionName);
-
-    sendLog("Создание нового подключения к базе данных. ");
-    createDatabaseConnection();
-  }
-}
-
 bool PostgreSqlDatabase::connect() {
   if (QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres уже установлено. ");
@@ -485,6 +472,16 @@ bool PostgreSqlDatabase::getLastId(const QString& table, int32_t& id) const {
  */
 
 void PostgreSqlDatabase::loadSettings() {
+  if (QSqlDatabase::database(ConnectionName).isValid()) {
+    sendLog("Удаление предыущего подключения к базе данных. ");
+    QSqlDatabase::removeDatabase(ConnectionName);
+
+    sendLog("Создание нового подключения к базе данных. ");
+    createDatabaseConnection();
+  }
+}
+
+void PostgreSqlDatabase::doLoadSettings() {
   // Загружаем настройки
   QSettings settings;
 

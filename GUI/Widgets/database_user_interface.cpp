@@ -91,6 +91,9 @@ void DatabaseUserInterface::connectDependecies() {
           &DatabaseGuiSubkernel::execCustomRequest);
 
   RecordTableView->setModel(dui->responseModel());
+
+  connect(this, &DatabaseUserInterface::getTable_signal, dui,
+          &DatabaseGuiSubkernel::getTable);
 }
 
 void DatabaseUserInterface::getTablePushButton_slot() {

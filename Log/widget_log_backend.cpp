@@ -3,7 +3,7 @@
 #include "widget_log_backend.h"
 
 WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
-  loadSettings();
+  doLoadSettings();
 }
 
 WidgetLogBackend::~WidgetLogBackend() {}
@@ -14,10 +14,6 @@ void WidgetLogBackend::writeLogMessage(const QString& str) {
   }
 }
 
-void WidgetLogBackend::applySettings() {
-  loadSettings();
-}
-
 void WidgetLogBackend::clear() {
   if (Enable) {
     emit clearLogDisplay_signal();
@@ -25,6 +21,10 @@ void WidgetLogBackend::clear() {
 }
 
 void WidgetLogBackend::loadSettings() {
+  doLoadSettings();
+}
+
+void WidgetLogBackend::doLoadSettings() {
   QSettings settings;
 
   Enable = settings.value("log_system/display_log_enable").toBool();
