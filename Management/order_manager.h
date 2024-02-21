@@ -37,7 +37,6 @@ class OrderManager : public AbstractManager
 
  private:
   Q_DISABLE_COPY_MOVE(OrderManager)
-  virtual void loadSettings(void) override;
   void connectDependencies(void);
 
   bool addOrder(const StringDictionary& param);

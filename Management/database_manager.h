@@ -33,7 +33,7 @@ class DatabaseManager final : public AbstractManager {
   void getPalletData(const std::shared_ptr<StringDictionary> param);
 
  private:
-  virtual void loadSettings(void) override;
+  Q_DISABLE_COPY_MOVE(DatabaseManager)
   void createDatabase(void);
 
   bool generateTransponderData(const QString& id, StringDictionary& data);

@@ -1,6 +1,6 @@
-#include "psobject.h"
 #include "global_environment.h"
 #include "log_system.h"
+#include "pobject.h"
 
 PObject::PObject(const QString& name) : QObject{nullptr} {
   setObjectName(name);

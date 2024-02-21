@@ -1,7 +1,7 @@
 #ifndef CONFIGURABLEOBJECT_H
 #define CONFIGURABLEOBJECT_H
 
-#include "psobject.h"
+#include "pobject.h"
 
 class ConfigurableObject : public PObject {
   Q_OBJECT

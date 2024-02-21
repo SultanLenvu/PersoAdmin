@@ -2,8 +2,6 @@
 #include "definitions.h"
 
 InteractionSystem::InteractionSystem(const QString& name) : PObject{name} {
-  loadSettings();
-
   createMessageMatchTable();
   createTimers();
 }

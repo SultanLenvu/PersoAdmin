@@ -1,6 +1,6 @@
 #include "abstract_sql_database.h"
 
 AbstractSqlDatabase::AbstractSqlDatabase(const QString& name)
-    : PObject{name} {}
+    : ConfigurableObject{name} {}
 
 AbstractSqlDatabase::~AbstractSqlDatabase() {}

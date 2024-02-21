@@ -86,7 +86,8 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual bool getLastId(const QString& table, int32_t& id) const override;
 
  private:
-  void loadSettings(void);
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
   void createDatabaseConnection(void);
   bool init(void);

@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QObject>
 
-#include "Log/log_backend.h"
+#include "log_backend.h"
 
 class WidgetLogBackend final : public LogBackend {
   Q_OBJECT

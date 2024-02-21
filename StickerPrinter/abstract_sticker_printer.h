@@ -7,7 +7,7 @@
 #include <QSettings>
 #include <QtPrintSupport/QPrinterInfo>
 
-#include "psobject.h"
+#include "pobject.h"
 #include "types.h"
 
 class AbstractStickerPrinter : public PObject {

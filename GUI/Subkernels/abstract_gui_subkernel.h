@@ -1,7 +1,7 @@
 #ifndef ABSTRACT_GUI_SUBKERNEL_H
 #define ABSTRACT_GUI_SUBKERNEL_H
 
-#include "psobject.h"
+#include "pobject.h"
 
 class AbstractGuiSubkernel : public PObject {
   Q_OBJECT

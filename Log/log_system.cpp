@@ -5,7 +5,7 @@
 #include "widget_log_backend.h"
 
 LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
-  loadSettings();
+  doLoadSettings();
 }
 
 LogSystem::~LogSystem() {
@@ -17,18 +17,6 @@ LogSystem::~LogSystem() {
 
   //  PersoServerLogSocket->blockSignals(true);
   //  delete PersoServerLogSocket;
-}
-
-void LogSystem::applySettings() {
-  generate("LogSystem - Применение новых настроек. ");
-  loadSettings();
-
-  PersoServerLogSocket->abort();
-  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
-
-  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
-    (*it)->applySettings();
-  }
 }
 
 void LogSystem::instanceThreadStarted() {
@@ -54,11 +42,22 @@ void LogSystem::generate(const QString& log) {
  */
 
 void LogSystem::loadSettings() {
+  doLoadSettings();
+
+  PersoServerLogSocket->abort();
+  PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
+
+  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
+    (*it)->applySettings();
+  }
+}
+
+void LogSystem::doLoadSettings() {
   QSettings settings;
 
   UdpListenEnable = settings.value("log_system/udp_listen_enable").toBool();
-  UdpListenIp = QHostAddress(
-      settings.value("log_system/udp_listen_ip").toString());
+  UdpListenIp =
+      QHostAddress(settings.value("log_system/udp_listen_ip").toString());
   UdpListenPort = settings.value("log_system/udp_listen_port").toUInt();
 }
 

@@ -1,10 +1,10 @@
 #ifndef ABSTRACTSQLDATABASE_H
 #define ABSTRACTSQLDATABASE_H
 
-#include "psobject.h"
+#include "configurable_object.h"
 #include "sql_query_values.h"
 
-class AbstractSqlDatabase : public PObject {
+class AbstractSqlDatabase : public ConfigurableObject {
   Q_OBJECT
 
  public:

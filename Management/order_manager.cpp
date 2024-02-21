@@ -8,19 +8,12 @@
 #include "order_manager.h"
 
 OrderManager::OrderManager(const QString& name) : AbstractManager(name) {
-  loadSettings();
   connectDependencies();
 }
 
 OrderManager::~OrderManager() {}
 
 void OrderManager::onInstanceThreadStarted() {}
-
-void OrderManager::applySettings() {
-  sendLog("Применение новых настроек.");
-
-  loadSettings();
-}
 
 void OrderManager::applyDatabase(
     std::shared_ptr<AbstractSqlDatabase> database) {

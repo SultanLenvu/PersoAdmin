@@ -70,7 +70,7 @@ add_executable(PersoAdmin WIN32
     General/types.h
     General/definitions.h
     General/sql_response_model.cpp General/sql_response_model.h
-    General/psobject.cpp General/psobject.h
+    General/pobject.cpp General/pobject.h
     General/hash_table_model.cpp General/hash_table_model.h
     General/configurable_object.h General/configurable_object.cpp
 

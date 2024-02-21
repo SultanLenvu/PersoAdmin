@@ -3,7 +3,6 @@
 
 StickerPrinterManager::StickerPrinterManager(const QString& name)
     : AbstractManager(name) {
-  doLoadSettings();
 }
 
 StickerPrinterManager::~StickerPrinterManager() {}
@@ -63,12 +62,4 @@ void StickerPrinterManager::execCommandScript(
   }
 
   completeOperation("execCommandScript");
-}
-
-void StickerPrinterManager::loadSettings() {
-  doLoadSettings();
-}
-
-void StickerPrinterManager::doLoadSettings() {
-  StickerPrinter->applySetting();
 }

@@ -5,7 +5,7 @@ PostgreSqlDatabase::PostgreSqlDatabase(const QString& name)
     : AbstractSqlDatabase{name} {
   ConnectionName = QString("%1%2").arg(name, "Connection");
 
-  loadSettings();
+  doLoadSettings();
 }
 
 PostgreSqlDatabase::~PostgreSqlDatabase() {
@@ -472,6 +472,8 @@ bool PostgreSqlDatabase::getLastId(const QString& table, int32_t& id) const {
  */
 
 void PostgreSqlDatabase::loadSettings() {
+  doLoadSettings();
+
   if (QSqlDatabase::database(ConnectionName).isValid()) {
     sendLog("Удаление предыущего подключения к базе данных. ");
     QSqlDatabase::removeDatabase(ConnectionName);

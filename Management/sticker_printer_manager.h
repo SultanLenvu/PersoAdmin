@@ -27,8 +27,6 @@ class StickerPrinterManager : public AbstractManager
 
  private:
   Q_DISABLE_COPY_MOVE(StickerPrinterManager)
-  virtual void loadSettings(void) override;
-  void doLoadSettings(void);
 };
 
 #endif // STICKERPRINTERMANAGER_H

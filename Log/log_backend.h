@@ -1,9 +1,9 @@
 #ifndef LOGBACKEND_H
 #define LOGBACKEND_H
 
-#include "psobject.h"
+#include "configurable_object.h"
 
-class LogBackend : public PObject {
+class LogBackend : public ConfigurableObject {
   Q_OBJECT
 
  public:

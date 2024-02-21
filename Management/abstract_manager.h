@@ -1,7 +1,7 @@
 #ifndef ABSTRACTMANAGER_H
 #define ABSTRACTMANAGER_H
 
-#include "psobject.h"
+#include "pobject.h"
 #include "types.h"
 
 class AbstractManager : public PObject {

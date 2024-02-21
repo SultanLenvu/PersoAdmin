@@ -14,7 +14,6 @@ class ProgrammerManager : public AbstractManager
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-  virtual void applySettings() override;
 };
 
 #endif // PROGRAMMERMANAGER_H

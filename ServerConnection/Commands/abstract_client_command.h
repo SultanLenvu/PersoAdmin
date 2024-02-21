@@ -3,7 +3,7 @@
 
 #include <QJsonObject>
 
-#include "psobject.h"
+#include "pobject.h"
 #include "types.h"
 
 class AbstractClientCommand : public PObject {

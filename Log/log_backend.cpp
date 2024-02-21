@@ -1,5 +1,5 @@
 #include "log_backend.h"
 
-LogBackend::LogBackend(const QString& name) : PObject(name) {}
+LogBackend::LogBackend(const QString& name) : ConfigurableObject(name) {}
 
 LogBackend::~LogBackend() {}

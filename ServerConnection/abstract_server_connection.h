@@ -1,7 +1,7 @@
 #ifndef ABSTARCTSERVERCONNECTION_H
 #define ABSTARCTSERVERCONNECTION_H
 
-#include "psobject.h"
+#include "pobject.h"
 #include "types.h"
 
 class AbstractServerConnection : public PObject {

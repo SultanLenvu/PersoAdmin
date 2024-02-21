@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "psobject.h"
+#include "pobject.h"
 #include "sql_query_values.h"
 
 class AbstractSqlTable : public PObject {

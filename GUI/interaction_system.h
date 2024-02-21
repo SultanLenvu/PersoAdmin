@@ -11,7 +11,7 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "psobject.h"
+#include "pobject.h"
 #include "types.h"
 
 class InteractionSystem : public PObject {
