@@ -10,7 +10,7 @@ class LogBackend : public ConfigurableObject {
   LogBackend(const QString& name);
   virtual ~LogBackend();
 
-  virtual void writeLogMessage(const QString& str) = 0;
+  virtual void writeMessage(const QString& str) = 0;
 };
 
 #endif /* LOGBACKEND_H */

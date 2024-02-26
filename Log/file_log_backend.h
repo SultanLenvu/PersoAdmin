@@ -26,7 +26,7 @@ class FileLogBackend : public LogBackend {
 
   // LogBackend interface
  public:
-  virtual void writeLogMessage(const QString& str) override;
+  virtual void writeMessage(const QString& str) override;
 
  private:
   Q_DISABLE_COPY(FileLogBackend);

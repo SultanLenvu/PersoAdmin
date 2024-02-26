@@ -41,20 +41,20 @@ void DatabaseGuiSubkernel::display(std::shared_ptr<SqlQueryValues> response) {
 }
 
 void DatabaseGuiSubkernel::connectDependecies() {
-  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
-      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
+      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
   QObject::connect(this, &DatabaseGuiSubkernel::connect_signal, dm,
-                   &DatabaseManager::connect);
+                   &DatabaseAsyncWrapper::connect);
   QObject::connect(this, &DatabaseGuiSubkernel::disconnect_signal, dm,
-                   &DatabaseManager::disconnect);
+                   &DatabaseAsyncWrapper::disconnect);
   QObject::connect(this, &DatabaseGuiSubkernel::getTable_signal, dm,
-                   &DatabaseManager::getTable);
+                   &DatabaseAsyncWrapper::getTable);
   QObject::connect(this, &DatabaseGuiSubkernel::execCustomRequest_signal, dm,
-                   &DatabaseManager::execCustomRequest);
+                   &DatabaseAsyncWrapper::execCustomRequest);
 
   // От менеджеров
-  QObject::connect(dm, &DatabaseManager::responseReady, this,
+  QObject::connect(dm, &DatabaseAsyncWrapper::responseReady, this,
                    &DatabaseGuiSubkernel::display);
 }

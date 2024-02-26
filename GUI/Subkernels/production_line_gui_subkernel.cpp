@@ -83,8 +83,8 @@ void ProductionLineGuiSubkernel::display(std::shared_ptr<SqlQueryValues> data) {
 void ProductionLineGuiSubkernel::connectDependecies() {
   const ProductionLineManager* om = static_cast<const ProductionLineManager*>(
       GlobalEnvironment::instance()->getObject("ProductionLineManager"));
-  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
-      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
+      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
   connect(this, &ProductionLineGuiSubkernel::create_signal, om,
@@ -101,9 +101,9 @@ void ProductionLineGuiSubkernel::connectDependecies() {
           &ProductionLineManager::edit);
 
   connect(this, &ProductionLineGuiSubkernel::get_signal, dm,
-          &DatabaseManager::getTable);
+          &DatabaseAsyncWrapper::getTable);
 
   // От менеджеров
-  connect(dm, &DatabaseManager::responseReady, this,
+  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
           &ProductionLineGuiSubkernel::display);
 }

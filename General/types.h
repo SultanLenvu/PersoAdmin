@@ -23,6 +23,7 @@ enum class ReturnStatus {
   FileOpenError,
   DynamicLibraryMissing,
 
+  DatabaseMissed,
   DatabaseConnectionError,
   DatabaseTransactionError,
   DatabaseQueryError,

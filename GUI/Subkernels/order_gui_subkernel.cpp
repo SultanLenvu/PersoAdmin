@@ -134,8 +134,8 @@ void OrderGuiSubkernel::display(std::shared_ptr<SqlQueryValues> orders) {
 void OrderGuiSubkernel::connectDependecies() {
   const OrderManager* om = static_cast<const OrderManager*>(
       GlobalEnvironment::instance()->getObject("OrderManager"));
-  const DatabaseManager* dm = static_cast<const DatabaseManager*>(
-      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
+      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
   connect(this, &OrderGuiSubkernel::create_signal, om, &OrderManager::create);
@@ -154,9 +154,9 @@ void OrderGuiSubkernel::connectDependecies() {
   connect(this, &OrderGuiSubkernel::linkIssuerWithKeys_signal, om,
           &OrderManager::linkIssuerWithKeys);
 
-  connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseManager::getTable);
+  connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseAsyncWrapper::getTable);
 
   // От менеджеров
-  connect(dm, &DatabaseManager::responseReady, this,
+  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
           &OrderGuiSubkernel::display);
 }

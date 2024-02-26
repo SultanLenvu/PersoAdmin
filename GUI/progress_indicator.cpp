@@ -1,22 +1,15 @@
-#include "interaction_system.h"
+#include "progress_indicator.h"
 #include "definitions.h"
 
-InteractionSystem::InteractionSystem(const QString& name) : PObject{name} {
+ProgressIndicator::ProgressIndicator(const QString& name)
+    : AbstractProgressIndicator{name} {
   createMessageMatchTable();
   createTimers();
 }
 
-InteractionSystem::~InteractionSystem() {}
+ProgressIndicator::~ProgressIndicator() {}
 
-void InteractionSystem::generateMessage(const QString& text) {
-  QMessageBox::information(nullptr, "Сообщение", text, QMessageBox::Ok);
-}
-
-void InteractionSystem::generateErrorMessage(const QString& text) {
-  QMessageBox::critical(nullptr, "Ошибка", text, QMessageBox::Ok);
-}
-
-void InteractionSystem::processOperationStart(const QString& operationName) {
+void ProgressIndicator::begin(const QString& operationName) {
   QSettings settings;
 
   // Создаем  окно
@@ -40,8 +33,7 @@ void InteractionSystem::processOperationStart(const QString& operationName) {
   ODMeter->start();
 }
 
-void InteractionSystem::processOperationFinish(const QString& operationName,
-                                               ReturnStatus ret) {
+void ProgressIndicator::finish(const QString& operationName, ReturnStatus ret) {
   QSettings settings;
 
   // Измеряем и сохраняем длительность операции
@@ -67,7 +59,7 @@ void InteractionSystem::processOperationFinish(const QString& operationName,
  * Приватные методы
  */
 
-void InteractionSystem::createProgressDialog() {
+void ProgressIndicator::createProgressDialog() {
   ProgressDialog = std::unique_ptr<QProgressDialog>(new QProgressDialog());
 
   ProgressDialog->setLabelText("Выполнение операции...");
@@ -80,16 +72,16 @@ void InteractionSystem::createProgressDialog() {
   ProgressDialog->show();
 }
 
-void InteractionSystem::destroyProgressDialog() {
+void ProgressIndicator::destroyProgressDialog() {
   ProgressDialog->close();
 }
 
-void InteractionSystem::createTimers() {
+void ProgressIndicator::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = std::unique_ptr<QTimer>(new QTimer());
   ODTimer->setInterval(SERVER_MANAGER_OPERATION_MAX_DURATION);
   connect(ODTimer.get(), &QTimer::timeout, this,
-          &InteractionSystem::ODTimerTimeout_slot);
+          &ProgressIndicator::ODTimerTimeout_slot);
   connect(ODTimer.get(), &QTimer::timeout, ODTimer.get(), &QTimer::stop);
 
   // Таймер для измерения длительности операции
@@ -98,10 +90,10 @@ void InteractionSystem::createTimers() {
   // Таймер, отслеживающий квант длительности операции
   ODQTimer = std::unique_ptr<QTimer>(new QTimer());
   connect(ODQTimer.get(), &QTimer::timeout, this,
-          &InteractionSystem::ODQTimerTimeout_slot);
+          &ProgressIndicator::ODQTimerTimeout_slot);
 }
 
-void InteractionSystem::createMessageMatchTable() {
+void ProgressIndicator::createMessageMatchTable() {
   // Заполняем таблицу соответствий статусов возврата
   MessageTable[ReturnStatus::NoError] = QString("Выполнено. ");
 
@@ -151,7 +143,7 @@ void InteractionSystem::createMessageMatchTable() {
   MessageTable[ReturnStatus::UnknownError] = QString("Неизвествная ошибка. ");
 }
 
-void InteractionSystem::processReturnStatus(ReturnStatus ret) {
+void ProgressIndicator::processReturnStatus(ReturnStatus ret) {
   if (ret == ReturnStatus::NoError) {
     QMessageBox::information(nullptr, "Сообщение", MessageTable[ret],
                              QMessageBox::Ok);
@@ -167,18 +159,18 @@ void InteractionSystem::processReturnStatus(ReturnStatus ret) {
   QMessageBox::critical(nullptr, "Ошибка", MessageTable[ret], QMessageBox::Ok);
 }
 
-void InteractionSystem::progressDialogCanceled_slot() {
+void ProgressIndicator::progressDialogCanceled_slot() {
   ProgressDialog->close();
 
   emit abortCurrentOperation();
 }
 
-void InteractionSystem::ODTimerTimeout_slot() {
+void ProgressIndicator::ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
   generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
-void InteractionSystem::ODQTimerTimeout_slot() {
+void ProgressIndicator::ODQTimerTimeout_slot() {
   int32_t cvalue = ProgressDialog->value();
 
   if (cvalue < 99) {

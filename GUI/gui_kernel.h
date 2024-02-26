@@ -11,7 +11,7 @@
 #include "abstract_gui_subkernel.h"
 #include "abstract_manager.h"
 #include "global_environment.h"
-#include "interaction_system.h"
+#include "progress_indicator.h"
 #include "log_system.h"
 
 class GuiKernel : public QMainWindow {
@@ -29,7 +29,7 @@ class GuiKernel : public QMainWindow {
   //===========================================
   GlobalEnvironment* GEnv;
 
-  std::unique_ptr<InteractionSystem> Interactor;
+  std::unique_ptr<ProgressIndicator> Interactor;
 
   std::unique_ptr<QThread> LoggerThread;
   std::unique_ptr<LogSystem> Logger;

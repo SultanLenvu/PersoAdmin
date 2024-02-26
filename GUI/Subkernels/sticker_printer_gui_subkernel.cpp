@@ -1,6 +1,6 @@
 #include "sticker_printer_gui_subkernel.h"
 #include "global_environment.h"
-#include "sticker_printer_manager.h"
+#include "sticker_printer_async_wrapper.h"
 #include "string_input_dialog.h"
 
 StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)

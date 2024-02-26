@@ -1,4 +1,4 @@
-#include "perso_server_manager.h"
+#include "perso_server_async_wrapper.h"
 
 #include <QDir>
 #include <QSettings>

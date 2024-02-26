@@ -205,10 +205,10 @@ void ProductionLineManager::remove(
 void ProductionLineManager::loadSettings() {}
 
 void ProductionLineManager::connectDependencies() {
-  DatabaseManager* dm = static_cast<DatabaseManager*>(
-      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
+      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
-  connect(dm, &DatabaseManager::databaseCreated, this,
+  connect(dm, &DatabaseAsyncWrapper::databaseCreated, this,
           &ProductionLineManager::applyDatabase);
 }
 

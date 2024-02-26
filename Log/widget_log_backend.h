@@ -17,7 +17,7 @@ class WidgetLogBackend final : public LogBackend {
 
   // LogBackend interface
  public:
-  virtual void writeLogMessage(const QString& str) override;
+  virtual void writeMessage(const QString& str) override;
 
   // Own
  public:

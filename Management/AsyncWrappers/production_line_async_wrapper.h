@@ -1,22 +1,21 @@
-#ifndef PRODUCTIONLINEMANAGER_H
-#define PRODUCTIONLINEMANAGER_H
+#ifndef PRODUCTIONLINEASYNCWRAPPER_H
+#define PRODUCTIONLINEASYNCWRAPPER_H
 
-#include "abstract_manager.h"
-#include "abstract_sql_database.h"
+#include "abstract_async_wrapper.h"
+#include "production_line_manager.h"
 
-class ProductionLineManager : public AbstractManager {
+class ProductionLineAsyncWrapper final : public AbstractAsyncWrapper {
   Q_OBJECT
  private:
-  std::shared_ptr<AbstractSqlDatabase> Database;
+  std::unique_ptr<ProductionLineManager> Manager;
 
  public:
-  explicit ProductionLineManager(const QString& name);
-  ~ProductionLineManager();
+  ProductionLineAsyncWrapper(const QString& name);
+  ~ProductionLineAsyncWrapper();
 
-  // AbstractManager interface
+  // AbstractAsyncWrapper interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-  virtual void applySettings() override;
 
   // Own
  public slots:
@@ -34,11 +33,7 @@ class ProductionLineManager : public AbstractManager {
   void remove(const std::shared_ptr<StringDictionary> param);
 
  private:
-  void loadSettings(void);
-  void connectDependencies(void);
-
-  bool addProductionLine(const StringDictionary& param);
-  bool stopAllProductionLines(void);
+  Q_DISABLE_COPY_MOVE(ProductionLineAsyncWrapper)
 };
 
-#endif // PRODUCTIONLINEMANAGER_H
+#endif // PRODUCTIONLINEASYNCWRAPPER_H

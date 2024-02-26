@@ -1,4 +1,4 @@
-#include "programmer_manager.h"
+#include "programmer_async_wrapper.h"
 
 ProgrammerManager::ProgrammerManager(const QString& name)
     : AbstractManager(name) {}

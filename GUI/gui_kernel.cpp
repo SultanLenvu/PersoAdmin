@@ -5,17 +5,19 @@
 #include "mainwindow_gui.h"
 #include "order_gui_subkernel.h"
 #include "order_manager.h"
+#include "perso_server_async_wrapper.h"
 #include "perso_server_gui_subkernel.h"
-#include "perso_server_manager.h"
 #include "production_line_gui_subkernel.h"
 #include "production_line_manager.h"
+#include "programmer_async_wrapper.h"
 #include "programmer_gui_subkernel.h"
-#include "programmer_manager.h"
 #include "settings_dialog.h"
+#include "sticker_printer_async_wrapper.h"
 #include "sticker_printer_gui_subkernel.h"
-#include "sticker_printer_manager.h"
 
 GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
+  setObjectName("GuiKernel");
+
   DesktopGeometry = QApplication::primaryScreen()->size();
   loadSettings();
 
@@ -30,6 +32,7 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createMainWindowGui();
 
   registerMetaType();
+  GEnv->registerObject(this);
 }
 
 GuiKernel::~GuiKernel() {
@@ -125,7 +128,7 @@ void GuiKernel::createGuiSubkernels() {
 }
 
 void GuiKernel::createManagersInstance() {
-  Managers.emplace_back(new DatabaseManager("DatabaseManager"));
+  Managers.emplace_back(new DatabaseAsyncWrapper("DatabaseAsyncWrapper"));
   Managers.emplace_back(new OrderManager("OrderManager"));
   Managers.emplace_back(new ProductionLineManager("ProductionLineManager"));
   Managers.emplace_back(new PersoServerManager("PersoServerManager"));
@@ -146,8 +149,8 @@ void GuiKernel::createManagersInstance() {
 }
 
 void GuiKernel::createInteractorInstance() {
-  Interactor = std::unique_ptr<InteractionSystem>(
-      new InteractionSystem("InteractionSystem"));
+  Interactor = std::unique_ptr<ProgressIndicator>(
+      new ProgressIndicator("ProgressIndicator"));
 }
 
 void GuiKernel::registerMetaType() {

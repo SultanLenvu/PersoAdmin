@@ -1,15 +1,22 @@
-#ifndef ABSTRACTMANAGERSIGNALHANDLER_H
-#define ABSTRACTMANAGERSIGNALHANDLER_H
+#ifndef PROGRESS_INDICATOR_H
+#define PROGRESS_INDICATOR_H
 
 #include <QElapsedTimer>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QObject>
+#include <QProgressBar>
 #include <QProgressDialog>
+#include <QSettings>
 #include <QTimer>
 
-#include "abstract_gui_subkernel.h"
+#include "abstract_progress_indicator.h"
 #include "types.h"
 
-class AbstractManagerSignalHandler : public AbstractGuiSubkernel {
+class ProgressIndicator final : public AbstractProgressIndicator {
   Q_OBJECT
+
  private:
   std::unique_ptr<QProgressDialog> ProgressDialog;
 
@@ -20,18 +27,16 @@ class AbstractManagerSignalHandler : public AbstractGuiSubkernel {
   std::unordered_map<ReturnStatus, QString> MessageTable;
 
  public:
-  explicit AbstractManagerSignalHandler(const QString& name);
-  virtual ~AbstractManagerSignalHandler();
+  ProgressIndicator(const QString& name);
+  ~ProgressIndicator();
 
-  // Own
+  // AbstractProgressIndicator interface
  public slots:
-  virtual void processOperationStart(const QString& operationName);
-  virtual void processOperationFinish(const QString& operationName,
-                                      ReturnStatus ret);
+  virtual void begin(const QString& operationName) override;
+  virtual void finish(const QString& operationName) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(AbstractManagerSignalHandler)
-  virtual void loadSettings(void) override;
+  Q_DISABLE_COPY_MOVE(ProgressIndicator)
 
   void createProgressDialog(void);
   void destroyProgressDialog(void);
@@ -45,9 +50,6 @@ class AbstractManagerSignalHandler : public AbstractGuiSubkernel {
 
   void ODTimerTimeout_slot(void);
   void ODQTimerTimeout_slot(void);
-
- signals:
-  void abortCurrentOperation(void);
 };
 
-#endif  // ABSTRACTMANAGERSIGNALHANDLER_H
+#endif  // PROGRESS_INDICATOR_H

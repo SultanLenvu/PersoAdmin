@@ -15,29 +15,27 @@ class OrderManager : public AbstractManager
   explicit OrderManager(const QString& name);
   ~OrderManager();
 
-  // AbstractManager interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
-
   // Own
  public slots:
   void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
 
-  void create(const std::shared_ptr<StringDictionary> param);
-  void startAssembling(const std::shared_ptr<StringDictionary> param);
-  void stopAssembling(const std::shared_ptr<StringDictionary> param);
-  void generateShipmentRegister(const std::shared_ptr<StringDictionary> param);
+  ReturnStatus create(const StringDictionary& param);
+  ReturnStatus startAssembling(const StringDictionary& param);
+  ReturnStatus stopAssembling(const StringDictionary& param);
+  ReturnStatus generateShipmentRegister(const StringDictionary& param);
 
-  void release(const std::shared_ptr<StringDictionary> param);
-  void refund(const std::shared_ptr<StringDictionary> param);
+  ReturnStatus release(const StringDictionary& param);
+  ReturnStatus refund(const StringDictionary& param);
 
-  void initTransportMasterKeys(void);
-  void initIssuers(void);
-  void linkIssuerWithKeys(const std::shared_ptr<StringDictionary> param);
+  ReturnStatus initTransportMasterKeys(void);
+  ReturnStatus initIssuers(void);
+  ReturnStatus linkIssuerWithKeys(const StringDictionary& param);
 
  private:
   Q_DISABLE_COPY_MOVE(OrderManager)
   void connectDependencies(void);
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
   bool addOrder(const StringDictionary& param);
   bool addPallets(const QString& orderId, const StringDictionary& param);

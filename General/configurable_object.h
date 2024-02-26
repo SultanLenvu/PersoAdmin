@@ -15,6 +15,8 @@ class ConfigurableObject : public PObject {
  private:
   Q_DISABLE_COPY_MOVE(ConfigurableObject)
 
+  void connectDependencies(void);
+
   virtual void loadSettings(void);
 };
 

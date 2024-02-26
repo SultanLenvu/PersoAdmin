@@ -20,7 +20,8 @@ include_directories(GUI/Subkernels)
 include_directories(GUI/Dialogs)
 include_directories(GUI/Widgets)
 include_directories(Log/)
-include_directories(Management/)
+include_directories(Management/Managers)
+include_directories(Management/AsyncWrappers)
 include_directories(StickerPrinter/)
 include_directories(ServerConnection/)
 include_directories(ServerConnection/Commands)
@@ -35,11 +36,11 @@ add_executable(PersoAdmin WIN32
     Database/sql_query_values.h Database/sql_query_values.cpp
     Database/sql_insert_values.h Database/sql_insert_values.cpp
 
-
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/interaction_system.cpp GUI/interaction_system.h
+    GUI/progress_indicator.cpp GUI/progress_indicator.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
+    GUI/abstract_progress_indicator.h GUI/abstract_progress_indicator.cpp
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
@@ -73,6 +74,7 @@ add_executable(PersoAdmin WIN32
     General/pobject.cpp General/pobject.h
     General/hash_table_model.cpp General/hash_table_model.h
     General/configurable_object.h General/configurable_object.cpp
+    General/global_environment.cpp General/global_environment.h
 
     Functors/abstract_string_checker.h Functors/abstract_string_checker.cpp
     Functors/ucid_checker.h Functors/ucid_checker.cpp
@@ -83,15 +85,17 @@ add_executable(PersoAdmin WIN32
     Log/log_system.cpp Log/log_system.h
     Log/widget_log_backend.cpp Log/widget_log_backend.h
 
-    Management/abstract_manager.h Management/abstract_manager.cpp
+    Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
+    Management/Managers/order_manager.h Management/Managers/order_manager.cpp
+    Management/Managers/production_line_manager.h Management/Managers/production_line_manager.cpp
 
-    Management/global_environment.cpp Management/global_environment.h
-    Management/perso_server_manager.cpp Management/perso_server_manager.h
-    Management/database_manager.h Management/database_manager.cpp
-    Management/order_manager.h Management/order_manager.cpp
-    Management/production_line_manager.h Management/production_line_manager.cpp
-    Management/programmer_manager.h Management/programmer_manager.cpp
-    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
+    Management/AsyncWrappers/database_async_wrapper.h Management/AsyncWrappers/database_async_wrapper.cpp
+    Management/AsyncWrappers/abstract_async_wrapper.h Management/AsyncWrappers/abstract_async_wrapper.cpp
+    Management/AsyncWrappers/order_manager_async_wrapper.h Management/AsyncWrappers/order_manager_async_wrapper.cpp
+    Management/AsyncWrappers/production_line_async_wrapper.h Management/AsyncWrappers/production_line_async_wrapper.cpp
+    Management/AsyncWrappers/programmer_async_wrapper.h Management/AsyncWrappers/programmer_async_wrapper.cpp
+    Management/AsyncWrappers/sticker_printer_async_wrapper.h Management/AsyncWrappers/sticker_printer_async_wrapper.cpp
+    Management/AsyncWrappers/perso_server_async_wrapper.cpp Management/AsyncWrappers/perso_server_async_wrapper.h
 
     ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
@@ -114,13 +118,12 @@ add_executable(PersoAdmin WIN32
     ServerConnection/Commands/request_box.h ServerConnection/Commands/rerelease_transponder.cpp
     ServerConnection/Commands/rerelease_transponder.h ServerConnection/Commands/rollback_transponder.cpp
     ServerConnection/Commands/rollback_transponder.h ServerConnection/Commands/shutdown_production_line.cpp
-    ServerConnection/Commands/shutdown_production_line.h
+    ServerConnection/Commands/shutdown_production_line.h ServerConnection/Commands/shutdown_production_line.cpp
 
     StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    GUI/Subkernels/abstract_manager_signal_handler.h GUI/Subkernels/abstract_manager_signal_handler.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE

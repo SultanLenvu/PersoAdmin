@@ -1,4 +1,4 @@
-#include "sticker_printer_manager.h"
+#include "sticker_printer_async_wrapper.h"
 #include "te310_printer.h"
 
 StickerPrinterManager::StickerPrinterManager(const QString& name)

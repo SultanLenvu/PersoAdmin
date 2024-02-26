@@ -1,26 +1,22 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
-#include "abstract_manager.h"
+#include "abstract_async_wrapper.h"
 #include "abstract_sql_database.h"
 #include "types.h"
 
-class DatabaseManager final : public AbstractManager {
+class DatabaseAsyncWrapper final : public AbstractAsyncWrapper {
   Q_OBJECT
  private:
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit DatabaseManager(const QString& name);
-  ~DatabaseManager();
+  explicit DatabaseAsyncWrapper(const QString& name);
+  ~DatabaseAsyncWrapper();
 
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
-
-  // Own
- public:
-  std::shared_ptr<AbstractSqlDatabase> database(void);
 
  public slots:
   void connect(void);
@@ -33,7 +29,7 @@ class DatabaseManager final : public AbstractManager {
   void getPalletData(const std::shared_ptr<StringDictionary> param);
 
  private:
-  Q_DISABLE_COPY_MOVE(DatabaseManager)
+  Q_DISABLE_COPY_MOVE(DatabaseAsyncWrapper)
   void createDatabase(void);
 
   bool generateTransponderData(const QString& id, StringDictionary& data);

@@ -1,20 +1,17 @@
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "postgre_sql_database.h"
 #include "sql_query_values.h"
 
-DatabaseManager::DatabaseManager(const QString& name) : AbstractManager(name) {}
+DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
+    : AbstractAsyncWrapper(name) {}
 
-DatabaseManager::~DatabaseManager() {}
+DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}
 
-void DatabaseManager::onInstanceThreadStarted() {
+void DatabaseAsyncWrapper::onInstanceThreadStarted() {
   createDatabase();
 }
 
-std::shared_ptr<AbstractSqlDatabase> DatabaseManager::database() {
-  return Database;
-}
-
-void DatabaseManager::connect() {
+void DatabaseAsyncWrapper::connect() {
   initOperation("connect");
 
   if (!Database->connect()) {
@@ -25,7 +22,7 @@ void DatabaseManager::connect() {
   completeOperation("connect");
 }
 
-void DatabaseManager::disconnect() {
+void DatabaseAsyncWrapper::disconnect() {
   initOperation("connect");
 
   Database->disconnect();
@@ -33,7 +30,7 @@ void DatabaseManager::disconnect() {
   completeOperation("connect");
 }
 
-void DatabaseManager::getTable(const QString& name) {
+void DatabaseAsyncWrapper::getTable(const QString& name) {
   initOperation("getTable");
 
   std::shared_ptr<SqlQueryValues> response(new SqlQueryValues());
@@ -50,7 +47,7 @@ void DatabaseManager::getTable(const QString& name) {
   completeOperation("getTable");
 }
 
-void DatabaseManager::execCustomRequest(const QString& req) {
+void DatabaseAsyncWrapper::execCustomRequest(const QString& req) {
   initOperation("execCustomRequest");
 
   std::shared_ptr<SqlQueryValues> response(new SqlQueryValues());
@@ -79,7 +76,7 @@ void DatabaseManager::execCustomRequest(const QString& req) {
   completeOperation("execCustomRequest");
 }
 
-void DatabaseManager::getTransponderData(
+void DatabaseAsyncWrapper::getTransponderData(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("getTransponderData");
 
@@ -95,7 +92,7 @@ void DatabaseManager::getTransponderData(
   completeOperation("getTransponderData");
 }
 
-void DatabaseManager::getBoxData(
+void DatabaseAsyncWrapper::getBoxData(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("getBoxData");
 
@@ -110,7 +107,7 @@ void DatabaseManager::getBoxData(
   completeOperation("getBoxData");
 }
 
-void DatabaseManager::getPalletData(
+void DatabaseAsyncWrapper::getPalletData(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("getPalletData");
 
@@ -126,19 +123,15 @@ void DatabaseManager::getPalletData(
   completeOperation("getPalletData");
 }
 
-void DatabaseManager::loadSettings() {
-  Database->applySettings();
-}
-
-void DatabaseManager::createDatabase() {
+void DatabaseAsyncWrapper::createDatabase() {
   Database = std::shared_ptr<AbstractSqlDatabase>(
       new PostgreSqlDatabase("PostgreSqlDatabase"));
 
   emit databaseCreated(Database);
 }
 
-bool DatabaseManager::generateTransponderData(const QString& id,
-                                              StringDictionary& data) {
+bool DatabaseAsyncWrapper::generateTransponderData(const QString& id,
+                                                   StringDictionary& data) {
   QStringList tables{"transponders", "boxes", "pallets", "orders"};
   SqlQueryValues record;
   uint32_t quantity;
@@ -199,8 +192,8 @@ bool DatabaseManager::generateTransponderData(const QString& id,
   return true;
 }
 
-bool DatabaseManager::generateBoxData(const QString& id,
-                                      StringDictionary& data) {
+bool DatabaseAsyncWrapper::generateBoxData(const QString& id,
+                                           StringDictionary& data) {
   SqlQueryValues box;
   SqlQueryValues transponders;
   StringDictionary transponderData;
@@ -245,8 +238,8 @@ bool DatabaseManager::generateBoxData(const QString& id,
   return true;
 }
 
-bool DatabaseManager::generatePalletData(const QString& id,
-                                         StringDictionary& data) {
+bool DatabaseAsyncWrapper::generatePalletData(const QString& id,
+                                              StringDictionary& data) {
   SqlQueryValues boxes;
   SqlQueryValues pallet;
   SqlQueryValues order;

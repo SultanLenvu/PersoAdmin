@@ -2,57 +2,54 @@
 #include <QFile>
 #include <QSettings>
 
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "definitions.h"
 #include "global_environment.h"
 #include "order_manager.h"
 
 OrderManager::OrderManager(const QString& name) : AbstractManager(name) {
+  doLoadSettings();
   connectDependencies();
 }
 
 OrderManager::~OrderManager() {}
-
-void OrderManager::onInstanceThreadStarted() {}
 
 void OrderManager::applyDatabase(
     std::shared_ptr<AbstractSqlDatabase> database) {
   Database = database;
 }
 
-void OrderManager::create(const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("create");
-
-  if (!Database->openTransaction()) {
-    processOperationError("create", ReturnStatus::DatabaseTransactionError);
-    return;
+ReturnStatus OrderManager::create(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
   }
 
-  if (!addOrder(*param)) {
+  if (!Database->openTransaction()) {
+    return ReturnStatus::DatabaseTransactionError;
+  }
+
+  if (!addOrder(param)) {
     sendLog("Получена ошибка при добавлении заказа. ");
     Database->rollbackTransaction();
-    processOperationError("create", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("create", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("create");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::startAssembling(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("startAssembling");
+ReturnStatus OrderManager::startAssembling(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("startAssembling",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   SqlQueryValues orders;
@@ -63,193 +60,176 @@ void OrderManager::startAssembling(
   Database->setCurrentOrder(Qt::AscendingOrder);
   if (!Database->readRecords("orders", "in_process = true", orders)) {
     Database->rollbackTransaction();
-    processOperationError("startAssembling",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   // В сборке может находится только один заказ
   if (!orders.isEmpty()) {
     Database->rollbackTransaction();
-    processOperationError("startAssembling",
-                          ReturnStatus::OrderMultiplyAssembly);
-    return;
+    return ReturnStatus::OrderMultiplyAssembly;
   }
 
   orderNewValue.add("in_process", "true");
   orderNewValue.add("assembling_start", QDateTime::currentDateTime().toString(
                                             POSTGRES_TIMESTAMP_TEMPLATE));
-  if (!Database->updateRecords("orders", QString("id = %1").arg((*param)["id"]),
+  if (!Database->updateRecords("orders", QString("id = %1").arg(param["id"]),
                                orderNewValue)) {
     Database->rollbackTransaction();
-    processOperationError("startAssembling", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("startAssembling",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("startAssembling");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::stopAssembling(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("stopAssembling");
+ReturnStatus OrderManager::stopAssembling(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("stopAssembling",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   SqlQueryValues orderNewValue;
   orderNewValue.add("in_process", "false");
-  if (!Database->updateRecords("orders", QString("id = %1").arg((*param)["id"]),
+  if (!Database->updateRecords("orders", QString("id = %1").arg(param["id"]),
                                orderNewValue)) {
     Database->rollbackTransaction();
-    processOperationError("stopAssembling", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("stopAssembling",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("stopAssembling");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::generateShipmentRegister(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("generateShipmentRegister");
+ReturnStatus OrderManager::generateShipmentRegister(
+    const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   ReturnStatus ret;
   QString ShipmentRegisterName =
       QString("sr_pallets_%1_%2.csv")
-          .arg(param->value("first_pallet_id"), param->value("last_pallet_id"));
+          .arg(param.value("first_pallet_id"), param.value("last_pallet_id"));
   QFile file(ShipmentRegisterName);
   QTextStream out(&file);
 
   // Открываем файл для записи
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    processOperationError("generateShipmentRegister",
-                          ReturnStatus::RegisterFileError);
-    return;
+    return ReturnStatus::RegisterFileError;
   }
   file.resize(0);
   out << "model;sn;pan;box_id;pallet_id\n";
 
-  for (uint32_t i = param->value("first_pallet_id").toUInt();
-       i <= param->value("last_pallet_id").toUInt(); i++) {
+  for (uint32_t i = param.value("first_pallet_id").toUInt();
+       i <= param.value("last_pallet_id").toUInt(); i++) {
     sendLog(QString("Отгрузка паллеты %1.").arg(QString::number(i)));
     ret = shipPallet(QString::number(i), out);
     if (ret != ReturnStatus::NoError) {
       sendLog(QString("Получена ошибка при отгрузке паллеты %1.")
                   .arg(QString::number(i)));
       file.close();
-      processOperationError("generateShipmentRegister",
-                            ReturnStatus::DatabaseQueryError);
-      return;
+      return ReturnStatus::DatabaseQueryError;
     }
   }
 
-  completeOperation("generateShipmentRegister");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::release(const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("release");
-
-  if (!Database->openTransaction()) {
-    processOperationError("release", ReturnStatus::DatabaseTransactionError);
-    return;
+ReturnStatus OrderManager::release(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
   }
 
-  QString table = param->value("table");
+  if (!Database->openTransaction()) {
+    return ReturnStatus::DatabaseTransactionError;
+  }
+
+  QString table = param.value("table");
   ReturnStatus ret = ReturnStatus::NoError;
 
   if (table == "transponders") {
-    ret = releaseTransponder(param->value("id"));
+    ret = releaseTransponder(param.value("id"));
   } else if (table == "boxes") {
-    ret = releaseBox(param->value("id"));
+    ret = releaseBox(param.value("id"));
   } else if (table == "pallets") {
-    ret = releasePallet(param->value("id"));
+    ret = releasePallet(param.value("id"));
   } else if (table == "orders") {
-    ret = releaseOrder(param->value("id"));
+    ret = releaseOrder(param.value("id"));
   } else {
-    processOperationError("release", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::ParameterError;
   }
 
   if (ret != ReturnStatus::NoError) {
     Database->rollbackTransaction();
-    processOperationError("release", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("release", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("release");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::refund(const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("refund");
-
-  if (!Database->openTransaction()) {
-    processOperationError("refund", ReturnStatus::DatabaseTransactionError);
-    return;
+ReturnStatus OrderManager::refund(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
   }
 
-  QString table = param->value("table");
+  if (!Database->openTransaction()) {
+    return ReturnStatus::DatabaseTransactionError;
+  }
+
+  QString table = param.value("table");
   ReturnStatus ret = ReturnStatus::NoError;
 
   if (table == "transponders") {
-    ret = refundTransponder(param->value("id"));
+    ret = refundTransponder(param.value("id"));
   } else if (table == "boxes") {
-    ret = refundBox(param->value("id"));
+    ret = refundBox(param.value("id"));
   } else if (table == "pallets") {
-    ret = refundPallet(param->value("id"));
+    ret = refundPallet(param.value("id"));
   } else if (table == "orders") {
-    ret = refundOrder(param->value("id"));
+    ret = refundOrder(param.value("id"));
   } else {
-    processOperationError("refund", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::ParameterError;
   }
 
   if (ret != ReturnStatus::NoError) {
     Database->rollbackTransaction();
-    processOperationError("release", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("refund", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("refund");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::initTransportMasterKeys() {
-  assert(Database);
-  initOperation("initTransportMasterKeys");
+ReturnStatus OrderManager::initTransportMasterKeys() {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   SqlQueryValues transportKeys;
 
   if (!Database->openTransaction()) {
-    processOperationError("initTransportMasterKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   // Конструируем запись
@@ -267,31 +247,27 @@ void OrderManager::initTransportMasterKeys() {
 
   if (!Database->createRecords("transport_master_keys", transportKeys)) {
     Database->rollbackTransaction();
-    processOperationError("initTransportMasterKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("initTransportMasterKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("initTransportMasterKeys");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::initIssuers() {
-  assert(Database);
-  initOperation("initIssuers");
+ReturnStatus OrderManager::initIssuers() {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   SqlQueryValues newValues;
   int32_t id = 0;
 
   if (!Database->openTransaction()) {
-    processOperationError("initIssuers",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   newValues.add("id", QString::number(++id));
@@ -321,61 +297,56 @@ void OrderManager::initIssuers() {
 
   if (!Database->createRecords("issuers", newValues)) {
     Database->rollbackTransaction();
-    processOperationError("initIssuers",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("initIssuers",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("initIssuers");
+  return ReturnStatus::NoError;
 }
 
-void OrderManager::linkIssuerWithKeys(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("linkIssuerWithKeys");
+ReturnStatus OrderManager::linkIssuerWithKeys(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   SqlQueryValues issuerNewValue;
 
   if (!Database->openTransaction()) {
-    processOperationError("linkIssuerWithKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  if (!Database->updateRecords("issuers", "id = " + param->value("issuer_id"),
+  if (!Database->updateRecords("issuers", "id = " + param.value("issuer_id"),
                                issuerNewValue)) {
     Database->rollbackTransaction();
-    processOperationError("linkIssuerWithKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("linkIssuerWithKeys",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("linkIssuerWithKeys");
+  return ReturnStatus::NoError;
 }
 
 void OrderManager::loadSettings() {
+  doLoadSettings();
+}
+
+void OrderManager::doLoadSettings() {
   QSettings settings;
 
   ShipmentRegisterDir = "/ShipmentRegisters/";
 }
 
 void OrderManager::connectDependencies() {
-  DatabaseManager* dm = static_cast<DatabaseManager*>(
-      GlobalEnvironment::instance()->getObject("DatabaseManager"));
+  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
+      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
-  connect(dm, &DatabaseManager::databaseCreated, this,
+  connect(dm, &DatabaseAsyncWrapper::databaseCreated, this,
           &OrderManager::applyDatabase);
 }
 

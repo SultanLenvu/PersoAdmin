@@ -2,7 +2,7 @@
 #include "authorization_dialog.h"
 #include "global_environment.h"
 #include "numeric_string_checker.h"
-#include "perso_server_manager.h"
+#include "perso_server_async_wrapper.h"
 #include "string_input_dialog.h"
 
 PersoServerGuiSubkernel::PersoServerGuiSubkernel(const QString& name)

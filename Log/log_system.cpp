@@ -33,7 +33,7 @@ void LogSystem::generate(const QString& log) {
       QString("%1 - %2").arg(time.toString("hh:mm:ss.zzz"), log);
 
   for (auto it = Backends.begin(); it != Backends.end(); ++it) {
-    (*it)->writeLogMessage(LogMessage);
+    (*it)->writeMessage(LogMessage);
   }
 }
 

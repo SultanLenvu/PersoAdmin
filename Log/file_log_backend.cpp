@@ -13,7 +13,7 @@ FileLogBackend::~FileLogBackend() {
   CurrentFile.close();
 }
 
-void FileLogBackend::writeLogMessage(const QString& str) {
+void FileLogBackend::writeMessage(const QString& str) {
   if (!Enable) {
     return;
   }
