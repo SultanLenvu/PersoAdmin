@@ -1,8 +1,8 @@
 #include "production_line_gui_subkernel.h"
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "global_environment.h"
 #include "production_line_creation_dialog.h"
-#include "production_line_manager.h"
+#include "production_line_manager_async_wrapper.h"
 #include "string_input_dialog.h"
 
 ProductionLineGuiSubkernel::ProductionLineGuiSubkernel(const QString& name)
@@ -73,37 +73,41 @@ void ProductionLineGuiSubkernel::edit() {
 
 void ProductionLineGuiSubkernel::get() {
   emit clearLogDisplay();
+
+  //  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
+  //          &ProductionLineGuiSubkernel::display);
   emit get_signal("production_lines");
 }
 
 void ProductionLineGuiSubkernel::display(std::shared_ptr<SqlQueryValues> data) {
   ProductionLines->setResponse(data);
+
+  //  disconnect(dm, &DatabaseAsyncWrapper::responseReady, this,
+  //             &ProductionLineGuiSubkernel::display);
 }
 
 void ProductionLineGuiSubkernel::connectDependecies() {
-  const ProductionLineManager* om = static_cast<const ProductionLineManager*>(
-      GlobalEnvironment::instance()->getObject("ProductionLineManager"));
+  ProductionLineManagerAsyncWrapper* om =
+      static_cast<ProductionLineManagerAsyncWrapper*>(
+          GlobalEnvironment::instance()->getObject(
+              "ProductionLineManagerAsyncWrapper"));
   const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
       GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
   connect(this, &ProductionLineGuiSubkernel::create_signal, om,
-          &ProductionLineManager::create);
+          &ProductionLineManagerAsyncWrapper::create);
   connect(this, &ProductionLineGuiSubkernel::activate_signal, om,
-          &ProductionLineManager::activate);
+          &ProductionLineManagerAsyncWrapper::activate);
   connect(this, &ProductionLineGuiSubkernel::activateAll_signal, om,
-          &ProductionLineManager::activateAll);
+          &ProductionLineManagerAsyncWrapper::activateAll);
   connect(this, &ProductionLineGuiSubkernel::deactivate_signal, om,
-          &ProductionLineManager::deactivate);
+          &ProductionLineManagerAsyncWrapper::deactivate);
   connect(this, &ProductionLineGuiSubkernel::deactivateAll_signal, om,
-          &ProductionLineManager::deactivateAll);
+          &ProductionLineManagerAsyncWrapper::deactivateAll);
   connect(this, &ProductionLineGuiSubkernel::edit_signal, om,
-          &ProductionLineManager::edit);
+          &ProductionLineManagerAsyncWrapper::edit);
 
   connect(this, &ProductionLineGuiSubkernel::get_signal, dm,
           &DatabaseAsyncWrapper::getTable);
-
-  // От менеджеров
-  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
-          &ProductionLineGuiSubkernel::display);
 }

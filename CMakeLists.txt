@@ -12,14 +12,16 @@ qt_standard_project_setup()
 #======================================================================================================#
 
 #========================================== SOURCE DIRECTORIES ===========================================#
+include_directories(Service/)
+include_directories(Service/General/)
+include_directories(Service/Log/)
+include_directories(Service/Functors/)
 include_directories(Database/)
-include_directories(General/)
-include_directories(Functors/)
 include_directories(GUI/)
 include_directories(GUI/Subkernels)
 include_directories(GUI/Dialogs)
 include_directories(GUI/Widgets)
-include_directories(Log/)
+include_directories(GUI/Reactions)
 include_directories(Management/Managers)
 include_directories(Management/AsyncWrappers)
 include_directories(StickerPrinter/)
@@ -28,6 +30,26 @@ include_directories(ServerConnection/Commands)
 #======================================================================================================#
 
 add_executable(PersoAdmin WIN32
+    Service/General/types.h
+    Service/General/definitions.h
+    Service/General/sql_response_model.cpp Service/General/sql_response_model.h
+    Service/General/pobject.cpp Service/General/pobject.h
+    Service/General/hash_table_model.cpp Service/General/hash_table_model.h
+    Service/General/configurable_object.h Service/General/configurable_object.cpp
+    Service/General/global_environment.cpp Service/General/global_environment.h
+
+    Service/abstract_service_space.h Service/abstract_service_space.cpp
+    Service/internal_service_space.h Service/internal_service_space.cpp
+
+    Service/Functors/abstract_string_checker.h Service/Functors/abstract_string_checker.cpp
+    Service/Functors/ucid_checker.h Service/Functors/ucid_checker.cpp
+    Service/Functors/numeric_string_checker.h Service/Functors/numeric_string_checker.cpp
+
+    Service/Log/file_log_backend.cpp Service/Log/file_log_backend.h
+    Service/Log/log_backend.cpp Service/Log/log_backend.h
+    Service/Log/log_system.cpp Service/Log/log_system.h
+    Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
+
     Database/abstract_sql_database.cpp Database/abstract_sql_database.h
     Database/postgre_sql_database.cpp Database/postgre_sql_database.h
     Database/postgre_sql_table.cpp Database/postgre_sql_table.h
@@ -37,10 +59,8 @@ add_executable(PersoAdmin WIN32
     Database/sql_insert_values.h Database/sql_insert_values.cpp
 
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/progress_indicator.cpp GUI/progress_indicator.h
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
-    GUI/abstract_progress_indicator.h GUI/abstract_progress_indicator.cpp
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
@@ -68,22 +88,10 @@ add_executable(PersoAdmin WIN32
     GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
     GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
 
-    General/types.h
-    General/definitions.h
-    General/sql_response_model.cpp General/sql_response_model.h
-    General/pobject.cpp General/pobject.h
-    General/hash_table_model.cpp General/hash_table_model.h
-    General/configurable_object.h General/configurable_object.cpp
-    General/global_environment.cpp General/global_environment.h
-
-    Functors/abstract_string_checker.h Functors/abstract_string_checker.cpp
-    Functors/ucid_checker.h Functors/ucid_checker.cpp
-    Functors/numeric_string_checker.h Functors/numeric_string_checker.cpp
-
-    Log/file_log_backend.cpp Log/file_log_backend.h
-    Log/log_backend.cpp Log/log_backend.h
-    Log/log_system.cpp Log/log_system.h
-    Log/widget_log_backend.cpp Log/widget_log_backend.h
+    GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
+    GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
+    GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
+    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp
@@ -92,7 +100,7 @@ add_executable(PersoAdmin WIN32
     Management/AsyncWrappers/database_async_wrapper.h Management/AsyncWrappers/database_async_wrapper.cpp
     Management/AsyncWrappers/abstract_async_wrapper.h Management/AsyncWrappers/abstract_async_wrapper.cpp
     Management/AsyncWrappers/order_manager_async_wrapper.h Management/AsyncWrappers/order_manager_async_wrapper.cpp
-    Management/AsyncWrappers/production_line_async_wrapper.h Management/AsyncWrappers/production_line_async_wrapper.cpp
+    Management/AsyncWrappers/production_line_manager_async_wrapper.h Management/AsyncWrappers/production_line_manager_async_wrapper.cpp
     Management/AsyncWrappers/programmer_async_wrapper.h Management/AsyncWrappers/programmer_async_wrapper.cpp
     Management/AsyncWrappers/sticker_printer_async_wrapper.h Management/AsyncWrappers/sticker_printer_async_wrapper.cpp
     Management/AsyncWrappers/perso_server_async_wrapper.cpp Management/AsyncWrappers/perso_server_async_wrapper.h

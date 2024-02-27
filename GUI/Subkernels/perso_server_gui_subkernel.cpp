@@ -212,70 +212,71 @@ void PersoServerGuiSubkernel::displayFirmware(
 }
 
 void PersoServerGuiSubkernel::connectDependecies() {
-  const PersoServerManager* psm = static_cast<const PersoServerManager*>(
-      GlobalEnvironment::instance()->getObject("PersoServerManager"));
+  const PersoServerAsyncWrapper* psm =
+      static_cast<const PersoServerAsyncWrapper*>(
+          GlobalEnvironment::instance()->getObject("PersoServerAsyncWrapper"));
 
   // К менеджерам
   QObject::connect(this, &PersoServerGuiSubkernel::connect_signal, psm,
-                   &PersoServerManager::connect);
+                   &PersoServerAsyncWrapper::connect);
   QObject::connect(this, &PersoServerGuiSubkernel::disconnect_signal, psm,
-                   &PersoServerManager::disconnect);
+                   &PersoServerAsyncWrapper::disconnect);
 
   QObject::connect(this, &PersoServerGuiSubkernel::echo_signal, psm,
-                   &PersoServerManager::echo);
+                   &PersoServerAsyncWrapper::echo);
   QObject::connect(this, &PersoServerGuiSubkernel::logOn_signal, psm,
-                   &PersoServerManager::logOn);
+                   &PersoServerAsyncWrapper::logOn);
   QObject::connect(this, &PersoServerGuiSubkernel::logOut_signal, psm,
-                   &PersoServerManager::logOut);
+                   &PersoServerAsyncWrapper::logOut);
 
   QObject::connect(this, &PersoServerGuiSubkernel::launchProductionLine_signal,
-                   psm, &PersoServerManager::launchProductionLine);
+                   psm, &PersoServerAsyncWrapper::launchProductionLine);
   QObject::connect(this,
                    &PersoServerGuiSubkernel::shutdownProductionLine_signal, psm,
-                   &PersoServerManager::shutdownProductionLine);
+                   &PersoServerAsyncWrapper::shutdownProductionLine);
   QObject::connect(this, &PersoServerGuiSubkernel::getProductionLineData_signal,
-                   psm, &PersoServerManager::getProductionLineData);
+                   psm, &PersoServerAsyncWrapper::getProductionLineData);
 
   QObject::connect(this, &PersoServerGuiSubkernel::requestBox_signal, psm,
-                   &PersoServerManager::requestBox);
+                   &PersoServerAsyncWrapper::requestBox);
   QObject::connect(this, &PersoServerGuiSubkernel::getCurrentBoxData_signal,
-                   psm, &PersoServerManager::getCurrentBoxData);
+                   psm, &PersoServerAsyncWrapper::getCurrentBoxData);
   QObject::connect(this, &PersoServerGuiSubkernel::refundCurrentBox_signal, psm,
-                   &PersoServerManager::refundCurrentBox);
+                   &PersoServerAsyncWrapper::refundCurrentBox);
   QObject::connect(this, &PersoServerGuiSubkernel::completeCurrentBox_signal,
-                   psm, &PersoServerManager::completeCurrentBox);
+                   psm, &PersoServerAsyncWrapper::completeCurrentBox);
 
   QObject::connect(this, &PersoServerGuiSubkernel::releaseTransponder_signal,
-                   psm, &PersoServerManager::releaseTransponder);
+                   psm, &PersoServerAsyncWrapper::releaseTransponder);
   QObject::connect(this, &PersoServerGuiSubkernel::rereleaseTransponder_signal,
-                   psm, &PersoServerManager::rereleaseTransponder);
+                   psm, &PersoServerAsyncWrapper::rereleaseTransponder);
   QObject::connect(this, &PersoServerGuiSubkernel::rollbackTransponder_signal,
-                   psm, &PersoServerManager::rollbackTransponder);
+                   psm, &PersoServerAsyncWrapper::rollbackTransponder);
   QObject::connect(this,
                    &PersoServerGuiSubkernel::getCurrentTransponderData_signal,
-                   psm, &PersoServerManager::getCurrentTransponderData);
+                   psm, &PersoServerAsyncWrapper::getCurrentTransponderData);
   QObject::connect(this, &PersoServerGuiSubkernel::getTransponderData_signal,
-                   psm, &PersoServerManager::getTransponderData);
+                   psm, &PersoServerAsyncWrapper::getTransponderData);
 
   QObject::connect(this, &PersoServerGuiSubkernel::printBoxSticker_signal, psm,
-                   &PersoServerManager::printBoxSticker);
+                   &PersoServerAsyncWrapper::printBoxSticker);
   QObject::connect(this, &PersoServerGuiSubkernel::printLastBoxSticker_signal,
-                   psm, &PersoServerManager::printLastBoxSticker);
+                   psm, &PersoServerAsyncWrapper::printLastBoxSticker);
   QObject::connect(this, &PersoServerGuiSubkernel::printPalletSticker_signal,
-                   psm, &PersoServerManager::printPalletSticker);
+                   psm, &PersoServerAsyncWrapper::printPalletSticker);
   QObject::connect(this,
                    &PersoServerGuiSubkernel::printLastPalletSticker_signal, psm,
-                   &PersoServerManager::printLastPalletSticker);
+                   &PersoServerAsyncWrapper::printLastPalletSticker);
 
   // От менеджеров
-  QObject::connect(psm, &PersoServerManager::productionLineDataReady, this,
+  QObject::connect(psm, &PersoServerAsyncWrapper::productionLineDataReady, this,
                    &PersoServerGuiSubkernel::displayProductionLineData);
-  QObject::connect(psm, &PersoServerManager::boxDataReady, this,
+  QObject::connect(psm, &PersoServerAsyncWrapper::boxDataReady, this,
                    &PersoServerGuiSubkernel::displayBoxData);
-  QObject::connect(psm, &PersoServerManager::transponderDataReady, this,
+  QObject::connect(psm, &PersoServerAsyncWrapper::transponderDataReady, this,
                    &PersoServerGuiSubkernel::displayTransponderData);
 
-  QObject::connect(psm, &PersoServerManager::transponderDataReady, this,
+  QObject::connect(psm, &PersoServerAsyncWrapper::transponderDataReady, this,
                    &PersoServerGuiSubkernel::displayTransponderData);
 }
 

@@ -19,7 +19,7 @@ LogSystem::~LogSystem() {
   //  delete PersoServerLogSocket;
 }
 
-void LogSystem::instanceThreadStarted() {
+void LogSystem::onInstanceThreadStarted() {
   Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
   Backends.emplace_back(new FileLogBackend("FileLogBackend"));
 

@@ -1,11 +1,13 @@
 #include "database_gui_subkernel.h"
 
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "global_environment.h"
 
 DatabaseGuiSubkernel::DatabaseGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name), ResponseModel(new SqlResponseModel()) {
   connectDependecies();
+
+  ResponseModel = std::unique_ptr<SqlResponseModel>(new SqlResponseModel());
 }
 
 DatabaseGuiSubkernel::~DatabaseGuiSubkernel() {}

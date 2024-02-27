@@ -1,10 +1,8 @@
 #include "programmer_async_wrapper.h"
 
-ProgrammerManager::ProgrammerManager(const QString& name)
-    : AbstractManager(name) {}
+ProgrammerAsyncWrapper::ProgrammerAsyncWrapper(const QString& name)
+    : AbstractAsyncWrapper(name) {}
 
-ProgrammerManager::~ProgrammerManager() {}
+ProgrammerAsyncWrapper::~ProgrammerAsyncWrapper() {}
 
-void ProgrammerManager::onInstanceThreadStarted() {}
-
-void ProgrammerManager::applySettings() {}
+void ProgrammerAsyncWrapper::onInstanceThreadStarted() {}

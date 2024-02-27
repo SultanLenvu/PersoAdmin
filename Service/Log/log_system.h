@@ -21,7 +21,7 @@ class LogSystem : public ConfigurableObject {
 
  private:
   QString SavePath;
-  std::vector<std::shared_ptr<LogBackend>> Backends;
+  std::vector<std::unique_ptr<LogBackend>> Backends;
 
   bool UdpListenEnable;
   //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
@@ -35,7 +35,7 @@ class LogSystem : public ConfigurableObject {
   ~LogSystem();
 
  public slots:
-  void instanceThreadStarted(void);
+  void onInstanceThreadStarted(void);
 
   void generate(const QString& log);
 

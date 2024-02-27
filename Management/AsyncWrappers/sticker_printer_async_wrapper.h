@@ -1,18 +1,17 @@
 #ifndef STICKERPRINTERMANAGER_H
 #define STICKERPRINTERMANAGER_H
 
-#include "abstract_manager.h"
+#include "abstract_async_wrapper.h"
 #include "abstract_sticker_printer.h"
 
-class StickerPrinterManager : public AbstractManager
-{
+class StickerPrinterAsyncWrapper final : public AbstractAsyncWrapper {
   Q_OBJECT
  private:
   std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
 
  public:
-  explicit StickerPrinterManager(const QString& name);
-  ~StickerPrinterManager();
+  explicit StickerPrinterAsyncWrapper(const QString& name);
+  ~StickerPrinterAsyncWrapper();
 
   // AbstractManager interface
  public slots:
@@ -26,7 +25,7 @@ class StickerPrinterManager : public AbstractManager
   void execCommandScript(const std::shared_ptr<QStringList> script);
 
  private:
-  Q_DISABLE_COPY_MOVE(StickerPrinterManager)
+  Q_DISABLE_COPY_MOVE(StickerPrinterAsyncWrapper)
 };
 
 #endif // STICKERPRINTERMANAGER_H

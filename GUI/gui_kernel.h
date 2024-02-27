@@ -8,11 +8,11 @@
 #include <QSettings>
 #include <QString>
 
+#include "abstract_async_wrapper.h"
 #include "abstract_gui_subkernel.h"
-#include "abstract_manager.h"
-#include "global_environment.h"
+#include "abstract_service_space.h"
+#include "internal_service_space.h"
 #include "progress_indicator.h"
-#include "log_system.h"
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
@@ -27,17 +27,14 @@ class GuiKernel : public QMainWindow {
   QAction* SettingsAction;
   QAction* AboutProgramAction;
   //===========================================
-  GlobalEnvironment* GEnv;
+  std::unique_ptr<InternalServiceSpace> Service;
 
   std::unique_ptr<ProgressIndicator> Interactor;
-
-  std::unique_ptr<QThread> LoggerThread;
-  std::unique_ptr<LogSystem> Logger;
 
   std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
 
   std::unique_ptr<QThread> ManagerThread;
-  std::vector<std::unique_ptr<AbstractManager>> Managers;
+  std::vector<std::unique_ptr<AbstractAsyncWrapper>> Managers;
 
  public:
   GuiKernel(QWidget* parent = nullptr);
@@ -55,10 +52,11 @@ class GuiKernel : public QMainWindow {
 
   void createMainWindowGui(void);
 
-  void createLoggerInstance(void);
-  void createGuiSubkernels(void);
-  void createManagersInstance(void);
+  void createServiceInstance(void);
   void createInteractorInstance(void);
+
+  void createGuiSubkernels(void);
+  void createAsyncInstance(void);
 
   void registerMetaType(void);
 

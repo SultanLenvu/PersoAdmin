@@ -1,11 +1,11 @@
 #include "order_gui_subkernel.h"
 
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "global_environment.h"
 #include "link_issuer_key_dialog.h"
 #include "manual_release_refund_dialog.h"
 #include "order_creation_dialog.h"
-#include "order_manager.h"
+#include "order_manager_async_wrapper.h"
 #include "pallet_shiping_dialog.h"
 #include "string_input_dialog.h"
 
@@ -132,27 +132,31 @@ void OrderGuiSubkernel::display(std::shared_ptr<SqlQueryValues> orders) {
 }
 
 void OrderGuiSubkernel::connectDependecies() {
-  const OrderManager* om = static_cast<const OrderManager*>(
-      GlobalEnvironment::instance()->getObject("OrderManager"));
+  const OrderManagerAsyncWrapper* om =
+      static_cast<const OrderManagerAsyncWrapper*>(
+          GlobalEnvironment::instance()->getObject("OrderManagerAsyncWrapper"));
   const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
       GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
-  connect(this, &OrderGuiSubkernel::create_signal, om, &OrderManager::create);
+  connect(this, &OrderGuiSubkernel::create_signal, om,
+          &OrderManagerAsyncWrapper::create);
   connect(this, &OrderGuiSubkernel::startAssembling_signal, om,
-          &OrderManager::startAssembling);
+          &OrderManagerAsyncWrapper::startAssembling);
   connect(this, &OrderGuiSubkernel::stopAssembling_signal, om,
-          &OrderManager::stopAssembling);
-  connect(this, &OrderGuiSubkernel::release_signal, om, &OrderManager::release);
-  connect(this, &OrderGuiSubkernel::refund_signal, om, &OrderManager::refund);
+          &OrderManagerAsyncWrapper::stopAssembling);
+  connect(this, &OrderGuiSubkernel::release_signal, om,
+          &OrderManagerAsyncWrapper::release);
+  connect(this, &OrderGuiSubkernel::refund_signal, om,
+          &OrderManagerAsyncWrapper::refund);
   connect(this, &OrderGuiSubkernel::shipPallets_signal, om,
-          &OrderManager::generateShipmentRegister);
+          &OrderManagerAsyncWrapper::generateShipmentRegister);
   connect(this, &OrderGuiSubkernel::initIssuers_signal, om,
-          &OrderManager::initIssuers);
+          &OrderManagerAsyncWrapper::initIssuers);
   connect(this, &OrderGuiSubkernel::initTransportMasterKeys_signal, om,
-          &OrderManager::initTransportMasterKeys);
+          &OrderManagerAsyncWrapper::initTransportMasterKeys);
   connect(this, &OrderGuiSubkernel::linkIssuerWithKeys_signal, om,
-          &OrderManager::linkIssuerWithKeys);
+          &OrderManagerAsyncWrapper::linkIssuerWithKeys);
 
   connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseAsyncWrapper::getTable);
 

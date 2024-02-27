@@ -3,10 +3,10 @@
 
 #include <QFile>
 
-#include "abstract_manager.h"
+#include "abstract_async_wrapper.h"
 #include "abstract_server_connection.h"
 
-class PersoServerManager : public AbstractManager {
+class PersoServerAsyncWrapper : public AbstractAsyncWrapper {
   Q_OBJECT
 
  private:  
@@ -19,13 +19,12 @@ class PersoServerManager : public AbstractManager {
   std::shared_ptr<StringDictionary> TransponderData;
 
  public:
-  explicit PersoServerManager(const QString& name);
-  ~PersoServerManager();
+  explicit PersoServerAsyncWrapper(const QString& name);
+  ~PersoServerAsyncWrapper();
 
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted(void) override;
-  virtual void applySettings(void) override;
 
   // Own
  public:

@@ -1,18 +1,17 @@
 #include "sticker_printer_async_wrapper.h"
 #include "te310_printer.h"
 
-StickerPrinterManager::StickerPrinterManager(const QString& name)
-    : AbstractManager(name) {
-}
+StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
+    : AbstractAsyncWrapper(name) {}
 
-StickerPrinterManager::~StickerPrinterManager() {}
+StickerPrinterAsyncWrapper::~StickerPrinterAsyncWrapper() {}
 
-void StickerPrinterManager::onInstanceThreadStarted() {
+void StickerPrinterAsyncWrapper::onInstanceThreadStarted() {
   StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
       new TE310Printer("StickerPrinter"));
 }
 
-void StickerPrinterManager::printTransponderSticker(
+void StickerPrinterAsyncWrapper::printTransponderSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printTransponderSticker");
 
@@ -25,7 +24,7 @@ void StickerPrinterManager::printTransponderSticker(
   completeOperation("printTransponderSticker");
 }
 
-void StickerPrinterManager::printBoxSticker(
+void StickerPrinterAsyncWrapper::printBoxSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printBoxSticker");
 
@@ -38,7 +37,7 @@ void StickerPrinterManager::printBoxSticker(
   completeOperation("printBoxSticker");
 }
 
-void StickerPrinterManager::printPalletSticker(
+void StickerPrinterAsyncWrapper::printPalletSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printPalletSticker");
 
@@ -51,7 +50,7 @@ void StickerPrinterManager::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void StickerPrinterManager::execCommandScript(
+void StickerPrinterAsyncWrapper::execCommandScript(
     const std::shared_ptr<QStringList> script) {
   initOperation("execCommandScript");
 

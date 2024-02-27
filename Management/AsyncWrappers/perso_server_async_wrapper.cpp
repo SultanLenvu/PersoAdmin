@@ -5,28 +5,21 @@
 
 #include "perso_server_connection.h"
 
-PersoServerManager::PersoServerManager(const QString& name)
-    : AbstractManager{name},
+PersoServerAsyncWrapper::PersoServerAsyncWrapper(const QString& name)
+    : AbstractAsyncWrapper{name},
       ProductionLineData(new StringDictionary()),
       BoxData(new StringDictionary()),
       TransponderData(new StringDictionary()) {
   loadSettings();
 }
 
-PersoServerManager::~PersoServerManager() {}
+PersoServerAsyncWrapper::~PersoServerAsyncWrapper() {}
 
-void PersoServerManager::onInstanceThreadStarted() {
+void PersoServerAsyncWrapper::onInstanceThreadStarted() {
   createServerConnection();
 }
 
-void PersoServerManager::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-
-  Server->applySettings();
-}
-
-void PersoServerManager::connect() {
+void PersoServerAsyncWrapper::connect() {
   initOperation("connectToServer");
 
   ReturnStatus ret;
@@ -39,7 +32,7 @@ void PersoServerManager::connect() {
   completeOperation("connectToServer");
 }
 
-void PersoServerManager::disconnect() {
+void PersoServerAsyncWrapper::disconnect() {
   initOperation("connectToServer");
 
   Server->disconnect();
@@ -47,7 +40,7 @@ void PersoServerManager::disconnect() {
   completeOperation("connectToServer");
 }
 
-void PersoServerManager::launchProductionLine(
+void PersoServerAsyncWrapper::launchProductionLine(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("launchProductionLine");
 
@@ -71,7 +64,7 @@ void PersoServerManager::launchProductionLine(
   completeOperation("launchProductionLine");
 }
 
-void PersoServerManager::shutdownProductionLine() {
+void PersoServerAsyncWrapper::shutdownProductionLine() {
   initOperation("shutdownProductionLine");
 
   Server->shutdownProductionLine();
@@ -82,7 +75,7 @@ void PersoServerManager::shutdownProductionLine() {
   completeOperation("shutdownProductionLine");
 }
 
-void PersoServerManager::getProductionLineData() {
+void PersoServerAsyncWrapper::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret;
@@ -99,7 +92,7 @@ void PersoServerManager::getProductionLineData() {
   completeOperation("getProductionLineData");
 }
 
-void PersoServerManager::logOn(const std::shared_ptr<StringDictionary> param) {
+void PersoServerAsyncWrapper::logOn(const std::shared_ptr<StringDictionary> param) {
   initOperation("logOnServer");
 
   ReturnStatus ret;
@@ -135,7 +128,7 @@ void PersoServerManager::logOn(const std::shared_ptr<StringDictionary> param) {
   completeOperation("logOnServer");
 }
 
-void PersoServerManager::logOut() {
+void PersoServerAsyncWrapper::logOut() {
   initOperation("logOutServer");
 
   if (Server->isConnected()) {
@@ -146,7 +139,7 @@ void PersoServerManager::logOut() {
   completeOperation("logOutServer");
 }
 
-void PersoServerManager::echo() {
+void PersoServerAsyncWrapper::echo() {
   initOperation("echoServer");
 
   ReturnStatus ret;
@@ -159,7 +152,7 @@ void PersoServerManager::echo() {
   completeOperation("echoServer");
 }
 
-void PersoServerManager::requestBox() {
+void PersoServerAsyncWrapper::requestBox() {
   initOperation("requestBox");
 
   ReturnStatus ret;
@@ -206,7 +199,7 @@ void PersoServerManager::requestBox() {
   completeOperation("requestBox");
 }
 
-void PersoServerManager::getCurrentBoxData() {
+void PersoServerAsyncWrapper::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
   ReturnStatus ret = Server->getCurrentBoxData(*BoxData);
@@ -223,7 +216,7 @@ void PersoServerManager::getCurrentBoxData() {
   completeOperation("getCurrentBoxData");
 }
 
-void PersoServerManager::refundCurrentBox() {
+void PersoServerAsyncWrapper::refundCurrentBox() {
   initOperation("refundCurrentBox");
 
   ReturnStatus ret;
@@ -252,7 +245,7 @@ void PersoServerManager::refundCurrentBox() {
   completeOperation("refundCurrentBox");
 }
 
-void PersoServerManager::completeCurrentBox() {
+void PersoServerAsyncWrapper::completeCurrentBox() {
   initOperation("completeCurrentBox");
 
   ReturnStatus ret;
@@ -281,7 +274,7 @@ void PersoServerManager::completeCurrentBox() {
   completeOperation("completeCurrentBox");
 }
 
-void PersoServerManager::releaseTransponder() {
+void PersoServerAsyncWrapper::releaseTransponder() {
   initOperation("releaseTransponder");
 
   ReturnStatus ret;
@@ -341,7 +334,7 @@ void PersoServerManager::releaseTransponder() {
   completeOperation("releaseTransponder");
 }
 
-void PersoServerManager::rereleaseTransponder(
+void PersoServerAsyncWrapper::rereleaseTransponder(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("rereleaseTransponder");
   sendLog("Выпуск транспондера. ");
@@ -390,7 +383,7 @@ void PersoServerManager::rereleaseTransponder(
   completeOperation("rereleaseTransponder");
 }
 
-void PersoServerManager::rollbackTransponder() {
+void PersoServerAsyncWrapper::rollbackTransponder() {
   initOperation("rollbackTransponder");
   sendLog("Откат производственной линии. ");
 
@@ -431,7 +424,7 @@ void PersoServerManager::rollbackTransponder() {
   completeOperation("rollbackTransponder");
 }
 
-void PersoServerManager::getCurrentTransponderData() {
+void PersoServerAsyncWrapper::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret;
@@ -448,7 +441,7 @@ void PersoServerManager::getCurrentTransponderData() {
   completeOperation("getCurrentTransponderData");
 }
 
-void PersoServerManager::getTransponderData(
+void PersoServerAsyncWrapper::getTransponderData(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("getTransponderData");
 
@@ -466,7 +459,7 @@ void PersoServerManager::getTransponderData(
   completeOperation("getTransponderData");
 }
 
-void PersoServerManager::printBoxSticker(
+void PersoServerAsyncWrapper::printBoxSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printBoxSticker");
 
@@ -480,7 +473,7 @@ void PersoServerManager::printBoxSticker(
   completeOperation("printBoxSticker");
 }
 
-void PersoServerManager::printLastBoxSticker() {
+void PersoServerAsyncWrapper::printLastBoxSticker() {
   initOperation("printLastBoxSticker");
 
   ReturnStatus ret;
@@ -493,7 +486,7 @@ void PersoServerManager::printLastBoxSticker() {
   completeOperation("printLastBoxSticker");
 }
 
-void PersoServerManager::printPalletSticker(
+void PersoServerAsyncWrapper::printPalletSticker(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("printPalletSticker");
 
@@ -507,7 +500,7 @@ void PersoServerManager::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void PersoServerManager::printLastPalletSticker() {
+void PersoServerAsyncWrapper::printLastPalletSticker() {
   initOperation("printLastPalletSticker");
 
   ReturnStatus ret;
@@ -520,7 +513,7 @@ void PersoServerManager::printLastPalletSticker() {
   completeOperation("printLastPalletSticker");
 }
 
-void PersoServerManager::onServerDisconnected() {
+void PersoServerAsyncWrapper::onServerDisconnected() {
   ProductionLineData->clear();
   emit productionLineDataReady(ProductionLineData);
 
@@ -531,9 +524,9 @@ void PersoServerManager::onServerDisconnected() {
   emit transponderDataReady(TransponderData);
 }
 
-void PersoServerManager::loadSettings() {}
+void PersoServerAsyncWrapper::loadSettings() {}
 
-ReturnStatus PersoServerManager::checkConfig() {
+ReturnStatus PersoServerAsyncWrapper::checkConfig() {
   sendLog("Проверка конфигурации.");
 
   ReturnStatus ret = ReturnStatus::NoError;
@@ -542,10 +535,10 @@ ReturnStatus PersoServerManager::checkConfig() {
   return ret;
 }
 
-void PersoServerManager::createServerConnection() {
+void PersoServerAsyncWrapper::createServerConnection() {
   Server = std::unique_ptr<AbstractServerConnection>(
       new PersoServerConnection("PersoServerConnection"));
 
   QObject::connect(Server.get(), &AbstractServerConnection::disconnected, this,
-                   &PersoServerManager::onServerDisconnected);
+                   &PersoServerAsyncWrapper::onServerDisconnected);
 }

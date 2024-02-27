@@ -16,7 +16,7 @@ void OrderManagerAsyncWrapper::create(
 
   ret = Manager->create(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("create", ReturnStatus::DatabaseMissed);
+    processOperationError("create", ret);
     return;
   }
 
@@ -30,7 +30,7 @@ void OrderManagerAsyncWrapper::startAssembling(
 
   ret = Manager->startAssembling(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("startAssembling", ReturnStatus::DatabaseMissed);
+    processOperationError("startAssembling", ret);
     return;
   }
 
@@ -44,7 +44,7 @@ void OrderManagerAsyncWrapper::stopAssembling(
 
   ret = Manager->stopAssembling(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("stopAssembling", ReturnStatus::DatabaseMissed);
+    processOperationError("stopAssembling", ret);
     return;
   }
 
@@ -58,8 +58,7 @@ void OrderManagerAsyncWrapper::generateShipmentRegister(
 
   ret = Manager->generateShipmentRegister(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("generateShipmentRegister",
-                          ReturnStatus::DatabaseMissed);
+    processOperationError("generateShipmentRegister", ret);
     return;
   }
 
@@ -73,7 +72,7 @@ void OrderManagerAsyncWrapper::release(
 
   ret = Manager->release(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("release", ReturnStatus::DatabaseMissed);
+    processOperationError("release", ret);
     return;
   }
 
@@ -87,7 +86,7 @@ void OrderManagerAsyncWrapper::refund(
 
   ret = Manager->refund(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("refund", ReturnStatus::DatabaseMissed);
+    processOperationError("refund", ret);
     return;
   }
 
@@ -100,8 +99,7 @@ void OrderManagerAsyncWrapper::initTransportMasterKeys() {
 
   ret = Manager->initTransportMasterKeys();
   if (ret != ReturnStatus::NoError) {
-    processOperationError("initTransportMasterKeys",
-                          ReturnStatus::DatabaseMissed);
+    processOperationError("initTransportMasterKeys", ret);
     return;
   }
 
@@ -114,7 +112,7 @@ void OrderManagerAsyncWrapper::initIssuers() {
 
   ret = Manager->initIssuers();
   if (ret != ReturnStatus::NoError) {
-    processOperationError("initIssuers", ReturnStatus::DatabaseMissed);
+    processOperationError("initIssuers", ret);
     return;
   }
 
@@ -128,7 +126,7 @@ void OrderManagerAsyncWrapper::linkIssuerWithKeys(
 
   ret = Manager->linkIssuerWithKeys(*param);
   if (ret != ReturnStatus::NoError) {
-    processOperationError("linkIssuerWithKeys", ReturnStatus::DatabaseMissed);
+    processOperationError("linkIssuerWithKeys", ret);
     return;
   }
 

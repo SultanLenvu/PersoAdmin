@@ -1,115 +1,99 @@
 #include "production_line_manager.h"
-#include "database_manager.h"
+#include "database_async_wrapper.h"
 #include "global_environment.h"
 
 ProductionLineManager::ProductionLineManager(const QString& name)
     : AbstractManager(name) {
-  loadSettings();
   connectDependencies();
 }
 
 ProductionLineManager::~ProductionLineManager() {}
-
-void ProductionLineManager::onInstanceThreadStarted() {}
-
-void ProductionLineManager::applySettings() {
-  sendLog("Применение новых настроек.");
-
-  loadSettings();
-}
 
 void ProductionLineManager::applyDatabase(
     std::shared_ptr<AbstractSqlDatabase> database) {
   Database = database;
 }
 
-void ProductionLineManager::create(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("create");
+ReturnStatus ProductionLineManager::create(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("create", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   if (!stopAllProductionLines()) {
     Database->rollbackTransaction();
-    processOperationError("deactivateAll", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("create", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("activateAll");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::activate(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("activate");
+ReturnStatus ProductionLineManager::activate(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("activate", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   SqlQueryValues productionLineNewValues;
   productionLineNewValues.add("active", "true");
   if (!Database->updateRecords("production_lines",
-                               QString("id = %1").arg((*param)["id"]),
+                               QString("id = %1").arg(param["id"]),
                                productionLineNewValues)) {
     Database->rollbackTransaction();
-    processOperationError("activate", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("activate", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("activate");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::activateAll() {
-  assert(Database);
-  initOperation("activateAll");
+ReturnStatus ProductionLineManager::activateAll() {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("activateAll",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   SqlQueryValues productionLineNewValues;
   productionLineNewValues.add("active", "true");
   if (!Database->updateRecords("production_lines", productionLineNewValues)) {
     Database->rollbackTransaction();
-    processOperationError("activateAll", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("activateAll",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("activateAll");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::deactivate(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("deactivate");
+ReturnStatus ProductionLineManager::deactivate(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("deactivate", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   SqlQueryValues productionLineNewValue;
@@ -120,72 +104,66 @@ void ProductionLineManager::deactivate(
   productionLineNewValue.add("box_id", "NULL");
   productionLineNewValue.add("transponder_id", "NULL");
   if (!Database->updateRecords("production_lines",
-                               QString("id = %1").arg((*param)["id"]),
+                               QString("id = %1").arg(param["id"]),
                                productionLineNewValue)) {
     Database->rollbackTransaction();
-    processOperationError("deactivate", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("deactivate", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("deactivate");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::deactivateAll() {
-  assert(Database);
-  initOperation("deactivateAll");
+ReturnStatus ProductionLineManager::deactivateAll() {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("deactivateAll",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   if (!stopAllProductionLines()) {
     Database->rollbackTransaction();
-    processOperationError("deactivateAll", ReturnStatus::DatabaseQueryError);
-    return;
+    return ReturnStatus::DatabaseQueryError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("deactivateAll",
-                          ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("deactivateAll");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::edit(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("edit");
+ReturnStatus ProductionLineManager::edit(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("edit", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   if (!Database->commitTransaction()) {
-    processOperationError("edit", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("edit");
+  return ReturnStatus::NoError;
 }
 
-void ProductionLineManager::remove(
-    const std::shared_ptr<StringDictionary> param) {
-  assert(Database);
-  initOperation("remove");
+ReturnStatus ProductionLineManager::remove(const StringDictionary& param) {
+  if (!Database) {
+    sendLog("База данных не определена.");
+    return ReturnStatus::DatabaseMissed;
+  }
 
   if (!Database->openTransaction()) {
-    processOperationError("remove", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
   //  if (!removeLastProductionLine()) {
@@ -195,14 +173,11 @@ void ProductionLineManager::remove(
   //  }
 
   if (!Database->commitTransaction()) {
-    processOperationError("remove", ReturnStatus::DatabaseTransactionError);
-    return;
+    return ReturnStatus::DatabaseTransactionError;
   }
 
-  completeOperation("remove");
+  return ReturnStatus::NoError;
 }
-
-void ProductionLineManager::loadSettings() {}
 
 void ProductionLineManager::connectDependencies() {
   DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(

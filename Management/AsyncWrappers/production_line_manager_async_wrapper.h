@@ -4,14 +4,14 @@
 #include "abstract_async_wrapper.h"
 #include "production_line_manager.h"
 
-class ProductionLineAsyncWrapper final : public AbstractAsyncWrapper {
+class ProductionLineManagerAsyncWrapper final : public AbstractAsyncWrapper {
   Q_OBJECT
  private:
   std::unique_ptr<ProductionLineManager> Manager;
 
  public:
-  ProductionLineAsyncWrapper(const QString& name);
-  ~ProductionLineAsyncWrapper();
+  ProductionLineManagerAsyncWrapper(const QString& name);
+  ~ProductionLineManagerAsyncWrapper();
 
   // AbstractAsyncWrapper interface
  public slots:
@@ -19,8 +19,6 @@ class ProductionLineAsyncWrapper final : public AbstractAsyncWrapper {
 
   // Own
  public slots:
-  void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
-
   void create(const std::shared_ptr<StringDictionary> param);
 
   void activate(const std::shared_ptr<StringDictionary> param);
@@ -33,7 +31,7 @@ class ProductionLineAsyncWrapper final : public AbstractAsyncWrapper {
   void remove(const std::shared_ptr<StringDictionary> param);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionLineAsyncWrapper)
+  Q_DISABLE_COPY_MOVE(ProductionLineManagerAsyncWrapper)
 };
 
 #endif // PRODUCTIONLINEASYNCWRAPPER_H

@@ -1,10 +1,10 @@
 #ifndef ABSTARCTSERVERCONNECTION_H
 #define ABSTARCTSERVERCONNECTION_H
 
-#include "pobject.h"
+#include "configurable_object.h"
 #include "types.h"
 
-class AbstractServerConnection : public PObject {
+class AbstractServerConnection : public ConfigurableObject {
   Q_OBJECT
  public:
   explicit AbstractServerConnection(const QString& name);

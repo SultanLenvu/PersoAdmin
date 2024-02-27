@@ -1,14 +1,16 @@
 #include "gui_kernel.h"
+#include "database_async_wrapper.h"
 #include "database_gui_subkernel.h"
-#include "database_manager.h"
 #include "definitions.h"
+#include "global_environment.h"
+#include "internal_service_space.h"
 #include "mainwindow_gui.h"
 #include "order_gui_subkernel.h"
-#include "order_manager.h"
+#include "order_manager_async_wrapper.h"
 #include "perso_server_async_wrapper.h"
 #include "perso_server_gui_subkernel.h"
 #include "production_line_gui_subkernel.h"
-#include "production_line_manager.h"
+#include "production_line_manager_async_wrapper.h"
 #include "programmer_async_wrapper.h"
 #include "programmer_gui_subkernel.h"
 #include "settings_dialog.h"
@@ -21,26 +23,20 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   DesktopGeometry = QApplication::primaryScreen()->size();
   loadSettings();
 
-  // Создаем глобальную среду для сигналов и слотов объектов
-  GEnv = GlobalEnvironment::instance();
-
-  createLoggerInstance();
+  createServiceInstance();
   createInteractorInstance();
 
-  createManagersInstance();
+  createAsyncInstance();
   createGuiSubkernels();
   createMainWindowGui();
 
   registerMetaType();
-  GEnv->registerObject(this);
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
 GuiKernel::~GuiKernel() {
   ManagerThread->quit();
   ManagerThread->wait();
-
-  LoggerThread->quit();
-  LoggerThread->wait();
 }
 
 void GuiKernel::settingsActionTrigger_slot() {
@@ -104,15 +100,14 @@ void GuiKernel::createMainWindowGui() {
   createTopMenu();
 }
 
-void GuiKernel::createLoggerInstance() {
-  Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
+void GuiKernel::createServiceInstance() {
+  Service = std::unique_ptr<InternalServiceSpace>(
+      new InternalServiceSpace("InternalServiceSpace"));
+}
 
-  LoggerThread = std::unique_ptr<QThread>(new QThread());
-  connect(LoggerThread.get(), &QThread::started, Logger.get(),
-          &LogSystem::instanceThreadStarted);
-
-  Logger->moveToThread(LoggerThread.get());
-  LoggerThread->start();
+void GuiKernel::createInteractorInstance() {
+  Interactor = std::unique_ptr<ProgressIndicator>(
+      new ProgressIndicator("ProgressIndicator"));
 }
 
 void GuiKernel::createGuiSubkernels() {
@@ -127,30 +122,26 @@ void GuiKernel::createGuiSubkernels() {
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
 }
 
-void GuiKernel::createManagersInstance() {
+void GuiKernel::createAsyncInstance() {
   Managers.emplace_back(new DatabaseAsyncWrapper("DatabaseAsyncWrapper"));
-  Managers.emplace_back(new OrderManager("OrderManager"));
-  Managers.emplace_back(new ProductionLineManager("ProductionLineManager"));
-  Managers.emplace_back(new PersoServerManager("PersoServerManager"));
-  Managers.emplace_back(new ProgrammerManager("ProgrammerManager"));
-  Managers.emplace_back(new StickerPrinterManager("StickerPrinterManager"));
+  Managers.emplace_back(
+      new OrderManagerAsyncWrapper("OrderManagerAsyncWrapper"));
+  Managers.emplace_back(new ProductionLineManagerAsyncWrapper(
+      "ProductionLineManagerAsyncWrapper"));
+  Managers.emplace_back(new PersoServerAsyncWrapper("PersoServerAsyncWrapper"));
+  Managers.emplace_back(new ProgrammerAsyncWrapper("ProgrammerAsyncWrapper"));
+  Managers.emplace_back(new StickerPrinterAsyncWrapper("StickerPrinterAsyncWrapper"));
 
   ManagerThread = std::unique_ptr<QThread>(new QThread());
 
   for (auto it1 = Managers.cbegin(), it2 = Managers.cend(); it1 != it2; ++it1) {
     connect(ManagerThread.get(), &QThread::started, (*it1).get(),
-            &AbstractManager::onInstanceThreadStarted);
-    connect(this, &GuiKernel::applySettings_signal, (*it1).get(),
-            &AbstractManager::applySettings);
+            &AbstractAsyncWrapper::onInstanceThreadStarted,
+            Qt::DirectConnection);
     (*it1)->moveToThread(ManagerThread.get());
   }
 
   ManagerThread->start();
-}
-
-void GuiKernel::createInteractorInstance() {
-  Interactor = std::unique_ptr<ProgressIndicator>(
-      new ProgressIndicator("ProgressIndicator"));
 }
 
 void GuiKernel::registerMetaType() {

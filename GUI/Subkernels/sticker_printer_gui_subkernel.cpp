@@ -56,15 +56,17 @@ void StickerPrinterGuiSubkernel::execCommandScript(
 }
 
 void StickerPrinterGuiSubkernel::connectDependecies() {
-  const StickerPrinterManager* spm = static_cast<const StickerPrinterManager*>(
-      GlobalEnvironment::instance()->getObject("StickerPrinterManager"));
+  const StickerPrinterAsyncWrapper* spm =
+      static_cast<const StickerPrinterAsyncWrapper*>(
+          GlobalEnvironment::instance()->getObject(
+              "StickerPrinterAsyncWrapper"));
 
   connect(this, &StickerPrinterGuiSubkernel::printTransponderSticker_signal,
-          spm, &StickerPrinterManager::printTransponderSticker);
+          spm, &StickerPrinterAsyncWrapper::printTransponderSticker);
   connect(this, &StickerPrinterGuiSubkernel::printBoxSticker_signal, spm,
-          &StickerPrinterManager::printBoxSticker);
+          &StickerPrinterAsyncWrapper::printBoxSticker);
   connect(this, &StickerPrinterGuiSubkernel::printPalletSticker_signal, spm,
-          &StickerPrinterManager::printPalletSticker);
+          &StickerPrinterAsyncWrapper::printPalletSticker);
   connect(this, &StickerPrinterGuiSubkernel::execCommandScript_signal, spm,
-          &StickerPrinterManager::execCommandScript);
+          &StickerPrinterAsyncWrapper::execCommandScript);
 }

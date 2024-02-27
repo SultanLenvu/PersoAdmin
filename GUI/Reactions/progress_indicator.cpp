@@ -33,7 +33,7 @@ void ProgressIndicator::begin(const QString& operationName) {
   ODMeter->start();
 }
 
-void ProgressIndicator::finish(const QString& operationName, ReturnStatus ret) {
+void ProgressIndicator::finish(const QString& operationName) {
   QSettings settings;
 
   // Измеряем и сохраняем длительность операции
@@ -52,6 +52,7 @@ void ProgressIndicator::finish(const QString& operationName, ReturnStatus ret) {
   destroyProgressDialog();
 
   // Обрабатываем статус возврата
+  ReturnStatus ret = ReturnStatus::NoError;
   processReturnStatus(ret);
 }
 
@@ -167,7 +168,6 @@ void ProgressIndicator::progressDialogCanceled_slot() {
 
 void ProgressIndicator::ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
-  generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
 void ProgressIndicator::ODQTimerTimeout_slot() {

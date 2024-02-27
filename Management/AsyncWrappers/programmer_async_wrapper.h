@@ -1,19 +1,17 @@
-#ifndef PROGRAMMERMANAGER_H
-#define PROGRAMMERMANAGER_H
+#ifndef PROGRAMMERASYNCWRAPPER_H
+#define PROGRAMMERASYNCWRAPPER_H
 
-#include "abstract_manager.h"
-#include <QWidget>
+#include "abstract_async_wrapper.h"
 
-class ProgrammerManager : public AbstractManager
-{
+class ProgrammerAsyncWrapper : public AbstractAsyncWrapper {
   Q_OBJECT
  public:
-  explicit ProgrammerManager(const QString& name);
-  ~ProgrammerManager();
+  explicit ProgrammerAsyncWrapper(const QString& name);
+  ~ProgrammerAsyncWrapper();
 
   // AbstractManager interface
  public slots:
   virtual void onInstanceThreadStarted() override;
 };
 
-#endif // PROGRAMMERMANAGER_H
+#endif  // PROGRAMMERASYNCWRAPPER_H
