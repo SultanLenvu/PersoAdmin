@@ -10,9 +10,9 @@
 
 #include "abstract_async_wrapper.h"
 #include "abstract_gui_subkernel.h"
+#include "abstract_progress_indicator.h"
+#include "abstract_return_status_handler.h"
 #include "abstract_service_space.h"
-#include "internal_service_space.h"
-#include "progress_indicator.h"
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
@@ -27,9 +27,10 @@ class GuiKernel : public QMainWindow {
   QAction* SettingsAction;
   QAction* AboutProgramAction;
   //===========================================
-  std::unique_ptr<InternalServiceSpace> Service;
+  std::unique_ptr<AbstractServiceSpace> Service;
 
-  std::unique_ptr<ProgressIndicator> Interactor;
+  std::unique_ptr<AbstractProgressIndicator> ProgressIndicator;
+  std::unique_ptr<AbstractReturnStatusHandler> ReturnStatusHandler;
 
   std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
 
@@ -52,8 +53,8 @@ class GuiKernel : public QMainWindow {
 
   void createMainWindowGui(void);
 
-  void createServiceInstance(void);
-  void createInteractorInstance(void);
+  void createServiceSpace(void);
+  void createReactions(void);
 
   void createGuiSubkernels(void);
   void createAsyncInstance(void);

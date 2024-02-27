@@ -1,5 +1,5 @@
-#ifndef GLOBALCONTEXT_H
-#define GLOBALCONTEXT_H
+#ifndef GLOBALENVIRONMENT_H
+#define GLOBALENVIRONMENT_H
 
 #include <QHash>
 #include <QObject>
@@ -21,9 +21,9 @@ class GlobalEnvironment : public QObject {
   Q_DISABLE_COPY_MOVE(GlobalEnvironment)
 
  private slots:
-  void onRegosteredObjectDestroyed(void);
+  void onRegosteredObjectDestroyed(const QString& name);
 
  signals:
 };
 
-#endif  // GLOBALCONTEXT_H
+#endif  // GLOBALENVIRONMENT_H

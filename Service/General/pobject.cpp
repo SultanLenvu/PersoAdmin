@@ -9,7 +9,9 @@ PObject::PObject(const QString& name) : QObject{nullptr} {
   connectDependencies();
 }
 
-PObject::~PObject() {}
+PObject::~PObject() {
+  emit deleted(objectName());
+}
 
 void PObject::sendLog(const QString& log) const {
   emit logging(QString("%1 - %2").arg(objectName(), log));

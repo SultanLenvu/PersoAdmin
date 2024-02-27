@@ -16,6 +16,7 @@ include_directories(Service/)
 include_directories(Service/General/)
 include_directories(Service/Log/)
 include_directories(Service/Functors/)
+include_directories(Service/Reactions/)
 include_directories(Database/)
 include_directories(GUI/)
 include_directories(GUI/Subkernels)
@@ -89,9 +90,9 @@ add_executable(PersoAdmin WIN32
     GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
 
     GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
-    GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
+    GUI/Reactions/measuring_progress_indicator.cpp GUI/Reactions/measuring_progress_indicator.h
     GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
-    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
+    GUI/Reactions/gui_return_status_handler.h GUI/Reactions/gui_return_status_handler.cpp
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp

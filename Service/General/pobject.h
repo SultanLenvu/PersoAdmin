@@ -20,6 +20,7 @@ class PObject : public QObject {
 
  signals:
   void logging(const QString& log) const;
+  void deleted(const QString& name) const;
 };
 
 #endif  // POBJECT_H

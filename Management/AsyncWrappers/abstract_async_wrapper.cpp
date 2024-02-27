@@ -1,6 +1,6 @@
 #include "abstract_async_wrapper.h"
 #include "global_environment.h"
-#include "progress_indicator.h"
+#include "measuring_progress_indicator.h"
 
 AbstractAsyncWrapper::AbstractAsyncWrapper(const QString& name)
     : PObject{name} {
@@ -28,11 +28,11 @@ void AbstractAsyncWrapper::completeOperation(const QString& name) {
 }
 
 void AbstractAsyncWrapper::connectDependencies() {
-  ProgressIndicator* is = static_cast<ProgressIndicator*>(
-      GlobalEnvironment::instance()->getObject("ProgressIndicator"));
+  MeasuringProgressIndicator* is = static_cast<MeasuringProgressIndicator*>(
+      GlobalEnvironment::instance()->getObject("MeasuringProgressIndicator"));
 
   connect(this, &AbstractAsyncWrapper::executionStarted, is,
-          &ProgressIndicator::begin);
+          &MeasuringProgressIndicator::begin);
   connect(this, &AbstractAsyncWrapper::executionFinished, is,
-          &ProgressIndicator::finish);
+          &MeasuringProgressIndicator::finish);
 }

@@ -3,8 +3,10 @@
 #include "database_gui_subkernel.h"
 #include "definitions.h"
 #include "global_environment.h"
+#include "gui_return_status_handler.h"
 #include "internal_service_space.h"
 #include "mainwindow_gui.h"
+#include "measuring_progress_indicator.h"
 #include "order_gui_subkernel.h"
 #include "order_manager_async_wrapper.h"
 #include "perso_server_async_wrapper.h"
@@ -19,19 +21,19 @@
 
 GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("GuiKernel");
+  GlobalEnvironment::instance()->registerObject(this);
 
   DesktopGeometry = QApplication::primaryScreen()->size();
   loadSettings();
 
-  createServiceInstance();
-  createInteractorInstance();
+  createServiceSpace();
+  createReactions();
 
   createAsyncInstance();
   createGuiSubkernels();
   createMainWindowGui();
 
   registerMetaType();
-  GlobalEnvironment::instance()->registerObject(this);
 }
 
 GuiKernel::~GuiKernel() {
@@ -100,14 +102,17 @@ void GuiKernel::createMainWindowGui() {
   createTopMenu();
 }
 
-void GuiKernel::createServiceInstance() {
+void GuiKernel::createServiceSpace() {
   Service = std::unique_ptr<InternalServiceSpace>(
       new InternalServiceSpace("InternalServiceSpace"));
 }
 
-void GuiKernel::createInteractorInstance() {
-  Interactor = std::unique_ptr<ProgressIndicator>(
-      new ProgressIndicator("ProgressIndicator"));
+void GuiKernel::createReactions() {
+  ProgressIndicator = std::unique_ptr<MeasuringProgressIndicator>(
+      new MeasuringProgressIndicator("MeasuringProgressIndicator"));
+
+  ReturnStatusHandler = std::unique_ptr<AbstractReturnStatusHandler>(
+      new GuiReturnStatusHandler("GuiReturnStatusHandler"));
 }
 
 void GuiKernel::createGuiSubkernels() {
@@ -135,9 +140,12 @@ void GuiKernel::createAsyncInstance() {
   ManagerThread = std::unique_ptr<QThread>(new QThread());
 
   for (auto it1 = Managers.cbegin(), it2 = Managers.cend(); it1 != it2; ++it1) {
-    connect(ManagerThread.get(), &QThread::started, (*it1).get(),
+    connect(ManagerThread.get(), &QThread::started, it1->get(),
             &AbstractAsyncWrapper::onInstanceThreadStarted,
             Qt::DirectConnection);
+    connect(it1->get(), &AbstractAsyncWrapper::executionStatus,
+            ReturnStatusHandler.get(), &AbstractReturnStatusHandler::handle,
+            Qt::QueuedConnection);
     (*it1)->moveToThread(ManagerThread.get());
   }
 

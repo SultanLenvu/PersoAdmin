@@ -1,5 +1,5 @@
-#ifndef PROGRESS_INDICATOR_H
-#define PROGRESS_INDICATOR_H
+#ifndef MEASURING_PROGRESS_INDICATOR_H
+#define MEASURING_PROGRESS_INDICATOR_H
 
 #include <QElapsedTimer>
 #include <QInputDialog>
@@ -12,9 +12,8 @@
 #include <QTimer>
 
 #include "abstract_progress_indicator.h"
-#include "types.h"
 
-class ProgressIndicator final : public AbstractProgressIndicator {
+class MeasuringProgressIndicator final : public AbstractProgressIndicator {
   Q_OBJECT
 
  private:
@@ -24,11 +23,9 @@ class ProgressIndicator final : public AbstractProgressIndicator {
   std::unique_ptr<QTimer> ODQTimer;
   std::unique_ptr<QElapsedTimer> ODMeter;
 
-  std::unordered_map<ReturnStatus, QString> MessageTable;
-
  public:
-  ProgressIndicator(const QString& name);
-  ~ProgressIndicator();
+  MeasuringProgressIndicator(const QString& name);
+  ~MeasuringProgressIndicator();
 
   // AbstractProgressIndicator interface
  public slots:
@@ -36,14 +33,11 @@ class ProgressIndicator final : public AbstractProgressIndicator {
   virtual void finish(const QString& operationName) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(ProgressIndicator)
+  Q_DISABLE_COPY_MOVE(MeasuringProgressIndicator)
 
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
-
-  void createMessageMatchTable(void);
-  void processReturnStatus(ReturnStatus ret);
 
  private slots:
   void progressDialogCanceled_slot(void);
@@ -52,4 +46,4 @@ class ProgressIndicator final : public AbstractProgressIndicator {
   void ODQTimerTimeout_slot(void);
 };
 
-#endif  // PROGRESS_INDICATOR_H
+#endif  // MEASURING_PROGRESS_INDICATOR_H

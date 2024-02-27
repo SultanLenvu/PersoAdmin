@@ -13,11 +13,11 @@ GlobalEnvironment* GlobalEnvironment::instance() {
 
 void GlobalEnvironment::registerObject(QObject* obj) {
   QString name = obj->objectName();
-  assert(!GlobalObjects.contains(name));
+  //  assert(!GlobalObjects.contains(name));
 
   GlobalObjects[name] = obj;
 
-  //  connect(obj, &QObject::destroyed, this,
+  //  connect(obj, &PObject::deleted, this,
   //          &GlobalEnvironment::onRegosteredObjectDestroyed,
   //          Qt::QueuedConnection);
 }
@@ -32,7 +32,7 @@ QObject* GlobalEnvironment::getObject(const QString& name) {
 
 GlobalEnvironment::GlobalEnvironment() {}
 
-void GlobalEnvironment::onRegosteredObjectDestroyed() {
+void GlobalEnvironment::onRegosteredObjectDestroyed(const QString& name) {
   //  qDebug() << "Объект" << sender()->objectName()
   //           << "удалился из глобального контекста.";
   //  if (QApplication::instance()->thread() != thread()) {
@@ -41,5 +41,5 @@ void GlobalEnvironment::onRegosteredObjectDestroyed() {
   //    qDebug() << "В главном потоке.";
   //  }
 
-  GlobalObjects.remove(sender()->objectName());
+  GlobalObjects.remove(name);
 }

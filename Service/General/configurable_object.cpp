@@ -13,9 +13,11 @@ void ConfigurableObject::applySettings() {
   loadSettings();
 }
 
-void ConfigurableObject::connectDependencies() {}
-
 void ConfigurableObject::loadSettings() {
+
+}
+
+void ConfigurableObject::connectDependencies() {
   GuiKernel* gk = static_cast<GuiKernel*>(
       GlobalEnvironment::instance()->getObject("GuiKernel"));
 
