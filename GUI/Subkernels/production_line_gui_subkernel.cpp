@@ -110,4 +110,8 @@ void ProductionLineGuiSubkernel::connectDependecies() {
 
   connect(this, &ProductionLineGuiSubkernel::get_signal, dm,
           &DatabaseAsyncWrapper::getTable);
+
+  // От менеджеров
+  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
+          &ProductionLineGuiSubkernel::display);
 }

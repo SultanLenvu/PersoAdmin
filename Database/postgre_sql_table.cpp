@@ -141,7 +141,7 @@ bool PostgreSqlTable::readRecords(const QString& conditions,
 bool PostgreSqlTable::readLastRecord(SqlQueryValues& response) {
   // Создаем запрос
   QString requestText =
-      QString("SELECT * FROM public.%1 ORDER BY %2 ASC LIMIT 1;")
+      QString("SELECT * FROM public.%1 ORDER BY %2 DESC LIMIT 1;")
           .arg(TableName, PrimaryKey);
 
   // Выполняем запрос

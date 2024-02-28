@@ -68,7 +68,7 @@ void OrderCreationDialog::create() {
   MainLayout->addWidget(IssuerNameComboLabel, 2, 0, 1, 1);
   IssuerNameComboBox = new QComboBox();
   IssuerNameComboBox->addItem("Новое качество дорог");
-  IssuerNameComboBox->addItem("Западный скоростной диаметр");
+  IssuerNameComboBox->addItem("Магистраль северной столицы");
   MainLayout->addWidget(IssuerNameComboBox, 2, 1, 1, 2);
 
   TransponderQuantityLabel = new QLabel("Количество транспондеров:");

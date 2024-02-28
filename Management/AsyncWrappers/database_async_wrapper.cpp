@@ -19,6 +19,8 @@ void DatabaseAsyncWrapper::connect() {
     return;
   }
 
+  emit databaseCreated(Database);
+
   completeOperation("connect");
 }
 
