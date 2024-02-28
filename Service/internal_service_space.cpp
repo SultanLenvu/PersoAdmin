@@ -1,19 +1,23 @@
 #include "internal_service_space.h"
 #include "global_environment.h"
+#include "thread_object_builder.h"
 
 InternalServiceSpace::InternalServiceSpace(const QString& name)
     : AbstractServiceSpace{name} {
   Thread = std::unique_ptr<QThread>(new QThread());
-  Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
+  Thread->start();
 
-  connect(Thread.get(), &QThread::started, Logger.get(),
-          &LogSystem::onInstanceThreadStarted, Qt::DirectConnection);
+  ThreadObjectBuilder builder(Thread.get());
+
+  Logger = std::unique_ptr<LogSystem>(builder.build<LogSystem>("LogSystem"));
+
+  //  connect(Thread.get(), &QThread::started, Logger.get(),
+  //          &LogSystem::onInstanceThreadStarted, Qt::DirectConnection);
 
   GlobalEnvironment::instance()->moveToThread(Thread.get());
-  Logger->moveToThread(Thread.get());
+  //  Logger->moveToThread(Thread.get());
 
   // Создаем глобальную среду для сигналов и слотов объектов
-  Thread->start();
 }
 
 InternalServiceSpace::~InternalServiceSpace() {

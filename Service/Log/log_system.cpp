@@ -6,6 +6,7 @@
 
 LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
   doLoadSettings();
+  onInstanceThreadStarted();
 }
 
 LogSystem::~LogSystem() {

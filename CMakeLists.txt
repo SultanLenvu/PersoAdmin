@@ -133,6 +133,7 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
+    Service/General/thread_object_builder.h Service/General/thread_object_builder.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
