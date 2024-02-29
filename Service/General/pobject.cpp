@@ -4,13 +4,21 @@
 
 PObject::PObject(const QString& name) : QObject{nullptr} {
   setObjectName(name);
-  GlobalEnvironment::instance()->registerObject(this);
 
+  GlobalEnvironment::instance()->registerObject(this);
   connectDependencies();
 }
 
 PObject::~PObject() {
   emit deleted(objectName());
+}
+
+bool PObject::init() {
+  sendLog("Инициализация.");
+
+  Valid = initInternals();
+
+  return Valid;
 }
 
 void PObject::sendLog(const QString& log) const {
@@ -19,8 +27,12 @@ void PObject::sendLog(const QString& log) const {
 
 PObject::PObject() {}
 
+bool PObject::initInternals() {
+  return true;
+}
+
 void PObject::connectDependencies() {
-  const LogSystem* ls = static_cast<const LogSystem*>(
+  LogSystem* ls = static_cast<LogSystem*>(
       GlobalEnvironment::instance()->getObject("LogSystem"));
 
   connect(this, &PObject::logging, ls, &LogSystem::generate);

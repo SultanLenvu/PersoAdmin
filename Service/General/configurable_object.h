@@ -10,13 +10,13 @@ class ConfigurableObject : public PObject {
   virtual ~ConfigurableObject();
 
  public slots:
-  void applySettings(void);
+  virtual void applySettings(void);
+
+ private:
+  virtual void loadSettings(void);
 
  private:
   Q_DISABLE_COPY_MOVE(ConfigurableObject)
-
-  virtual void loadSettings(void);
-
   void connectDependencies(void);
 };
 

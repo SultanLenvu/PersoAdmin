@@ -10,12 +10,9 @@ ConfigurableObject::~ConfigurableObject() {}
 
 void ConfigurableObject::applySettings() {
   sendLog("Применение новых настроек.");
-  loadSettings();
 }
 
-void ConfigurableObject::loadSettings() {
-
-}
+void ConfigurableObject::loadSettings() {}
 
 void ConfigurableObject::connectDependencies() {
   GuiKernel* gk = static_cast<GuiKernel*>(

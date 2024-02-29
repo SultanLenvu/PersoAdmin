@@ -35,13 +35,14 @@ class LogSystem : public ConfigurableObject {
   ~LogSystem();
 
  public slots:
-  void onInstanceThreadStarted(void);
-
   void generate(const QString& log);
 
  private:
-  Q_DISABLE_COPY_MOVE(LogSystem)
+  virtual bool initInternals(void) override;
   virtual void loadSettings(void) override;
+
+ private:
+  Q_DISABLE_COPY_MOVE(LogSystem)
   void doLoadSettings(void);
 
   void createPersoServerLogSocket(void);

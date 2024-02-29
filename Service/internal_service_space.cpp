@@ -1,13 +1,13 @@
 #include "internal_service_space.h"
 #include "global_environment.h"
-#include "thread_object_builder.h"
+#include "pobject_builder.h"
 
 InternalServiceSpace::InternalServiceSpace(const QString& name)
     : AbstractServiceSpace{name} {
   Thread = std::unique_ptr<QThread>(new QThread());
   Thread->start();
 
-  ThreadObjectBuilder builder(Thread.get());
+  PObjectBuilder builder(Thread.get());
 
   Logger = std::unique_ptr<LogSystem>(builder.build<LogSystem>("LogSystem"));
 

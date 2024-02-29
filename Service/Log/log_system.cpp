@@ -6,7 +6,6 @@
 
 LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
   doLoadSettings();
-  onInstanceThreadStarted();
 }
 
 LogSystem::~LogSystem() {
@@ -20,13 +19,6 @@ LogSystem::~LogSystem() {
   //  delete PersoServerLogSocket;
 }
 
-void LogSystem::onInstanceThreadStarted() {
-  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
-  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
-
-  createPersoServerLogSocket();
-}
-
 void LogSystem::generate(const QString& log) {
   QTime time = QDateTime::currentDateTime().time();
 
@@ -36,6 +28,15 @@ void LogSystem::generate(const QString& log) {
   for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->writeMessage(LogMessage);
   }
+}
+
+bool LogSystem::initInternals() {
+  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
+  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
+
+  createPersoServerLogSocket();
+
+  return true;
 }
 
 /*

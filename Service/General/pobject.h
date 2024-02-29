@@ -5,12 +5,21 @@
 
 class PObject : public QObject {
   Q_OBJECT
+ private:
+  bool Valid;
+
  public:
   explicit PObject(const QString& name);
   virtual ~PObject();
 
+ public slots:
+  bool init(void);
+
  protected:
   void sendLog(const QString& log) const;
+
+ private:
+  virtual bool initInternals(void);
 
  private:
   PObject();
