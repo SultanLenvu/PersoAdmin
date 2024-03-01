@@ -7,7 +7,7 @@ InternalServiceSpace::InternalServiceSpace(const QString& name)
   Thread = std::unique_ptr<QThread>(new QThread());
   Thread->start();
 
-  EruIluvatar* eru = EruIluvatar::instance();
+  PObjectBuilder* eru = PObjectBuilder::instance();
   eru->setThread(Thread.get());
 
   Logger = std::unique_ptr<LogSystem>(eru->create<LogSystem>("LogSystem"));

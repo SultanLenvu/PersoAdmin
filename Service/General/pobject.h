@@ -3,12 +3,12 @@
 
 #include <QObject>
 
-class EruIluvatar;
+class PObjectBuilder;
 
 class PObject : public QObject {
   Q_OBJECT
 
-  friend class EruIluvatar;
+  friend class PObjectBuilder;
 
  private:
   bool Valid;

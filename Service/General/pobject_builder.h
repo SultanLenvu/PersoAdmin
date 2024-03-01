@@ -5,13 +5,13 @@
 
 #include "pobject.h"
 
-class EruIluvatar {
+class PObjectBuilder {
  public:
   QThread* Thread;
 
  public:
-  static EruIluvatar* instance(void);
-  ~EruIluvatar();
+  static PObjectBuilder* instance(void);
+  ~PObjectBuilder();
 
  public:
   void setThread(QThread* thread);
@@ -36,9 +36,9 @@ class EruIluvatar {
   }
 
  private:
-  //  EruIluvatar(QThread* thread);
-  EruIluvatar();
-  Q_DISABLE_COPY_MOVE(EruIluvatar)
+  //  PObjectBuilder(QThread* thread);
+  PObjectBuilder();
+  Q_DISABLE_COPY_MOVE(PObjectBuilder)
 };
 
 #endif  // POBJECTBUILDER_H

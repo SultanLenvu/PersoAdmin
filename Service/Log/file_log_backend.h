@@ -29,8 +29,10 @@ class FileLogBackend : public LogBackend {
   virtual void writeMessage(const QString& str) override;
 
  private:
-  Q_DISABLE_COPY(FileLogBackend);
+  Q_DISABLE_COPY_MOVE(FileLogBackend)
+  virtual bool initInternals(void) override;
   virtual void loadSettings(void) override;
+
   void doLoadSettings(void);
 
   void initialize();

@@ -17,9 +17,8 @@ class InternalServiceSpace final : public AbstractServiceSpace {
   InternalServiceSpace(const QString& name);
   ~InternalServiceSpace();
 
-  // AbstractServiceSpace interface
- public:
-  virtual void init() override;
+ private:
+  Q_DISABLE_COPY_MOVE(InternalServiceSpace)
 };
 
 #endif  // INTERNALSERVICESPACE_H
