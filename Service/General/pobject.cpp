@@ -2,7 +2,7 @@
 #include "log_system.h"
 #include "pobject.h"
 
-PObject::PObject(const QString& name) : QObject{nullptr} {
+PObject::PObject(const QString& name) : QObject{nullptr}, Valid(false) {
   setObjectName(name);
 
   GlobalEnvironment::instance()->registerObject(this);
@@ -11,6 +11,10 @@ PObject::PObject(const QString& name) : QObject{nullptr} {
 
 PObject::~PObject() {
   emit deleted(objectName());
+}
+
+bool PObject::valid() {
+  return Valid;
 }
 
 bool PObject::init() {
@@ -24,8 +28,6 @@ bool PObject::init() {
 void PObject::sendLog(const QString& log) const {
   emit logging(QString("%1 - %2").arg(objectName(), log));
 }
-
-PObject::PObject() {}
 
 bool PObject::initInternals() {
   return true;

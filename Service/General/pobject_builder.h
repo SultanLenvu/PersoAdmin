@@ -5,19 +5,25 @@
 
 #include "pobject.h"
 
-class PObjectBuilder {
+class EruIluvatar {
  public:
   QThread* Thread;
 
  public:
-  explicit PObjectBuilder(QThread* thread);
-  ~PObjectBuilder();
+  static EruIluvatar* instance(void);
+  ~EruIluvatar();
 
  public:
+  void setThread(QThread* thread);
+
   template <typename T, typename... Args>
-  typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type build(
+  typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type create(
       Args&&... args) {
     assert(Thread);
+
+    if (!Thread->isRunning()) {
+      Thread->start();
+    }
 
     T* obj = new T(std::forward<Args>(args)...);
     obj->moveToThread(Thread);
@@ -30,10 +36,9 @@ class PObjectBuilder {
   }
 
  private:
-  PObjectBuilder();
-  Q_DISABLE_COPY_MOVE(PObjectBuilder)
+  //  EruIluvatar(QThread* thread);
+  EruIluvatar();
+  Q_DISABLE_COPY_MOVE(EruIluvatar)
 };
-
-#include "pobject_builder.h"
 
 #endif  // POBJECTBUILDER_H

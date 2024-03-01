@@ -1,12 +1,22 @@
 #include "pobject_builder.h"
 
-PObjectBuilder::PObjectBuilder(QThread* thread) : Thread(thread) {}
+EruIluvatar* EruIluvatar::instance() {
+  static EruIluvatar instance;
 
-PObjectBuilder::~PObjectBuilder() {}
+  return &instance;
+}
+
+EruIluvatar::~EruIluvatar() {}
+
+void EruIluvatar::setThread(QThread* thread) {
+  Thread = thread;
+}
+
+EruIluvatar::EruIluvatar() : Thread(QThread::currentThread()) {}
 
 // template <typename T, typename... Args>
 // typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type
-// PObjectBuilder::build(Args&&... args) {
+// EruIluvatar::build(Args&&... args) {
 //   assert(Thread);
 
 //  T* obj = new T(std::forward<Args>(args)...);

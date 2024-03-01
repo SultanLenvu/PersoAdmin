@@ -7,17 +7,13 @@ InternalServiceSpace::InternalServiceSpace(const QString& name)
   Thread = std::unique_ptr<QThread>(new QThread());
   Thread->start();
 
-  PObjectBuilder builder(Thread.get());
+  EruIluvatar* eru = EruIluvatar::instance();
+  eru->setThread(Thread.get());
 
-  Logger = std::unique_ptr<LogSystem>(builder.build<LogSystem>("LogSystem"));
-
-  //  connect(Thread.get(), &QThread::started, Logger.get(),
-  //          &LogSystem::onInstanceThreadStarted, Qt::DirectConnection);
-
-  GlobalEnvironment::instance()->moveToThread(Thread.get());
-  //  Logger->moveToThread(Thread.get());
+  Logger = std::unique_ptr<LogSystem>(eru->create<LogSystem>("LogSystem"));
 
   // Создаем глобальную среду для сигналов и слотов объектов
+  GlobalEnvironment::instance()->moveToThread(Thread.get());
 }
 
 InternalServiceSpace::~InternalServiceSpace() {
