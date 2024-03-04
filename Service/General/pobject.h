@@ -30,7 +30,7 @@ class PObject : public QObject {
   virtual bool initInternals(void);
 
  private:
-  PObject() = delete;
+  PObject();
   Q_DISABLE_COPY_MOVE(PObject)
 
   void connectDependencies(void);

@@ -20,5 +20,3 @@ InternalServiceSpace::~InternalServiceSpace() {
   Thread->quit();
   Thread->wait();
 }
-
-void InternalServiceSpace::init() {}

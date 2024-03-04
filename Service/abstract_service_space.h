@@ -10,7 +10,6 @@ class AbstractServiceSpace : public QObject {
   virtual ~AbstractServiceSpace();
 
  public:
-  virtual void init(void) = 0;
 };
 
 #endif // ABSTRACTSERVICESPACE_H

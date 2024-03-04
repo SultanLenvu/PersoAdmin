@@ -17,6 +17,8 @@ include_directories(Service/General/)
 include_directories(Service/Log/)
 include_directories(Service/Functors/)
 include_directories(Service/Reactions/)
+include_directories(Service/Options/)
+include_directories(Service/Entities/)
 include_directories(Database/)
 include_directories(GUI/)
 include_directories(GUI/Subkernels)
@@ -134,6 +136,8 @@ add_executable(PersoAdmin WIN32
 
     main.cpp
     Service/General/pobject_builder.h Service/General/pobject_builder.cpp
+    Service/Options/qsettings_configurator.h Service/Options/qsettings_configurator.cpp
+    Service/Entities/configurable_entity.h Service/Entities/configurable_entity.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
