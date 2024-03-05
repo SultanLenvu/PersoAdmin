@@ -7,10 +7,10 @@ InternalServiceSpace::InternalServiceSpace(const QString& name)
   Thread = std::unique_ptr<QThread>(new QThread());
   Thread->start();
 
-  PObjectBuilder* eru = PObjectBuilder::instance();
-  eru->setThread(Thread.get());
+  //  PObjectBuilder* builder = PObjectBuilder::instance();
+  //  builder->setThread(Thread.get());
 
-  Logger = std::unique_ptr<LogSystem>(eru->create<LogSystem>("LogSystem"));
+  Logger = std::unique_ptr<LogSystem>(builder->create<LogSystem>("LogSystem"));
 
   // Создаем глобальную среду для сигналов и слотов объектов
   GlobalEnvironment::instance()->moveToThread(Thread.get());

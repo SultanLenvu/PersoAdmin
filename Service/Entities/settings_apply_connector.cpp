@@ -2,18 +2,18 @@
 #include "global_environment.h"
 #include "gui_kernel.h"
 
-SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject1* object) {
-  Object = object;
+// SettingsApplyBundle::SettingsApplyBundle(ConfigurableObjectNew* object) {
+//   Object = object;
 
-  GuiKernel* gk = static_cast<GuiKernel*>(
-      GlobalEnvironment::instance()->getObject("GuiKernel"));
+//  GuiKernel* gk = static_cast<GuiKernel*>(
+//      GlobalEnvironment::instance()->getObject("GuiKernel"));
 
-  connect(gk, &GuiKernel::applySettings_signal, this,
-          &SettingsApplyBundle::apply);
-}
+//  connect(gk, &GuiKernel::applySettings_signal, this,
+//          &SettingsApplyBundle::apply);
+//}
 
-SettingsApplyBundle::~SettingsApplyBundle() {}
+// SettingsApplyBundle::~SettingsApplyBundle() {}
 
-void SettingsApplyBundle::apply() {
-  //  Object->loadSettings();
-}
+// void SettingsApplyBundle::apply() {
+//   //  Object->loadSettings();
+// }

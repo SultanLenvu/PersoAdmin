@@ -3,20 +3,20 @@
 
 #include <QObject>
 
-class ConfigurableObject1;
+// class ConfigurableObjectNew;
 
-class SettingsApplyBundle : public QObject {
-  Q_OBJECT
+// class SettingsApplyBundle : public QObject {
+//   Q_OBJECT
 
- private:
-  ConfigurableObject1* Object;
+// private:
+//  ConfigurableObjectNew* Object;
 
- public:
-  SettingsApplyBundle(ConfigurableObject1* entity);
-  virtual ~SettingsApplyBundle();
+// public:
+//  SettingsApplyBundle(ConfigurableObjectNew* entity);
+//  virtual ~SettingsApplyBundle();
 
- private slots:
-  void apply(void);
-};
+// private slots:
+//  void apply(void);
+//};
 
 #endif  // SETTINGSAPPLYBUNDLE_H

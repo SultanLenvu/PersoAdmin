@@ -6,6 +6,8 @@
 
 LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
   doLoadSettings();
+
+  bool b = initInternals();
 }
 
 LogSystem::~LogSystem() {
