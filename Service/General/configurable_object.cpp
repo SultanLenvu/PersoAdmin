@@ -15,9 +15,9 @@ void ConfigurableObject::applySettings() {
 void ConfigurableObject::loadSettings() {}
 
 void ConfigurableObject::connectDependencies() {
-  GuiKernel* gk = static_cast<GuiKernel*>(
-      GlobalEnvironment::instance()->getObject("GuiKernel"));
+  //  GuiKernel* gk = static_cast<GuiKernel*>(
+  //      GlobalEnvironment::instance()->getObject("GuiKernel"));
 
-  connect(gk, &GuiKernel::applySettings_signal, this,
-          &ConfigurableObject::applySettings);
+  //  connect(gk, &GuiKernel::applySettings_signal, this,
+  //          &ConfigurableObject::applySettings);
 }

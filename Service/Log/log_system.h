@@ -11,12 +11,13 @@
 #include <QUdpSocket>
 
 #include "configurable_object.h"
+#include "configurable_object1.h"
 #include "log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public ConfigurableObject {
+class LogSystem : public ConfigurableObject, public ConfigurableObject1 {
   Q_OBJECT
 
  private:

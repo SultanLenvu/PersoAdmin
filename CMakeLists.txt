@@ -136,8 +136,9 @@ add_executable(PersoAdmin WIN32
 
     main.cpp
     Service/General/pobject_builder.h Service/General/pobject_builder.cpp
-    Service/Options/qsettings_configurator.h Service/Options/qsettings_configurator.cpp
-    Service/Entities/configurable_entity.h Service/Entities/configurable_entity.cpp
+
+    Service/Entities/configurable_object1.h Service/Entities/configurable_object1.cpp
+    Service/Entities/settings_apply_connector.h Service/Entities/settings_apply_connector.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
