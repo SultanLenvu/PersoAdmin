@@ -22,6 +22,10 @@ void FileLogBackend::writeMessage(const QString& str) {
   FileStream.flush();
 }
 
+bool FileLogBackend::initInternals() {
+  return true;
+}
+
 void FileLogBackend::loadSettings() {
   doLoadSettings();
   initialize();

@@ -15,5 +15,5 @@ SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject1* object) {
 SettingsApplyBundle::~SettingsApplyBundle() {}
 
 void SettingsApplyBundle::apply() {
-  Object->loadSettings();
+  //  Object->loadSettings();
 }

@@ -17,7 +17,7 @@
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public ConfigurableObject, public ConfigurableObject1 {
+class LogSystem : public ConfigurableObject /*, public ConfigurableObject1*/ {
   Q_OBJECT
 
  private:

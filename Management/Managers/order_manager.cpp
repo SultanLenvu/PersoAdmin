@@ -887,14 +887,14 @@ ReturnStatus OrderManager::shipPallet(const QString& id,
 
   for (int32_t i = 0; i < records.recordCount(); i++) {
     // Удаляем пробелы из названия модели
-    QString tempModel = records.get(i, "transponder_model");
+    QString tempModel = records.get(i, "transponder_model").remove(" ");
 
     // Преобразуем в десятичный формат
     QString manufacturerId =
         QString::number(records.get(i, "manufacturer_id").toInt(nullptr, 16));
 
     // Дата сборки
-    QStringList tempDate = records.get(i, "assembling_start").split("T");
+    QStringList tempDate = records.get(i, "boxes.assembling_start").split("T");
     QDate date = QDate::fromString(tempDate.first(), POSTGRES_DATE_TEMPLATE);
     QString batteryInsertationDate =
         QString("%1%2")
@@ -903,7 +903,7 @@ ReturnStatus OrderManager::shipPallet(const QString& id,
 
     // Дополняем серийник до 10 цифр нулями слева
     QString extendedTransponderId =
-        QString("%1").arg(records.get(i, "transponders.id"), 10, QChar('0'));
+        QString("%1").arg(records.get(i, "id"), 10, QChar('0'));
 
     // Конструируем серийный номер транспондера
     QString sn = QString("%1%2%3").arg(manufacturerId, batteryInsertationDate,
