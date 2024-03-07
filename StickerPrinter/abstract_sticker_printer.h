@@ -7,21 +7,14 @@
 #include <QSettings>
 #include <QtPrintSupport/QPrinterInfo>
 
-#include "pobject.h"
 #include "types.h"
 
-class AbstractStickerPrinter : public PObject {
-  Q_OBJECT
+class AbstractStickerPrinter {
  public:
-  AbstractStickerPrinter(const QString& name);
-  virtual ~AbstractStickerPrinter();
+  AbstractStickerPrinter() = default;
+  virtual ~AbstractStickerPrinter() = default;
 
-  // PObject interface
- public slots:
-  virtual void applySetting(void) = 0;
-
-  // Own
- public slots:
+ public:
   virtual ReturnStatus checkConfig(void) = 0;
 
   virtual ReturnStatus printTransponderSticker(
@@ -35,8 +28,6 @@ class AbstractStickerPrinter : public PObject {
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 
   virtual ReturnStatus exec(const QStringList& commandScript) = 0;
-
- signals:
 };
 
 #endif  // ISTICKERPRINTER_H

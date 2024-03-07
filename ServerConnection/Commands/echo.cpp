@@ -2,8 +2,6 @@
 
 Echo::Echo(const QString& name) : AbstractClientCommand(name) {}
 
-Echo::~Echo() {}
-
 const QString& Echo::name() {
   return Name;
 }

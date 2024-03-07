@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class PrintLastPalletSticker : public AbstractClientCommand {
+class PrintLastPalletSticker final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_PRINTLASTPALLETSTICKER_NAME;
@@ -12,7 +12,7 @@ class PrintLastPalletSticker : public AbstractClientCommand {
 
  public:
   explicit PrintLastPalletSticker(const QString& name);
-  ~PrintLastPalletSticker();
+  ~PrintLastPalletSticker() = default;
 
   // AbstractClientCommand interface
  public:
@@ -24,8 +24,6 @@ class PrintLastPalletSticker : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(PrintLastPalletSticker)
-
- signals:
 };
 
 #endif  // LASTPALLETSTICKERPRINTCOMMAND_H

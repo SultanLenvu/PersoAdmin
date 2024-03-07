@@ -3,8 +3,6 @@
 ConfirmTransponderRerelease::ConfirmTransponderRerelease(const QString& name)
     : AbstractClientCommand(name) {}
 
-ConfirmTransponderRerelease::~ConfirmTransponderRerelease() {}
-
 const QString& ConfirmTransponderRerelease::name() {
   return Name;
 }

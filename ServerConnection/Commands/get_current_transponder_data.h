@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class GetCurrentTransponderData : public AbstractClientCommand {
+class GetCurrentTransponderData final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_GETCURRENTTRANSPONDERDATA_NAME;
@@ -12,7 +12,7 @@ class GetCurrentTransponderData : public AbstractClientCommand {
 
  public:
   explicit GetCurrentTransponderData(const QString& name);
-  ~GetCurrentTransponderData();
+  ~GetCurrentTransponderData() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(GetCurrentTransponderData)

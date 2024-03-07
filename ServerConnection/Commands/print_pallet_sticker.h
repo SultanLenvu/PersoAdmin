@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class PrintPalletSticker : public AbstractClientCommand {
+class PrintPalletSticker final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_PRINTPALLETSTICKER_NAME;
@@ -12,7 +12,7 @@ class PrintPalletSticker : public AbstractClientCommand {
 
  public:
   explicit PrintPalletSticker(const QString& name);
-  ~PrintPalletSticker();
+  ~PrintPalletSticker() = default;
 
   // AbstractClientCommand interface
  public:
@@ -24,8 +24,6 @@ class PrintPalletSticker : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(PrintPalletSticker)
-
- signals:
 };
 
 #endif  // PALLETSTICKERPRINTCOMMAND_H

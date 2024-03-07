@@ -1,18 +1,18 @@
 #ifndef SETTINGSAPPLYBUNDLE_H
 #define SETTINGSAPPLYBUNDLE_H
 
-#include <QObject>
+// #include <QObject>
 
-// class ConfigurableObjectNew;
+// class ConfigurableObject;
 
 // class SettingsApplyBundle : public QObject {
 //   Q_OBJECT
 
 // private:
-//  ConfigurableObjectNew* Object;
+//  ConfigurableObject* Object;
 
 // public:
-//  SettingsApplyBundle(ConfigurableObjectNew* entity);
+//  SettingsApplyBundle(ConfigurableObject* entity);
 //  virtual ~SettingsApplyBundle();
 
 // private slots:

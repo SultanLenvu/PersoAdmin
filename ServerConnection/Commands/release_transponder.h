@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class ReleaseTransponder : public AbstractClientCommand {
+class ReleaseTransponder final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_RELEASETRANSPONDER_NAME;
@@ -12,7 +12,7 @@ class ReleaseTransponder : public AbstractClientCommand {
 
  public:
   explicit ReleaseTransponder(const QString& name);
-  ~ReleaseTransponder();
+  ~ReleaseTransponder() = default;
 
   // AbstractClientCommand interface
  public:
@@ -25,8 +25,6 @@ class ReleaseTransponder : public AbstractClientCommand {
  private:
   Q_DISABLE_COPY_MOVE(ReleaseTransponder)
   bool checkSyntax(void);
-
- signals:
 };
 
 #endif  // RELEASECOMMAND_H

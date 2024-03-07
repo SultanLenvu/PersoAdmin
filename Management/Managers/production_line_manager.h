@@ -3,20 +3,23 @@
 
 #include "abstract_manager.h"
 #include "abstract_sql_database.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class ProductionLineManager final : public AbstractManager {
+class ProductionLineManager final : public NamedObject,
+                                    public AbstractManager,
+                                    public LoggableObject {
   Q_OBJECT
  private:
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit ProductionLineManager(const QString& name);
+  explicit ProductionLineManager(const QString& name,
+                                 std::shared_ptr<AbstractSqlDatabase> database);
   ~ProductionLineManager();
 
   // Own
- public slots:
-  void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
-
+ public:
   ReturnStatus create(const StringDictionary& param);
 
   ReturnStatus activate(const StringDictionary& param);
@@ -30,8 +33,8 @@ class ProductionLineManager final : public AbstractManager {
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionLineManager)
-  void connectDependencies(void);
 
+ private:
   bool addProductionLine(const StringDictionary& param);
   bool stopAllProductionLines(void);
 };

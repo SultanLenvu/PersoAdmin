@@ -14,9 +14,8 @@ class DatabaseAsyncWrapper final : public AbstractAsyncWrapper {
   explicit DatabaseAsyncWrapper(const QString& name);
   ~DatabaseAsyncWrapper();
 
-  // AbstractManager interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
+ public:
+  std::shared_ptr<AbstractSqlDatabase> database(void);
 
  public slots:
   void connect(void);
@@ -30,7 +29,6 @@ class DatabaseAsyncWrapper final : public AbstractAsyncWrapper {
 
  private:
   Q_DISABLE_COPY_MOVE(DatabaseAsyncWrapper)
-  void createDatabase(void);
 
   bool generateTransponderData(const QString& id, StringDictionary& data);
   bool generateBoxData(const QString& id, StringDictionary& data);
@@ -39,7 +37,6 @@ class DatabaseAsyncWrapper final : public AbstractAsyncWrapper {
  signals:
   void dataReady(const std::shared_ptr<StringDictionary> data);
   void responseReady(const std::shared_ptr<SqlQueryValues> response);
-  void databaseCreated(std::shared_ptr<AbstractSqlDatabase> database);
 };
 
 #endif  // DATABASEMANAGER_H

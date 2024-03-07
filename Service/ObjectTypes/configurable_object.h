@@ -1,19 +1,19 @@
-#ifndef CONFIGURABLEOBJECTNEW_H
-#define CONFIGURABLEOBJECTNEW_H
+#ifndef CONFIGURABLEOBJECT_H
+#define CONFIGURABLEOBJECT_H
 
 #include <QObject>
 
 class SettingsApplyBundle;
 
-class ConfigurableObjectNew {
+class ConfigurableObject {
   friend class SettingsApplyBundle;
 
  private:
   std::unique_ptr<SettingsApplyBundle> Connector;
 
  public:
-  ConfigurableObjectNew();
-  virtual ~ConfigurableObjectNew();
+  ConfigurableObject();
+  virtual ~ConfigurableObject() = default;
 
  private:
   virtual void loadSettings(void) = 0;
@@ -23,14 +23,14 @@ class SettingsApplyBundle : public QObject {
   Q_OBJECT
 
  private:
-  ConfigurableObjectNew* Object;
+  ConfigurableObject* Object;
 
  public:
-  SettingsApplyBundle(ConfigurableObjectNew* entity);
+  SettingsApplyBundle(ConfigurableObject* entity);
   virtual ~SettingsApplyBundle();
 
  private slots:
   void apply(void);
 };
 
-#endif  // CONFIGURABLEOBJECTNEW_H
+#endif  // CONFIGURABLEOBJECT_H

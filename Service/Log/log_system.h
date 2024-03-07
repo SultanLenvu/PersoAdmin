@@ -10,19 +10,19 @@
 #include <QTime>
 #include <QUdpSocket>
 
+#include "abstract_log_backend.h"
 #include "configurable_object.h"
-#include "configurable_object_new.h"
-#include "log_backend.h"
+#include "named_object.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public ConfigurableObject, public ConfigurableObjectNew {
+class LogSystem : public NamedObject, public ConfigurableObject {
   Q_OBJECT
 
  private:
   QString SavePath;
-  std::vector<std::unique_ptr<LogBackend>> Backends;
+  std::vector<std::unique_ptr<AbstractLogBackend>> Backends;
 
   bool UdpListenEnable;
   //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;

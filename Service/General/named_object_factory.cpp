@@ -9,9 +9,9 @@ NamedObjectFactory::NamedObjectFactory(QThread* thread) {
 
 NamedObjectFactory::~NamedObjectFactory() {}
 
-PObject* NamedObjectFactory::doCreate(const QString& objectName) {
-  PObject* createdObject =
-      reinterpret_cast<PObject*>(CreatedMetaObject->newInstance(objectName));
+NamedObject* NamedObjectFactory::doCreate(const QString& objectName) {
+  NamedObject* createdObject =
+      reinterpret_cast<NamedObject*>(CreatedMetaObject->newInstance(objectName));
 
   return createdObject;
 }

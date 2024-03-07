@@ -1,13 +1,14 @@
 #include "order_manager_async_wrapper.h"
 
-OrderManagerAsyncWrapper::OrderManagerAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper{name} {}
+OrderManagerAsyncWrapper::OrderManagerAsyncWrapper(
+    const QString& name,
+    std::shared_ptr<AbstractSqlDatabase> database)
+    : AbstractAsyncWrapper{name} {
+  Manager =
+      std::unique_ptr<OrderManager>(new OrderManager("OrderManager", database));
+}
 
 OrderManagerAsyncWrapper::~OrderManagerAsyncWrapper() {}
-
-void OrderManagerAsyncWrapper::onInstanceThreadStarted() {
-  Manager = std::unique_ptr<OrderManager>(new OrderManager("OrderManager"));
-}
 
 void OrderManagerAsyncWrapper::create(
     const std::shared_ptr<StringDictionary> param) {

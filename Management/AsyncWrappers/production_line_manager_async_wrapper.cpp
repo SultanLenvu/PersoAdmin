@@ -1,14 +1,12 @@
 #include "production_line_manager_async_wrapper.h"
 
-ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper{name} {}
+ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(
+    const QString& name,
+    std::shared_ptr<AbstractSqlDatabase> database)
+    : AbstractAsyncWrapper{name},
+      Manager(new ProductionLineManager("ProductionLineManager", database)) {}
 
 ProductionLineManagerAsyncWrapper::~ProductionLineManagerAsyncWrapper() {}
-
-void ProductionLineManagerAsyncWrapper::onInstanceThreadStarted() {
-  Manager = std::unique_ptr<ProductionLineManager>(
-      new ProductionLineManager("ProductionLineManager"));
-}
 
 void ProductionLineManagerAsyncWrapper::create(
     const std::shared_ptr<StringDictionary> param) {

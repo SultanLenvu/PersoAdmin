@@ -103,8 +103,7 @@ void GuiKernel::createMainWindowGui() {
 }
 
 void GuiKernel::createServiceSpace() {
-  Service = std::unique_ptr<InternalServiceSpace>(
-      new InternalServiceSpace("InternalServiceSpace"));
+  Service = std::unique_ptr<InternalServiceSpace>(new InternalServiceSpace());
 }
 
 void GuiKernel::createReactions() {
@@ -128,11 +127,14 @@ void GuiKernel::createGuiSubkernels() {
 }
 
 void GuiKernel::createAsyncInstance() {
-  Managers.emplace_back(new DatabaseAsyncWrapper("DatabaseAsyncWrapper"));
-  Managers.emplace_back(
-      new OrderManagerAsyncWrapper("OrderManagerAsyncWrapper"));
+  std::unique_ptr<DatabaseAsyncWrapper> daw(
+      new DatabaseAsyncWrapper("DatabaseAsyncWrapper"));
+
+  Managers.emplace_back(new OrderManagerAsyncWrapper("OrderManagerAsyncWrapper",
+                                                     daw->database()));
   Managers.emplace_back(new ProductionLineManagerAsyncWrapper(
-      "ProductionLineManagerAsyncWrapper"));
+      "ProductionLineManagerAsyncWrapper", daw->database()));
+  Managers.emplace_back(std::move(daw));
   Managers.emplace_back(new PersoServerAsyncWrapper("PersoServerAsyncWrapper"));
   Managers.emplace_back(new ProgrammerAsyncWrapper("ProgrammerAsyncWrapper"));
   Managers.emplace_back(new StickerPrinterAsyncWrapper("StickerPrinterAsyncWrapper"));
@@ -140,9 +142,6 @@ void GuiKernel::createAsyncInstance() {
   ManagerThread = std::unique_ptr<QThread>(new QThread());
 
   for (auto it1 = Managers.cbegin(), it2 = Managers.cend(); it1 != it2; ++it1) {
-    connect(ManagerThread.get(), &QThread::started, it1->get(),
-            &AbstractAsyncWrapper::onInstanceThreadStarted,
-            Qt::DirectConnection);
     connect(it1->get(), &AbstractAsyncWrapper::executionStatus,
             ReturnStatusHandler.get(), &AbstractReturnStatusHandler::handle,
             Qt::QueuedConnection);

@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class CompleteCurrentBox : public AbstractClientCommand {
+class CompleteCurrentBox final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_COMPLETECURRENTBOX_NAME;
@@ -12,7 +12,7 @@ class CompleteCurrentBox : public AbstractClientCommand {
 
  public:
   explicit CompleteCurrentBox(const QString& name);
-  ~CompleteCurrentBox();
+  ~CompleteCurrentBox() = default;
 
   // AbstractClientCommand interface
  public:

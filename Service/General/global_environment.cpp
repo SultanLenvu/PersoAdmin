@@ -17,7 +17,7 @@ void GlobalEnvironment::registerObject(QObject* obj) {
 
   GlobalObjects[name] = obj;
 
-  //  connect(obj, &PObject::deleted, this,
+  //  connect(obj, &NamedObject::deleted, this,
   //          &GlobalEnvironment::onRegosteredObjectDestroyed,
   //          Qt::QueuedConnection);
 }

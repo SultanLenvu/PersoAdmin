@@ -9,15 +9,10 @@ PersoServerAsyncWrapper::PersoServerAsyncWrapper(const QString& name)
     : AbstractAsyncWrapper{name},
       ProductionLineData(new StringDictionary()),
       BoxData(new StringDictionary()),
-      TransponderData(new StringDictionary()) {
-  loadSettings();
-}
+      TransponderData(new StringDictionary()),
+      Server(new PersoServerConnection("PersoServerConnection")) {}
 
 PersoServerAsyncWrapper::~PersoServerAsyncWrapper() {}
-
-void PersoServerAsyncWrapper::onInstanceThreadStarted() {
-  createServerConnection();
-}
 
 void PersoServerAsyncWrapper::connect() {
   initOperation("connectToServer");
@@ -524,8 +519,6 @@ void PersoServerAsyncWrapper::onServerDisconnected() {
   emit transponderDataReady(TransponderData);
 }
 
-void PersoServerAsyncWrapper::loadSettings() {}
-
 ReturnStatus PersoServerAsyncWrapper::checkConfig() {
   sendLog("Проверка конфигурации.");
 
@@ -533,12 +526,4 @@ ReturnStatus PersoServerAsyncWrapper::checkConfig() {
 
   sendLog("Проверка конфигурации успешно завершена.");
   return ret;
-}
-
-void PersoServerAsyncWrapper::createServerConnection() {
-  Server = std::unique_ptr<AbstractServerConnection>(
-      new PersoServerConnection("PersoServerConnection"));
-
-  QObject::connect(Server.get(), &AbstractServerConnection::disconnected, this,
-                   &PersoServerAsyncWrapper::onServerDisconnected);
 }

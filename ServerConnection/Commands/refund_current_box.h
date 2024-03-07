@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class RefundCurrentBox : public AbstractClientCommand {
+class RefundCurrentBox final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_REFUNDCURRENTBOX_NAME;
@@ -12,7 +12,7 @@ class RefundCurrentBox : public AbstractClientCommand {
 
  public:
   explicit RefundCurrentBox(const QString& name);
-  ~RefundCurrentBox();
+  ~RefundCurrentBox() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(RefundCurrentBox)
@@ -27,8 +27,6 @@ class RefundCurrentBox : public AbstractClientCommand {
 
  private:
   bool checkSyntax(void);
-
- signals:
 };
 
 #endif  // REFUNDCURRENTBOXDATA_H

@@ -1,20 +1,15 @@
 #ifndef ABSTRACTSQLTABLE_H
 #define ABSTRACTSQLTABLE_H
 
-#include <QObject>
-
-#include "pobject.h"
 #include "sql_query_values.h"
 
-class AbstractSqlTable : public PObject {
-  Q_OBJECT
+class AbstractSqlTable {
+ public:
+  explicit AbstractSqlTable() = default;
+  virtual ~AbstractSqlTable() = default;
 
  public:
-  explicit AbstractSqlTable(const QString& name);
-  virtual ~AbstractSqlTable();
-
   virtual bool init() = 0;
-  virtual void applySettings() = 0;
 
   // Create
   virtual bool createRecords(const SqlQueryValues& records) = 0;
@@ -36,6 +31,9 @@ class AbstractSqlTable : public PObject {
 
   // Aggregation
   virtual bool getRecordCount(uint32_t& count) = 0;
+
+ private:
+  Q_DISABLE_COPY_MOVE(AbstractSqlTable)
 
  signals:
 };

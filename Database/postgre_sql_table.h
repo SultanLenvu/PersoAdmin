@@ -7,8 +7,12 @@
 #include <QtSql>
 
 #include "abstract_sql_table.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class PostgreSqlTable : public AbstractSqlTable {
+class PostgreSqlTable : public AbstractSqlTable,
+                        public NamedObject,
+                        public LoggableObject {
  private:
   QString TableName;
   QString ConnectionName;
@@ -25,10 +29,6 @@ class PostgreSqlTable : public AbstractSqlTable {
                            const QString& tableName,
                            const QString& connectionName);
   ~PostgreSqlTable();
-
-  // PObject interface
- public:
-  virtual void applySettings() override;
 
   // AbstractSqlTable interface
  public:
@@ -64,8 +64,6 @@ class PostgreSqlTable : public AbstractSqlTable {
   const StringDictionary* relations() const;
 
  private:
-  void loadSettings(void);
-
   bool checkFieldNames(const SqlQueryValues& record) const;
   bool checkFieldNames(const StringDictionary& record) const;
 

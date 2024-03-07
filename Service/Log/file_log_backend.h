@@ -10,10 +10,10 @@
 #include <QString>
 #include <QTextStream>
 
-#include "log_backend.h"
+#include "abstract_log_backend.h"
+#include "configurable_object.h"
 
-class FileLogBackend : public LogBackend {
-  Q_OBJECT
+class FileLogBackend : public AbstractLogBackend, public ConfigurableObject {
  private:
   bool Enable;
   QDir CurrentDir;
@@ -21,20 +21,21 @@ class FileLogBackend : public LogBackend {
   QTextStream FileStream;
 
  public:
-  explicit FileLogBackend(const QString& name);
+  explicit FileLogBackend();
   ~FileLogBackend();
 
-  // LogBackend interface
+  // AbstractLogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
 
  private:
   Q_DISABLE_COPY_MOVE(FileLogBackend)
-  virtual bool initInternals(void) override;
-  virtual void loadSettings(void) override;
 
+ private:
+  virtual void loadSettings(void) override;
   void doLoadSettings(void);
 
+ private:
   void initialize();
   void removeOldestLogFiles(void);
 };

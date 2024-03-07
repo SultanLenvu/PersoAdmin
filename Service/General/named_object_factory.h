@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "pobject.h"
+#include "named_object.h"
 
 class NamedObjectFactory final : public QObject {
   Q_OBJECT
@@ -20,7 +20,7 @@ class NamedObjectFactory final : public QObject {
 
  public:
   template <typename T>
-  typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type create(
+  typename std::enable_if<std::is_base_of<NamedObject, T>::value, T*>::type create(
       const QString& name) {
     if (!Thread->isRunning()) {
       return nullptr;
@@ -28,7 +28,7 @@ class NamedObjectFactory final : public QObject {
 
     CreatedMetaObject = QMetaType(qRegisterMetaType<T>()).metaObject();
 
-    PObject* createdObject;
+    NamedObject* createdObject;
     bool ok = QMetaObject::invokeMethod(this, "doCreate",
                                         Qt::BlockingQueuedConnection,
                                         qReturnArg(createdObject), name);
@@ -43,7 +43,7 @@ class NamedObjectFactory final : public QObject {
   Q_DISABLE_COPY_MOVE(NamedObjectFactory)
 
  private slots:
-  PObject* doCreate(const QString& objectName);
+  NamedObject* doCreate(const QString& objectName);
 
  signals:
 };

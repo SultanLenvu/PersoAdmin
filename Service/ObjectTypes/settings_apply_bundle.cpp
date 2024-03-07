@@ -1,8 +1,8 @@
-#include "settings_apply_connector.h"
-#include "global_environment.h"
-#include "gui_kernel.h"
+// #include "settings_apply_connector.h"
+// #include "global_environment.h"
+// #include "gui_kernel.h"
 
-// SettingsApplyBundle::SettingsApplyBundle(ConfigurableObjectNew* object) {
+// SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
 //   Object = object;
 
 //  GuiKernel* gk = static_cast<GuiKernel*>(

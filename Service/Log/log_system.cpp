@@ -5,11 +5,11 @@
 #include "types.h"
 #include "widget_log_backend.h"
 
-LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
+LogSystem::LogSystem(const QString& name) : NamedObject(name) {
   doLoadSettings();
 
-  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
-  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
+  Backends.emplace_back(new WidgetLogBackend());
+  Backends.emplace_back(new FileLogBackend());
 
   createPersoServerLogSocket();
 
@@ -47,10 +47,6 @@ void LogSystem::loadSettings() {
 
   PersoServerLogSocket->abort();
   PersoServerLogSocket->bind(UdpListenIp, UdpListenPort);
-
-  for (auto it = Backends.begin(); it != Backends.end(); ++it) {
-    (*it)->applySettings();
-  }
 }
 
 void LogSystem::doLoadSettings() {

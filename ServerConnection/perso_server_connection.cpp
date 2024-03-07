@@ -24,9 +24,7 @@
 #include "shutdown_production_line.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
-    : AbstractServerConnection(name),
-      PersoServerPort(0),
-      ReceivedDataBlockSize(0) {
+    : NamedObject(name), PersoServerPort(0), ReceivedDataBlockSize(0) {
   doLoadSettings();
 
   createSocket();
@@ -451,7 +449,7 @@ void PersoServerConnection::socketDisconnected_slot() {
 
   // Если отключение произошло в результате ошибки
   if (Socket->error() != QTcpSocket::UnknownSocketError) {
-    emit disconnected();
+    Disconnection.signal();
   }
 }
 

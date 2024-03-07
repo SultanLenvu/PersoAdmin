@@ -10,12 +10,9 @@ class OrderManagerAsyncWrapper final : public AbstractAsyncWrapper {
   std::unique_ptr<OrderManager> Manager;
 
  public:
-  OrderManagerAsyncWrapper(const QString& name);
+  OrderManagerAsyncWrapper(const QString& name,
+                           std::shared_ptr<AbstractSqlDatabase> database);
   ~OrderManagerAsyncWrapper();
-
-  // AbstractAsyncWrapper interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
 
   // Own
  public slots:

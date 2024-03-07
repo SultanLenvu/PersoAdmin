@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class GetCurrentBoxData : public AbstractClientCommand {
+class GetCurrentBoxData final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_GETCURRENTBOXDATA_NAME;
@@ -12,7 +12,7 @@ class GetCurrentBoxData : public AbstractClientCommand {
 
  public:
   explicit GetCurrentBoxData(const QString& name);
-  ~GetCurrentBoxData();
+  ~GetCurrentBoxData() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(GetCurrentBoxData)

@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class Echo : public AbstractClientCommand {
+class Echo final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_ECHO_NAME;
@@ -12,7 +12,7 @@ class Echo : public AbstractClientCommand {
 
  public:
   explicit Echo(const QString& name);
-  ~Echo();
+  ~Echo() = default;
 
   // AbstractClientCommand interface
  public:

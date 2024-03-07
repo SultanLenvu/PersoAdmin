@@ -3,8 +3,6 @@
 PrintLastPalletSticker::PrintLastPalletSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-PrintLastPalletSticker::~PrintLastPalletSticker() {}
-
 const QString& PrintLastPalletSticker::name() {
   return Name;
 }

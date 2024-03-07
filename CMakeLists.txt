@@ -18,7 +18,7 @@ include_directories(Service/Log/)
 include_directories(Service/Functors/)
 include_directories(Service/Reactions/)
 include_directories(Service/Options/)
-include_directories(Service/Entities/)
+include_directories(Service/ObjectTypes/)
 include_directories(Database/)
 include_directories(GUI/)
 include_directories(GUI/Subkernels)
@@ -36,10 +36,17 @@ add_executable(PersoAdmin WIN32
     Service/General/types.h
     Service/General/definitions.h
     Service/General/sql_response_model.cpp Service/General/sql_response_model.h
-    Service/General/pobject.cpp Service/General/pobject.h
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
-    Service/General/configurable_object.h Service/General/configurable_object.cpp
+
     Service/General/global_environment.cpp Service/General/global_environment.h
+    Service/General/pobject_builder.h Service/General/pobject_builder.cpp
+    Service/General/named_object_factory.h Service/General/named_object_factory.cpp
+
+    Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
+    Service/ObjectTypes/configurable_object.h Service/ObjectTypes/configurable_object.cpp
+    Service/ObjectTypes/settings_apply_bundle.h Service/ObjectTypes/settings_apply_bundle.cpp
+    Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
+    Service/ObjectTypes/log_system_bundle.h Service/ObjectTypes/log_system_bundle.cpp
 
     Service/abstract_service_space.h Service/abstract_service_space.cpp
     Service/internal_service_space.h Service/internal_service_space.cpp
@@ -49,7 +56,7 @@ add_executable(PersoAdmin WIN32
     Service/Functors/numeric_string_checker.h Service/Functors/numeric_string_checker.cpp
 
     Service/Log/file_log_backend.cpp Service/Log/file_log_backend.h
-    Service/Log/log_backend.cpp Service/Log/log_backend.h
+    Service/Log/abstract_log_backend.cpp Service/Log/abstract_log_backend.h
     Service/Log/log_system.cpp Service/Log/log_system.h
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
 
@@ -110,6 +117,8 @@ add_executable(PersoAdmin WIN32
 
     ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
+    ServerConnection/server_disconnected_signal.h ServerConnection/server_disconnected_signal.cpp
+
     ServerConnection/Commands/abstract_client_command.cpp ServerConnection/Commands/abstract_client_command.h
     ServerConnection/Commands/complete_current_box.cpp ServerConnection/Commands/complete_current_box.h
     ServerConnection/Commands/confirm_transponder_release.cpp ServerConnection/Commands/confirm_transponder_release.h
@@ -135,12 +144,6 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    Service/General/pobject_builder.h Service/General/pobject_builder.cpp
-
-    Service/Entities/configurable_object_new.h Service/Entities/configurable_object_new.cpp
-    Service/Entities/settings_apply_connector.h Service/Entities/settings_apply_connector.cpp
-    Service/General/named_object_factory.h Service/General/named_object_factory.cpp
-
     )
 
 target_compile_definitions(PersoAdmin PRIVATE

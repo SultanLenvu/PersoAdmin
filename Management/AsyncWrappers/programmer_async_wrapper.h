@@ -8,10 +8,6 @@ class ProgrammerAsyncWrapper : public AbstractAsyncWrapper {
  public:
   explicit ProgrammerAsyncWrapper(const QString& name);
   ~ProgrammerAsyncWrapper();
-
-  // AbstractManager interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
 };
 
 #endif  // PROGRAMMERASYNCWRAPPER_H

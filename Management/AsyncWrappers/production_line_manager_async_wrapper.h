@@ -10,12 +10,10 @@ class ProductionLineManagerAsyncWrapper final : public AbstractAsyncWrapper {
   std::unique_ptr<ProductionLineManager> Manager;
 
  public:
-  ProductionLineManagerAsyncWrapper(const QString& name);
+  explicit ProductionLineManagerAsyncWrapper(
+      const QString& name,
+      std::shared_ptr<AbstractSqlDatabase> database);
   ~ProductionLineManagerAsyncWrapper();
-
-  // AbstractAsyncWrapper interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
 
   // Own
  public slots:

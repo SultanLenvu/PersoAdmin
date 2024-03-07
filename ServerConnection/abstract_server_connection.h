@@ -1,14 +1,12 @@
 #ifndef ABSTARCTSERVERCONNECTION_H
 #define ABSTARCTSERVERCONNECTION_H
 
-#include "configurable_object.h"
 #include "types.h"
 
-class AbstractServerConnection : public ConfigurableObject {
-  Q_OBJECT
+class AbstractServerConnection {
  public:
-  explicit AbstractServerConnection(const QString& name);
-  virtual ~AbstractServerConnection();
+  explicit AbstractServerConnection() = default;
+  virtual ~AbstractServerConnection() = default;
 
   // Own
  public:
@@ -44,12 +42,6 @@ class AbstractServerConnection : public ConfigurableObject {
   virtual ReturnStatus printLastBoxSticker(void) = 0;
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
-
- private:
-  void connectDepedencies(void);
-
- signals:
-  void disconnected(void);
 };
 
 #endif  // ABSTARCTSERVERCONNECTION_H

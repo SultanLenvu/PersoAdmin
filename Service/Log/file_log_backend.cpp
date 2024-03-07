@@ -4,7 +4,7 @@
 
 #include "file_log_backend.h"
 
-FileLogBackend::FileLogBackend(const QString& name) : LogBackend(name) {
+FileLogBackend::FileLogBackend() {
   doLoadSettings();
   initialize();
 }
@@ -19,11 +19,6 @@ void FileLogBackend::writeMessage(const QString& str) {
   }
 
   FileStream << str << "\n";
-  FileStream.flush();
-}
-
-bool FileLogBackend::initInternals() {
-  return true;
 }
 
 void FileLogBackend::loadSettings() {

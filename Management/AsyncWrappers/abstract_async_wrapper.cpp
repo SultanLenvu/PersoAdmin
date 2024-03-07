@@ -3,7 +3,7 @@
 #include "measuring_progress_indicator.h"
 
 AbstractAsyncWrapper::AbstractAsyncWrapper(const QString& name)
-    : PObject{name} {
+    : NamedObject{name} {
   connectDependencies();
 }
 

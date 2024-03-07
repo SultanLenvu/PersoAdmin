@@ -6,9 +6,14 @@
 #include <QtSql>
 
 #include "abstract_sql_database.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
 #include "postgre_sql_table.h"
 
-class PostgreSqlDatabase : public AbstractSqlDatabase {
+class PostgreSqlDatabase : public NamedObject,
+                           public AbstractSqlDatabase,
+                           public ConfigurableObject,
+                           public LoggableObject {
   Q_OBJECT
 
  private:
@@ -89,11 +94,15 @@ class PostgreSqlDatabase : public AbstractSqlDatabase {
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 
+ private:
   void createDatabaseConnection(void);
   bool init(void);
   bool createTable(const QString& name);
 
   bool checkTableNames(const QStringList& names) const;
+
+ signals:
+  void disconnected(void);
 };
 
 #endif  // PostgreSqlDatabase_H

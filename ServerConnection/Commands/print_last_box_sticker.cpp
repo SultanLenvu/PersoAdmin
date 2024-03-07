@@ -3,8 +3,6 @@
 PrintLastBoxSticker::PrintLastBoxSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-PrintLastBoxSticker::~PrintLastBoxSticker() {}
-
 const QString& PrintLastBoxSticker::name() {
   return Name;
 }

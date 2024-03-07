@@ -1,9 +1,9 @@
 #ifndef ABSTRACTPROGRESSINDICATOR_H
 #define ABSTRACTPROGRESSINDICATOR_H
 
-#include "pobject.h"
+#include "named_object.h"
 
-class AbstractProgressIndicator : public PObject {
+class AbstractProgressIndicator : public NamedObject {
   Q_OBJECT
  public:
   explicit AbstractProgressIndicator(const QString& name);

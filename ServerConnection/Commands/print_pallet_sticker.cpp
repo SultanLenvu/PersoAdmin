@@ -3,8 +3,6 @@
 PrintPalletSticker::PrintPalletSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-PrintPalletSticker::~PrintPalletSticker() {}
-
 const QString& PrintPalletSticker::name() {
   return Name;
 }

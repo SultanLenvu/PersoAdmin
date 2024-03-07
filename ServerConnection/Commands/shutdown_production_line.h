@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class ShutdownProductionLine : public AbstractClientCommand {
+class ShutdownProductionLine final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_SHUTDOWNPRODUCTIONLINE_NAME;
@@ -12,7 +12,7 @@ class ShutdownProductionLine : public AbstractClientCommand {
 
  public:
   explicit ShutdownProductionLine(const QString& name);
-  ~ShutdownProductionLine();
+  ~ShutdownProductionLine() = default;
 
   // AbstractClientCommand interface
  public:
@@ -24,8 +24,6 @@ class ShutdownProductionLine : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(ShutdownProductionLine)
-
- signals:
 };
 
 #endif  // LOGOUT_H

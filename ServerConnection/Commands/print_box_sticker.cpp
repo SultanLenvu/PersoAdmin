@@ -3,8 +3,6 @@
 PrintBoxSticker::PrintBoxSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-PrintBoxSticker::~PrintBoxSticker() {}
-
 const QString& PrintBoxSticker::name() {
   return Name;
 }

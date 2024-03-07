@@ -1,8 +1,7 @@
 #include "shutdown_production_line.h"
 
-ShutdownProductionLine::ShutdownProductionLine(const QString& name) : AbstractClientCommand(name) {}
-
-ShutdownProductionLine::~ShutdownProductionLine() {}
+ShutdownProductionLine::ShutdownProductionLine(const QString& name)
+    : AbstractClientCommand(name) {}
 
 const QString& ShutdownProductionLine::name() {
   return Name;

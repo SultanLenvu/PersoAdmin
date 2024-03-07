@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class PrintLastBoxSticker : public AbstractClientCommand {
+class PrintLastBoxSticker final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_PRINTLASTBOXSTICKER_NAME;
@@ -12,7 +12,7 @@ class PrintLastBoxSticker : public AbstractClientCommand {
 
  public:
   explicit PrintLastBoxSticker(const QString& name);
-  ~PrintLastBoxSticker();
+  ~PrintLastBoxSticker() = default;
 
   // AbstractClientCommand interface
  public:

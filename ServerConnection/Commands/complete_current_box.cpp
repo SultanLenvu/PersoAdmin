@@ -3,8 +3,6 @@
 CompleteCurrentBox::CompleteCurrentBox(const QString& name)
     : AbstractClientCommand(name) {}
 
-CompleteCurrentBox::~CompleteCurrentBox() {}
-
 const QString& CompleteCurrentBox::name() {
   return Name;
 }

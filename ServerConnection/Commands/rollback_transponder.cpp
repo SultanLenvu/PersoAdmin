@@ -3,8 +3,6 @@
 RollbackTransponder::RollbackTransponder(const QString& name)
     : AbstractClientCommand(name) {}
 
-RollbackTransponder::~RollbackTransponder() {}
-
 const QString& RollbackTransponder::name() {
   return Name;
 }

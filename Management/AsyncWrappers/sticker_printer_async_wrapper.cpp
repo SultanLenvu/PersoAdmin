@@ -2,14 +2,12 @@
 #include "te310_printer.h"
 
 StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper(name) {}
-
-StickerPrinterAsyncWrapper::~StickerPrinterAsyncWrapper() {}
-
-void StickerPrinterAsyncWrapper::onInstanceThreadStarted() {
+    : AbstractAsyncWrapper(name) {
   StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
       new TE310Printer("StickerPrinter"));
 }
+
+StickerPrinterAsyncWrapper::~StickerPrinterAsyncWrapper() {}
 
 void StickerPrinterAsyncWrapper::printTransponderSticker(
     const std::shared_ptr<StringDictionary> param) {

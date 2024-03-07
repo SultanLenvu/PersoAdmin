@@ -1,8 +1,7 @@
 #include "release_transponder.h"
+
 ReleaseTransponder::ReleaseTransponder(const QString& name)
     : AbstractClientCommand(name) {}
-
-ReleaseTransponder::~ReleaseTransponder() {}
 
 const QString& ReleaseTransponder::name() {
   return Name;

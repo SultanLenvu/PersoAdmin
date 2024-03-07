@@ -1,8 +1,7 @@
 #include "launch_production_line.h"
 
-LaunchProductionLine::LaunchProductionLine(const QString& name) : AbstractClientCommand(name) {}
-
-LaunchProductionLine::~LaunchProductionLine() {}
+LaunchProductionLine::LaunchProductionLine(const QString& name)
+    : AbstractClientCommand(name) {}
 
 const QString& LaunchProductionLine::name() {
   return Name;

@@ -3,8 +3,6 @@
 GetCurrentBoxData::GetCurrentBoxData(const QString& name)
     : AbstractClientCommand(name) {}
 
-GetCurrentBoxData::~GetCurrentBoxData() {}
-
 const QString& GetCurrentBoxData::name() {
   return Name;
 }

@@ -4,18 +4,21 @@
 #include <QApplication>
 #include <QObject>
 
-#include "log_backend.h"
+#include "abstract_log_backend.h"
+#include "configurable_object.h"
 
-class WidgetLogBackend final : public LogBackend {
+class WidgetLogBackend final : public QObject,
+                               public AbstractLogBackend,
+                               public ConfigurableObject {
   Q_OBJECT
  private:
   bool Enable;
 
  public:
-  WidgetLogBackend(const QString& name);
+  explicit WidgetLogBackend();
   ~WidgetLogBackend();
 
-  // LogBackend interface
+  // AbstractLogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
 
@@ -25,6 +28,8 @@ class WidgetLogBackend final : public LogBackend {
 
  private:
   Q_DISABLE_COPY_MOVE(WidgetLogBackend)
+
+ public:
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 

@@ -1,10 +1,10 @@
 #ifndef ABSTRACTRETURNSTATUSHANDLER_H
 #define ABSTRACTRETURNSTATUSHANDLER_H
 
-#include "pobject.h"
+#include "named_object.h"
 #include "types.h"
 
-class AbstractReturnStatusHandler : public PObject
+class AbstractReturnStatusHandler : public NamedObject
 {
   Q_OBJECT
  public:

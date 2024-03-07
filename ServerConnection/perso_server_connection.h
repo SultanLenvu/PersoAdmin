@@ -13,8 +13,15 @@
 
 #include "abstract_client_command.h"
 #include "abstract_server_connection.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
+#include "server_disconnected_signal.h"
 
-class PersoServerConnection : public AbstractServerConnection {
+class PersoServerConnection final : public NamedObject,
+                                    public AbstractServerConnection,
+                                    public LoggableObject,
+                                    public ConfigurableObject {
   Q_OBJECT
  public:
   enum CommandId {
@@ -49,6 +56,7 @@ class PersoServerConnection : public AbstractServerConnection {
   uint32_t PersoServerPort;
 
   std::unique_ptr<QTcpSocket> Socket;
+  ServerDisconnectionSignal Disconnection;
 
   std::shared_ptr<AbstractClientCommand> CurrentCommand;
   std::unordered_map<CommandId, std::shared_ptr<AbstractClientCommand>>
@@ -102,9 +110,12 @@ class PersoServerConnection : public AbstractServerConnection {
 
  private:
   Q_DISABLE_COPY_MOVE(PersoServerConnection)
+
+ private:
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 
+ private:
   ReturnStatus processCurrentCommand(const StringDictionary& param,
                                      StringDictionary& result);
   ReturnStatus transmitDataBlock(const QByteArray& dataBlock);

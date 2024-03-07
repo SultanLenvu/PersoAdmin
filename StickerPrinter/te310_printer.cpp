@@ -2,8 +2,8 @@
 
 #include "te310_printer.h"
 
-TE310Printer::TE310Printer(const QString& name) : AbstractStickerPrinter(name) {
-  loadSetting();
+TE310Printer::TE310Printer(const QString& name) : NamedObject(name) {
+  doLoadSettings();
 
   loadTscLib();
 }
@@ -248,14 +248,12 @@ ReturnStatus TE310Printer::exec(const QStringList& commandScript) {
   return ReturnStatus::NoError;
 }
 
-void TE310Printer::applySetting() {
-  sendLog("Применение новых настроек.");
-
-  loadSetting();
+void TE310Printer::loadSettings() {
+  doLoadSettings();
   loadTscLib();
 }
 
-void TE310Printer::loadSetting() {
+void TE310Printer::doLoadSettings() {
   QSettings settings;
 
   TscLibPath =
@@ -270,10 +268,6 @@ void TE310Printer::loadSetting() {
         settings.value(QString("%1/ip_address").arg(objectName())).toString());
     Port = settings.value(QString("%1/port").arg(objectName())).toInt();
   }
-}
-
-void TE310Printer::sendLog(const QString& log) {
-  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 void TE310Printer::loadTscLib() {

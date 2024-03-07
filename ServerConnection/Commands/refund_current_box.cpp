@@ -3,8 +3,6 @@
 RefundCurrentBox::RefundCurrentBox(const QString& name)
     : AbstractClientCommand(name) {}
 
-RefundCurrentBox::~RefundCurrentBox() {}
-
 const QString& RefundCurrentBox::name() {
   return Name;
 }

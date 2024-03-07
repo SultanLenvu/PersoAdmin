@@ -12,8 +12,10 @@
 #include <QTimer>
 
 #include "abstract_progress_indicator.h"
+#include "loggable_object.h"
 
-class MeasuringProgressIndicator final : public AbstractProgressIndicator {
+class MeasuringProgressIndicator final : public AbstractProgressIndicator,
+                                         public LoggableObject {
   Q_OBJECT
 
  private:

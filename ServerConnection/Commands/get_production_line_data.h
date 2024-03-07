@@ -4,8 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class GetProductionLineData : public AbstractClientCommand
-{
+class GetProductionLineData final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_GETPRODUCTIONLINEDATA_NAME;
@@ -13,7 +12,7 @@ class GetProductionLineData : public AbstractClientCommand
 
  public:
   explicit GetProductionLineData(const QString& name);
-  ~GetProductionLineData();
+  ~GetProductionLineData() = default;
 
   // AbstractClientCommand interface
  public:

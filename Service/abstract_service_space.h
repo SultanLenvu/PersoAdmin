@@ -1,15 +1,10 @@
 #ifndef ABSTRACTSERVICESPACE_H
 #define ABSTRACTSERVICESPACE_H
 
-#include <QObject>
-
-class AbstractServiceSpace : public QObject {
-  Q_OBJECT
+class AbstractServiceSpace {
  public:
-  AbstractServiceSpace(const QString& name);
-  virtual ~AbstractServiceSpace();
-
- public:
+  AbstractServiceSpace() = default;
+  virtual ~AbstractServiceSpace() = default;
 };
 
 #endif // ABSTRACTSERVICESPACE_H

@@ -3,13 +3,11 @@
 PostgreSqlTable::PostgreSqlTable(const QString& name,
                                  const QString& tableName,
                                  const QString& connectionName)
-    : AbstractSqlTable(name),
+    : NamedObject(name),
       TableName(tableName),
       ConnectionName(connectionName),
       RecordMaxCount(1000),
-      CurrentOrder("ASC") {
-  loadSettings();
-}
+      CurrentOrder("ASC") {}
 
 PostgreSqlTable::~PostgreSqlTable() {}
 
@@ -64,11 +62,6 @@ bool PostgreSqlTable::init() {
   }
 
   return true;
-}
-
-void PostgreSqlTable::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
 }
 
 bool PostgreSqlTable::createRecords(const SqlQueryValues& records) {
@@ -302,8 +295,6 @@ const QVector<QString>* PostgreSqlTable::columns() const {
 const StringDictionary* PostgreSqlTable::relations() const {
   return &Relations;
 }
-
-void PostgreSqlTable::loadSettings() {}
 
 bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
   for (int32_t i = 0; i < records.fieldCount(); i++) {

@@ -3,12 +3,13 @@
 #include "sql_query_values.h"
 
 DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper(name) {}
+    : AbstractAsyncWrapper(name),
+      Database(new PostgreSqlDatabase("PostgreSqlDatabase")) {}
 
 DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}
 
-void DatabaseAsyncWrapper::onInstanceThreadStarted() {
-  createDatabase();
+std::shared_ptr<AbstractSqlDatabase> DatabaseAsyncWrapper::database() {
+  return Database;
 }
 
 void DatabaseAsyncWrapper::connect() {
@@ -18,8 +19,6 @@ void DatabaseAsyncWrapper::connect() {
     processOperationError("connect", ReturnStatus::DatabaseConnectionError);
     return;
   }
-
-  emit databaseCreated(Database);
 
   completeOperation("connect");
 }
@@ -123,13 +122,6 @@ void DatabaseAsyncWrapper::getPalletData(
 
   emit dataReady(data);
   completeOperation("getPalletData");
-}
-
-void DatabaseAsyncWrapper::createDatabase() {
-  Database = std::shared_ptr<AbstractSqlDatabase>(
-      new PostgreSqlDatabase("PostgreSqlDatabase"));
-
-  emit databaseCreated(Database);
 }
 
 bool DatabaseAsyncWrapper::generateTransponderData(const QString& id,

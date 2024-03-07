@@ -3,8 +3,6 @@
 RereleaseTransponder::RereleaseTransponder(const QString& name)
     : AbstractClientCommand(name) {}
 
-RereleaseTransponder::~RereleaseTransponder() {}
-
 const QString& RereleaseTransponder::name() {
   return Name;
 }

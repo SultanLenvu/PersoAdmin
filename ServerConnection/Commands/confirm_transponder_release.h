@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class ConfirmTransponderRelease : public AbstractClientCommand {
+class ConfirmTransponderRelease final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_CONFIRMTRANSPONDERRELEASE_NAME;
@@ -12,7 +12,7 @@ class ConfirmTransponderRelease : public AbstractClientCommand {
 
  public:
   explicit ConfirmTransponderRelease(const QString& name);
-  ~ConfirmTransponderRelease();
+  ~ConfirmTransponderRelease() = default;
 
   // AbstractClientCommand interface
  public:

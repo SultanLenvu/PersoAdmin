@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class LaunchProductionLine : public AbstractClientCommand {
+class LaunchProductionLine final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_LAUNCHPRODUCTIONLINE_NAME;
@@ -12,7 +12,7 @@ class LaunchProductionLine : public AbstractClientCommand {
 
  public:
   explicit LaunchProductionLine(const QString& name);
-  ~LaunchProductionLine();
+  ~LaunchProductionLine() = default;
 
   // AbstractClientCommand interface
  public:

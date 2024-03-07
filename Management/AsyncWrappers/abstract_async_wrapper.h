@@ -1,18 +1,15 @@
 #ifndef ABSTRACTASYNCWRAPPER_H
 #define ABSTRACTASYNCWRAPPER_H
 
-#include <pobject.h>
+#include "loggable_object.h"
+#include "named_object.h"
 #include "types.h"
 
-class AbstractAsyncWrapper : public PObject
-{
+class AbstractAsyncWrapper : public NamedObject, public LoggableObject {
   Q_OBJECT
  public:
   explicit AbstractAsyncWrapper(const QString& name);
   virtual ~AbstractAsyncWrapper();
-
- public slots:
-  virtual void onInstanceThreadStarted(void) = 0;
 
  protected:
   virtual void initOperation(const QString& name);

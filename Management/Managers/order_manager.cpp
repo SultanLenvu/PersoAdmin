@@ -2,22 +2,16 @@
 #include <QFile>
 #include <QSettings>
 
-#include "database_async_wrapper.h"
 #include "definitions.h"
-#include "global_environment.h"
 #include "order_manager.h"
 
-OrderManager::OrderManager(const QString& name) : AbstractManager(name) {
+OrderManager::OrderManager(const QString& name,
+                           std::shared_ptr<AbstractSqlDatabase> database)
+    : NamedObject(name), Database(database) {
   doLoadSettings();
-  connectDependencies();
 }
 
 OrderManager::~OrderManager() {}
-
-void OrderManager::applyDatabase(
-    std::shared_ptr<AbstractSqlDatabase> database) {
-  Database = database;
-}
 
 ReturnStatus OrderManager::create(const StringDictionary& param) {
   if (!Database) {
@@ -340,14 +334,6 @@ void OrderManager::doLoadSettings() {
   QSettings settings;
 
   ShipmentRegisterDir = "/ShipmentRegisters/";
-}
-
-void OrderManager::connectDependencies() {
-  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
-
-  connect(dm, &DatabaseAsyncWrapper::databaseCreated, this,
-          &OrderManager::applyDatabase);
 }
 
 bool OrderManager::addOrder(const StringDictionary& param) {

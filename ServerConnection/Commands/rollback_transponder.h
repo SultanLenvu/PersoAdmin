@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class RollbackTransponder : public AbstractClientCommand {
+class RollbackTransponder final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_ROLLBACKTRANSPONDER_NAME;
@@ -12,7 +12,7 @@ class RollbackTransponder : public AbstractClientCommand {
 
  public:
   explicit RollbackTransponder(const QString& name);
-  ~RollbackTransponder();
+  ~RollbackTransponder() = default;
 
   // AbstractClientCommand interface
  public:
@@ -24,8 +24,6 @@ class RollbackTransponder : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(RollbackTransponder)
-
- signals:
 };
 
 #endif  // ROLLBACKCOMMAND_H

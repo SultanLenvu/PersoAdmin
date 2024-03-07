@@ -22,10 +22,6 @@ class PersoServerAsyncWrapper : public AbstractAsyncWrapper {
   explicit PersoServerAsyncWrapper(const QString& name);
   ~PersoServerAsyncWrapper();
 
-  // AbstractManager interface
- public slots:
-  virtual void onInstanceThreadStarted(void) override;
-
   // Own
  public:
   void connect(void);
@@ -58,10 +54,7 @@ class PersoServerAsyncWrapper : public AbstractAsyncWrapper {
   void onServerDisconnected(void);
 
  private:
-  void loadSettings(void);
   ReturnStatus checkConfig(void);
-
-  void createServerConnection(void);
 
  signals:
   void productionLineDataReady(const std::shared_ptr<StringDictionary> data);

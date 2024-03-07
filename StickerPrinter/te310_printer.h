@@ -5,8 +5,14 @@
 #include <QHostInfo>
 
 #include "abstract_sticker_printer.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class TE310Printer : public AbstractStickerPrinter {
+class TE310Printer final : public NamedObject,
+                           public AbstractStickerPrinter,
+                           public ConfigurableObject,
+                           public LoggableObject {
   Q_OBJECT
 
  private:
@@ -40,10 +46,7 @@ class TE310Printer : public AbstractStickerPrinter {
 
  public:
   explicit TE310Printer(const QString& name);
-
-  // PObject interface
- public slots:
-  virtual void applySetting(void) override;
+  ~TE310Printer() = default;
 
   // AbstractStickerPrinter interface
  public slots:
@@ -64,13 +67,14 @@ class TE310Printer : public AbstractStickerPrinter {
 
  private:
   Q_DISABLE_COPY_MOVE(TE310Printer);
-  void loadSetting(void);
-  void sendLog(const QString& log);
 
+ private:
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
   void loadTscLib(void);
 
+ private:
   bool initConnection(void);
-
   void printNkdSticker(const StringDictionary& param);
   void printZsdSticker(const StringDictionary& param);
 };

@@ -2,7 +2,7 @@
 
 #include "widget_log_backend.h"
 
-WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
+WidgetLogBackend::WidgetLogBackend() {
   doLoadSettings();
 }
 

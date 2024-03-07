@@ -1,16 +1,14 @@
-#include "configurable_object_new.h"
+#include "configurable_object.h"
 
 #include "global_environment.h"
 #include "gui_kernel.h"
 
-ConfigurableObjectNew::ConfigurableObjectNew() {
+ConfigurableObject::ConfigurableObject() {
   Connector =
       std::unique_ptr<SettingsApplyBundle>(new SettingsApplyBundle(this));
 }
 
-ConfigurableObjectNew::~ConfigurableObjectNew() {}
-
-SettingsApplyBundle::SettingsApplyBundle(ConfigurableObjectNew* object) {
+SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
   Object = object;
 
   GuiKernel* gk = static_cast<GuiKernel*>(

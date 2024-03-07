@@ -3,22 +3,25 @@
 
 #include "abstract_manager.h"
 #include "abstract_sql_database.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class OrderManager : public AbstractManager
-{
-  Q_OBJECT
+class OrderManager final : public NamedObject,
+                           public AbstractManager,
+                           public ConfigurableObject,
+                           public LoggableObject {
  private:
   QString ShipmentRegisterDir;
   std::shared_ptr<AbstractSqlDatabase> Database;
 
  public:
-  explicit OrderManager(const QString& name);
+  explicit OrderManager(const QString& name,
+                        std::shared_ptr<AbstractSqlDatabase> database);
   ~OrderManager();
 
   // Own
- public slots:
-  void applyDatabase(std::shared_ptr<AbstractSqlDatabase> database);
-
+ public:
   ReturnStatus create(const StringDictionary& param);
   ReturnStatus startAssembling(const StringDictionary& param);
   ReturnStatus stopAssembling(const StringDictionary& param);
@@ -33,10 +36,12 @@ class OrderManager : public AbstractManager
 
  private:
   Q_DISABLE_COPY_MOVE(OrderManager)
-  void connectDependencies(void);
+
+ private:
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 
+ private:
   bool addOrder(const StringDictionary& param);
   bool addPallets(const QString& orderId, const StringDictionary& param);
   bool addBoxes(const QString& palletId,

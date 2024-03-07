@@ -3,7 +3,7 @@
 
 #include <QThread>
 
-#include "pobject.h"
+#include "named_object.h"
 
 class PObjectBuilder {
  public:
@@ -17,8 +17,8 @@ class PObjectBuilder {
   void setThread(QThread* thread);
 
   template <typename T, typename... Args>
-  typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type create(
-      Args&&... args) {
+  typename std::enable_if<std::is_base_of<NamedObject, T>::value, T*>::type
+  create(Args&&... args) {
     assert(Thread);
 
     if (!Thread->isRunning()) {

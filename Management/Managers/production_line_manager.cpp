@@ -1,18 +1,11 @@
 #include "production_line_manager.h"
-#include "database_async_wrapper.h"
-#include "global_environment.h"
 
-ProductionLineManager::ProductionLineManager(const QString& name)
-    : AbstractManager(name) {
-  connectDependencies();
-}
+ProductionLineManager::ProductionLineManager(
+    const QString& name,
+    std::shared_ptr<AbstractSqlDatabase> database)
+    : NamedObject(name), Database(database) {}
 
 ProductionLineManager::~ProductionLineManager() {}
-
-void ProductionLineManager::applyDatabase(
-    std::shared_ptr<AbstractSqlDatabase> database) {
-  Database = database;
-}
 
 ReturnStatus ProductionLineManager::create(const StringDictionary& param) {
   if (!Database) {
@@ -177,14 +170,6 @@ ReturnStatus ProductionLineManager::remove(const StringDictionary& param) {
   }
 
   return ReturnStatus::NoError;
-}
-
-void ProductionLineManager::connectDependencies() {
-  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
-
-  connect(dm, &DatabaseAsyncWrapper::databaseCreated, this,
-          &ProductionLineManager::applyDatabase);
 }
 
 bool ProductionLineManager::addProductionLine(const StringDictionary& param) {

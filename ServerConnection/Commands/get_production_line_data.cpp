@@ -3,8 +3,6 @@
 GetProductionLineData::GetProductionLineData(const QString& name)
     : AbstractClientCommand(name) {}
 
-GetProductionLineData::~GetProductionLineData() {}
-
 const QString& GetProductionLineData::name() {
   return Name;
 }

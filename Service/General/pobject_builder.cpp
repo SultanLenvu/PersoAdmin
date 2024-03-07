@@ -15,7 +15,7 @@ void PObjectBuilder::setThread(QThread* thread) {
 PObjectBuilder::PObjectBuilder() : Thread(QThread::currentThread()) {}
 
 // template <typename T, typename... Args>
-// typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type
+// typename std::enable_if<std::is_base_of<NamedObject, T>::value, T*>::type
 // PObjectBuilder::build(Args&&... args) {
 //   assert(Thread);
 

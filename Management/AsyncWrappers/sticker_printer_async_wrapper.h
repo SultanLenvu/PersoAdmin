@@ -13,10 +13,6 @@ class StickerPrinterAsyncWrapper final : public AbstractAsyncWrapper {
   explicit StickerPrinterAsyncWrapper(const QString& name);
   ~StickerPrinterAsyncWrapper();
 
-  // AbstractManager interface
- public slots:
-  virtual void onInstanceThreadStarted() override;
-
   // Own
  public slots:
   void printTransponderSticker(const std::shared_ptr<StringDictionary> param);

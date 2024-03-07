@@ -1,16 +1,14 @@
 #ifndef ABSTRACTSQLDATABASE_H
 #define ABSTRACTSQLDATABASE_H
 
-#include "configurable_object.h"
 #include "sql_query_values.h"
 
-class AbstractSqlDatabase : public ConfigurableObject {
-  Q_OBJECT
+class AbstractSqlDatabase {
+ public:
+  explicit AbstractSqlDatabase() = default;
+  virtual ~AbstractSqlDatabase() = default;
 
  public:
-  explicit AbstractSqlDatabase(const QString& name);
-  virtual ~AbstractSqlDatabase();
-
   virtual bool connect(void) = 0;
   virtual void disconnect(void) = 0;
   virtual bool isConnected() = 0;
@@ -64,7 +62,7 @@ class AbstractSqlDatabase : public ConfigurableObject {
   virtual bool getLastId(const QString& table, int32_t& id) const = 0;
 
  signals:
-  void disconnected(void);
+  void disconneted(void);
 };
 
 #endif  // ABSTRACTSQLDATABASE_H

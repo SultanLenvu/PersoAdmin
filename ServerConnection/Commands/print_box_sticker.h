@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class PrintBoxSticker : public AbstractClientCommand {
+class PrintBoxSticker final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_PRINTBOXSTICKER_NAME;
@@ -15,7 +15,7 @@ class PrintBoxSticker : public AbstractClientCommand {
 
  public:
   explicit PrintBoxSticker(const QString& name);
-  ~PrintBoxSticker();
+  ~PrintBoxSticker() = default;
 
   // AbstractClientCommand interface
  public:

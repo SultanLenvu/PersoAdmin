@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class RequestBox : public AbstractClientCommand {
+class RequestBox final : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_REQUESTBOX_NAME;
@@ -12,7 +12,7 @@ class RequestBox : public AbstractClientCommand {
 
  public:
   explicit RequestBox(const QString& name);
-  ~RequestBox();
+  ~RequestBox() = default;
 
   // AbstractClientCommand interface
  public:
@@ -24,8 +24,6 @@ class RequestBox : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(RequestBox)
-
- signals:
 };
 
 #endif  // REQUESTBOX_H

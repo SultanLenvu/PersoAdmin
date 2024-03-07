@@ -3,12 +3,37 @@
 
 #include <QJsonObject>
 
-#include "pobject.h"
+#include "loggable_object.h"
+#include "named_object.h"
 #include "types.h"
 
-class AbstractClientCommand : public PObject {
-  Q_OBJECT
+class AbstractClientCommand : public NamedObject, public LoggableObject {
+ public:
+  explicit AbstractClientCommand(const QString& name);
+  virtual ~AbstractClientCommand();
 
+ public:
+  virtual const QString& name(void) = 0;
+  virtual ReturnStatus generate(const StringDictionary& param,
+                                QByteArray& dataBlock) = 0;
+  virtual ReturnStatus processResponse(const QByteArray& dataBlock,
+                                       StringDictionary& responseData) = 0;
+
+ public:
+  void clear(void);
+
+ protected:
+  void generateDataBlock(QByteArray& dataBlock);
+  bool processDataBlock(const QByteArray& dataBlock);
+  ReturnStatus processReturnStatus(const QString& ret);
+
+ private:
+  Q_DISABLE_COPY_MOVE(AbstractClientCommand);
+
+  void createCrtMap(void);
+  void createCrtLogMap(void);
+
+ private:
   enum CommandReturnStatus {
     NoError = 0,
     DynamicLibraryMissing,
@@ -82,29 +107,6 @@ class AbstractClientCommand : public PObject {
 
   std::unordered_map<CommandReturnStatus, ReturnStatus> CrtMap;
   std::unordered_map<CommandReturnStatus, QString> CrtLogMap;
-
- public:
-  explicit AbstractClientCommand(const QString& name);
-  virtual ~AbstractClientCommand();
-
- public:
-  virtual const QString& name(void) = 0;
-  virtual ReturnStatus generate(const StringDictionary& param,
-                                QByteArray& dataBlock) = 0;
-  virtual ReturnStatus processResponse(const QByteArray& dataBlock,
-                                       StringDictionary& responseData) = 0;
-  void clear(void);
-
- protected:
-  void generateDataBlock(QByteArray& dataBlock);
-  bool processDataBlock(const QByteArray& dataBlock);
-  ReturnStatus processReturnStatus(const QString& ret);
-
- private:
-  void createCrtMap(void);
-  void createCrtLogMap(void);
-
- signals:
 };
 
 #endif  // ABSTRACTCLIENTCOMMAND_H

@@ -3,8 +3,6 @@
 GetCurrentTransponderData::GetCurrentTransponderData(const QString& name)
     : AbstractClientCommand(name) {}
 
-GetCurrentTransponderData::~GetCurrentTransponderData() {}
-
 const QString& GetCurrentTransponderData::name() {
   return Name;
 }

@@ -2,8 +2,6 @@
 
 RequestBox::RequestBox(const QString& name) : AbstractClientCommand(name) {}
 
-RequestBox::~RequestBox() {}
-
 const QString& RequestBox::name() {
   return Name;
 }
