@@ -32,14 +32,13 @@ class LogSystem : public ConfigurableObject, public ConfigurableObjectNew {
   uint32_t UdpListenPort;
 
  public:
-  LogSystem(const QString& name);
+  Q_INVOKABLE LogSystem(const QString& name);
   ~LogSystem();
 
  public slots:
   void generate(const QString& log);
 
  private:
-  virtual bool initInternals(void) override;
   virtual void loadSettings(void) override;
 
  private:

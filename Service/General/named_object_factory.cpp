@@ -5,24 +5,13 @@ NamedObjectFactory::NamedObjectFactory(QThread* thread) {
 
   Thread = thread;
   moveToThread(Thread);
-
-  connect(this, &NamedObjectFactory::create_signal, this,
-          &NamedObjectFactory::doCreate, Qt::BlockingQueuedConnection);
 }
 
 NamedObjectFactory::~NamedObjectFactory() {}
 
-template <typename T>
-typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type
-NamedObjectFactory::create(const QString& name) {
-  assert(Thread);
+PObject* NamedObjectFactory::doCreate(const QString& objectName) {
+  PObject* createdObject =
+      reinterpret_cast<PObject*>(CreatedMetaObject->newInstance(objectName));
 
-  PObject* createdObject = nullptr;
-
-  AuxiliaryBuilder<T> builder;
-
-  emit create_signal(builder, name, &createdObject);
+  return createdObject;
 }
-
-void NamedObjectFactory::doCreate(const QString& name,
-                                  PObject** createdObject) {}

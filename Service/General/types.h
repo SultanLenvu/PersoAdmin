@@ -8,6 +8,15 @@ using StringDictionary = QHash<QString, QString>;
 template <typename T>
 using SharedVector = std::shared_ptr<QVector<T>>;
 
+#define CHECK_EXECUTION_THREAD                            \
+  {                                                       \
+    if (QApplication::instance()->thread() != thread()) { \
+      qDebug() << "Запущено в отдельном потоке.";         \
+    } else {                                              \
+      qDebug() << "Запущено в главном потоке.";           \
+    }                                                     \
+  }
+
 enum class ProductionLineState {
   NotActive,
   Idle,

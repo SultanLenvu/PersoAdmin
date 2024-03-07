@@ -1,13 +1,19 @@
-#include "QNetworkDatagram"
-
 #include "log_system.h"
+
+#include "QNetworkDatagram"
 #include "file_log_backend.h"
+#include "types.h"
 #include "widget_log_backend.h"
 
 LogSystem::LogSystem(const QString& name) : ConfigurableObject(name) {
   doLoadSettings();
 
-  bool b = initInternals();
+  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
+  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
+
+  createPersoServerLogSocket();
+
+  CHECK_EXECUTION_THREAD
 }
 
 LogSystem::~LogSystem() {
@@ -30,15 +36,6 @@ void LogSystem::generate(const QString& log) {
   for (auto it = Backends.begin(); it != Backends.end(); ++it) {
     (*it)->writeMessage(LogMessage);
   }
-}
-
-bool LogSystem::initInternals() {
-  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
-  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
-
-  createPersoServerLogSocket();
-
-  return true;
 }
 
 /*

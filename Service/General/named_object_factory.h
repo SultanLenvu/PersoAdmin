@@ -1,23 +1,18 @@
 #ifndef NAMEDOBJECTFACTORY_H
 #define NAMEDOBJECTFACTORY_H
 
+#include <QMetaType>
 #include <QObject>
 #include <QThread>
 
 #include "pobject.h"
 
 class NamedObjectFactory final : public QObject {
- private:
-  template <typename T, typename... Args>
-  class AuxiliaryBuilder {
-    AuxiliaryBuilder() = default;
-    ~AuxiliaryBuilder() = default;
-
-    PObject* build(const QString& name);
-  };
+  Q_OBJECT
 
  private:
   QThread* Thread;
+  const QMetaObject* CreatedMetaObject;
 
  public:
   NamedObjectFactory(QThread* thread);
@@ -26,20 +21,31 @@ class NamedObjectFactory final : public QObject {
  public:
   template <typename T>
   typename std::enable_if<std::is_base_of<PObject, T>::value, T*>::type create(
-      const QString& name);
+      const QString& name) {
+    if (!Thread->isRunning()) {
+      return nullptr;
+    }
 
- public:
+    CreatedMetaObject = QMetaType(qRegisterMetaType<T>()).metaObject();
+
+    PObject* createdObject;
+    bool ok = QMetaObject::invokeMethod(this, "doCreate",
+                                        Qt::BlockingQueuedConnection,
+                                        qReturnArg(createdObject), name);
+    if (!ok) {
+      return nullptr;
+    }
+
+    return reinterpret_cast<T*>(createdObject);
+  }
+
+ private:
   Q_DISABLE_COPY_MOVE(NamedObjectFactory)
 
  private slots:
-  template <typename T>
-  void doCreate(AuxiliaryBuilder<T> builder, const QString& name,
-                PObject** createdObject);
+  PObject* doCreate(const QString& objectName);
 
  signals:
-  template <typename T>
-  void create_signal(AuxiliaryBuilder<T> builder, const QString& name,
-                     PObject** createdObject);
 };
 
 #endif  // NAMEDOBJECTFACTORY_H
