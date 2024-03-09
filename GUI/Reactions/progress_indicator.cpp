@@ -1,22 +1,22 @@
 #include "definitions.h"
-#include "measuring_progress_indicator.h"
+#include "progress_indicator.h"
 
-MeasuringProgressIndicator::MeasuringProgressIndicator(const QString& name)
+ProgressIndicator::ProgressIndicator(const QString& name)
     : AbstractProgressIndicator{name} {
   createTimers();
 }
 
-MeasuringProgressIndicator::~MeasuringProgressIndicator() {}
+ProgressIndicator::~ProgressIndicator() {}
 
-void MeasuringProgressIndicator::begin(const QString& operationName) {
-  QSettings settings;
+void ProgressIndicator::begin(const QString& operationName) {
+  sendLog(QString("Начало выполнения операции '%1'. ").arg(operationName));
 
   // Создаем  окно
   createProgressDialog();
 
   //  Настраиваем и запускаем таймер для измерения квантов времени
   uint64_t operationDuration =
-      settings.value(QString("duration_of_operations/") + operationName)
+      Settings.value(QString("duration_of_operations/") + operationName)
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
   operationQuantDuration += 1;
@@ -32,13 +32,13 @@ void MeasuringProgressIndicator::begin(const QString& operationName) {
   ODMeter->start();
 }
 
-void MeasuringProgressIndicator::finish(const QString& operationName) {
-  QSettings settings;
+void ProgressIndicator::finish(const QString& operationName) {
+  sendLog(QString("Выполнение операции '%1' завершено. ").arg(operationName));
 
   // Измеряем и сохраняем длительность операции
   uint64_t duration = ODMeter->elapsed();
   sendLog(QString("Длительность операции: %1.").arg(QString::number(duration)));
-  settings.setValue(QString("duration_of_operations/") + operationName,
+  Settings.setValue(QString("duration_of_operations/") + operationName,
                     QVariant::fromValue(duration));
 
   // Останавливаем таймер для контроля максимальной длительности операции
@@ -55,7 +55,7 @@ void MeasuringProgressIndicator::finish(const QString& operationName) {
  * Приватные методы
  */
 
-void MeasuringProgressIndicator::createProgressDialog() {
+void ProgressIndicator::createProgressDialog() {
   ProgressDialog = std::unique_ptr<QProgressDialog>(new QProgressDialog());
 
   ProgressDialog->setLabelText("Выполнение операции...");
@@ -68,16 +68,16 @@ void MeasuringProgressIndicator::createProgressDialog() {
   ProgressDialog->show();
 }
 
-void MeasuringProgressIndicator::destroyProgressDialog() {
+void ProgressIndicator::destroyProgressDialog() {
   ProgressDialog->close();
 }
 
-void MeasuringProgressIndicator::createTimers() {
+void ProgressIndicator::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = std::unique_ptr<QTimer>(new QTimer());
   ODTimer->setInterval(SERVER_MANAGER_OPERATION_MAX_DURATION);
   connect(ODTimer.get(), &QTimer::timeout, this,
-          &MeasuringProgressIndicator::ODTimerTimeout_slot);
+          &ProgressIndicator::ODTimerTimeout_slot);
   connect(ODTimer.get(), &QTimer::timeout, ODTimer.get(), &QTimer::stop);
 
   // Таймер для измерения длительности операции
@@ -86,20 +86,20 @@ void MeasuringProgressIndicator::createTimers() {
   // Таймер, отслеживающий квант длительности операции
   ODQTimer = std::unique_ptr<QTimer>(new QTimer());
   connect(ODQTimer.get(), &QTimer::timeout, this,
-          &MeasuringProgressIndicator::ODQTimerTimeout_slot);
+          &ProgressIndicator::ODQTimerTimeout_slot);
 }
 
-void MeasuringProgressIndicator::progressDialogCanceled_slot() {
+void ProgressIndicator::progressDialogCanceled_slot() {
   ProgressDialog->close();
 
   emit abortCurrentOperation();
 }
 
-void MeasuringProgressIndicator::ODTimerTimeout_slot() {
+void ProgressIndicator::ODTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
 }
 
-void MeasuringProgressIndicator::ODQTimerTimeout_slot() {
+void ProgressIndicator::ODQTimerTimeout_slot() {
   int32_t cvalue = ProgressDialog->value();
 
   if (cvalue < 99) {

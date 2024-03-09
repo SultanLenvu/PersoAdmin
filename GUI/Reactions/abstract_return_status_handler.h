@@ -1,15 +1,12 @@
 #ifndef ABSTRACTRETURNSTATUSHANDLER_H
 #define ABSTRACTRETURNSTATUSHANDLER_H
 
-#include "named_object.h"
 #include "types.h"
 
-class AbstractReturnStatusHandler : public NamedObject
-{
-  Q_OBJECT
+class AbstractReturnStatusHandler {
  public:
-  explicit AbstractReturnStatusHandler(const QString& name);
-  virtual ~AbstractReturnStatusHandler();
+  explicit AbstractReturnStatusHandler() = default;
+  virtual ~AbstractReturnStatusHandler() = default;
 
  public:
   virtual void handle(ReturnStatus ret) = 0;

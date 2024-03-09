@@ -3,12 +3,15 @@
 
 #include <QFile>
 
-#include "abstract_async_wrapper.h"
 #include "abstract_server_connection.h"
+#include "loggable_object.h"
+#include "named_object.h"
+#include "progressable_async_wrapper.h"
 
-class PersoServerAsyncWrapper : public AbstractAsyncWrapper {
+class PersoServerAsyncWrapper : public NamedObject,
+                                public ProgressableAsyncWrapper,
+                                public LoggableObject {
   Q_OBJECT
-
  private:  
   std::unique_ptr<AbstractServerConnection> Server;
 
@@ -19,7 +22,7 @@ class PersoServerAsyncWrapper : public AbstractAsyncWrapper {
   std::shared_ptr<StringDictionary> TransponderData;
 
  public:
-  explicit PersoServerAsyncWrapper(const QString& name);
+  Q_INVOKABLE explicit PersoServerAsyncWrapper(const QString& name);
   ~PersoServerAsyncWrapper();
 
   // Own

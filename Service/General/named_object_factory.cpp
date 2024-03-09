@@ -10,8 +10,17 @@ NamedObjectFactory::NamedObjectFactory(QThread* thread) {
 NamedObjectFactory::~NamedObjectFactory() {}
 
 NamedObject* NamedObjectFactory::doCreate(const QString& objectName) {
-  NamedObject* createdObject =
-      reinterpret_cast<NamedObject*>(CreatedMetaObject->newInstance(objectName));
+  NamedObject* createdObject = reinterpret_cast<NamedObject*>(
+      CreatedMetaObject->newInstance(objectName));
+
+  return createdObject;
+}
+
+NamedObject* NamedObjectFactory::doCreate(
+    const QString& objectName,
+    std::shared_ptr<AbstractSqlDatabase> database) {
+  NamedObject* createdObject = reinterpret_cast<NamedObject*>(
+      CreatedMetaObject->newInstance(objectName, database));
 
   return createdObject;
 }

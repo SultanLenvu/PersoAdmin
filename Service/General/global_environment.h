@@ -2,19 +2,20 @@
 #define GLOBALENVIRONMENT_H
 
 #include <QHash>
-#include <QObject>
+
+#include "named_object.h"
 
 class GlobalEnvironment : public QObject {
   Q_OBJECT
  private:
-  QHash<QString, QObject*> GlobalObjects;
+  QHash<QString, NamedObject*> GlobalObjects;
 
  public:
   ~GlobalEnvironment();
   static GlobalEnvironment* instance(void);
 
-  void registerObject(QObject* obj);
-  QObject* getObject(const QString& name);
+  void registerObject(NamedObject* obj);
+  NamedObject* getObject(const QString& name);
 
  private:
   GlobalEnvironment();

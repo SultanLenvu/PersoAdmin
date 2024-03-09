@@ -3,7 +3,7 @@
 ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(
     const QString& name,
     std::shared_ptr<AbstractSqlDatabase> database)
-    : AbstractAsyncWrapper{name},
+    : NamedObject{name},
       Manager(new ProductionLineManager("ProductionLineManager", database)) {}
 
 ProductionLineManagerAsyncWrapper::~ProductionLineManagerAsyncWrapper() {}

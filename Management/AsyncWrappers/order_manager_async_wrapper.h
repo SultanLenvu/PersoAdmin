@@ -1,17 +1,22 @@
 #ifndef ORDERMANAGERASYNCWRAPPER_H
 #define ORDERMANAGERASYNCWRAPPER_H
 
-#include "abstract_async_wrapper.h"
+#include "loggable_object.h"
+#include "named_object.h"
 #include "order_manager.h"
+#include "progressable_async_wrapper.h"
 
-class OrderManagerAsyncWrapper final : public AbstractAsyncWrapper {
+class OrderManagerAsyncWrapper final : public NamedObject,
+                                       public ProgressableAsyncWrapper,
+                                       public LoggableObject {
   Q_OBJECT
  private:
   std::unique_ptr<OrderManager> Manager;
 
  public:
-  OrderManagerAsyncWrapper(const QString& name,
-                           std::shared_ptr<AbstractSqlDatabase> database);
+  Q_INVOKABLE OrderManagerAsyncWrapper(
+      const QString& name,
+      std::shared_ptr<AbstractSqlDatabase> database);
   ~OrderManagerAsyncWrapper();
 
   // Own

@@ -1,19 +1,17 @@
 #include "log_system.h"
 
-#include "QNetworkDatagram"
+#include <QNetworkDatagram>
+
 #include "file_log_backend.h"
-#include "types.h"
 #include "widget_log_backend.h"
 
 LogSystem::LogSystem(const QString& name) : NamedObject(name) {
   doLoadSettings();
 
-  Backends.emplace_back(new WidgetLogBackend());
+  Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
   Backends.emplace_back(new FileLogBackend());
 
   createPersoServerLogSocket();
-
-  CHECK_EXECUTION_THREAD
 }
 
 LogSystem::~LogSystem() {
@@ -27,7 +25,8 @@ LogSystem::~LogSystem() {
   //  delete PersoServerLogSocket;
 }
 
-void LogSystem::generate(const QString& log) {
+void LogSystem::generate(const QString& log,
+                         const LoggableObject* source) const {
   QTime time = QDateTime::currentDateTime().time();
 
   QString LogMessage =
@@ -80,6 +79,6 @@ void LogSystem::udpSocketReadyRead_slot() {
   //  generate(datagram.data());
 
   if (UdpListenEnable) {
-    generate(QString::fromUtf8(datagram));
+    generate(QString::fromUtf8(datagram), this);
   }
 }

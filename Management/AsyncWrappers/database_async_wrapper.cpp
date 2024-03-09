@@ -3,7 +3,7 @@
 #include "sql_query_values.h"
 
 DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper(name),
+    : NamedObject(name),
       Database(new PostgreSqlDatabase("PostgreSqlDatabase")) {}
 
 DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}

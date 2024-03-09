@@ -6,7 +6,7 @@
 #include "perso_server_connection.h"
 
 PersoServerAsyncWrapper::PersoServerAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper{name},
+    : NamedObject{name},
       ProductionLineData(new StringDictionary()),
       BoxData(new StringDictionary()),
       TransponderData(new StringDictionary()),

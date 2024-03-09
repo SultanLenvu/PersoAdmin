@@ -12,12 +12,15 @@
 
 #include "abstract_log_backend.h"
 #include "configurable_object.h"
+#include "loggable_object.h"
 #include "named_object.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public NamedObject, public ConfigurableObject {
+class LogSystem : public NamedObject,
+                  public ConfigurableObject,
+                  public LoggableObject {
   Q_OBJECT
 
  private:
@@ -36,7 +39,7 @@ class LogSystem : public NamedObject, public ConfigurableObject {
   ~LogSystem();
 
  public slots:
-  void generate(const QString& log);
+  void generate(const QString& log, const LoggableObject* source) const;
 
  private:
   virtual void loadSettings(void) override;

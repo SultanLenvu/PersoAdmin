@@ -1,15 +1,15 @@
 #include <QMessageBox>
 
-#include "gui_return_status_handler.h"
+#include "return_status_handler.h"
 
-GuiReturnStatusHandler::GuiReturnStatusHandler(const QString& name)
-    : AbstractReturnStatusHandler{name} {
+ReturnStatusHandler::ReturnStatusHandler(const QString& name)
+    : NamedObject{name} {
   createMessageMatchTable();
 }
 
-GuiReturnStatusHandler::~GuiReturnStatusHandler() {}
+ReturnStatusHandler::~ReturnStatusHandler() {}
 
-void GuiReturnStatusHandler::handle(ReturnStatus ret) {
+void ReturnStatusHandler::handle(ReturnStatus ret) {
   if (ret == ReturnStatus::NoError) {
     QMessageBox::information(nullptr, "Сообщение", MessageTable[ret],
                              QMessageBox::Ok);
@@ -25,7 +25,7 @@ void GuiReturnStatusHandler::handle(ReturnStatus ret) {
   QMessageBox::critical(nullptr, "Ошибка", MessageTable[ret], QMessageBox::Ok);
 }
 
-void GuiReturnStatusHandler::createMessageMatchTable() {
+void ReturnStatusHandler::createMessageMatchTable() {
   MessageTable[ReturnStatus::NoError] = QString("Выполнено. ");
 
   MessageTable[ReturnStatus::ParameterError] =

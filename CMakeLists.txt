@@ -17,7 +17,6 @@ include_directories(Service/General/)
 include_directories(Service/Log/)
 include_directories(Service/Functors/)
 include_directories(Service/Reactions/)
-include_directories(Service/Options/)
 include_directories(Service/ObjectTypes/)
 include_directories(Database/)
 include_directories(GUI/)
@@ -39,7 +38,7 @@ add_executable(PersoAdmin WIN32
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
 
     Service/General/global_environment.cpp Service/General/global_environment.h
-    Service/General/pobject_builder.h Service/General/pobject_builder.cpp
+
     Service/General/named_object_factory.h Service/General/named_object_factory.cpp
 
     Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
@@ -48,8 +47,10 @@ add_executable(PersoAdmin WIN32
     Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
     Service/ObjectTypes/log_system_bundle.h Service/ObjectTypes/log_system_bundle.cpp
 
-    Service/abstract_service_space.h Service/abstract_service_space.cpp
-    Service/internal_service_space.h Service/internal_service_space.cpp
+    Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
+    Service/service_object_space.h Service/service_object_space.cpp
+    Service/asynchronous_object_space.h Service/asynchronous_object_space.cpp
+    Service/configuration_manager.h Service/configuration_manager.cpp
 
     Service/Functors/abstract_string_checker.h Service/Functors/abstract_string_checker.cpp
     Service/Functors/ucid_checker.h Service/Functors/ucid_checker.cpp
@@ -99,9 +100,11 @@ add_executable(PersoAdmin WIN32
     GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
 
     GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
-    GUI/Reactions/measuring_progress_indicator.cpp GUI/Reactions/measuring_progress_indicator.h
+    GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
     GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
-    GUI/Reactions/gui_return_status_handler.h GUI/Reactions/gui_return_status_handler.cpp
+    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
+    GUI/Reactions/progress_indicator_bundle.h GUI/Reactions/progress_indicator_bundle.cpp
+    GUI/Reactions/return_status_handler_bundle.h GUI/Reactions/return_status_handler_bundle.cpp
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp
@@ -109,6 +112,7 @@ add_executable(PersoAdmin WIN32
 
     Management/AsyncWrappers/database_async_wrapper.h Management/AsyncWrappers/database_async_wrapper.cpp
     Management/AsyncWrappers/abstract_async_wrapper.h Management/AsyncWrappers/abstract_async_wrapper.cpp
+    Management/AsyncWrappers/progressable_async_wrapper.h Management/AsyncWrappers/progressable_async_wrapper.cpp
     Management/AsyncWrappers/order_manager_async_wrapper.h Management/AsyncWrappers/order_manager_async_wrapper.cpp
     Management/AsyncWrappers/production_line_manager_async_wrapper.h Management/AsyncWrappers/production_line_manager_async_wrapper.cpp
     Management/AsyncWrappers/programmer_async_wrapper.h Management/AsyncWrappers/programmer_async_wrapper.cpp

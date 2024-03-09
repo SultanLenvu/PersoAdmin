@@ -1,5 +1,5 @@
-#ifndef MEASURING_PROGRESS_INDICATOR_H
-#define MEASURING_PROGRESS_INDICATOR_H
+#ifndef PROGRESS_INDICATOR_H
+#define PROGRESS_INDICATOR_H
 
 #include <QElapsedTimer>
 #include <QInputDialog>
@@ -14,11 +14,13 @@
 #include "abstract_progress_indicator.h"
 #include "loggable_object.h"
 
-class MeasuringProgressIndicator final : public AbstractProgressIndicator,
-                                         public LoggableObject {
+class ProgressIndicator final : public AbstractProgressIndicator,
+                                public LoggableObject {
   Q_OBJECT
 
  private:
+  QSettings Settings;
+
   std::unique_ptr<QProgressDialog> ProgressDialog;
 
   std::unique_ptr<QTimer> ODTimer;
@@ -26,8 +28,8 @@ class MeasuringProgressIndicator final : public AbstractProgressIndicator,
   std::unique_ptr<QElapsedTimer> ODMeter;
 
  public:
-  MeasuringProgressIndicator(const QString& name);
-  ~MeasuringProgressIndicator();
+  ProgressIndicator(const QString& name);
+  ~ProgressIndicator();
 
   // AbstractProgressIndicator interface
  public slots:
@@ -35,7 +37,7 @@ class MeasuringProgressIndicator final : public AbstractProgressIndicator,
   virtual void finish(const QString& operationName) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(MeasuringProgressIndicator)
+  Q_DISABLE_COPY_MOVE(ProgressIndicator)
 
   void createProgressDialog(void);
   void destroyProgressDialog(void);
@@ -48,4 +50,4 @@ class MeasuringProgressIndicator final : public AbstractProgressIndicator,
   void ODQTimerTimeout_slot(void);
 };
 
-#endif  // MEASURING_PROGRESS_INDICATOR_H
+#endif  // PROGRESS_INDICATOR_H

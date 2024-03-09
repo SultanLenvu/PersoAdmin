@@ -11,8 +11,8 @@ GlobalEnvironment* GlobalEnvironment::instance() {
   return &context;
 }
 
-void GlobalEnvironment::registerObject(QObject* obj) {
-  QString name = obj->objectName();
+void GlobalEnvironment::registerObject(NamedObject* obj) {
+  QString name = obj->name();
   //  assert(!GlobalObjects.contains(name));
 
   GlobalObjects[name] = obj;
@@ -22,7 +22,7 @@ void GlobalEnvironment::registerObject(QObject* obj) {
   //          Qt::QueuedConnection);
 }
 
-QObject* GlobalEnvironment::getObject(const QString& name) {
+NamedObject* GlobalEnvironment::getObject(const QString& name) {
   if (!GlobalObjects.contains(name)) {
     return nullptr;
   }

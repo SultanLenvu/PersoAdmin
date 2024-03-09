@@ -1,13 +1,11 @@
 #ifndef WIDGETLOGBACKEND_H
 #define WIDGETLOGBACKEND_H
 
-#include <QApplication>
-#include <QObject>
-
 #include "abstract_log_backend.h"
 #include "configurable_object.h"
+#include "named_object.h"
 
-class WidgetLogBackend final : public QObject,
+class WidgetLogBackend final : public NamedObject,
                                public AbstractLogBackend,
                                public ConfigurableObject {
   Q_OBJECT
@@ -15,7 +13,7 @@ class WidgetLogBackend final : public QObject,
   bool Enable;
 
  public:
-  explicit WidgetLogBackend();
+  explicit WidgetLogBackend(const QString& name);
   ~WidgetLogBackend();
 
   // AbstractLogBackend interface
@@ -29,7 +27,7 @@ class WidgetLogBackend final : public QObject,
  private:
   Q_DISABLE_COPY_MOVE(WidgetLogBackend)
 
- public:
+ private:
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 

@@ -8,5 +8,3 @@ LogSystemBundle::LogSystemBundle() : QObject{nullptr} {
 
   connect(this, &LogSystemBundle::logging, ls, &LogSystem::generate);
 }
-
-void LogSystemBundle::send(const QString& msg) const {}

@@ -2,15 +2,20 @@
 #define PRODUCTIONLINEASYNCWRAPPER_H
 
 #include "abstract_async_wrapper.h"
+#include "loggable_object.h"
+#include "named_object.h"
 #include "production_line_manager.h"
+#include "progressable_async_wrapper.h"
 
-class ProductionLineManagerAsyncWrapper final : public AbstractAsyncWrapper {
+class ProductionLineManagerAsyncWrapper final : public NamedObject,
+                                                public ProgressableAsyncWrapper,
+                                                public LoggableObject {
   Q_OBJECT
  private:
   std::unique_ptr<ProductionLineManager> Manager;
 
  public:
-  explicit ProductionLineManagerAsyncWrapper(
+  Q_INVOKABLE explicit ProductionLineManagerAsyncWrapper(
       const QString& name,
       std::shared_ptr<AbstractSqlDatabase> database);
   ~ProductionLineManagerAsyncWrapper();

@@ -2,7 +2,7 @@
 #include "te310_printer.h"
 
 StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
-    : AbstractAsyncWrapper(name) {
+    : NamedObject(name) {
   StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
       new TE310Printer("StickerPrinter"));
 }

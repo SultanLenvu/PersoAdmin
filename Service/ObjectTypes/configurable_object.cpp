@@ -1,7 +1,7 @@
 #include "configurable_object.h"
 
+#include "configuration_manager.h"
 #include "global_environment.h"
-#include "gui_kernel.h"
 
 ConfigurableObject::ConfigurableObject() {
   Connector =
@@ -11,10 +11,10 @@ ConfigurableObject::ConfigurableObject() {
 SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
   Object = object;
 
-  GuiKernel* gk = static_cast<GuiKernel*>(
-      GlobalEnvironment::instance()->getObject("GuiKernel"));
+  ConfigurationManager* cum = static_cast<ConfigurationManager*>(
+      GlobalEnvironment::instance()->getObject("ConfigurationManager"));
 
-  connect(gk, &GuiKernel::applySettings_signal, this,
+  connect(cum, &ConfigurationManager::applySettings_signal, this,
           &SettingsApplyBundle::apply);
 }
 

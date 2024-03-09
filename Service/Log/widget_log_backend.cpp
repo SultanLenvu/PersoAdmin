@@ -2,7 +2,7 @@
 
 #include "widget_log_backend.h"
 
-WidgetLogBackend::WidgetLogBackend() {
+WidgetLogBackend::WidgetLogBackend(const QString& name) : NamedObject(name) {
   doLoadSettings();
 }
 

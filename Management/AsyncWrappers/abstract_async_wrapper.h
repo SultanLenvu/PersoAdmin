@@ -1,28 +1,22 @@
 #ifndef ABSTRACTASYNCWRAPPER_H
 #define ABSTRACTASYNCWRAPPER_H
 
-#include "loggable_object.h"
-#include "named_object.h"
+#include <QString>
+
 #include "types.h"
 
-class AbstractAsyncWrapper : public NamedObject, public LoggableObject {
-  Q_OBJECT
+class AbstractAsyncWrapper {
  public:
-  explicit AbstractAsyncWrapper(const QString& name);
-  virtual ~AbstractAsyncWrapper();
+  explicit AbstractAsyncWrapper() = default;
+  virtual ~AbstractAsyncWrapper() = default;
 
  protected:
-  virtual void initOperation(const QString& name);
-  virtual void processOperationError(const QString& name, ReturnStatus ret);
-  virtual void completeOperation(const QString& name);
+  virtual void initOperation(const QString& name) = 0;
+  virtual void processOperationError(const QString& name, ReturnStatus ret) = 0;
+  virtual void completeOperation(const QString& name) = 0;
 
  private:
-  void connectDependencies(void);
-
- signals:
-  void executionStarted(const QString& opname);
-  void executionFinished(const QString& opname);
-  void executionStatus(ReturnStatus ret);
+  Q_DISABLE_COPY_MOVE(AbstractAsyncWrapper)
 };
 
 #endif // ABSTRACTASYNCWRAPPER_H

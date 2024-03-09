@@ -1,8 +1,11 @@
 #include "settings_dialog.h"
-#include "General/definitions.h"
+#include "definitions.h"
+
+#include "configuration_manager.h"
+#include "global_environment.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
-  setObjectName("SettingsDialog");
+  connectDependencies();
 
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
@@ -215,6 +218,14 @@ void SettingsDialog::create() {
   RejectPushButton = new QPushButton("Закрыть");
   ButtonLayout->addWidget(RejectPushButton);
   connect(RejectPushButton, &QPushButton::clicked, this, &QDialog::reject);
+}
+
+void SettingsDialog::connectDependencies() {
+  ConfigurationManager* cum = static_cast<ConfigurationManager*>(
+      GlobalEnvironment::instance()->getObject("ConfigurationManager"));
+
+  connect(this, &SettingsDialog::applyNewSettings, cum,
+          &ConfigurationManager::applySettings_signal);
 }
 
 bool SettingsDialog::check() const {

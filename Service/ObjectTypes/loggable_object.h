@@ -6,7 +6,9 @@
 #include "log_system_bundle.h"
 
 class LoggableObject {
-  std::unique_ptr<LogSystemBundle> Connection;
+  LogSystemBundle Connection;
+  QString LogName;
+  size_t ThreadId;
 
  public:
   LoggableObject();
@@ -14,6 +16,12 @@ class LoggableObject {
 
  protected:
   void sendLog(const QString& log) const;
+  size_t threadId(void) const;
+  QString logName(void) const;
+
+ protected:
+  void updateThreadId(void);
+  void setLogName(const QString& name);
 
  private:
   Q_DISABLE_COPY_MOVE(LoggableObject)

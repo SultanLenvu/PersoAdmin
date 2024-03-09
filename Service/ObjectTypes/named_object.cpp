@@ -7,6 +7,10 @@ NamedObject::NamedObject(const QString& name) : QObject{nullptr} {
   GlobalEnvironment::instance()->registerObject(this);
 }
 
+QString NamedObject::name() {
+  return objectName();
+}
+
 NamedObject::~NamedObject() {
   emit deleted(objectName());
 }
