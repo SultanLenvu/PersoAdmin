@@ -7,6 +7,7 @@
 
 PersoServerAsyncWrapper::PersoServerAsyncWrapper(const QString& name)
     : NamedObject{name},
+      LoggableObject(name),
       ProductionLineData(new StringDictionary()),
       BoxData(new StringDictionary()),
       TransponderData(new StringDictionary()),

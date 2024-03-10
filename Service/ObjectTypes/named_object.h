@@ -14,9 +14,6 @@ class NamedObject : public QObject {
   NamedObject();
   Q_DISABLE_COPY_MOVE(NamedObject)
 
- public:
-  QString name(void);
-
  signals:
   void deleted(const QString& name) const;
 };

@@ -4,6 +4,7 @@
 
 DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
     : NamedObject(name),
+      LoggableObject(name),
       Database(new PostgreSqlDatabase("PostgreSqlDatabase")) {}
 
 DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}

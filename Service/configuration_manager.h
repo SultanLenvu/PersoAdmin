@@ -6,13 +6,14 @@
 class ConfigurationManager : public NamedObject {
   Q_OBJECT
  public:
-  explicit ConfigurationManager(const QString& name);
+  Q_INVOKABLE explicit ConfigurationManager(const QString& name);
   ~ConfigurationManager() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(ConfigurationManager)
 
  private:
+  void init(void);
   void registerMetaTypes(void);
 
  signals:

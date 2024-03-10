@@ -8,6 +8,11 @@
 
 ConfigurationManager::ConfigurationManager(const QString& name)
     : NamedObject(name) {
+  init();
+  registerMetaTypes();
+}
+
+void ConfigurationManager::init() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);

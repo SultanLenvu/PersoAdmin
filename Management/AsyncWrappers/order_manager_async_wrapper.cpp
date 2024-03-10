@@ -3,7 +3,7 @@
 OrderManagerAsyncWrapper::OrderManagerAsyncWrapper(
     const QString& name,
     std::shared_ptr<AbstractSqlDatabase> database)
-    : NamedObject{name} {
+    : NamedObject{name}, LoggableObject(name) {
   Manager =
       std::unique_ptr<OrderManager>(new OrderManager("OrderManager", database));
 }

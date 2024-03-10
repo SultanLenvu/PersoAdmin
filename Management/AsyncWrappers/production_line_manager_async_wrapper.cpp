@@ -4,6 +4,7 @@ ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(
     const QString& name,
     std::shared_ptr<AbstractSqlDatabase> database)
     : NamedObject{name},
+      LoggableObject(name),
       Manager(new ProductionLineManager("ProductionLineManager", database)) {}
 
 ProductionLineManagerAsyncWrapper::~ProductionLineManagerAsyncWrapper() {}

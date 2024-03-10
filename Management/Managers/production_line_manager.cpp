@@ -3,7 +3,7 @@
 ProductionLineManager::ProductionLineManager(
     const QString& name,
     std::shared_ptr<AbstractSqlDatabase> database)
-    : NamedObject(name), Database(database) {}
+    : NamedObject(name), LoggableObject(name), Database(database) {}
 
 ProductionLineManager::~ProductionLineManager() {}
 

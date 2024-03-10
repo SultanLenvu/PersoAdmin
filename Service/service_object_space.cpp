@@ -7,9 +7,9 @@ ServiceObjectSpace::ServiceObjectSpace() {
   Thread.start();
 
   NamedObjectFactory factory(&Thread);
-  Logger = std::unique_ptr<LogSystem>(factory.create<LogSystem>("LogSystem"));
   ConfigUpdater = std::unique_ptr<ConfigurationManager>(
       factory.create<ConfigurationManager>("ConfigurationManager"));
+  Logger = std::unique_ptr<LogSystem>(factory.create<LogSystem>("LogSystem"));
 
   // Переносим глобальную среду для сигналов и слотов объектов
   GlobalEnvironment::instance()->moveToThread(&Thread);

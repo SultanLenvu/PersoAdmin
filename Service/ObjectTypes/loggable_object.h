@@ -7,21 +7,20 @@
 
 class LoggableObject {
   LogSystemBundle Connection;
-  QString LogName;
+  QString SourceName;
   size_t ThreadId;
 
  public:
-  LoggableObject();
+  explicit LoggableObject(const QString& name);
   virtual ~LoggableObject() = default;
+
+ public:
+  size_t threadId(void) const;
+  QString sourceName(void) const;
 
  protected:
   void sendLog(const QString& log) const;
-  size_t threadId(void) const;
-  QString logName(void) const;
-
- protected:
   void updateThreadId(void);
-  void setLogName(const QString& name);
 
  private:
   Q_DISABLE_COPY_MOVE(LoggableObject)

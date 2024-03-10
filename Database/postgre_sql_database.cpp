@@ -2,7 +2,7 @@
 #include "definitions.h"
 
 PostgreSqlDatabase::PostgreSqlDatabase(const QString& name)
-    : NamedObject{name} {
+    : NamedObject{name}, LoggableObject(name) {
   ConnectionName = QString("%1%2").arg(name, "Connection");
 
   doLoadSettings();

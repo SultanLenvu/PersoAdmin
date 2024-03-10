@@ -4,6 +4,7 @@ PostgreSqlTable::PostgreSqlTable(const QString& name,
                                  const QString& tableName,
                                  const QString& connectionName)
     : NamedObject(name),
+      LoggableObject(name),
       TableName(tableName),
       ConnectionName(connectionName),
       RecordMaxCount(1000),

@@ -24,7 +24,10 @@
 #include "shutdown_production_line.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
-    : NamedObject(name), PersoServerPort(0), ReceivedDataBlockSize(0) {
+    : NamedObject(name),
+      LoggableObject(name),
+      PersoServerPort(0),
+      ReceivedDataBlockSize(0) {
   doLoadSettings();
 
   createSocket();

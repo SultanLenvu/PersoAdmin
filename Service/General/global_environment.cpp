@@ -12,7 +12,7 @@ GlobalEnvironment* GlobalEnvironment::instance() {
 }
 
 void GlobalEnvironment::registerObject(NamedObject* obj) {
-  QString name = obj->name();
+  QString name = obj->objectName();
   //  assert(!GlobalObjects.contains(name));
 
   GlobalObjects[name] = obj;

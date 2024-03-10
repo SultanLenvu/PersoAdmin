@@ -2,7 +2,7 @@
 #include "progress_indicator.h"
 
 ProgressIndicator::ProgressIndicator(const QString& name)
-    : AbstractProgressIndicator{name} {
+    : AbstractProgressIndicator{name}, LoggableObject(name) {
   createTimers();
 }
 
