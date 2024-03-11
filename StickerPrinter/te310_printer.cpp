@@ -240,16 +240,23 @@ ReturnStatus TE310Printer::exec(const QStringList& commandScript) {
     return ReturnStatus::StickerPrinterConnectionError;
   }
 
-  for (int32_t i = 0; i < commandScript.size(); i++) {
-    sendCommand(commandScript.at(i).toUtf8().data());
+  bool ok = true;
+  for (int32_t i = 0; i < commandScript.size() && ok; i++) {
+    ok = sendCommand(commandScript.at(i).toUtf8().data());
   }
-
   closePort();
 
+  if (!ok) {
+    sendLog("Получена ошибка при выполнении командного скрипта.");
+    return ReturnStatus::StickerPrinterCommandScriptExecutionError;
+  }
+
+  sendLog("Выполнение командного скрипта успешно завершено.");
   return ReturnStatus::NoError;
 }
 
 void TE310Printer::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
   loadTscLib();
 }
@@ -266,7 +273,7 @@ void TE310Printer::doLoadSettings() {
       settings.value(QString("%1/use_ethernet").arg(objectName())).toBool();
   if (UseEthernet) {
     IPAddress = QHostAddress(
-        settings.value(QString("%1/ip_address").arg(objectName())).toString());
+        settings.value(QString("%1/ip").arg(objectName())).toString());
     Port = settings.value(QString("%1/port").arg(objectName())).toInt();
   }
 }

@@ -38,15 +38,15 @@ void SettingsDialog::create() {
   DatabaseIpLabel = new QLabel("IP-адрес");
   DatabaseLayout->addWidget(DatabaseIpLabel, 0, 0, 1, 1);
 
-  DatabaseIpLineEdit = new QLineEdit(
-      Settings.value("postgre_sql_database/server_ip").toString());
+  DatabaseIpLineEdit =
+      new QLineEdit(Settings.value("postgre_sql_database/ip").toString());
   DatabaseLayout->addWidget(DatabaseIpLineEdit, 0, 1, 1, 1);
 
   DatabasePortLabel = new QLabel("Порт ");
   DatabaseLayout->addWidget(DatabasePortLabel, 1, 0, 1, 1);
 
-  DatabasePortLineEdit = new QLineEdit(
-      Settings.value("postgre_sql_database/server_port").toString());
+  DatabasePortLineEdit =
+      new QLineEdit(Settings.value("postgre_sql_database/port").toString());
   DatabaseLayout->addWidget(DatabasePortLineEdit, 1, 1, 1, 1);
 
   DatabaseNameLabel = new QLabel("Название базы данных ");
@@ -80,13 +80,13 @@ void SettingsDialog::create() {
   PersoClientServerIdLabel =
       new QLabel("IP адрес или URL сервера персонализации");
   PersoClientMainLayout->addWidget(PersoClientServerIdLabel, 0, 0, 1, 1);
-  PersoClientServerIpLineEdit = new QLineEdit(
-      Settings.value("perso_server_connection/server_ip").toString());
+  PersoClientServerIpLineEdit =
+      new QLineEdit(Settings.value("perso_server_connection/ip").toString());
   PersoClientMainLayout->addWidget(PersoClientServerIpLineEdit, 0, 1, 1, 1);
   PersoClientServerPortLabel = new QLabel("Порт сервера персонализации");
   PersoClientMainLayout->addWidget(PersoClientServerPortLabel, 1, 0, 1, 1);
-  PersoClientServerPortLineEdit = new QLineEdit(
-      Settings.value("perso_server_connection/server_port").toString());
+  PersoClientServerPortLineEdit =
+      new QLineEdit(Settings.value("perso_server_connection/port").toString());
   PersoClientMainLayout->addWidget(PersoClientServerPortLineEdit, 1, 1, 1, 1);
 
   // Настройки логгера
@@ -303,15 +303,14 @@ void SettingsDialog::save() {
                     LogSystemListenPortLineEdit->text().toInt());
 
   // Настройки клиента
-  Settings.setValue("perso_server_connection/server_ip",
+  Settings.setValue("perso_server_connection/ip",
                     PersoClientServerIpLineEdit->text());
-  Settings.setValue("perso_server_connection/server_port",
+  Settings.setValue("perso_server_connection/port",
                     PersoClientServerPortLineEdit->text());
 
   // Настройки контроллера базы данных
-  Settings.setValue("postgre_sql_database/server_ip",
-                    DatabaseIpLineEdit->text());
-  Settings.setValue("postgre_sql_database/server_port",
+  Settings.setValue("postgre_sql_database/ip", DatabaseIpLineEdit->text());
+  Settings.setValue("postgre_sql_database/port",
                     DatabasePortLineEdit->text().toInt());
   Settings.setValue("postgre_sql_database/database_name",
                     DatabaseNameLineEdit->text());

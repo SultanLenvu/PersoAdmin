@@ -327,6 +327,7 @@ ReturnStatus OrderManager::linkIssuerWithKeys(const StringDictionary& param) {
 }
 
 void OrderManager::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
 }
 

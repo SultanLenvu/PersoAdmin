@@ -472,6 +472,7 @@ bool PostgreSqlDatabase::getLastId(const QString& table, int32_t& id) const {
  */
 
 void PostgreSqlDatabase::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
 
   if (QSqlDatabase::database(ConnectionName).isValid()) {
@@ -488,8 +489,8 @@ void PostgreSqlDatabase::doLoadSettings() {
   QSettings settings;
 
   HostAddress =
-      QHostAddress(settings.value("postgre_sql_database/server_ip").toString());
-  HostPort = settings.value("postgre_sql_database/server_port").toInt();
+      QHostAddress(settings.value("postgre_sql_database/ip").toString());
+  HostPort = settings.value("postgre_sql_database/port").toInt();
   DatabaseName =
       settings.value("postgre_sql_database/database_name").toString();
   UserName = settings.value("postgre_sql_database/user_name").toString();
