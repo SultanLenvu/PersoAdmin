@@ -10,7 +10,7 @@ class SqlResponseModel final : public QAbstractTableModel {
   std::shared_ptr<SqlQueryValues> Response;
 
  public:
-  SqlResponseModel();
+  explicit SqlResponseModel();
   ~SqlResponseModel();
 
   void setResponse(std::shared_ptr<SqlQueryValues> response);

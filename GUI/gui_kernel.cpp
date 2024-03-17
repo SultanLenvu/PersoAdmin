@@ -23,15 +23,6 @@ GuiKernel::GuiKernel()
   createMainWindowGui();
 }
 
-void GuiKernel::settingsActionTrigger_slot() {
-  emit clearLogDisplay();
-
-  SettingsDialog dialog;
-  if (dialog.exec() == QDialog::Rejected) {
-    return;
-  }
-}
-
 /*
  * Приватные методы
  */
@@ -87,4 +78,13 @@ void GuiKernel::createGuiSubkernels() {
   Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
   Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
+}
+
+void GuiKernel::settingsActionTrigger_slot() {
+  emit clearLogDisplay();
+
+  SettingsDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
 }

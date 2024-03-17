@@ -1,9 +1,9 @@
 #ifndef ORDERUSERINTERFACE_H
 #define ORDERUSERINTERFACE_H
 
-#include <QtWidgets>
+#include "abstract_user_interface.h"
 
-class OrderUserInterface : public QWidget {
+class OrderUserInterface final : public AbstractUserInterface {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -39,7 +39,7 @@ class OrderUserInterface : public QWidget {
 
  public:
   explicit OrderUserInterface(QWidget* parent = nullptr);
-  ~OrderUserInterface();
+  ~OrderUserInterface() = default;
 
  private:
   void create(void);

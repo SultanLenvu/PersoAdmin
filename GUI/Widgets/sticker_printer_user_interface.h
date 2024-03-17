@@ -1,9 +1,9 @@
 #ifndef STICKERPRINTERUSERINTERFACE_H
 #define STICKERPRINTERUSERINTERFACE_H
 
-#include <QtWidgets>
+#include "abstract_user_interface.h"
 
-class StickerPrinterUserInterface : public QWidget {
+class StickerPrinterUserInterface : public AbstractUserInterface {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -24,7 +24,7 @@ class StickerPrinterUserInterface : public QWidget {
 
  public:
   explicit StickerPrinterUserInterface(QWidget* parent = nullptr);
-  ~StickerPrinterUserInterface();
+  ~StickerPrinterUserInterface() = default;
 
  private:
   void create(void);

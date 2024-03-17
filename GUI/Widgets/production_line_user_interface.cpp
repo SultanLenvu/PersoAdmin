@@ -3,12 +3,10 @@
 #include "production_line_gui_subkernel.h"
 
 ProductionLineUserInterface::ProductionLineUserInterface(QWidget* parent)
-    : QWidget{parent} {
+    : AbstractUserInterface{parent} {
   create();
   connectDependencies();
 }
-
-ProductionLineUserInterface::~ProductionLineUserInterface() {}
 
 void ProductionLineUserInterface::create() {
   MainLayout = new QHBoxLayout();

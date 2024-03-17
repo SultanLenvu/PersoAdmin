@@ -1,9 +1,9 @@
 #ifndef PERSOSERVERWIDGET_H
 #define PERSOSERVERWIDGET_H
 
-#include <QtWidgets>
+#include "abstract_user_interface.h"
 
-class PersoServerUserInterface : public QWidget {
+class PersoServerUserInterface final : public AbstractUserInterface {
   Q_OBJECT
 
  private:
@@ -73,6 +73,7 @@ class PersoServerUserInterface : public QWidget {
 
  public:
   explicit PersoServerUserInterface(QWidget* parent = nullptr);
+  ~PersoServerUserInterface() = default;
 
  private:
   void create(void);
@@ -87,8 +88,6 @@ class PersoServerUserInterface : public QWidget {
   void createDataDisplayPanel(void);
 
   void connectDependencies(void);
-
- private slots:
 };
 
 #endif  // PERSOSERVERWIDGET_H

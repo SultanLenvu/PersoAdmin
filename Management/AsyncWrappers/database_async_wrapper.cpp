@@ -2,6 +2,8 @@
 #include "postgre_sql_database.h"
 #include "sql_query_values.h"
 
+#include "response_ready_connection.h"
+
 DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
     : NamedObject(name),
       LoggableObject(name),
@@ -45,7 +47,14 @@ void DatabaseAsyncWrapper::getTable(const QString& name) {
     return;
   }
 
+  QObject::connect(this, SIGNAL(responseReady(std::shared_ptr<SqlQueryValues>)),
+                   sender(),
+                   SLOT(displayResponse(std::shared_ptr<SqlQueryValues>)));
   emit responseReady(response);
+  QObject::disconnect(
+      this, SIGNAL(responseReady(std::shared_ptr<SqlQueryValues>)), sender(),
+      SLOT(displayResponse(std::shared_ptr<SqlQueryValues>)));
+
   completeOperation("getTable");
 }
 

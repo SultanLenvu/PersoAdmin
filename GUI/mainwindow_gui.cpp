@@ -1,9 +1,14 @@
 #include "mainwindow_gui.h"
+#include "abstract_user_interface.h"
+#include "database_user_interface.h"
 #include "global_environment.h"
+#include "order_user_interface.h"
+#include "perso_server_user_interface.h"
+#include "production_line_user_interface.h"
+#include "sticker_printer_user_interface.h"
 #include "widget_log_backend.h"
 
 MainWindowGui::MainWindowGui(QWidget* parent) {
-  setObjectName("MainWindowGui");
   create();
   connectDependecies();
 }
@@ -35,38 +40,22 @@ void MainWindowGui::createTabs() {
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
 
-  createDatabaseTab();
-  createOrderTab();
-  createProductionLineTab();
-  createServerTab();
-  createStickerTab();
+  AbstractUserInterface* userInterface = new DatabaseUserInterface();
+  Tabs->addTab(userInterface, "База данных");
+
+  userInterface = new OrderUserInterface();
+  Tabs->addTab(userInterface, "Заказы");
+
+  userInterface = new ProductionLineUserInterface();
+  Tabs->addTab(userInterface, "Линии производства");
+
+  userInterface = new PersoServerUserInterface();
+  Tabs->addTab(userInterface, "Cервер");
+
+  userInterface = new StickerPrinterUserInterface();
+  Tabs->addTab(userInterface, "Стикер принтер");
 
   Tabs->setCurrentIndex(0);
-}
-
-void MainWindowGui::createDatabaseTab() {
-  DatabaseTab = new DatabaseUserInterface();
-  Tabs->addTab(DatabaseTab, "База данных");
-}
-
-void MainWindowGui::createOrderTab() {
-  OrderTab = new OrderUserInterface();
-  Tabs->addTab(OrderTab, "Заказы");
-}
-
-void MainWindowGui::createProductionLineTab() {
-  ProductionLineTab = new ProductionLineUserInterface();
-  Tabs->addTab(ProductionLineTab, "Линии производства");
-}
-
-void MainWindowGui::createServerTab() {
-  ServerTab = new PersoServerUserInterface();
-  Tabs->addTab(ServerTab, "Cервер");
-}
-
-void MainWindowGui::createStickerTab() {
-  StickerPrinterTab = new StickerPrinterUserInterface();
-  Tabs->addTab(StickerPrinterTab, "Стикер принтер");
 }
 
 void MainWindowGui::createLog() {
@@ -77,7 +66,6 @@ void MainWindowGui::createLog() {
   LogLayout = new QVBoxLayout();
   LogGroup->setLayout(LogLayout);
 
-  LogDisplay = new QPlainTextEdit();
   LogDisplay = new QPlainTextEdit();
   LogDisplay->setEnabled(true);
   LogDisplay->setTabletTracking(true);

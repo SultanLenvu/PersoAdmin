@@ -93,6 +93,7 @@ add_executable(PersoAdmin WIN32
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
 
+    GUI/Widgets/abstract_user_interface.h GUI/Widgets/abstract_user_interface.cpp
     GUI/Widgets/order_user_interface.h GUI/Widgets/order_user_interface.cpp
     GUI/Widgets/database_user_interface.h GUI/Widgets/database_user_interface.cpp
     GUI/Widgets/production_line_user_interface.h GUI/Widgets/production_line_user_interface.cpp
@@ -148,6 +149,7 @@ add_executable(PersoAdmin WIN32
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
+    GUI/Subkernels/response_ready_connection.h GUI/Subkernels/response_ready_connection.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE
