@@ -10,7 +10,7 @@ LogSystem::LogSystem(const QString& name)
   doLoadSettings();
 
   Backends.emplace_back(new WidgetLogBackend("WidgetLogBackend"));
-  Backends.emplace_back(new FileLogBackend());
+  Backends.emplace_back(new FileLogBackend("FileLogBackend"));
 
   createPersoServerLogSocket();
 }
@@ -45,6 +45,7 @@ void LogSystem::generate(const QString& log,
  */
 
 void LogSystem::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
 
   PersoServerLogSocket->abort();

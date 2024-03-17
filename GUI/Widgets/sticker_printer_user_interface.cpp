@@ -45,17 +45,28 @@ void StickerPrinterUserInterface::createControlPanel() {
 }
 
 void StickerPrinterUserInterface::createDataDisplayGroup() {
+  MainSublayout = new QVBoxLayout();
+  MainLayout->addLayout(MainSublayout);
+
   DisplayDataGroup = new QGroupBox(QString("Данные стикера"));
   DisplayDataGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  MainLayout->addWidget(DisplayDataGroup);
+  MainSublayout->addWidget(DisplayDataGroup);
 
   DisplayDataLayout = new QVBoxLayout();
   DisplayDataGroup->setLayout(DisplayDataLayout);
 
   StickerDataTableView = new QTableView();
   DisplayDataLayout->addWidget(StickerDataTableView);
+
+  CommandScriptGroup = new QGroupBox(QString("Поле ввода скрипта"));
+  CommandScriptGroup->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  MainSublayout->addWidget(CommandScriptGroup);
+
+  CommandScriptLayout = new QVBoxLayout();
+  CommandScriptGroup->setLayout(CommandScriptLayout);
+
   CommandScriptInput = new QPlainTextEdit();
-  DisplayDataLayout->addWidget(CommandScriptInput);
+  CommandScriptLayout->addWidget(CommandScriptInput);
 }
 
 void StickerPrinterUserInterface::connectDependencies() {
@@ -70,14 +81,18 @@ void StickerPrinterUserInterface::connectDependencies() {
           &StickerPrinterGuiSubkernel::printBoxSticker);
   connect(PrintPalletStickerPushButton, &QPushButton::clicked, pls,
           &StickerPrinterGuiSubkernel::printPalletSticker);
+  connect(ExecCommandScriptPushButton, &QPushButton::clicked, this,
+          &StickerPrinterUserInterface::execCommandScriptPushButton_slot);
+
   connect(this, &StickerPrinterUserInterface::execCommandScript_signal, pls,
           &StickerPrinterGuiSubkernel::execCommandScript);
 }
 
 void StickerPrinterUserInterface::execCommandScriptPushButton_slot() {
-  std::shared_ptr<QStringList> script(new QStringList());
+  QString rawScript = CommandScriptInput->toPlainText();
+  rawScript.remove("\r");
 
-  //  script->emplace_back(CommandScriptInput->toPlainText().split("\n"));
+  std::shared_ptr<QStringList> script(new QStringList(rawScript.split("\n")));
 
   emit execCommandScript_signal(script);
 }

@@ -4,7 +4,8 @@
 
 #include "file_log_backend.h"
 
-FileLogBackend::FileLogBackend() {
+FileLogBackend::FileLogBackend(const QString& name)
+    : NamedObject(name), LoggableObject(name) {
   doLoadSettings();
   initialize();
 }
@@ -22,6 +23,7 @@ void FileLogBackend::writeMessage(const QString& str) {
 }
 
 void FileLogBackend::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
   initialize();
 }

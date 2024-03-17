@@ -12,8 +12,13 @@
 
 #include "abstract_log_backend.h"
 #include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class FileLogBackend : public AbstractLogBackend, public ConfigurableObject {
+class FileLogBackend final : public NamedObject,
+                             public AbstractLogBackend,
+                             public ConfigurableObject,
+                             public LoggableObject {
  private:
   bool Enable;
   QDir CurrentDir;
@@ -21,7 +26,7 @@ class FileLogBackend : public AbstractLogBackend, public ConfigurableObject {
   QTextStream FileStream;
 
  public:
-  explicit FileLogBackend();
+  explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
   // AbstractLogBackend interface

@@ -2,7 +2,8 @@
 
 #include "widget_log_backend.h"
 
-WidgetLogBackend::WidgetLogBackend(const QString& name) : NamedObject(name) {
+WidgetLogBackend::WidgetLogBackend(const QString& name)
+    : NamedObject(name), LoggableObject(name) {
   doLoadSettings();
 }
 
@@ -21,6 +22,7 @@ void WidgetLogBackend::clear() {
 }
 
 void WidgetLogBackend::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
 }
 

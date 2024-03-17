@@ -3,8 +3,8 @@
 
 StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
     : NamedObject(name), LoggableObject(name) {
-  StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
-      new TE310Printer("StickerPrinter"));
+  StickerPrinter =
+      std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TE310Printer"));
 }
 
 StickerPrinterAsyncWrapper::~StickerPrinterAsyncWrapper() {}

@@ -17,9 +17,14 @@ class StickerPrinterUserInterface : public AbstractUserInterface {
   QSpacerItem* ControlPanelVS;
   QPushButton* ExecCommandScriptPushButton;
 
+  QVBoxLayout* MainSublayout;
+
   QGroupBox* DisplayDataGroup;
   QVBoxLayout* DisplayDataLayout;
   QTableView* StickerDataTableView;
+
+  QGroupBox* CommandScriptGroup;
+  QVBoxLayout* CommandScriptLayout;
   QPlainTextEdit* CommandScriptInput;
 
  public:

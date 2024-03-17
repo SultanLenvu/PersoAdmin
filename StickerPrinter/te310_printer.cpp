@@ -1,4 +1,5 @@
 #include <QHostAddress>
+#include <QTextCodec>
 
 #include "te310_printer.h"
 
@@ -96,6 +97,27 @@ ReturnStatus TE310Printer::printBoxSticker(const StringDictionary& param) {
     return ReturnStatus::StickerPrinterConnectionError;
   }
 
+  /* Командный скрипт
+    SIZE 100 mm, 50 mm
+    GAP 2 mm,2 mm
+    REFERENCE 0,0
+    DIRECTION 1
+    CLS
+    TEXT 600,10,"D.FNT",0,2,2,2,"JSC PowerSyntez"
+    BOX 25, 50, 1150, 560, 4
+    TEXT 50, 90, "D.FNT", 0, 2, 2, 1,"MODEL:"
+    TEXT 600, 90, "D.FNT", 0, 2, 2, 1, "%1"
+    TEXT 50, 190, "D.FNT", 0, 2, 2, 1, "QUANTITY:"
+    TEXT 600, 190, "D.FNT", 0, 2, 2, 1, "%1"
+    TEXT 50, 290, "D.FNT", 0, 2, 2, 1, "SERIAL NO FROM:"
+    BARCODE 600, 275, "128M", 50, 2, 0, 2, 4, 1, "%1"
+    TEXT 50, 390, "D.FNT", 0, 2, 2, 1, "SERIAL NO TO:"
+    BARCODE 600, 375, "128M", 50, 2, 0, 2, 4, 1, "%1"
+    TEXT 50, 490, "D.FNT", 0, 2, 2, 1, "BOX NO:"
+    BARCODE 600, 475, "128M", 50, 2, 0, 2, 4, 1, "%1"
+    PRINT 1
+   */
+
   sendCommand("SIZE 100 mm, 50 mm");
   sendCommand("GAP 2 mm,2 mm");
   sendCommand("REFERENCE 0,0");
@@ -154,69 +176,103 @@ ReturnStatus TE310Printer::printLastBoxSticker() {
 }
 
 ReturnStatus TE310Printer::printPalletSticker(const StringDictionary& param) {
-  sendLog(QString("Печать стикера для паллеты."));
+  sendLog(QString("Печать стикера для бокса."));
 
-  if (param.value("pallet_id").isEmpty() ||
+  if (param.value("box_id").isEmpty() ||
       param.value("transponder_model").isEmpty() ||
-      param.value("pallet_quantity").isEmpty() ||
-      param.value("first_box_id").isEmpty() ||
-      param.value("last_box_id").isEmpty() ||
-      param.value("pallet_assembly_date").isEmpty()) {
+      param.value("box_assembled_units").isEmpty() ||
+      param.value("first_transponder_sn").isEmpty() ||
+      param.value("last_transponder_sn").isEmpty() ||
+      param.value("employee_data").isEmpty()) {
     sendLog(QString("Получены некорректные параметры. Сброс."));
     return ReturnStatus::ParameterError;
   }
 
   // Сохраняем данные о стикере
-  LastPalletSticker = param;
+  LastBoxSticker = param;
 
   if (!initConnection()) {
     return ReturnStatus::StickerPrinterConnectionError;
   }
 
-  sendCommand("SIZE 100 mm,100 mm");
+  /* Командный скрипт:
+    SIZE 100 mm, 50 mm
+    GAP 2 mm,2 mm
+    REFERENCE 0,0
+    DIRECTION 1
+    CLS
+
+   TEXT 600,10,"D.FNT",0,2,2,2,"JSC PowerSyntez"
+   BOX 25, 50, 1150, 525, 4
+
+   TEXT 50, 75, "D.FNT", 0, 2, 2, 1,"MODEL:"
+   TEXT 600, 75, "D.FNT", 0, 2, 2, 1, "TC1001"
+
+   TEXT 50, 150, "D.FNT", 0, 2, 2, 1, "QUANTITY:"
+   TEXT 600, 150, "D.FNT", 0, 2, 2, 1, "50"
+
+   TEXT 50, 225, "D.FNT", 0, 2, 2, 1, "SERIAL NO FROM:"
+   TEXT 600, 225, "D.FNT", 0, 2, 2, 1, "501234NNNNNNNNNN"
+
+   TEXT 50, 300, "D.FNT", 0, 2, 2, 1, "SERIAL NO TO:"
+   TEXT 600, 300, "D.FNT", 0, 2, 2, 1, "501234NNNNNNNNNN"
+
+   TEXT 50, 375, "D.FNT", 0, 2, 2, 1, "BOX NO:"
+   TEXT 600, 375, "D.FNT", 0, 2, 2, 1, "1000555"
+
+   TEXT 50, 450, "D.FNT", 0, 2, 2, 1, "EMPLOYEE:"
+   TEXT 600, 450, "D.FNT", 0, 2, 2, 1, "NAME SURNAME"
+
+   TEXT 600, 535, "D.FNT", 0, 2, 2, 2,"Made in Russia"
+
+   PRINT 1
+  */
+
+  sendCommand("SIZE 100 mm, 50 mm");
   sendCommand("GAP 2 mm,2 mm");
   sendCommand("REFERENCE 0,0");
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
-  sendCommand("TEXT 600, 25, \"D.FNT\", 0, 3, 3, 2, \"JSC PowerSyntez\"");
-  sendCommand("BOX 25, 100, 1150, 1075, 4");
-  sendCommand("TEXT 50, 150, \"D.FNT\", 0, 3, 3, 1,\"MODEL:\"");
-  sendCommand(QString("TEXT 600, 150,\"D.FNT\", 0, 3, 3, 1, \"%1\"")
+  sendCommand("TEXT 600,10,\"D.FNT\",0,2,2,2,\"JSC PowerSyntez\"");
+  sendCommand("BOX 25, 50, 1150, 525, 4 ");
+
+  sendCommand("TEXT 50, 75, \"D.FNT\", 0, 2, 2, 1,\"MODEL:\"");
+  sendCommand(QString("TEXT 600, 75, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
                   .arg(param.value("transponder_model"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 50, 300, \"D.FNT\", 0, 3, 3, 1, \"QUANTITY:\"");
-  sendCommand(QString("TEXT 600, 300, \"D.FNT\", 0, 3, 3, 1, \"%1\"")
-                  .arg(param.value("pallet_quantity"))
+  sendCommand("TEXT 50, 150, \"D.FNT\", 0, 2, 2, 1, \"QUANTITY:\"");
+  sendCommand(QString("TEXT 600, 150, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(param.value("box_assembled_units"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 50, 450, \"D.FNT\", 0, 3, 3, 1, \"BOX NO FROM:\"");
-  sendCommand(QString("BARCODE 600, 425, \"128M\", 75, 2, 0, 3, 6, 1, \"%1\"")
-                  .arg(param.value("first_box_id"))
+  sendCommand("TEXT 50, 225, \"D.FNT\", 0, 2, 2, 1, \"SERIAL NO FROM:\"");
+  sendCommand(QString("TEXT 600, 225, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(param.value("first_transponder_sn"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 50, 600, \"D.FNT\", 0, 3, 3, 1, \"BOX NO TO:\"");
-  sendCommand(QString("BARCODE 600, 575, \"128M\", 75, 2, 0, 3, 6, 1, \"%1\"")
-                  .arg(param.value("last_box_id"))
+  sendCommand("TEXT 50, 300, \"D.FNT\", 0, 2, 2, 1, \"SERIAL NO TO:\"");
+  sendCommand(QString("TEXT 600, 300, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(param.value("last_transponder_sn"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 50, 750, \"D.FNT\", 0, 3, 3, 1, \"PALLET NO:\"");
-  sendCommand(QString("BARCODE 600, 725, \"128M\", 75, 2, 0, 3, 6, 1, \"%1\"")
-                  .arg(param.value("pallet_id"))
+  sendCommand("TEXT 50, 375, \"D.FNT\", 0, 2, 2, 1, \"BOX NO:\"");
+  sendCommand(QString("TEXT 600, 375, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(param.value("box_id"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 50, 900, \"D.FNT\", 0, 3, 3, 1,\"ASSEMBLY DATE:\"");
-  sendCommand(QString("TEXT 600, 900, \"D.FNT\", 0, 3, 3, 1, \"%1\"")
-                  .arg(param.value("pallet_assembly_date"))
+  sendCommand("TEXT 50, 450, \"D.FNT\", 0, 2, 2, 1, \"EMPLOYEE:\"");
+  sendCommand(QString("TEXT 600, 450, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
+                  .arg(param.value("employee_data"))
                   .toUtf8()
-                  .constData());
+                  .data());
 
-  sendCommand("TEXT 600, 1090, \"D.FNT\", 0, 3, 3, 2, \"Made in Russia\"");
+  sendCommand("TEXT 600, 535, \"D.FNT\", 0, 2, 2, 2,\"Made in Russia\"");
   sendCommand("PRINT 1");
 
   closePort();
@@ -240,16 +296,27 @@ ReturnStatus TE310Printer::exec(const QStringList& commandScript) {
     return ReturnStatus::StickerPrinterConnectionError;
   }
 
-  for (int32_t i = 0; i < commandScript.size(); i++) {
-    sendCommand(commandScript.at(i).toUtf8().data());
+  bool ok = true;
+  for (int32_t i = 0; i < commandScript.size() && ok; i++) {
+    //    QByteArray encodedData = commandScript.at(i).toUtf8();
+    //    const char* charData = encodedData.constData();
+
+    ok = sendCommand(commandScript.at(i).toUtf8().constData());
   }
 
   closePort();
 
+  if (!ok) {
+    sendLog("Получена ошибка при выполнении командного скрипта.");
+    return ReturnStatus::StickerPrinterCommandScriptExecutionError;
+  }
+
+  sendLog("Выполнение командного скрипта успешно завершено.");
   return ReturnStatus::NoError;
 }
 
 void TE310Printer::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
   loadTscLib();
 }
@@ -266,7 +333,7 @@ void TE310Printer::doLoadSettings() {
       settings.value(QString("%1/use_ethernet").arg(objectName())).toBool();
   if (UseEthernet) {
     IPAddress = QHostAddress(
-        settings.value(QString("%1/ip_address").arg(objectName())).toString());
+        settings.value(QString("%1/ip").arg(objectName())).toString());
     Port = settings.value(QString("%1/port").arg(objectName())).toInt();
   }
 }

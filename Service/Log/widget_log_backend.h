@@ -3,11 +3,13 @@
 
 #include "abstract_log_backend.h"
 #include "configurable_object.h"
+#include "loggable_object.h"
 #include "named_object.h"
 
 class WidgetLogBackend final : public NamedObject,
                                public AbstractLogBackend,
-                               public ConfigurableObject {
+                               public ConfigurableObject,
+                               public LoggableObject {
   Q_OBJECT
  private:
   bool Enable;

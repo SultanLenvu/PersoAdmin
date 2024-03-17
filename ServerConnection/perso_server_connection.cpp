@@ -257,6 +257,7 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
 }
 
 void PersoServerConnection::loadSettings() {
+  sendLog("Загрузка настроек.");
   doLoadSettings();
 }
 
@@ -452,7 +453,7 @@ void PersoServerConnection::socketDisconnected_slot() {
 
   // Если отключение произошло в результате ошибки
   if (Socket->error() != QTcpSocket::UnknownSocketError) {
-    Disconnection.signal();
+    emit Disconnection.signal();
   }
 }
 
