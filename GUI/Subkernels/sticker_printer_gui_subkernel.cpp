@@ -13,7 +13,7 @@ StickerPrinterGuiSubkernel::~StickerPrinterGuiSubkernel() {}
 void StickerPrinterGuiSubkernel::printTransponderSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -26,7 +26,7 @@ void StickerPrinterGuiSubkernel::printTransponderSticker() {
 void StickerPrinterGuiSubkernel::printBoxSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -39,7 +39,7 @@ void StickerPrinterGuiSubkernel::printBoxSticker() {
 void StickerPrinterGuiSubkernel::printPalletSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }

@@ -1,7 +1,7 @@
 #include "string_input_dialog.h"
 
-StringInputDialog::StringInputDialog(QWidget* parent)
-    : AbstractInputDialog(parent), Checker(nullptr) {
+StringInputDialog::StringInputDialog(const QString& paramName, QWidget* parent)
+    : AbstractInputDialog(parent), ParamName(paramName), Checker(nullptr) {
   // Создаем диалоговое окно
   setWindowTitle("Ввод данных");
 
@@ -14,7 +14,7 @@ StringInputDialog::StringInputDialog(QWidget* parent)
 StringInputDialog::~StringInputDialog() {}
 
 void StringInputDialog::getData(StringDictionary& data) const {
-  data.insert("id", InputData->text());
+  data.insert(ParamName, InputData->text());
 }
 
 AbstractInputDialog::InputDialogType StringInputDialog::type() const {

@@ -8,6 +8,7 @@ class StringInputDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
+  QString ParamName;
 
   QGridLayout* MainLayout;
 
@@ -21,7 +22,8 @@ class StringInputDialog : public AbstractInputDialog {
   AbstractStringChecker* Checker;
 
  public:
-  explicit StringInputDialog(QWidget* parent = nullptr);
+  explicit StringInputDialog(const QString& paramName,
+                             QWidget* parent = nullptr);
   ~StringInputDialog();
 
  public:  // AbstractInputDialog interface

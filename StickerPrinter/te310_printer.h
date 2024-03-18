@@ -76,7 +76,7 @@ class TE310Printer final : public NamedObject,
  private:
   bool initConnection(void);
   void printNkdSticker(const StringDictionary& param);
-  void printZsdSticker(const StringDictionary& param);
+  void printMssSticker(const StringDictionary& param);
 };
 
 #endif  // TE310PRINTER_H

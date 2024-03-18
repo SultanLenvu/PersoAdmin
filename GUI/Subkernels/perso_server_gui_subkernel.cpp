@@ -114,7 +114,7 @@ void PersoServerGuiSubkernel::releaseTransponder() {
 void PersoServerGuiSubkernel::rereleaseTransponder() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("transponder_pan");
   NumericStringChecker checker;
   dialog.setChecker(&checker);
   if (dialog.exec() == QDialog::Rejected) {
@@ -139,7 +139,7 @@ void PersoServerGuiSubkernel::getCurrentTransponderData() {
 void PersoServerGuiSubkernel::getTransponderData() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("transponder_pan");
   NumericStringChecker checker;
   dialog.setChecker(&checker);
   if (dialog.exec() == QDialog::Rejected) {
@@ -154,7 +154,7 @@ void PersoServerGuiSubkernel::getTransponderData() {
 void PersoServerGuiSubkernel::printBoxSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("transponder_pan");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -172,7 +172,7 @@ void PersoServerGuiSubkernel::printLastBoxSticker() {
 void PersoServerGuiSubkernel::printPalletSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("transponder_pan");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }

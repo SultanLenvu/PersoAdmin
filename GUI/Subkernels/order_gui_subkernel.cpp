@@ -36,7 +36,7 @@ void OrderGuiSubkernel::create() {
 void OrderGuiSubkernel::startAssembling() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
 
   if (dialog.exec() == QDialog::Rejected) {
     return;
@@ -50,7 +50,7 @@ void OrderGuiSubkernel::startAssembling() {
 void OrderGuiSubkernel::stopAssembling() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }

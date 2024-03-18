@@ -32,7 +32,7 @@ void ProductionLineGuiSubkernel::create() {
 void ProductionLineGuiSubkernel::activate() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -50,7 +50,7 @@ void ProductionLineGuiSubkernel::activateAll() {
 void ProductionLineGuiSubkernel::deactivate() {
   std::shared_ptr<StringDictionary> param(new StringDictionary);
 
-  StringInputDialog dialog;
+  StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
