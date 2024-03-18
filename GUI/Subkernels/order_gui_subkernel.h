@@ -34,7 +34,7 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
 
   // Слоты для сигналов от менеджеров
  public slots:
-  void display(std::shared_ptr<SqlQueryValues> orders);
+  void displayResponse(std::shared_ptr<SqlQueryValues> orders);
 
  private:
   void connectDependecies(void);

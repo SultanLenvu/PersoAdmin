@@ -2,12 +2,11 @@
 #include "global_environment.h"
 #include "order_gui_subkernel.h"
 
-OrderUserInterface::OrderUserInterface(QWidget* parent) : QWidget{parent} {
+OrderUserInterface::OrderUserInterface(QWidget* parent)
+    : AbstractUserInterface{parent} {
   create();
   connectDependencies();
 }
-
-OrderUserInterface::~OrderUserInterface() {}
 
 void OrderUserInterface::create() {
   MainLayout = new QHBoxLayout();

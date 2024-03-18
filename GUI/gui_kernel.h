@@ -14,7 +14,7 @@
 #include "asynchronous_object_space.h"
 #include "service_object_space.h"
 
-class GuiKernel : public QMainWindow {
+class GuiKernel final : public QMainWindow {
   Q_OBJECT
  private:
   std::unique_ptr<ServiceObjectSpace> Service;
@@ -39,9 +39,6 @@ class GuiKernel : public QMainWindow {
   explicit GuiKernel();
   ~GuiKernel() = default;
 
-  // Функционал для настройки сервера
-  void settingsActionTrigger_slot(void);
-
  private:
   void createTopMenu(void);  // Создание верхнего меню
   void createTopMenuActions(void);  // Создание функционала для верхнего меню
@@ -49,6 +46,9 @@ class GuiKernel : public QMainWindow {
   void createMainWindowGui(void);
   void createReactions(void);
   void createGuiSubkernels(void);
+
+ private slots:
+  void settingsActionTrigger_slot(void);
 
  signals:
   void clearLogDisplay(void);

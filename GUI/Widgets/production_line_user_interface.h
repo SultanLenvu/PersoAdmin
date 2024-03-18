@@ -1,9 +1,9 @@
 #ifndef PRODUCTIONLINEUSERINTERFACE_H
 #define PRODUCTIONLINEUSERINTERFACE_H
 
-#include <QtWidgets>
+#include "abstract_user_interface.h"
 
-class ProductionLineUserInterface : public QWidget {
+class ProductionLineUserInterface : public AbstractUserInterface {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -27,7 +27,7 @@ class ProductionLineUserInterface : public QWidget {
 
  public:
   explicit ProductionLineUserInterface(QWidget* parent = nullptr);
-  ~ProductionLineUserInterface();
+  ~ProductionLineUserInterface() = default;
 
  private:
   void create(void);

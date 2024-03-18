@@ -5,7 +5,10 @@
 #include "sql_query_values.h"
 #include "sql_response_model.h"
 
-class DatabaseGuiSubkernel final : public AbstractGuiSubkernel {
+#include "response_ready_connection.h"
+
+class DatabaseGuiSubkernel final : public AbstractGuiSubkernel,
+                                   public ResponseReadyConnection {
   Q_OBJECT
 
  private:
@@ -26,11 +29,16 @@ class DatabaseGuiSubkernel final : public AbstractGuiSubkernel {
   void execCustomRequest(void);
 
   // Слоты для менеджеров
+
  public slots:
-  void display(std::shared_ptr<SqlQueryValues> response);
+  void displayResponse(std::shared_ptr<SqlQueryValues> response);
 
  private:
   void connectDependecies(void);
+
+  // ResponseReadyConnection interface
+ public:
+  virtual void connectSignal_ResponseReady(void) override;
 
  signals:
   void connect_signal(void);

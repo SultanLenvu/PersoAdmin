@@ -1,9 +1,9 @@
 #ifndef DATABASEUSERINTERFACE_H
 #define DATABASEUSERINTERFACE_H
 
-#include <QtWidgets>
+#include "abstract_user_interface.h"
 
-class DatabaseUserInterface final : public QWidget {
+class DatabaseUserInterface final : public AbstractUserInterface {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -30,7 +30,7 @@ class DatabaseUserInterface final : public QWidget {
 
  public:
   explicit DatabaseUserInterface(QWidget* parent = nullptr);
-  ~DatabaseUserInterface();
+  ~DatabaseUserInterface() = default;
 
  private:
   void create(void);

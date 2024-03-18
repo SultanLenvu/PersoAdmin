@@ -127,7 +127,8 @@ void OrderGuiSubkernel::linkIssuerWithKeys() {
   emit linkIssuerWithKeys_signal(param);
 }
 
-void OrderGuiSubkernel::display(std::shared_ptr<SqlQueryValues> orders) {
+void OrderGuiSubkernel::displayResponse(
+    std::shared_ptr<SqlQueryValues> orders) {
   Orders.setResponse(orders);
 }
 
@@ -159,8 +160,4 @@ void OrderGuiSubkernel::connectDependecies() {
           &OrderManagerAsyncWrapper::linkIssuerWithKeys);
 
   connect(this, &OrderGuiSubkernel::get_signal, dm, &DatabaseAsyncWrapper::getTable);
-
-  // От менеджеров
-  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
-          &OrderGuiSubkernel::display);
 }

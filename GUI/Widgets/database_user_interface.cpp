@@ -3,12 +3,10 @@
 #include "global_environment.h"
 
 DatabaseUserInterface::DatabaseUserInterface(QWidget* parent)
-    : QWidget{parent} {
+    : AbstractUserInterface{parent} {
   create();
   connectDependecies();
 }
-
-DatabaseUserInterface::~DatabaseUserInterface() {}
 
 void DatabaseUserInterface::create()
 {

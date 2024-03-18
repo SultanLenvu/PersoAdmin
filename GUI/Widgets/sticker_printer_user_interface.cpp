@@ -2,14 +2,11 @@
 #include "global_environment.h"
 #include "sticker_printer_gui_subkernel.h"
 
-StickerPrinterUserInterface::StickerPrinterUserInterface(QWidget *parent)
-    : QWidget{parent}
-{
+StickerPrinterUserInterface::StickerPrinterUserInterface(QWidget* parent)
+    : AbstractUserInterface{parent} {
   create();
   connectDependencies();
 }
-
-StickerPrinterUserInterface::~StickerPrinterUserInterface() {}
 
 void StickerPrinterUserInterface::create() {
   MainLayout = new QHBoxLayout();

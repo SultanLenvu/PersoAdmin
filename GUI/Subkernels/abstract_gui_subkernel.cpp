@@ -7,8 +7,6 @@ AbstractGuiSubkernel::AbstractGuiSubkernel(const QString& name)
   connectDependecies();
 }
 
-AbstractGuiSubkernel::~AbstractGuiSubkernel() {}
-
 void AbstractGuiSubkernel::connectDependecies() {
   WidgetLogBackend* wlb = static_cast<WidgetLogBackend*>(
       GlobalEnvironment::instance()->getObject("WidgetLogBackend"));

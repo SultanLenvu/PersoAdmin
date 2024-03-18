@@ -2,7 +2,8 @@
 #include "global_environment.h"
 #include "perso_server_gui_subkernel.h"
 
-PersoServerUserInterface::PersoServerUserInterface(QWidget* parent) : QWidget{parent} {
+PersoServerUserInterface::PersoServerUserInterface(QWidget* parent)
+    : AbstractUserInterface{parent} {
   create();
   connectDependencies();
 }

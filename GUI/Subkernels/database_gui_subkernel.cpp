@@ -38,12 +38,13 @@ void DatabaseGuiSubkernel::execCustomRequest() {
   emit clearLogDisplay();
 }
 
-void DatabaseGuiSubkernel::display(std::shared_ptr<SqlQueryValues> response) {
+void DatabaseGuiSubkernel::displayResponse(
+    std::shared_ptr<SqlQueryValues> response) {
   ResponseModel->setResponse(response);
 }
 
 void DatabaseGuiSubkernel::connectDependecies() {
-  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
+  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
       GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
 
   // К менеджерам
@@ -55,8 +56,6 @@ void DatabaseGuiSubkernel::connectDependecies() {
                    &DatabaseAsyncWrapper::getTable);
   QObject::connect(this, &DatabaseGuiSubkernel::execCustomRequest_signal, dm,
                    &DatabaseAsyncWrapper::execCustomRequest);
-
-  // От менеджеров
-  QObject::connect(dm, &DatabaseAsyncWrapper::responseReady, this,
-                   &DatabaseGuiSubkernel::display);
 }
+
+void DatabaseGuiSubkernel::connectSignal_ResponseReady() {}

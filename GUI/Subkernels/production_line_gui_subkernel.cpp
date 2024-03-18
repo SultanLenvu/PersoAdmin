@@ -73,17 +73,12 @@ void ProductionLineGuiSubkernel::edit() {
 
 void ProductionLineGuiSubkernel::get() {
   emit clearLogDisplay();
-
-  //  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
-  //          &ProductionLineGuiSubkernel::display);
   emit get_signal("production_lines");
 }
 
-void ProductionLineGuiSubkernel::display(std::shared_ptr<SqlQueryValues> data) {
+void ProductionLineGuiSubkernel::displayResponse(
+    std::shared_ptr<SqlQueryValues> data) {
   ProductionLines->setResponse(data);
-
-  //  disconnect(dm, &DatabaseAsyncWrapper::responseReady, this,
-  //             &ProductionLineGuiSubkernel::display);
 }
 
 void ProductionLineGuiSubkernel::connectDependecies() {
@@ -110,8 +105,4 @@ void ProductionLineGuiSubkernel::connectDependecies() {
 
   connect(this, &ProductionLineGuiSubkernel::get_signal, dm,
           &DatabaseAsyncWrapper::getTable);
-
-  // От менеджеров
-  connect(dm, &DatabaseAsyncWrapper::responseReady, this,
-          &ProductionLineGuiSubkernel::display);
 }
