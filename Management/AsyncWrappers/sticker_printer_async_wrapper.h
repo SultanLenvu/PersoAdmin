@@ -1,7 +1,7 @@
 #ifndef STICKERPRINTERMANAGER_H
 #define STICKERPRINTERMANAGER_H
 
-#include "abstract_sticker_printer.h"
+#include "i_sticker_printer.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "progressable_async_wrapper.h"
@@ -11,7 +11,7 @@ class StickerPrinterAsyncWrapper final : public NamedObject,
                                          public LoggableObject {
   Q_OBJECT
  private:
-  std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
+  std::unique_ptr<IStickerPrinter> StickerPrinter;
 
  public:
   Q_INVOKABLE explicit StickerPrinterAsyncWrapper(const QString& name);

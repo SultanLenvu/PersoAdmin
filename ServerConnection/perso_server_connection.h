@@ -12,14 +12,14 @@
 #include <QTimer>
 
 #include "abstract_client_command.h"
-#include "abstract_server_connection.h"
+#include "i_server_connection.h"
 #include "configurable_object.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "server_disconnected_signal.h"
 
 class PersoServerConnection final : public NamedObject,
-                                    public AbstractServerConnection,
+                                    public IServerConnection,
                                     public LoggableObject,
                                     public ConfigurableObject {
   Q_OBJECT
@@ -72,7 +72,7 @@ class PersoServerConnection final : public NamedObject,
   explicit PersoServerConnection(const QString& name);
   ~PersoServerConnection();
 
-  // AbstractServerConnection interface
+  // IServerConnection interface
  public:
   virtual ReturnStatus connect() override;
   virtual void disconnect() override;

@@ -1,12 +1,12 @@
-#ifndef ABSTARCTSERVERCONNECTION_H
-#define ABSTARCTSERVERCONNECTION_H
+#ifndef ISERVERCONNECTION_H
+#define ISERVERCONNECTION_H
 
 #include "types.h"
 
-class AbstractServerConnection {
+class IServerConnection {
  public:
-  explicit AbstractServerConnection() = default;
-  virtual ~AbstractServerConnection() = default;
+  explicit IServerConnection() = default;
+  virtual ~IServerConnection() = default;
 
   // Own
  public:
@@ -44,4 +44,4 @@ class AbstractServerConnection {
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 };
 
-#endif  // ABSTARCTSERVERCONNECTION_H
+#endif  // ISERVERCONNECTION_H

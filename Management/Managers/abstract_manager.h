@@ -1,10 +1,10 @@
 #ifndef ABSTRACTMANAGER_H
 #define ABSTRACTMANAGER_H
 
-class AbstractManager {
+class IManager {
  public:
-  explicit AbstractManager() = default;
-  virtual ~AbstractManager() = default;
+  explicit IManager() = default;
+  virtual ~IManager() = default;
 };
 
 #endif  // ABSTRACTMANAGER_H

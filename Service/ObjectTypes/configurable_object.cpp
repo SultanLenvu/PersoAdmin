@@ -4,22 +4,21 @@
 #include "global_environment.h"
 
 ConfigurableObject::ConfigurableObject() {
-  Connector =
-      std::unique_ptr<SettingsApplyBundle>(new SettingsApplyBundle(this));
+  Connector = std::unique_ptr<ConfigurationSystemConnection>(
+      new ConfigurationSystemConnection(this));
 }
 
-SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
+ConfigurationSystemConnection::ConfigurationSystemConnection(
+    ConfigurableObject* object) {
   Object = object;
 
-  ConfigurationManager* cum = static_cast<ConfigurationManager*>(
-      GlobalEnvironment::instance()->getObject("ConfigurationManager"));
+  ConfigurationSystem* cum = static_cast<ConfigurationSystem*>(
+      GlobalEnvironment::instance()->getObject("ConfigurationSystem"));
 
-  connect(cum, &ConfigurationManager::applySettings_signal, this,
-          &SettingsApplyBundle::apply);
+  connect(cum, &ConfigurationSystem::applySettings_signal, this,
+          &ConfigurationSystemConnection::apply);
 }
 
-SettingsApplyBundle::~SettingsApplyBundle() {}
-
-void SettingsApplyBundle::apply() {
+void ConfigurationSystemConnection::apply() {
   Object->loadSettings();
 }

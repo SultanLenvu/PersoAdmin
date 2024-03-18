@@ -3,12 +3,12 @@
 
 #include <QThread>
 
-#include "abstract_async_wrapper.h"
+#include "i_async_wrapper.h"
 
 class AsynchronousObjectSpace final {
  private:
   QThread Thread;
-  std::vector<std::unique_ptr<AbstractAsyncWrapper>> Managers;
+  std::vector<std::unique_ptr<IAsyncWrapper>> Managers;
 
  public:
   explicit AsynchronousObjectSpace();

@@ -2,11 +2,9 @@
 #include "progress_indicator.h"
 
 ProgressIndicator::ProgressIndicator(const QString& name)
-    : AbstractProgressIndicator{name}, LoggableObject(name) {
+    : NamedObject{name}, LoggableObject(name) {
   createTimers();
 }
-
-ProgressIndicator::~ProgressIndicator() {}
 
 void ProgressIndicator::begin(const QString& operationName) {
   sendLog(QString("Начало выполнения операции '%1'. ").arg(operationName));

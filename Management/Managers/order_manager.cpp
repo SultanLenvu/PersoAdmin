@@ -6,7 +6,7 @@
 #include "order_manager.h"
 
 OrderManager::OrderManager(const QString& name,
-                           std::shared_ptr<AbstractSqlDatabase> database)
+                           std::shared_ptr<ISqlDatabase> database)
     : NamedObject(name), LoggableObject(name), Database(database) {
   doLoadSettings();
 }

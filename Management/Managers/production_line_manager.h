@@ -2,20 +2,20 @@
 #define PRODUCTIONLINEMANAGER_H
 
 #include "abstract_manager.h"
-#include "abstract_sql_database.h"
+#include "i_sql_database.h"
 #include "loggable_object.h"
 #include "named_object.h"
 
 class ProductionLineManager final : public NamedObject,
-                                    public AbstractManager,
+                                    public IManager,
                                     public LoggableObject {
   Q_OBJECT
  private:
-  std::shared_ptr<AbstractSqlDatabase> Database;
+  std::shared_ptr<ISqlDatabase> Database;
 
  public:
   explicit ProductionLineManager(const QString& name,
-                                 std::shared_ptr<AbstractSqlDatabase> database);
+                                 std::shared_ptr<ISqlDatabase> database);
   ~ProductionLineManager();
 
   // Own

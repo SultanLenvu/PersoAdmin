@@ -3,14 +3,15 @@
 
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QLibrary>
 
-#include "abstract_sticker_printer.h"
+#include "i_sticker_printer.h"
 #include "configurable_object.h"
 #include "loggable_object.h"
 #include "named_object.h"
 
 class TE310Printer final : public NamedObject,
-                           public AbstractStickerPrinter,
+                           public IStickerPrinter,
                            public ConfigurableObject,
                            public LoggableObject {
   Q_OBJECT
@@ -48,7 +49,7 @@ class TE310Printer final : public NamedObject,
   explicit TE310Printer(const QString& name);
   ~TE310Printer() = default;
 
-  // AbstractStickerPrinter interface
+  // IStickerPrinter interface
  public slots:
   virtual ReturnStatus checkConfig(void) override;
 

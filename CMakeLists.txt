@@ -43,9 +43,8 @@ add_executable(PersoAdmin WIN32
 
     Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
     Service/ObjectTypes/configurable_object.h Service/ObjectTypes/configurable_object.cpp
-    Service/ObjectTypes/settings_apply_bundle.h Service/ObjectTypes/settings_apply_bundle.cpp
     Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
-    Service/ObjectTypes/log_system_bundle.h Service/ObjectTypes/log_system_bundle.cpp
+    Service/ObjectTypes/log_system_connection.h Service/ObjectTypes/log_system_connection.cpp
 
     Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
     Service/service_object_space.h Service/service_object_space.cpp
@@ -61,7 +60,7 @@ add_executable(PersoAdmin WIN32
     Service/Log/log_system.cpp Service/Log/log_system.h
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
 
-    Database/abstract_sql_database.cpp Database/abstract_sql_database.h
+    Database/i_sql_database.cpp Database/i_sql_database.h
     Database/postgre_sql_database.cpp Database/postgre_sql_database.h
     Database/postgre_sql_table.cpp Database/postgre_sql_table.h
     Database/sql_table_relation.cpp Database/sql_table_relation.h
@@ -73,6 +72,7 @@ add_executable(PersoAdmin WIN32
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
+    GUI/Subkernels/response_ready_connection.h GUI/Subkernels/response_ready_connection.cpp
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
     GUI/Subkernels/perso_server_gui_subkernel.h GUI/Subkernels/perso_server_gui_subkernel.cpp
@@ -100,19 +100,19 @@ add_executable(PersoAdmin WIN32
     GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
     GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
 
-    GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
+    GUI/Reactions/i_progress_indicator.h GUI/Reactions/i_progress_indicator.cpp
     GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
-    GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
-    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
-    GUI/Reactions/progress_indicator_bundle.h GUI/Reactions/progress_indicator_bundle.cpp
-    GUI/Reactions/return_status_handler_bundle.h GUI/Reactions/return_status_handler_bundle.cpp
+    GUI/Reactions/progress_indicator_link.h GUI/Reactions/progress_indicator_link.cpp
+    GUI/Reactions/i_status_indicator.h GUI/Reactions/i_status_indicator.cpp
+    GUI/Reactions/status_indicator.h GUI/Reactions/status_indicator.cpp
+    GUI/Reactions/status_indicator_link.h GUI/Reactions/status_indicator_link.cpp
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp
     Management/Managers/production_line_manager.h Management/Managers/production_line_manager.cpp
 
     Management/AsyncWrappers/database_async_wrapper.h Management/AsyncWrappers/database_async_wrapper.cpp
-    Management/AsyncWrappers/abstract_async_wrapper.h Management/AsyncWrappers/abstract_async_wrapper.cpp
+    Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
     Management/AsyncWrappers/progressable_async_wrapper.h Management/AsyncWrappers/progressable_async_wrapper.cpp
     Management/AsyncWrappers/order_manager_async_wrapper.h Management/AsyncWrappers/order_manager_async_wrapper.cpp
     Management/AsyncWrappers/production_line_manager_async_wrapper.h Management/AsyncWrappers/production_line_manager_async_wrapper.cpp
@@ -120,7 +120,7 @@ add_executable(PersoAdmin WIN32
     Management/AsyncWrappers/sticker_printer_async_wrapper.h Management/AsyncWrappers/sticker_printer_async_wrapper.cpp
     Management/AsyncWrappers/perso_server_async_wrapper.cpp Management/AsyncWrappers/perso_server_async_wrapper.h
 
-    ServerConnection/abstract_server_connection.cpp ServerConnection/abstract_server_connection.h
+    ServerConnection/i_server_connection.cpp ServerConnection/i_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
     ServerConnection/server_disconnected_signal.h ServerConnection/server_disconnected_signal.cpp
 
@@ -145,11 +145,10 @@ add_executable(PersoAdmin WIN32
     ServerConnection/Commands/rollback_transponder.h ServerConnection/Commands/shutdown_production_line.cpp
     ServerConnection/Commands/shutdown_production_line.h ServerConnection/Commands/shutdown_production_line.cpp
 
-    StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
+    StickerPrinter/i_sticker_printer.cpp StickerPrinter/i_sticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     main.cpp
-    GUI/Subkernels/response_ready_connection.h GUI/Subkernels/response_ready_connection.cpp
     )
 
 target_compile_definitions(PersoAdmin PRIVATE

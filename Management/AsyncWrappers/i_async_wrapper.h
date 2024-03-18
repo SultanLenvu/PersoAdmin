@@ -2,13 +2,12 @@
 #define ABSTRACTASYNCWRAPPER_H
 
 #include <QString>
-
 #include "types.h"
 
-class AbstractAsyncWrapper {
+class IAsyncWrapper {
  public:
-  explicit AbstractAsyncWrapper() = default;
-  virtual ~AbstractAsyncWrapper() = default;
+  explicit IAsyncWrapper() = default;
+  virtual ~IAsyncWrapper() = default;
 
  protected:
   virtual void initOperation(const QString& name) = 0;
@@ -16,7 +15,7 @@ class AbstractAsyncWrapper {
   virtual void completeOperation(const QString& name) = 0;
 
  private:
-  Q_DISABLE_COPY_MOVE(AbstractAsyncWrapper)
+  Q_DISABLE_COPY_MOVE(IAsyncWrapper)
 };
 
 #endif // ABSTRACTASYNCWRAPPER_H

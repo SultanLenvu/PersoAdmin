@@ -16,7 +16,7 @@
 #include "named_object.h"
 
 class FileLogBackend final : public NamedObject,
-                             public AbstractLogBackend,
+                             public ILogBackend,
                              public ConfigurableObject,
                              public LoggableObject {
  private:
@@ -29,7 +29,7 @@ class FileLogBackend final : public NamedObject,
   explicit FileLogBackend(const QString& name);
   ~FileLogBackend();
 
-  // AbstractLogBackend interface
+  // ILogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
 

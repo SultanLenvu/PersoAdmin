@@ -25,7 +25,7 @@ class LogSystem : public NamedObject,
 
  private:
   QString SavePath;
-  std::vector<std::unique_ptr<AbstractLogBackend>> Backends;
+  std::vector<std::unique_ptr<ILogBackend>> Backends;
 
   bool UdpListenEnable;
   //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;

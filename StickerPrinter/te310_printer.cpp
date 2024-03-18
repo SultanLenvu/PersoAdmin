@@ -1,5 +1,7 @@
 #include <QHostAddress>
+#include <QPrinterInfo>
 #include <QTextCodec>
+#include <QtPrintSupport>
 
 #include "te310_printer.h"
 

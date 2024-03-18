@@ -1,7 +1,7 @@
 #ifndef PROGRAMMERASYNCWRAPPER_H
 #define PROGRAMMERASYNCWRAPPER_H
 
-#include "abstract_async_wrapper.h"
+#include "i_async_wrapper.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "progressable_async_wrapper.h"

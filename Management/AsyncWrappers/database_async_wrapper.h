@@ -1,7 +1,7 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
-#include "abstract_sql_database.h"
+#include "i_sql_database.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "progressable_async_wrapper.h"
@@ -12,14 +12,14 @@ class DatabaseAsyncWrapper final : public NamedObject,
                                    public LoggableObject {
   Q_OBJECT
  private:
-  std::shared_ptr<AbstractSqlDatabase> Database;
+  std::shared_ptr<ISqlDatabase> Database;
 
  public:
   Q_INVOKABLE explicit DatabaseAsyncWrapper(const QString& name);
   ~DatabaseAsyncWrapper();
 
  public:
-  std::shared_ptr<AbstractSqlDatabase> database(void);
+  std::shared_ptr<ISqlDatabase> database(void);
 
  public slots:
   void connect(void);

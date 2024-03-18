@@ -12,7 +12,7 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
 
  public:
   explicit OrderGuiSubkernel(const QString& name);
-  ~OrderGuiSubkernel();
+  ~OrderGuiSubkernel() = default;
 
  public:
   SqlResponseModel& orders(void);

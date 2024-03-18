@@ -221,11 +221,11 @@ void SettingsDialog::create() {
 }
 
 void SettingsDialog::connectDependencies() {
-  ConfigurationManager* cum = static_cast<ConfigurationManager*>(
-      GlobalEnvironment::instance()->getObject("ConfigurationManager"));
+  ConfigurationSystem* cum = static_cast<ConfigurationSystem*>(
+      GlobalEnvironment::instance()->getObject("ConfigurationSystem"));
 
   connect(this, &SettingsDialog::applyNewSettings, cum,
-          &ConfigurationManager::applySettings_signal);
+          &ConfigurationSystem::applySettings_signal);
 }
 
 bool SettingsDialog::check() const {

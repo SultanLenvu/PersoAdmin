@@ -5,13 +5,13 @@
 #include <QVector>
 #include <QtSql>
 
-#include "abstract_sql_database.h"
+#include "i_sql_database.h"
 #include "configurable_object.h"
 #include "loggable_object.h"
 #include "postgre_sql_table.h"
 
 class PostgreSqlDatabase : public NamedObject,
-                           public AbstractSqlDatabase,
+                           public ISqlDatabase,
                            public ConfigurableObject,
                            public LoggableObject {
   Q_OBJECT
@@ -34,7 +34,7 @@ class PostgreSqlDatabase : public NamedObject,
   explicit PostgreSqlDatabase(const QString& name);
   ~PostgreSqlDatabase();
 
-  // AbstractSqlDatabase interface
+  // ISqlDatabase interface
  public:
   virtual bool connect() override;
   virtual void disconnect() override;

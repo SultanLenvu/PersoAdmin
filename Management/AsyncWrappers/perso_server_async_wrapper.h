@@ -3,7 +3,7 @@
 
 #include <QFile>
 
-#include "abstract_server_connection.h"
+#include "i_server_connection.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "progressable_async_wrapper.h"
@@ -12,8 +12,8 @@ class PersoServerAsyncWrapper : public NamedObject,
                                 public ProgressableAsyncWrapper,
                                 public LoggableObject {
   Q_OBJECT
- private:  
-  std::unique_ptr<AbstractServerConnection> Server;
+ private:
+  std::unique_ptr<IServerConnection> Server;
 
   std::unique_ptr<QFile> Firmware;
 

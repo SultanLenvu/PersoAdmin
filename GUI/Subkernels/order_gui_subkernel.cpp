@@ -14,8 +14,6 @@ OrderGuiSubkernel::OrderGuiSubkernel(const QString& name)
   connectDependecies();
 }
 
-OrderGuiSubkernel::~OrderGuiSubkernel() {}
-
 SqlResponseModel& OrderGuiSubkernel::orders() {
   return Orders;
 }

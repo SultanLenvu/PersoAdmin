@@ -2,22 +2,22 @@
 #define ORDERMANAGER_H
 
 #include "abstract_manager.h"
-#include "abstract_sql_database.h"
 #include "configurable_object.h"
+#include "i_sql_database.h"
 #include "loggable_object.h"
 #include "named_object.h"
 
 class OrderManager final : public NamedObject,
-                           public AbstractManager,
+                           public IManager,
                            public ConfigurableObject,
                            public LoggableObject {
  private:
   QString ShipmentRegisterDir;
-  std::shared_ptr<AbstractSqlDatabase> Database;
+  std::shared_ptr<ISqlDatabase> Database;
 
  public:
   explicit OrderManager(const QString& name,
-                        std::shared_ptr<AbstractSqlDatabase> database);
+                        std::shared_ptr<ISqlDatabase> database);
   ~OrderManager();
 
   // Own

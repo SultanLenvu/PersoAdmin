@@ -1,7 +1,6 @@
 #include "gui_kernel.h"
 
 #include "database_gui_subkernel.h"
-#include "return_status_handler.h"
 #include "mainwindow_gui.h"
 #include "order_gui_subkernel.h"
 #include "perso_server_gui_subkernel.h"
@@ -9,6 +8,7 @@
 #include "programmer_gui_subkernel.h"
 #include "progress_indicator.h"
 #include "settings_dialog.h"
+#include "status_indicator.h"
 #include "sticker_printer_gui_subkernel.h"
 
 GuiKernel::GuiKernel()
@@ -64,8 +64,8 @@ void GuiKernel::createReactions() {
   PIndicator = std::unique_ptr<ProgressIndicator>(
       new ProgressIndicator("ProgressIndicator"));
 
-  RSHandler = std::unique_ptr<AbstractReturnStatusHandler>(
-      new ReturnStatusHandler("ReturnStatusHandler"));
+  RSHandler = std::unique_ptr<IStatusIndicator>(
+      new StatusIndicator("StatusIndicator"));
 }
 
 void GuiKernel::createGuiSubkernels() {

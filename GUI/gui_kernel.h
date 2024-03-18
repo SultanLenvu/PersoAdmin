@@ -9,8 +9,8 @@
 #include <QString>
 
 #include "abstract_gui_subkernel.h"
-#include "abstract_progress_indicator.h"
-#include "abstract_return_status_handler.h"
+#include "i_progress_indicator.h"
+#include "i_status_indicator.h"
 #include "asynchronous_object_space.h"
 #include "service_object_space.h"
 
@@ -22,8 +22,8 @@ class GuiKernel final : public QMainWindow {
 
   std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
 
-  std::unique_ptr<AbstractProgressIndicator> PIndicator;
-  std::unique_ptr<AbstractReturnStatusHandler> RSHandler;
+  std::unique_ptr<IProgressIndicator> PIndicator;
+  std::unique_ptr<IStatusIndicator> RSHandler;
 
   QSize DesktopGeometry;
   // Верхнее меню

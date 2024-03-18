@@ -7,7 +7,7 @@ class AbstractGuiSubkernel : public NamedObject {
   Q_OBJECT
  public:
   explicit AbstractGuiSubkernel(const QString& name);
-  virtual ~AbstractGuiSubkernel();
+  virtual ~AbstractGuiSubkernel() = default;
 
  private:
   void connectDependecies(void);

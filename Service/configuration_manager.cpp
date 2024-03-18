@@ -6,13 +6,13 @@
 #include "definitions.h"
 #include "types.h"
 
-ConfigurationManager::ConfigurationManager(const QString& name)
+ConfigurationSystem::ConfigurationSystem(const QString& name)
     : NamedObject(name) {
   init();
   registerMetaTypes();
 }
 
-void ConfigurationManager::init() {
+void ConfigurationSystem::init() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
@@ -20,7 +20,7 @@ void ConfigurationManager::init() {
   QSettings::setDefaultFormat(QSettings::IniFormat);
 }
 
-void ConfigurationManager::registerMetaTypes() {
+void ConfigurationSystem::registerMetaTypes() {
   qRegisterMetaType<std::shared_ptr<StringDictionary>>(
       "std::shared_ptr<StringDictionary>");
   qRegisterMetaType<std::shared_ptr<QStringList>>(

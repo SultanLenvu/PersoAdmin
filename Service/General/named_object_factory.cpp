@@ -18,7 +18,7 @@ NamedObject* NamedObjectFactory::doCreate(const QString& objectName) {
 
 NamedObject* NamedObjectFactory::doCreate(
     const QString& objectName,
-    std::shared_ptr<AbstractSqlDatabase> database) {
+    std::shared_ptr<ISqlDatabase> database) {
   NamedObject* createdObject = reinterpret_cast<NamedObject*>(
       CreatedMetaObject->newInstance(objectName, database));
 

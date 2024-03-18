@@ -1,14 +1,14 @@
 #ifndef PROGRESSABLEASYNCWRAPPER_H
 #define PROGRESSABLEASYNCWRAPPER_H
 
-#include "abstract_async_wrapper.h"
-#include "progress_indicator_bundle.h"
-#include "return_status_handler_bundle.h"
+#include "i_async_wrapper.h"
+#include "progress_indicator_link.h"
+#include "status_indicator_link.h"
 
-class ProgressableAsyncWrapper : public AbstractAsyncWrapper {
+class ProgressableAsyncWrapper : public IAsyncWrapper {
  private:
-  ReturnStatusHandlerBundle RSB;
-  ProgressIndicatorBundle PIB;
+  StatusIndicatorLink SIL;
+  ProgressIndicatorLink PIB;
 
  public:
   explicit ProgressableAsyncWrapper() = default;

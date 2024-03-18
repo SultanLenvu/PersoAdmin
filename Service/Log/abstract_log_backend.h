@@ -3,16 +3,16 @@
 
 #include <QString>
 
-class AbstractLogBackend {
+class ILogBackend {
  public:
-  AbstractLogBackend() = default;
-  virtual ~AbstractLogBackend() = default;
+  ILogBackend() = default;
+  virtual ~ILogBackend() = default;
 
  public:
   virtual void writeMessage(const QString& str) = 0;
 
  private:
-  Q_DISABLE_COPY_MOVE(AbstractLogBackend)
+  Q_DISABLE_COPY_MOVE(ILogBackend)
 };
 
 #endif /* LOGBACKEND_H */

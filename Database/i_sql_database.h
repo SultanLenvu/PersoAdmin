@@ -3,10 +3,10 @@
 
 #include "sql_query_values.h"
 
-class AbstractSqlDatabase {
+class ISqlDatabase {
  public:
-  explicit AbstractSqlDatabase() = default;
-  virtual ~AbstractSqlDatabase() = default;
+  explicit ISqlDatabase() = default;
+  virtual ~ISqlDatabase() = default;
 
  public:
   virtual bool connect(void) = 0;

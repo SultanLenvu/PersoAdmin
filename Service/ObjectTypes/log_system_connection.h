@@ -5,14 +5,14 @@
 
 class LoggableObject;
 
-class LogSystemBundle final : public QObject {
+class LogSystemConnection final : public QObject {
   Q_OBJECT
  public:
-  explicit LogSystemBundle();
-  ~LogSystemBundle() = default;
+  explicit LogSystemConnection();
+  ~LogSystemConnection() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(LogSystemBundle)
+  Q_DISABLE_COPY_MOVE(LogSystemConnection)
 
  signals:
   void logging(const QString& log, const LoggableObject* source) const;

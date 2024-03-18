@@ -5,10 +5,7 @@
 #include "sql_query_values.h"
 #include "sql_response_model.h"
 
-#include "response_ready_connection.h"
-
-class DatabaseGuiSubkernel final : public AbstractGuiSubkernel,
-                                   public ResponseReadyConnection {
+class DatabaseGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  private:
@@ -35,10 +32,6 @@ class DatabaseGuiSubkernel final : public AbstractGuiSubkernel,
 
  private:
   void connectDependecies(void);
-
-  // ResponseReadyConnection interface
- public:
-  virtual void connectSignal_ResponseReady(void) override;
 
  signals:
   void connect_signal(void);

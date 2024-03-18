@@ -7,10 +7,10 @@ void ProgressableAsyncWrapper::initOperation(const QString& name) {
 void ProgressableAsyncWrapper::processOperationError(const QString& name,
                                                      ReturnStatus ret) {
   PIB.finish(name);
-  RSB.handle(ret);
+  SIL.handle(ret);
 }
 
 void ProgressableAsyncWrapper::completeOperation(const QString& name) {
   PIB.finish(name);
-  RSB.handle(ReturnStatus::NoError);
+  SIL.handle(ReturnStatus::NoError);
 }

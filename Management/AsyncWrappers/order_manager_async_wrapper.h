@@ -16,7 +16,7 @@ class OrderManagerAsyncWrapper final : public NamedObject,
  public:
   Q_INVOKABLE OrderManagerAsyncWrapper(
       const QString& name,
-      std::shared_ptr<AbstractSqlDatabase> database);
+      std::shared_ptr<ISqlDatabase> database);
   ~OrderManagerAsyncWrapper();
 
   // Own

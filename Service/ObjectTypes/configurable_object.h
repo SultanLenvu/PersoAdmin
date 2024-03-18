@@ -3,13 +3,13 @@
 
 #include <QObject>
 
-class SettingsApplyBundle;
+class ConfigurationSystemConnection;
 
 class ConfigurableObject {
-  friend class SettingsApplyBundle;
+  friend class ConfigurationSystemConnection;
 
  private:
-  std::unique_ptr<SettingsApplyBundle> Connector;
+  std::unique_ptr<ConfigurationSystemConnection> Connector;
 
  public:
   explicit ConfigurableObject();
@@ -19,15 +19,15 @@ class ConfigurableObject {
   virtual void loadSettings(void) = 0;
 };
 
-class SettingsApplyBundle final : public QObject {
+class ConfigurationSystemConnection final : public QObject {
   Q_OBJECT
 
  private:
   ConfigurableObject* Object;
 
  public:
-  SettingsApplyBundle(ConfigurableObject* entity);
-  ~SettingsApplyBundle();
+  ConfigurationSystemConnection(ConfigurableObject* entity);
+  ~ConfigurationSystemConnection() = default;
 
  private slots:
   void apply(void);

@@ -3,14 +3,14 @@
 
 #include "named_object.h"
 
-class ConfigurationManager : public NamedObject {
+class ConfigurationSystem : public NamedObject {
   Q_OBJECT
  public:
-  Q_INVOKABLE explicit ConfigurationManager(const QString& name);
-  ~ConfigurationManager() = default;
+  Q_INVOKABLE explicit ConfigurationSystem(const QString& name);
+  ~ConfigurationSystem() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(ConfigurationManager)
+  Q_DISABLE_COPY_MOVE(ConfigurationSystem)
 
  private:
   void init(void);

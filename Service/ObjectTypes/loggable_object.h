@@ -3,10 +3,10 @@
 
 #include <QString>
 
-#include "log_system_bundle.h"
+#include "log_system_connection.h"
 
 class LoggableObject {
-  LogSystemBundle Connection;
+  LogSystemConnection Connection;
   QString SourceName;
   size_t ThreadId;
 

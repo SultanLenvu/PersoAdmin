@@ -1,18 +1,12 @@
 #ifndef ISTICKERPRINTER_H
 #define ISTICKERPRINTER_H
 
-#include <QHash>
-#include <QLibrary>
-#include <QObject>
-#include <QSettings>
-#include <QtPrintSupport/QPrinterInfo>
-
 #include "types.h"
 
-class AbstractStickerPrinter {
+class IStickerPrinter {
  public:
-  AbstractStickerPrinter() = default;
-  virtual ~AbstractStickerPrinter() = default;
+  IStickerPrinter() = default;
+  virtual ~IStickerPrinter() = default;
 
  public:
   virtual ReturnStatus checkConfig(void) = 0;

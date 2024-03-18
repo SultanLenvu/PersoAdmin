@@ -11,10 +11,12 @@
 #include <QSettings>
 #include <QTimer>
 
-#include "abstract_progress_indicator.h"
+#include "i_progress_indicator.h"
 #include "loggable_object.h"
+#include "named_object.h"
 
-class ProgressIndicator final : public AbstractProgressIndicator,
+class ProgressIndicator final : public NamedObject,
+                                public IProgressIndicator,
                                 public LoggableObject {
   Q_OBJECT
 
@@ -29,9 +31,9 @@ class ProgressIndicator final : public AbstractProgressIndicator,
 
  public:
   ProgressIndicator(const QString& name);
-  ~ProgressIndicator();
+  ~ProgressIndicator() = default;
 
-  // AbstractProgressIndicator interface
+  // IProgressIndicator interface
  public slots:
   virtual void begin(const QString& operationName) override;
   virtual void finish(const QString& operationName) override;
@@ -48,6 +50,9 @@ class ProgressIndicator final : public AbstractProgressIndicator,
 
   void ODTimerTimeout_slot(void);
   void ODQTimerTimeout_slot(void);
+
+ signals:
+  void abortCurrentOperation(void);
 };
 
 #endif  // PROGRESS_INDICATOR_H

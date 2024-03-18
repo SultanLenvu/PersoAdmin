@@ -7,7 +7,7 @@
 #include "named_object.h"
 
 class WidgetLogBackend final : public NamedObject,
-                               public AbstractLogBackend,
+                               public ILogBackend,
                                public ConfigurableObject,
                                public LoggableObject {
   Q_OBJECT
@@ -18,7 +18,7 @@ class WidgetLogBackend final : public NamedObject,
   explicit WidgetLogBackend(const QString& name);
   ~WidgetLogBackend();
 
-  // AbstractLogBackend interface
+  // ILogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
 

@@ -11,7 +11,7 @@ class ServiceObjectSpace final : public AbstractServiceObjectSpace {
  private:
   QThread Thread;
   std::unique_ptr<LogSystem> Logger;
-  std::unique_ptr<ConfigurationManager> ConfigUpdater;
+  std::unique_ptr<ConfigurationSystem> ConfigUpdater;
 
  public:
   explicit ServiceObjectSpace();

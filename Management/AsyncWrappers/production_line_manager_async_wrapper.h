@@ -1,7 +1,7 @@
 #ifndef PRODUCTIONLINEASYNCWRAPPER_H
 #define PRODUCTIONLINEASYNCWRAPPER_H
 
-#include "abstract_async_wrapper.h"
+#include "i_async_wrapper.h"
 #include "loggable_object.h"
 #include "named_object.h"
 #include "production_line_manager.h"
@@ -17,7 +17,7 @@ class ProductionLineManagerAsyncWrapper final : public NamedObject,
  public:
   Q_INVOKABLE explicit ProductionLineManagerAsyncWrapper(
       const QString& name,
-      std::shared_ptr<AbstractSqlDatabase> database);
+      std::shared_ptr<ISqlDatabase> database);
   ~ProductionLineManagerAsyncWrapper();
 
   // Own

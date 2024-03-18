@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QThread>
 
-#include "abstract_sql_database.h"
+#include "i_sql_database.h"
 #include "named_object.h"
 
 class NamedObjectFactory final : public QObject {
@@ -47,9 +47,9 @@ class NamedObjectFactory final : public QObject {
       std::is_base_of<NamedObject, T>::value &&
           std::is_constructible<T,
                                 const QString&,
-                                std::shared_ptr<AbstractSqlDatabase>>::value,
+                                std::shared_ptr<ISqlDatabase>>::value,
       T*>::type
-  create(const QString& name, std::shared_ptr<AbstractSqlDatabase> database) {
+  create(const QString& name, std::shared_ptr<ISqlDatabase> database) {
     if (!Thread->isRunning()) {
       return nullptr;
     }
@@ -73,7 +73,7 @@ class NamedObjectFactory final : public QObject {
  private slots:
   NamedObject* doCreate(const QString& objectName);
   NamedObject* doCreate(const QString& objectName,
-                        std::shared_ptr<AbstractSqlDatabase> database);
+                        std::shared_ptr<ISqlDatabase> database);
 
  signals:
 };

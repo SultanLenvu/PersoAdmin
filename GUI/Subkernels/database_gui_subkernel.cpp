@@ -57,5 +57,3 @@ void DatabaseGuiSubkernel::connectDependecies() {
   QObject::connect(this, &DatabaseGuiSubkernel::execCustomRequest_signal, dm,
                    &DatabaseAsyncWrapper::execCustomRequest);
 }
-
-void DatabaseGuiSubkernel::connectSignal_ResponseReady() {}

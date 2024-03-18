@@ -11,7 +11,7 @@ DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
 
 DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}
 
-std::shared_ptr<AbstractSqlDatabase> DatabaseAsyncWrapper::database() {
+std::shared_ptr<ISqlDatabase> DatabaseAsyncWrapper::database() {
   return Database;
 }
 
