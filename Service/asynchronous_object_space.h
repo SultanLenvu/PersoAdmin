@@ -1,24 +1,24 @@
-#ifndef ASYNCHRONOUSOBJECTSPACE_H
-#define ASYNCHRONOUSOBJECTSPACE_H
+#ifndef ASYNCOBJECTSPACE_H
+#define ASYNCOBJECTSPACE_H
 
 #include <QThread>
 
 #include "i_async_wrapper.h"
 
-class AsynchronousObjectSpace final {
+class AsyncObjectSpace final {
  private:
   QThread Thread;
   std::vector<std::unique_ptr<IAsyncWrapper>> Managers;
 
  public:
-  explicit AsynchronousObjectSpace();
-  ~AsynchronousObjectSpace();
+  explicit AsyncObjectSpace();
+  ~AsyncObjectSpace();
 
  private:
-  Q_DISABLE_COPY_MOVE(AsynchronousObjectSpace)
+  Q_DISABLE_COPY_MOVE(AsyncObjectSpace)
 
  private:
   void createWrappers(void);
 };
 
-#endif // ASYNCHRONOUSOBJECTSPACE_H
+#endif  // ASYNCOBJECTSPACE_H

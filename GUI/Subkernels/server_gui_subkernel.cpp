@@ -1,51 +1,51 @@
-#include "perso_server_gui_subkernel.h"
+#include "server_gui_subkernel.h"
 #include "authorization_dialog.h"
 #include "global_environment.h"
 #include "numeric_string_checker.h"
-#include "perso_server_async_wrapper.h"
+#include "server_connection_async_wrapper.h"
 #include "string_input_dialog.h"
 
-PersoServerGuiSubkernel::PersoServerGuiSubkernel(const QString& name)
+ServerGuiSubkernel::ServerGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name), FirmwareDisplay(nullptr) {
   createModels();
   connectDependecies();
 }
 
-PersoServerGuiSubkernel::~PersoServerGuiSubkernel() {}
+ServerGuiSubkernel::~ServerGuiSubkernel() {}
 
-HashTableModel& PersoServerGuiSubkernel::productionLine() {
+HashTableModel& ServerGuiSubkernel::productionLine() {
   return ProductionLine;
 }
 
-HashTableModel& PersoServerGuiSubkernel::box() {
+HashTableModel& ServerGuiSubkernel::box() {
   return Box;
 }
 
-HashTableModel& PersoServerGuiSubkernel::transponder() {
+HashTableModel& ServerGuiSubkernel::transponder() {
   return Transponder;
 }
 
-void PersoServerGuiSubkernel::setFirmwareDisplay(
+void ServerGuiSubkernel::setFirmwareDisplay(
     QPlainTextEdit* firmwareDisplay) {
   FirmwareDisplay = firmwareDisplay;
 }
 
-void PersoServerGuiSubkernel::connect() {
+void ServerGuiSubkernel::connect() {
   emit clearLogDisplay();
   emit connect_signal();
 }
 
-void PersoServerGuiSubkernel::disconnect() {
+void ServerGuiSubkernel::disconnect() {
   emit clearLogDisplay();
   emit disconnect_signal();
 }
 
-void PersoServerGuiSubkernel::echo() {
+void ServerGuiSubkernel::echo() {
   emit clearLogDisplay();
   emit echo_signal();
 }
 
-void PersoServerGuiSubkernel::logOn() {
+void ServerGuiSubkernel::logOn() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   AuthorizationDialog dialog;
@@ -58,12 +58,12 @@ void PersoServerGuiSubkernel::logOn() {
   emit logOn_signal(param);
 }
 
-void PersoServerGuiSubkernel::logOut() {
+void ServerGuiSubkernel::logOut() {
   emit clearLogDisplay();
   emit logOut_signal();
 }
 
-void PersoServerGuiSubkernel::launchProductionLine() {
+void ServerGuiSubkernel::launchProductionLine() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   AuthorizationDialog dialog;
@@ -76,42 +76,42 @@ void PersoServerGuiSubkernel::launchProductionLine() {
   emit launchProductionLine_signal(param);
 }
 
-void PersoServerGuiSubkernel::shutdownProductionLine() {
+void ServerGuiSubkernel::shutdownProductionLine() {
   emit clearLogDisplay();
   emit shutdownProductionLine_signal();
 }
 
-void PersoServerGuiSubkernel::getProductionLineData() {
+void ServerGuiSubkernel::getProductionLineData() {
   emit clearLogDisplay();
   emit getProductionLineData_signal();
 }
 
-void PersoServerGuiSubkernel::requestBox() {
+void ServerGuiSubkernel::requestBox() {
   emit clearLogDisplay();
   emit requestBox_signal();
 }
 
-void PersoServerGuiSubkernel::getCurrentBoxData() {
+void ServerGuiSubkernel::getCurrentBoxData() {
   emit clearLogDisplay();
   emit getCurrentBoxData_signal();
 }
 
-void PersoServerGuiSubkernel::refundCurrentBox() {
+void ServerGuiSubkernel::refundCurrentBox() {
   emit clearLogDisplay();
   emit refundCurrentBox_signal();
 }
 
-void PersoServerGuiSubkernel::completeCurrentBox() {
+void ServerGuiSubkernel::completeCurrentBox() {
   emit clearLogDisplay();
   emit completeCurrentBox_signal();
 }
 
-void PersoServerGuiSubkernel::releaseTransponder() {
+void ServerGuiSubkernel::releaseTransponder() {
   emit clearLogDisplay();
   emit releaseTransponder_signal();
 }
 
-void PersoServerGuiSubkernel::rereleaseTransponder() {
+void ServerGuiSubkernel::rereleaseTransponder() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   StringInputDialog dialog("transponder_pan");
@@ -126,17 +126,17 @@ void PersoServerGuiSubkernel::rereleaseTransponder() {
   emit rereleaseTransponder_signal(param);
 }
 
-void PersoServerGuiSubkernel::rollbackTransponder() {
+void ServerGuiSubkernel::rollbackTransponder() {
   emit clearLogDisplay();
   emit rollbackTransponder_signal();
 }
 
-void PersoServerGuiSubkernel::getCurrentTransponderData() {
+void ServerGuiSubkernel::getCurrentTransponderData() {
   emit clearLogDisplay();
   emit getCurrentTransponderData_signal();
 }
 
-void PersoServerGuiSubkernel::getTransponderData() {
+void ServerGuiSubkernel::getTransponderData() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   StringInputDialog dialog("transponder_pan");
@@ -151,7 +151,7 @@ void PersoServerGuiSubkernel::getTransponderData() {
   emit getTransponderData_signal(param);
 }
 
-void PersoServerGuiSubkernel::printBoxSticker() {
+void ServerGuiSubkernel::printBoxSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   StringInputDialog dialog("transponder_pan");
@@ -164,12 +164,12 @@ void PersoServerGuiSubkernel::printBoxSticker() {
   emit printBoxSticker_signal(param);
 }
 
-void PersoServerGuiSubkernel::printLastBoxSticker() {
+void ServerGuiSubkernel::printLastBoxSticker() {
   emit clearLogDisplay();
   emit printLastBoxSticker_signal();
 }
 
-void PersoServerGuiSubkernel::printPalletSticker() {
+void ServerGuiSubkernel::printPalletSticker() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   StringInputDialog dialog("transponder_pan");
@@ -182,27 +182,27 @@ void PersoServerGuiSubkernel::printPalletSticker() {
   emit printPalletSticker_signal(param);
 }
 
-void PersoServerGuiSubkernel::printLastPalletSticker() {
+void ServerGuiSubkernel::printLastPalletSticker() {
   emit clearLogDisplay();
   emit printLastPalletSticker_signal();
 }
 
-void PersoServerGuiSubkernel::displayProductionLineData(
+void ServerGuiSubkernel::displayProductionLineData(
     const std::shared_ptr<StringDictionary> data) {
   ProductionLine.setData(data);
 }
 
-void PersoServerGuiSubkernel::displayBoxData(
+void ServerGuiSubkernel::displayBoxData(
     const std::shared_ptr<StringDictionary> data) {
   Box.setData(data);
 }
 
-void PersoServerGuiSubkernel::displayTransponderData(
+void ServerGuiSubkernel::displayTransponderData(
     const std::shared_ptr<StringDictionary> data) {
   Transponder.setData(data);
 }
 
-void PersoServerGuiSubkernel::displayFirmware(
+void ServerGuiSubkernel::displayFirmware(
     const std::shared_ptr<QByteArray> firmware) {
   if (!FirmwareDisplay) {
     return;
@@ -211,76 +211,76 @@ void PersoServerGuiSubkernel::displayFirmware(
   FirmwareDisplay->setPlainText(firmware->toHex());
 }
 
-void PersoServerGuiSubkernel::connectDependecies() {
-  const PersoServerAsyncWrapper* psm =
-      static_cast<const PersoServerAsyncWrapper*>(
-          GlobalEnvironment::instance()->getObject("PersoServerAsyncWrapper"));
+void ServerGuiSubkernel::connectDependecies() {
+  const ServerConnectionAsyncWrapper* psm =
+      static_cast<const ServerConnectionAsyncWrapper*>(
+          GlobalEnvironment::instance()->getObject("ServerConnectionAsyncWrapper"));
 
   // К менеджерам
-  QObject::connect(this, &PersoServerGuiSubkernel::connect_signal, psm,
-                   &PersoServerAsyncWrapper::connect);
-  QObject::connect(this, &PersoServerGuiSubkernel::disconnect_signal, psm,
-                   &PersoServerAsyncWrapper::disconnect);
+  QObject::connect(this, &ServerGuiSubkernel::connect_signal, psm,
+                   &ServerConnectionAsyncWrapper::connect);
+  QObject::connect(this, &ServerGuiSubkernel::disconnect_signal, psm,
+                   &ServerConnectionAsyncWrapper::disconnect);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::echo_signal, psm,
-                   &PersoServerAsyncWrapper::echo);
-  QObject::connect(this, &PersoServerGuiSubkernel::logOn_signal, psm,
-                   &PersoServerAsyncWrapper::logOn);
-  QObject::connect(this, &PersoServerGuiSubkernel::logOut_signal, psm,
-                   &PersoServerAsyncWrapper::logOut);
+  QObject::connect(this, &ServerGuiSubkernel::echo_signal, psm,
+                   &ServerConnectionAsyncWrapper::echo);
+  QObject::connect(this, &ServerGuiSubkernel::logOn_signal, psm,
+                   &ServerConnectionAsyncWrapper::logOn);
+  QObject::connect(this, &ServerGuiSubkernel::logOut_signal, psm,
+                   &ServerConnectionAsyncWrapper::logOut);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::launchProductionLine_signal,
-                   psm, &PersoServerAsyncWrapper::launchProductionLine);
+  QObject::connect(this, &ServerGuiSubkernel::launchProductionLine_signal,
+                   psm, &ServerConnectionAsyncWrapper::launchProductionLine);
   QObject::connect(this,
-                   &PersoServerGuiSubkernel::shutdownProductionLine_signal, psm,
-                   &PersoServerAsyncWrapper::shutdownProductionLine);
-  QObject::connect(this, &PersoServerGuiSubkernel::getProductionLineData_signal,
-                   psm, &PersoServerAsyncWrapper::getProductionLineData);
+                   &ServerGuiSubkernel::shutdownProductionLine_signal, psm,
+                   &ServerConnectionAsyncWrapper::shutdownProductionLine);
+  QObject::connect(this, &ServerGuiSubkernel::getProductionLineData_signal,
+                   psm, &ServerConnectionAsyncWrapper::getProductionLineData);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::requestBox_signal, psm,
-                   &PersoServerAsyncWrapper::requestBox);
-  QObject::connect(this, &PersoServerGuiSubkernel::getCurrentBoxData_signal,
-                   psm, &PersoServerAsyncWrapper::getCurrentBoxData);
-  QObject::connect(this, &PersoServerGuiSubkernel::refundCurrentBox_signal, psm,
-                   &PersoServerAsyncWrapper::refundCurrentBox);
-  QObject::connect(this, &PersoServerGuiSubkernel::completeCurrentBox_signal,
-                   psm, &PersoServerAsyncWrapper::completeCurrentBox);
+  QObject::connect(this, &ServerGuiSubkernel::requestBox_signal, psm,
+                   &ServerConnectionAsyncWrapper::requestBox);
+  QObject::connect(this, &ServerGuiSubkernel::getCurrentBoxData_signal,
+                   psm, &ServerConnectionAsyncWrapper::getCurrentBoxData);
+  QObject::connect(this, &ServerGuiSubkernel::refundCurrentBox_signal, psm,
+                   &ServerConnectionAsyncWrapper::refundCurrentBox);
+  QObject::connect(this, &ServerGuiSubkernel::completeCurrentBox_signal,
+                   psm, &ServerConnectionAsyncWrapper::completeCurrentBox);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::releaseTransponder_signal,
-                   psm, &PersoServerAsyncWrapper::releaseTransponder);
-  QObject::connect(this, &PersoServerGuiSubkernel::rereleaseTransponder_signal,
-                   psm, &PersoServerAsyncWrapper::rereleaseTransponder);
-  QObject::connect(this, &PersoServerGuiSubkernel::rollbackTransponder_signal,
-                   psm, &PersoServerAsyncWrapper::rollbackTransponder);
+  QObject::connect(this, &ServerGuiSubkernel::releaseTransponder_signal,
+                   psm, &ServerConnectionAsyncWrapper::releaseTransponder);
+  QObject::connect(this, &ServerGuiSubkernel::rereleaseTransponder_signal,
+                   psm, &ServerConnectionAsyncWrapper::rereleaseTransponder);
+  QObject::connect(this, &ServerGuiSubkernel::rollbackTransponder_signal,
+                   psm, &ServerConnectionAsyncWrapper::rollbackTransponder);
   QObject::connect(this,
-                   &PersoServerGuiSubkernel::getCurrentTransponderData_signal,
-                   psm, &PersoServerAsyncWrapper::getCurrentTransponderData);
-  QObject::connect(this, &PersoServerGuiSubkernel::getTransponderData_signal,
-                   psm, &PersoServerAsyncWrapper::getTransponderData);
+                   &ServerGuiSubkernel::getCurrentTransponderData_signal,
+                   psm, &ServerConnectionAsyncWrapper::getCurrentTransponderData);
+  QObject::connect(this, &ServerGuiSubkernel::getTransponderData_signal,
+                   psm, &ServerConnectionAsyncWrapper::getTransponderData);
 
-  QObject::connect(this, &PersoServerGuiSubkernel::printBoxSticker_signal, psm,
-                   &PersoServerAsyncWrapper::printBoxSticker);
-  QObject::connect(this, &PersoServerGuiSubkernel::printLastBoxSticker_signal,
-                   psm, &PersoServerAsyncWrapper::printLastBoxSticker);
-  QObject::connect(this, &PersoServerGuiSubkernel::printPalletSticker_signal,
-                   psm, &PersoServerAsyncWrapper::printPalletSticker);
+  QObject::connect(this, &ServerGuiSubkernel::printBoxSticker_signal, psm,
+                   &ServerConnectionAsyncWrapper::printBoxSticker);
+  QObject::connect(this, &ServerGuiSubkernel::printLastBoxSticker_signal,
+                   psm, &ServerConnectionAsyncWrapper::printLastBoxSticker);
+  QObject::connect(this, &ServerGuiSubkernel::printPalletSticker_signal,
+                   psm, &ServerConnectionAsyncWrapper::printPalletSticker);
   QObject::connect(this,
-                   &PersoServerGuiSubkernel::printLastPalletSticker_signal, psm,
-                   &PersoServerAsyncWrapper::printLastPalletSticker);
+                   &ServerGuiSubkernel::printLastPalletSticker_signal, psm,
+                   &ServerConnectionAsyncWrapper::printLastPalletSticker);
 
   // От менеджеров
-  QObject::connect(psm, &PersoServerAsyncWrapper::productionLineDataReady, this,
-                   &PersoServerGuiSubkernel::displayProductionLineData);
-  QObject::connect(psm, &PersoServerAsyncWrapper::boxDataReady, this,
-                   &PersoServerGuiSubkernel::displayBoxData);
-  QObject::connect(psm, &PersoServerAsyncWrapper::transponderDataReady, this,
-                   &PersoServerGuiSubkernel::displayTransponderData);
+  QObject::connect(psm, &ServerConnectionAsyncWrapper::productionLineDataReady, this,
+                   &ServerGuiSubkernel::displayProductionLineData);
+  QObject::connect(psm, &ServerConnectionAsyncWrapper::boxDataReady, this,
+                   &ServerGuiSubkernel::displayBoxData);
+  QObject::connect(psm, &ServerConnectionAsyncWrapper::transponderDataReady, this,
+                   &ServerGuiSubkernel::displayTransponderData);
 
-  QObject::connect(psm, &PersoServerAsyncWrapper::transponderDataReady, this,
-                   &PersoServerGuiSubkernel::displayTransponderData);
+  QObject::connect(psm, &ServerConnectionAsyncWrapper::transponderDataReady, this,
+                   &ServerGuiSubkernel::displayTransponderData);
 }
 
-void PersoServerGuiSubkernel::createModels() {
+void ServerGuiSubkernel::createModels() {
   std::shared_ptr<StringDictionary> plMatchTable(new StringDictionary());
   plMatchTable->insert("production_line_id", "Идентификатор");
   plMatchTable->insert("production_line_login", "Логин");

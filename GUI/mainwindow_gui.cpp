@@ -3,7 +3,7 @@
 #include "database_user_interface.h"
 #include "global_environment.h"
 #include "order_user_interface.h"
-#include "perso_server_user_interface.h"
+#include "server_user_interface.h"
 #include "production_line_user_interface.h"
 #include "sticker_printer_user_interface.h"
 #include "widget_log_backend.h"
@@ -49,7 +49,7 @@ void MainWindowGui::createTabs() {
   userInterface = new ProductionLineUserInterface();
   Tabs->addTab(userInterface, "Линии производства");
 
-  userInterface = new PersoServerUserInterface();
+  userInterface = new ServerUserInterface();
   Tabs->addTab(userInterface, "Cервер");
 
   userInterface = new StickerPrinterUserInterface();

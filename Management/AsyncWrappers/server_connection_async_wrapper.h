@@ -8,22 +8,16 @@
 #include "named_object.h"
 #include "progressable_async_wrapper.h"
 
-class PersoServerAsyncWrapper : public NamedObject,
-                                public ProgressableAsyncWrapper,
-                                public LoggableObject {
+class ServerConnectionAsyncWrapper : public NamedObject,
+                                     public ProgressableAsyncWrapper,
+                                     public LoggableObject {
   Q_OBJECT
  private:
   std::unique_ptr<IServerConnection> Server;
 
-  std::unique_ptr<QFile> Firmware;
-
-  std::shared_ptr<StringDictionary> ProductionLineData;
-  std::shared_ptr<StringDictionary> BoxData;
-  std::shared_ptr<StringDictionary> TransponderData;
-
  public:
-  Q_INVOKABLE explicit PersoServerAsyncWrapper(const QString& name);
-  ~PersoServerAsyncWrapper();
+  Q_INVOKABLE explicit ServerConnectionAsyncWrapper(const QString& name);
+  ~ServerConnectionAsyncWrapper();
 
   // Own
  public:
@@ -57,6 +51,7 @@ class PersoServerAsyncWrapper : public NamedObject,
   void onServerDisconnected(void);
 
  private:
+  Q_DISABLE_COPY_MOVE(ServerConnectionAsyncWrapper)
   ReturnStatus checkConfig(void);
 
  signals:

@@ -46,7 +46,7 @@ add_executable(PersoAdmin WIN32
     Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
     Service/ObjectTypes/log_system_connection.h Service/ObjectTypes/log_system_connection.cpp
 
-    Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
+    Service/i_service_object_space.h Service/i_service_object_space.cpp
     Service/service_object_space.h Service/service_object_space.cpp
     Service/asynchronous_object_space.h Service/asynchronous_object_space.cpp
     Service/configuration_manager.h Service/configuration_manager.cpp
@@ -75,7 +75,7 @@ add_executable(PersoAdmin WIN32
     GUI/Subkernels/response_ready_connection.h GUI/Subkernels/response_ready_connection.cpp
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
-    GUI/Subkernels/perso_server_gui_subkernel.h GUI/Subkernels/perso_server_gui_subkernel.cpp
+    GUI/Subkernels/server_gui_subkernel.h GUI/Subkernels/server_gui_subkernel.cpp
     GUI/Subkernels/production_line_gui_subkernel.h GUI/Subkernels/production_line_gui_subkernel.cpp
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
@@ -98,7 +98,7 @@ add_executable(PersoAdmin WIN32
     GUI/Widgets/database_user_interface.h GUI/Widgets/database_user_interface.cpp
     GUI/Widgets/production_line_user_interface.h GUI/Widgets/production_line_user_interface.cpp
     GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
-    GUI/Widgets/perso_server_user_interface.h GUI/Widgets/perso_server_user_interface.cpp
+    GUI/Widgets/server_user_interface.h GUI/Widgets/server_user_interface.cpp
 
     GUI/Reactions/i_progress_indicator.h GUI/Reactions/i_progress_indicator.cpp
     GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
@@ -118,7 +118,7 @@ add_executable(PersoAdmin WIN32
     Management/AsyncWrappers/production_line_manager_async_wrapper.h Management/AsyncWrappers/production_line_manager_async_wrapper.cpp
     Management/AsyncWrappers/programmer_async_wrapper.h Management/AsyncWrappers/programmer_async_wrapper.cpp
     Management/AsyncWrappers/sticker_printer_async_wrapper.h Management/AsyncWrappers/sticker_printer_async_wrapper.cpp
-    Management/AsyncWrappers/perso_server_async_wrapper.cpp Management/AsyncWrappers/perso_server_async_wrapper.h
+    Management/AsyncWrappers/server_connection_async_wrapper.cpp Management/AsyncWrappers/server_connection_async_wrapper.h
 
     ServerConnection/i_server_connection.cpp ServerConnection/i_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h

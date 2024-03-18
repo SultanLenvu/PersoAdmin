@@ -3,7 +3,7 @@
 #include "database_gui_subkernel.h"
 #include "mainwindow_gui.h"
 #include "order_gui_subkernel.h"
-#include "perso_server_gui_subkernel.h"
+#include "server_gui_subkernel.h"
 #include "production_line_gui_subkernel.h"
 #include "programmer_gui_subkernel.h"
 #include "progress_indicator.h"
@@ -17,7 +17,7 @@ GuiKernel::GuiKernel()
   Service = std::make_unique<ServiceObjectSpace>();
   createReactions();
 
-  Async = std::make_unique<AsynchronousObjectSpace>();
+  Async = std::make_unique<AsyncObjectSpace>();
 
   createGuiSubkernels();
   createMainWindowGui();
@@ -74,7 +74,7 @@ void GuiKernel::createGuiSubkernels() {
   Subkernels.emplace_back(
       new ProductionLineGuiSubkernel("ProductionLineGuiSubkernel"));
   Subkernels.emplace_back(
-      new PersoServerGuiSubkernel("PersoServerGuiSubkernel"));
+      new ServerGuiSubkernel("ServerGuiSubkernel"));
   Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
   Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));

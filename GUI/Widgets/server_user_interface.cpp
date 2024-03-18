@@ -1,14 +1,14 @@
-#include "perso_server_user_interface.h"
+#include "server_user_interface.h"
 #include "global_environment.h"
-#include "perso_server_gui_subkernel.h"
+#include "server_gui_subkernel.h"
 
-PersoServerUserInterface::PersoServerUserInterface(QWidget* parent)
+ServerUserInterface::ServerUserInterface(QWidget* parent)
     : AbstractUserInterface{parent} {
   create();
   connectDependencies();
 }
 
-void PersoServerUserInterface::create() {
+void ServerUserInterface::create() {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
@@ -20,7 +20,7 @@ void PersoServerUserInterface::create() {
   MainLayout->setStretch(1, 3);
 }
 
-void PersoServerUserInterface::createControlPanel() {
+void ServerUserInterface::createControlPanel() {
   ControlPanel = new QGroupBox("Панель управления");
   MainLayout->addWidget(ControlPanel);
 
@@ -38,7 +38,7 @@ void PersoServerUserInterface::createControlPanel() {
   ControlPanelLayout->addItem(ControlPanelVS);
 }
 
-void PersoServerUserInterface::createInitGroup() {
+void ServerUserInterface::createInitGroup() {
   InitGroup = new QGroupBox("Авторизация");
   ControlPanelLayout->addWidget(InitGroup);
 
@@ -57,7 +57,7 @@ void PersoServerUserInterface::createInitGroup() {
   InitGroupLayout->addWidget(LogOutPushButton);
 }
 
-void PersoServerUserInterface::createProductionLineGroup() {
+void ServerUserInterface::createProductionLineGroup() {
   ProductionLineGroup = new QGroupBox("Производственная линия");
   ControlPanelLayout->addWidget(ProductionLineGroup);
 
@@ -72,7 +72,7 @@ void PersoServerUserInterface::createProductionLineGroup() {
   ProductionLineGroupLayout->addWidget(GetProductionLineDataPushButton);
 }
 
-void PersoServerUserInterface::createBoxGroup() {
+void ServerUserInterface::createBoxGroup() {
   BoxGroup = new QGroupBox("Боксы");
   ControlPanelLayout->addWidget(BoxGroup);
 
@@ -89,7 +89,7 @@ void PersoServerUserInterface::createBoxGroup() {
   BoxGroupLayout->addWidget(CompleteCurrentBoxPushButton);
 }
 
-void PersoServerUserInterface::createTransponderGroup() {
+void ServerUserInterface::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Транспондеры");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -109,7 +109,7 @@ void PersoServerUserInterface::createTransponderGroup() {
   TransponderGroupLayout->addWidget(GetTransponderDataPushButton);
 }
 
-void PersoServerUserInterface::createPrintingGroup() {
+void ServerUserInterface::createPrintingGroup() {
   PrintingGroup = new QGroupBox("Принтер стикеров");
   ControlPanelLayout->addWidget(PrintingGroup);
 
@@ -130,7 +130,7 @@ void PersoServerUserInterface::createPrintingGroup() {
   PrintingGroupLayout->addWidget(PrintLastPalletStickerOnServerPushButton);
 }
 
-void PersoServerUserInterface::createDataDisplayPanel() {
+void ServerUserInterface::createDataDisplayPanel() {
   DataDisplayPanel = new QGroupBox("Данные");
   MainLayout->addWidget(DataDisplayPanel);
 
@@ -166,58 +166,58 @@ void PersoServerUserInterface::createDataDisplayPanel() {
   AssembledFirmwareLayout->addWidget(AssembledFirmwareView);
 }
 
-void PersoServerUserInterface::connectDependencies() {
-  PersoServerGuiSubkernel* psgs = static_cast<PersoServerGuiSubkernel*>(
-      GlobalEnvironment::instance()->getObject("PersoServerGuiSubkernel"));
+void ServerUserInterface::connectDependencies() {
+  ServerGuiSubkernel* psgs = static_cast<ServerGuiSubkernel*>(
+      GlobalEnvironment::instance()->getObject("ServerGuiSubkernel"));
 
   QObject::connect(ConnectPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::connect);
+                   &ServerGuiSubkernel::connect);
   QObject::connect(DisconnectPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::disconnect);
+                   &ServerGuiSubkernel::disconnect);
 
   QObject::connect(EchoPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::echo);
+                   &ServerGuiSubkernel::echo);
   QObject::connect(LogOnPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::logOn);
+                   &ServerGuiSubkernel::logOn);
   QObject::connect(LogOutPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::logOut);
+                   &ServerGuiSubkernel::logOut);
 
   QObject::connect(LaunchProductionLinePushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::launchProductionLine);
+                   &ServerGuiSubkernel::launchProductionLine);
   QObject::connect(ShutdownProductionLinePushButton, &QPushButton::clicked,
-                   psgs, &PersoServerGuiSubkernel::shutdownProductionLine);
+                   psgs, &ServerGuiSubkernel::shutdownProductionLine);
   QObject::connect(GetProductionLineDataPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::getProductionLineData);
+                   &ServerGuiSubkernel::getProductionLineData);
 
   QObject::connect(RequestBoxPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::requestBox);
+                   &ServerGuiSubkernel::requestBox);
   QObject::connect(GetCurrentBoxDataPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::getCurrentBoxData);
+                   &ServerGuiSubkernel::getCurrentBoxData);
   QObject::connect(RefundBoxPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::refundCurrentBox);
+                   &ServerGuiSubkernel::refundCurrentBox);
   QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::completeCurrentBox);
+                   &ServerGuiSubkernel::completeCurrentBox);
 
   QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::releaseTransponder);
+                   &ServerGuiSubkernel::releaseTransponder);
   QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::rereleaseTransponder);
+                   &ServerGuiSubkernel::rereleaseTransponder);
   QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::rollbackTransponder);
+                   &ServerGuiSubkernel::rollbackTransponder);
   QObject::connect(GetCurrentTransponderDataPushButton, &QPushButton::clicked,
-                   psgs, &PersoServerGuiSubkernel::getCurrentTransponderData);
+                   psgs, &ServerGuiSubkernel::getCurrentTransponderData);
   QObject::connect(GetTransponderDataPushButton, &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::getTransponderData);
+                   &ServerGuiSubkernel::getTransponderData);
 
   QObject::connect(PrintBoxStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &PersoServerGuiSubkernel::printBoxSticker);
+                   psgs, &ServerGuiSubkernel::printBoxSticker);
   QObject::connect(PrintLastBoxStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &PersoServerGuiSubkernel::printLastBoxSticker);
+                   psgs, &ServerGuiSubkernel::printLastBoxSticker);
   QObject::connect(PrintPalletStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &PersoServerGuiSubkernel::printPalletSticker);
+                   psgs, &ServerGuiSubkernel::printPalletSticker);
   QObject::connect(PrintLastPalletStickerOnServerPushButton,
                    &QPushButton::clicked, psgs,
-                   &PersoServerGuiSubkernel::printLastPalletSticker);
+                   &ServerGuiSubkernel::printLastPalletSticker);
 
   ProductionLineDataView->setModel(&psgs->productionLine());
   BoxDataView->setModel(&psgs->box());

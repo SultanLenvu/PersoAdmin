@@ -3,7 +3,7 @@
 
 #include "abstract_user_interface.h"
 
-class PersoServerUserInterface final : public AbstractUserInterface {
+class ServerUserInterface final : public AbstractUserInterface {
   Q_OBJECT
 
  private:
@@ -72,8 +72,8 @@ class PersoServerUserInterface final : public AbstractUserInterface {
   QPlainTextEdit* AssembledFirmwareView;
 
  public:
-  explicit PersoServerUserInterface(QWidget* parent = nullptr);
-  ~PersoServerUserInterface() = default;
+  explicit ServerUserInterface(QWidget* parent = nullptr);
+  ~ServerUserInterface() = default;
 
  private:
   void create(void);

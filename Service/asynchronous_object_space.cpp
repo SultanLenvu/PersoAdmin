@@ -3,22 +3,22 @@
 #include "database_async_wrapper.h"
 #include "named_object_factory.h"
 #include "order_manager_async_wrapper.h"
-#include "perso_server_async_wrapper.h"
 #include "production_line_manager_async_wrapper.h"
 #include "programmer_async_wrapper.h"
+#include "server_connection_async_wrapper.h"
 #include "sticker_printer_async_wrapper.h"
 
-AsynchronousObjectSpace::AsynchronousObjectSpace() {
+AsyncObjectSpace::AsyncObjectSpace() {
   Thread.start();
   createWrappers();
 }
 
-AsynchronousObjectSpace::~AsynchronousObjectSpace() {
+AsyncObjectSpace::~AsyncObjectSpace() {
   Thread.quit();
   Thread.wait();
 }
 
-void AsynchronousObjectSpace::createWrappers() {
+void AsyncObjectSpace::createWrappers() {
   NamedObjectFactory factory(&Thread);
 
   std::unique_ptr<DatabaseAsyncWrapper> daw(
@@ -29,8 +29,8 @@ void AsynchronousObjectSpace::createWrappers() {
   Managers.emplace_back(factory.create<ProductionLineManagerAsyncWrapper>(
       "ProductionLineManagerAsyncWrapper", daw->database()));
   Managers.emplace_back(std::move(daw));
-  Managers.emplace_back(
-      factory.create<PersoServerAsyncWrapper>("PersoServerAsyncWrapper"));
+  Managers.emplace_back(factory.create<ServerConnectionAsyncWrapper>(
+      "ServerConnectionAsyncWrapper"));
   Managers.emplace_back(
       factory.create<ProgrammerAsyncWrapper>("ProgrammerAsyncWrapper"));
   Managers.emplace_back(

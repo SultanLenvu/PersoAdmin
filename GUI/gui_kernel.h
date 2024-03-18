@@ -18,7 +18,7 @@ class GuiKernel final : public QMainWindow {
   Q_OBJECT
  private:
   std::unique_ptr<ServiceObjectSpace> Service;
-  std::unique_ptr<AsynchronousObjectSpace> Async;
+  std::unique_ptr<AsyncObjectSpace> Async;
 
   std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
 

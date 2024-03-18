@@ -1,5 +1,5 @@
-#ifndef PERSOSERVERGUISUBKERNEL_H
-#define PERSOSERVERGUISUBKERNEL_H
+#ifndef SERVERGUISUBKERNEL_H
+#define SERVERGUISUBKERNEL_H
 
 #include <QPlainTextEdit>
 
@@ -7,7 +7,7 @@
 #include "hash_table_model.h"
 #include "qplaintextedit.h"
 
-class PersoServerGuiSubkernel final : public AbstractGuiSubkernel {
+class ServerGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  private:
@@ -18,8 +18,8 @@ class PersoServerGuiSubkernel final : public AbstractGuiSubkernel {
   QPlainTextEdit* FirmwareDisplay;
 
  public:
-  explicit PersoServerGuiSubkernel(const QString& name);
-  ~PersoServerGuiSubkernel();
+  explicit ServerGuiSubkernel(const QString& name);
+  ~ServerGuiSubkernel();
 
  public:
   HashTableModel& productionLine(void);
@@ -98,4 +98,4 @@ class PersoServerGuiSubkernel final : public AbstractGuiSubkernel {
   void printLastPalletSticker_signal(void);
 };
 
-#endif  // PERSOSERVERGUISUBKERNEL_H
+#endif  // SERVERGUISUBKERNEL_H

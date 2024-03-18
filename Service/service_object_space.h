@@ -3,11 +3,11 @@
 
 #include <QThread>
 
-#include "abstract_service_object_space.h"
+#include "i_service_object_space.h"
 #include "configuration_manager.h"
 #include "log_system.h"
 
-class ServiceObjectSpace final : public AbstractServiceObjectSpace {
+class ServiceObjectSpace final : public IServiceObjectSpace {
  private:
   QThread Thread;
   std::unique_ptr<LogSystem> Logger;
