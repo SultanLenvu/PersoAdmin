@@ -38,6 +38,45 @@ void ServerUserInterface::createControlPanel() {
   ControlPanelLayout->addItem(ControlPanelVS);
 }
 
+void ServerUserInterface::createRawCommandGroup() {
+  RawCommandGroup = new QGroupBox("Отдельные команды");
+  ControlPanelLayout->addWidget(RawCommandGroup);
+
+  RawCommandLayout = new QVBoxLayout();
+  RawCommandGroup->setLayout(RawCommandLayout);
+
+  CommandComboBox = new QComboBox();
+  CommandComboBox->addItem("connect");
+  CommandComboBox->addItem("disconnect");
+
+  CommandComboBox->addItem("echo");
+  CommandComboBox->addItem("launch_production_line");
+  CommandComboBox->addItem("shutdown_production_line");
+  CommandComboBox->addItem("get_production_line_data");
+
+  CommandComboBox->addItem("request_box");
+  CommandComboBox->addItem("get_current_box_data");
+  CommandComboBox->addItem("refund_current_box");
+  CommandComboBox->addItem("complete_current_box");
+
+  CommandComboBox->addItem("release_transponder");
+  CommandComboBox->addItem("confirm_transponder_release");
+  CommandComboBox->addItem("rerelease_transponder");
+  CommandComboBox->addItem("confirm_transponder_rerelease");
+  CommandComboBox->addItem("rollback_tranponder");
+  CommandComboBox->addItem("get_current_transponder_data");
+  CommandComboBox->addItem("get_transponder_data");
+
+  CommandComboBox->addItem("print_box_sticker");
+  CommandComboBox->addItem("print_last_box_sticker");
+  CommandComboBox->addItem("print_pallet_sticker");
+  CommandComboBox->addItem("print_last_pallet_sticker");
+
+  ExecuteCommandButton = new QPushButton("Выполнить");
+  connect(ExecuteCommandButton, &QPushButton::clicked, this,
+          &ServerUserInterface::onExecuteCommandButton_slot);
+}
+
 void ServerUserInterface::createInitGroup() {
   InitGroup = new QGroupBox("Авторизация");
   ControlPanelLayout->addWidget(InitGroup);
@@ -167,60 +206,67 @@ void ServerUserInterface::createDataDisplayPanel() {
 }
 
 void ServerUserInterface::connectDependencies() {
-  ServerGuiSubkernel* psgs = static_cast<ServerGuiSubkernel*>(
+  ServerGuiSubkernel* sgs = static_cast<ServerGuiSubkernel*>(
       GlobalEnvironment::instance()->getObject("ServerGuiSubkernel"));
 
-  QObject::connect(ConnectPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(this, &ServerUserInterface::executeCommand_signal, sgs,
+                   &ServerGuiSubkernel::executeCommand);
+
+  QObject::connect(ConnectPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::connect);
-  QObject::connect(DisconnectPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(DisconnectPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::disconnect);
 
-  QObject::connect(EchoPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(EchoPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::echo);
-  QObject::connect(LogOnPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(LogOnPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::logOn);
-  QObject::connect(LogOutPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(LogOutPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::logOut);
 
-  QObject::connect(LaunchProductionLinePushButton, &QPushButton::clicked, psgs,
+  QObject::connect(LaunchProductionLinePushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::launchProductionLine);
-  QObject::connect(ShutdownProductionLinePushButton, &QPushButton::clicked,
-                   psgs, &ServerGuiSubkernel::shutdownProductionLine);
-  QObject::connect(GetProductionLineDataPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(ShutdownProductionLinePushButton, &QPushButton::clicked, sgs,
+                   &ServerGuiSubkernel::shutdownProductionLine);
+  QObject::connect(GetProductionLineDataPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::getProductionLineData);
 
-  QObject::connect(RequestBoxPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(RequestBoxPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::requestBox);
-  QObject::connect(GetCurrentBoxDataPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(GetCurrentBoxDataPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::getCurrentBoxData);
-  QObject::connect(RefundBoxPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(RefundBoxPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::refundCurrentBox);
-  QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::completeCurrentBox);
 
-  QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::releaseTransponder);
-  QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::rereleaseTransponder);
-  QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, psgs,
+  QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::rollbackTransponder);
   QObject::connect(GetCurrentTransponderDataPushButton, &QPushButton::clicked,
-                   psgs, &ServerGuiSubkernel::getCurrentTransponderData);
-  QObject::connect(GetTransponderDataPushButton, &QPushButton::clicked, psgs,
+                   sgs, &ServerGuiSubkernel::getCurrentTransponderData);
+  QObject::connect(GetTransponderDataPushButton, &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::getTransponderData);
 
   QObject::connect(PrintBoxStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &ServerGuiSubkernel::printBoxSticker);
+                   sgs, &ServerGuiSubkernel::printBoxSticker);
   QObject::connect(PrintLastBoxStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &ServerGuiSubkernel::printLastBoxSticker);
+                   sgs, &ServerGuiSubkernel::printLastBoxSticker);
   QObject::connect(PrintPalletStickerOnServerPushButton, &QPushButton::clicked,
-                   psgs, &ServerGuiSubkernel::printPalletSticker);
+                   sgs, &ServerGuiSubkernel::printPalletSticker);
   QObject::connect(PrintLastPalletStickerOnServerPushButton,
-                   &QPushButton::clicked, psgs,
+                   &QPushButton::clicked, sgs,
                    &ServerGuiSubkernel::printLastPalletSticker);
 
-  ProductionLineDataView->setModel(&psgs->productionLine());
-  BoxDataView->setModel(&psgs->box());
-  TransponderDataView->setModel(&psgs->transponder());
-  psgs->setFirmwareDisplay(AssembledFirmwareView);
+  ProductionLineDataView->setModel(&sgs->productionLine());
+  BoxDataView->setModel(&sgs->box());
+  TransponderDataView->setModel(&sgs->transponder());
+  sgs->setFirmwareDisplay(AssembledFirmwareView);
+}
+
+void ServerUserInterface::onExecuteCommandButton_slot() {
+  emit executeCommand_signal(CommandComboBox->currentText());
 }

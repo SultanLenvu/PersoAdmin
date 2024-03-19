@@ -13,6 +13,11 @@ class ServerUserInterface final : public AbstractUserInterface {
   QGroupBox* ControlPanel;
   QVBoxLayout* ControlPanelLayout;
 
+  QGroupBox* RawCommandGroup;
+  QVBoxLayout* RawCommandLayout;
+  QComboBox* CommandComboBox;
+  QPushButton* ExecuteCommandButton;
+
   QGroupBox* InitGroup;
   QVBoxLayout* InitGroupLayout;
   QPushButton* ConnectPushButton;
@@ -79,6 +84,7 @@ class ServerUserInterface final : public AbstractUserInterface {
   void create(void);
 
   void createControlPanel(void);
+  void createRawCommandGroup(void);
   void createInitGroup(void);
   void createProductionLineGroup(void);
   void createBoxGroup(void);
@@ -88,6 +94,12 @@ class ServerUserInterface final : public AbstractUserInterface {
   void createDataDisplayPanel(void);
 
   void connectDependencies(void);
+
+ private slots:
+  void onExecuteCommandButton_slot(void);
+
+ signals:
+  void executeCommand_signal(const QString& name);
 };
 
 #endif  // PERSOSERVERWIDGET_H

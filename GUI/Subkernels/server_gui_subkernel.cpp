@@ -6,28 +6,11 @@
 #include "string_input_dialog.h"
 
 ServerGuiSubkernel::ServerGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel(name), FirmwareDisplay(nullptr) {
-  createModels();
+    : AbstractGuiSubkernel(name) {
   connectDependecies();
 }
-
-ServerGuiSubkernel::~ServerGuiSubkernel() {}
-
-HashTableModel& ServerGuiSubkernel::productionLine() {
-  return ProductionLine;
-}
-
-HashTableModel& ServerGuiSubkernel::box() {
-  return Box;
-}
-
-HashTableModel& ServerGuiSubkernel::transponder() {
-  return Transponder;
-}
-
-void ServerGuiSubkernel::setFirmwareDisplay(
-    QPlainTextEdit* firmwareDisplay) {
-  FirmwareDisplay = firmwareDisplay;
+void ServerGuiSubkernel::executeCommand(const QString& name) {
+  emit clearLogDisplay();
 }
 
 void ServerGuiSubkernel::connect() {
@@ -43,24 +26,6 @@ void ServerGuiSubkernel::disconnect() {
 void ServerGuiSubkernel::echo() {
   emit clearLogDisplay();
   emit echo_signal();
-}
-
-void ServerGuiSubkernel::logOn() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary());
-
-  AuthorizationDialog dialog;
-  if (dialog.exec() == QDialog::Rejected) {
-    return;
-  }
-  dialog.getData(*param);
-
-  emit clearLogDisplay();
-  emit logOn_signal(param);
-}
-
-void ServerGuiSubkernel::logOut() {
-  emit clearLogDisplay();
-  emit logOut_signal();
 }
 
 void ServerGuiSubkernel::launchProductionLine() {

@@ -1,7 +1,7 @@
 #ifndef PRODUCTIONLINEMANAGER_H
 #define PRODUCTIONLINEMANAGER_H
 
-#include "abstract_manager.h"
+#include "i_manager.h"
 #include "i_sql_database.h"
 #include "loggable_object.h"
 #include "named_object.h"

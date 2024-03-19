@@ -1,7 +1,7 @@
 #ifndef ORDERMANAGER_H
 #define ORDERMANAGER_H
 
-#include "abstract_manager.h"
+#include "i_manager.h"
 #include "configurable_object.h"
 #include "i_sql_database.h"
 #include "loggable_object.h"

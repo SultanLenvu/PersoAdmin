@@ -80,6 +80,7 @@ add_executable(PersoAdmin WIN32
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
     GUI/Subkernels/database_gui_subkernel.h GUI/Subkernels/database_gui_subkernel.cpp
+    GUI/Subkernels/assembly_unit_gui_subkernel.h GUI/Subkernels/assembly_unit_gui_subkernel.cpp
 
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/pallet_shiping_dialog.cpp GUI/Dialogs/pallet_shiping_dialog.h
@@ -107,9 +108,10 @@ add_executable(PersoAdmin WIN32
     GUI/Reactions/status_indicator.h GUI/Reactions/status_indicator.cpp
     GUI/Reactions/status_indicator_link.h GUI/Reactions/status_indicator_link.cpp
 
-    Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
+    Management/Managers/i_manager.h Management/Managers/i_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp
     Management/Managers/production_line_manager.h Management/Managers/production_line_manager.cpp
+    Management/Managers/assembly_unit_manager.h Management/Managers/assembly_unit_manager.cpp
 
     Management/AsyncWrappers/database_async_wrapper.h Management/AsyncWrappers/database_async_wrapper.cpp
     Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
@@ -119,6 +121,7 @@ add_executable(PersoAdmin WIN32
     Management/AsyncWrappers/programmer_async_wrapper.h Management/AsyncWrappers/programmer_async_wrapper.cpp
     Management/AsyncWrappers/sticker_printer_async_wrapper.h Management/AsyncWrappers/sticker_printer_async_wrapper.cpp
     Management/AsyncWrappers/server_connection_async_wrapper.cpp Management/AsyncWrappers/server_connection_async_wrapper.h
+    Management/AsyncWrappers/assembly_unit_manager_async_wrapper.h Management/AsyncWrappers/assembly_unit_manager_async_wrapper.cpp
 
     ServerConnection/i_server_connection.cpp ServerConnection/i_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h

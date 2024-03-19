@@ -4,39 +4,22 @@
 #include <QPlainTextEdit>
 
 #include "abstract_gui_subkernel.h"
-#include "hash_table_model.h"
-#include "qplaintextedit.h"
+#include "types.h"
 
 class ServerGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
- private:
-  HashTableModel ProductionLine;
-  HashTableModel Box;
-  HashTableModel Transponder;
-
-  QPlainTextEdit* FirmwareDisplay;
-
  public:
   explicit ServerGuiSubkernel(const QString& name);
-  ~ServerGuiSubkernel();
-
- public:
-  HashTableModel& productionLine(void);
-  HashTableModel& box(void);
-  HashTableModel& transponder(void);
-
- public:
-  void setFirmwareDisplay(QPlainTextEdit* firmwareDisplay);
+  ~ServerGuiSubkernel() = default;
 
  public slots:  // Слоты для сигналов от GUI
+  void executeCommand(const QString& name);
+
   void connect(void);
   void disconnect(void);
 
   void echo(void);
-  void logOn(void);
-  void logOut(void);
-
   void launchProductionLine(void);
   void shutdownProductionLine(void);
   void getProductionLineData(void);
@@ -57,23 +40,14 @@ class ServerGuiSubkernel final : public AbstractGuiSubkernel {
   void printPalletSticker(void);
   void printLastPalletSticker(void);
 
- public slots:  // Слоты для сигналов от менеджеров
-  void displayProductionLineData(const std::shared_ptr<StringDictionary> data);
-  void displayBoxData(const std::shared_ptr<StringDictionary> data);
-  void displayTransponderData(const std::shared_ptr<StringDictionary> data);
-  void displayFirmware(const std::shared_ptr<QByteArray> firmware);
-
  private:
   void connectDependecies(void);
-  void createModels(void);
 
  signals:
   void connect_signal(void);
   void disconnect_signal(void);
 
   void echo_signal(void);
-  void logOn_signal(const std::shared_ptr<StringDictionary> param);
-  void logOut_signal(void);
 
   void launchProductionLine_signal(
       const std::shared_ptr<StringDictionary> param);
