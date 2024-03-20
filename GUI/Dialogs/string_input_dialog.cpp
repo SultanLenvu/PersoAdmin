@@ -1,17 +1,20 @@
 #include "string_input_dialog.h"
 
-StringInputDialog::StringInputDialog(const QString& paramName, QWidget* parent)
-    : AbstractInputDialog(parent), ParamName(paramName), Checker(nullptr) {
-  // Создаем диалоговое окно
-  setWindowTitle("Ввод данных");
-
+StringInputDialog::StringInputDialog()
+    : ParamName("input_data"), Checker(nullptr) {
   create();
-
-  adjustSize();
-  setFixedHeight(size().height());
 }
 
-StringInputDialog::~StringInputDialog() {}
+StringInputDialog::StringInputDialog(const QString& paramName)
+    : ParamName(paramName), Checker(nullptr) {
+  create();
+}
+
+StringInputDialog::StringInputDialog(const QString& paramName,
+                                     AbstractStringChecker* checker)
+    : ParamName(paramName), Checker(checker) {
+  create();
+}
 
 void StringInputDialog::getData(StringDictionary& data) const {
   data.insert(ParamName, InputData->text());
@@ -27,9 +30,10 @@ void StringInputDialog::accept() {
     return;
   }
 
-  if (!(*Checker)(InputData->text().toStdString())) {
+  if (!(*Checker)(InputData->text())) {
     QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
                           QMessageBox::Ok);
+    return;
   }
 
   QDialog::accept();
@@ -44,6 +48,8 @@ void StringInputDialog::setChecker(AbstractStringChecker* checker) {
 }
 
 void StringInputDialog::create() {
+  setWindowTitle("Ввод данных");
+
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
@@ -63,4 +69,7 @@ void StringInputDialog::create() {
   RejectButton = new QPushButton("Отмена");
   ButtonLayout->addWidget(RejectButton);
   connect(RejectButton, &QPushButton::clicked, this, &QDialog::reject);
+
+  adjustSize();
+  setFixedHeight(size().height());
 }

@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class ProductionLineCreationDialog : public AbstractInputDialog {
+class ProductionLineCreationDialog final : public AbstractInputDialog {
   Q_OBJECT
 
  private:
@@ -30,9 +30,10 @@ class ProductionLineCreationDialog : public AbstractInputDialog {
   QSpacerItem* VerticalSpacer;
 
  public:
-  explicit ProductionLineCreationDialog(QWidget* parent = nullptr);
-  ~ProductionLineCreationDialog();
+  explicit ProductionLineCreationDialog();
+  ~ProductionLineCreationDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 

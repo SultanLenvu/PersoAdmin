@@ -36,9 +36,7 @@ add_executable(PersoAdmin WIN32
     Service/General/definitions.h
     Service/General/sql_response_model.cpp Service/General/sql_response_model.h
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
-
     Service/General/global_environment.cpp Service/General/global_environment.h
-
     Service/General/named_object_factory.h Service/General/named_object_factory.cpp
 
     Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
@@ -54,6 +52,7 @@ add_executable(PersoAdmin WIN32
     Service/Functors/abstract_string_checker.h Service/Functors/abstract_string_checker.cpp
     Service/Functors/ucid_checker.h Service/Functors/ucid_checker.cpp
     Service/Functors/numeric_string_checker.h Service/Functors/numeric_string_checker.cpp
+    Service/Functors/pan_checker.h Service/Functors/pan_checker.cpp
 
     Service/Log/file_log_backend.cpp Service/Log/file_log_backend.h
     Service/Log/abstract_log_backend.cpp Service/Log/abstract_log_backend.h
@@ -72,10 +71,9 @@ add_executable(PersoAdmin WIN32
     GUI/mainwindow_gui.cpp GUI/mainwindow_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
-    GUI/Subkernels/response_ready_connection.h GUI/Subkernels/response_ready_connection.cpp
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/order_gui_subkernel.h GUI/Subkernels/order_gui_subkernel.cpp
-    GUI/Subkernels/server_gui_subkernel.h GUI/Subkernels/server_gui_subkernel.cpp
+    GUI/Subkernels/server_connection_gui_subkernel.h GUI/Subkernels/server_connection_gui_subkernel.cpp
     GUI/Subkernels/production_line_gui_subkernel.h GUI/Subkernels/production_line_gui_subkernel.cpp
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
@@ -93,6 +91,7 @@ add_executable(PersoAdmin WIN32
     GUI/Dialogs/settings_dialog.h GUI/Dialogs/settings_dialog.cpp
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
+    GUI/Dialogs/confirm_transponder_rerelease_input_dialog.h GUI/Dialogs/confirm_transponder_rerelease_input_dialog.cpp
 
     GUI/Widgets/abstract_user_interface.h GUI/Widgets/abstract_user_interface.cpp
     GUI/Widgets/order_user_interface.h GUI/Widgets/order_user_interface.cpp
@@ -103,10 +102,8 @@ add_executable(PersoAdmin WIN32
 
     GUI/Reactions/i_progress_indicator.h GUI/Reactions/i_progress_indicator.cpp
     GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
-    GUI/Reactions/progress_indicator_link.h GUI/Reactions/progress_indicator_link.cpp
     GUI/Reactions/i_status_indicator.h GUI/Reactions/i_status_indicator.cpp
     GUI/Reactions/status_indicator.h GUI/Reactions/status_indicator.cpp
-    GUI/Reactions/status_indicator_link.h GUI/Reactions/status_indicator_link.cpp
 
     Management/Managers/i_manager.h Management/Managers/i_manager.cpp
     Management/Managers/order_manager.h Management/Managers/order_manager.cpp

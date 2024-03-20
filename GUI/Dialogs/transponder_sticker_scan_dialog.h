@@ -5,7 +5,7 @@
 
 #include "abstract_input_dialog.h"
 
-class TransponderStickerScanDialog : public AbstractInputDialog {
+class TransponderStickerScanDialog final : public AbstractInputDialog {
   Q_OBJECT
 
  private:
@@ -25,8 +25,8 @@ class TransponderStickerScanDialog : public AbstractInputDialog {
   QRegularExpression Regex;
 
  public:
-  explicit TransponderStickerScanDialog(QWidget* parent);
-  ~TransponderStickerScanDialog();
+  explicit TransponderStickerScanDialog();
+  ~TransponderStickerScanDialog() = default;
 
   // AbstractInputDialog interface
  public:

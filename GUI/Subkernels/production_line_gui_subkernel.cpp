@@ -17,7 +17,7 @@ SqlResponseModel* ProductionLineGuiSubkernel::productionLines() {
 }
 
 void ProductionLineGuiSubkernel::create() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   ProductionLineCreationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -30,7 +30,7 @@ void ProductionLineGuiSubkernel::create() {
 }
 
 void ProductionLineGuiSubkernel::activate() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -48,7 +48,7 @@ void ProductionLineGuiSubkernel::activateAll() {
 }
 
 void ProductionLineGuiSubkernel::deactivate() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -83,11 +83,12 @@ void ProductionLineGuiSubkernel::displayResponse(
 
 void ProductionLineGuiSubkernel::connectDependecies() {
   ProductionLineManagerAsyncWrapper* om =
-      static_cast<ProductionLineManagerAsyncWrapper*>(
-          GlobalEnvironment::instance()->getObject(
-              "ProductionLineManagerAsyncWrapper"));
-  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
+      GlobalEnvironment::instance()
+          ->getObject<ProductionLineManagerAsyncWrapper>(
+              "ProductionLineManagerAsyncWrapper");
+  const DatabaseAsyncWrapper* dm =
+      GlobalEnvironment::instance()->getObject<DatabaseAsyncWrapper>(
+          "DatabaseAsyncWrapper");
 
   // К менеджерам
   connect(this, &ProductionLineGuiSubkernel::create_signal, om,

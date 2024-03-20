@@ -11,7 +11,7 @@ StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
 StickerPrinterGuiSubkernel::~StickerPrinterGuiSubkernel() {}
 
 void StickerPrinterGuiSubkernel::printTransponderSticker() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -24,7 +24,7 @@ void StickerPrinterGuiSubkernel::printTransponderSticker() {
 }
 
 void StickerPrinterGuiSubkernel::printBoxSticker() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -37,7 +37,7 @@ void StickerPrinterGuiSubkernel::printBoxSticker() {
 }
 
 void StickerPrinterGuiSubkernel::printPalletSticker() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -57,9 +57,9 @@ void StickerPrinterGuiSubkernel::execCommandScript(
 
 void StickerPrinterGuiSubkernel::connectDependecies() {
   const StickerPrinterAsyncWrapper* spm =
-      static_cast<const StickerPrinterAsyncWrapper*>(
-          GlobalEnvironment::instance()->getObject(
-              "StickerPrinterAsyncWrapper"));
+      GlobalEnvironment::instance()
+          ->getObject<const StickerPrinterAsyncWrapper>(
+              "StickerPrinterAsyncWrapper");
 
   connect(this, &StickerPrinterGuiSubkernel::printTransponderSticker_signal,
           spm, &StickerPrinterAsyncWrapper::printTransponderSticker);

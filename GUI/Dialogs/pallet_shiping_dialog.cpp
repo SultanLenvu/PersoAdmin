@@ -1,7 +1,6 @@
 #include "pallet_shiping_dialog.h"
 
-PalletShippingDialog::PalletShippingDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+PalletShippingDialog::PalletShippingDialog() {
   setObjectName("PalletShippingDialog");
 
   setWindowTitle("Отгрузка");
@@ -14,8 +13,6 @@ PalletShippingDialog::PalletShippingDialog(QWidget* parent)
   adjustSize();
   setFixedHeight(size().height());
 }
-
-PalletShippingDialog::~PalletShippingDialog() {}
 
 void PalletShippingDialog::getData(StringDictionary& data) const {
   data.insert("first_pallet_id", FirstPalletId->text());

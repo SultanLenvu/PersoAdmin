@@ -3,13 +3,16 @@
 
 #include "abstract_string_checker.h"
 
-class UcidChecker : public AbstractStringChecker {
+class UcidChecker final : public AbstractStringChecker {
  public:
-  UcidChecker();
-  ~UcidChecker();
+  UcidChecker() = default;
+  ~UcidChecker() = default;
 
  public:
-  virtual bool operator()(const std::string&) const override;
+  virtual bool operator()(const QString&) const override;
+
+ private:
+  Q_DISABLE_COPY_MOVE(UcidChecker)
 };
 
 #endif // UCIDCHECKER_H

@@ -1,7 +1,7 @@
 #include "pan_input_dialog.h"
 #include "General/definitions.h"
 
-PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
+PanInputDialog::PanInputDialog() : AbstractInputDialog() {
   setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
@@ -17,8 +17,6 @@ PanInputDialog::PanInputDialog(QWidget* parent) : AbstractInputDialog(parent) {
   adjustSize();
   setFixedHeight(size().height());
 }
-
-PanInputDialog::~PanInputDialog() {}
 
 void PanInputDialog::getData(StringDictionary& data) const {
   QString pan;

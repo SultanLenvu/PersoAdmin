@@ -8,7 +8,7 @@
 
 #include "abstract_input_dialog.h"
 
-class PanInputDialog : public AbstractInputDialog {
+class PanInputDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -23,9 +23,10 @@ class PanInputDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit PanInputDialog(QWidget* parent);
-  ~PanInputDialog();
+  explicit PanInputDialog();
+  ~PanInputDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 

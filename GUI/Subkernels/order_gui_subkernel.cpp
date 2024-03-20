@@ -19,7 +19,7 @@ SqlResponseModel& OrderGuiSubkernel::orders() {
 }
 
 void OrderGuiSubkernel::create() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   OrderCreationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -32,7 +32,7 @@ void OrderGuiSubkernel::create() {
 }
 
 void OrderGuiSubkernel::startAssembling() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
 
@@ -46,7 +46,7 @@ void OrderGuiSubkernel::startAssembling() {
 }
 
 void OrderGuiSubkernel::stopAssembling() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
@@ -64,7 +64,7 @@ void OrderGuiSubkernel::get() {
 }
 
 void OrderGuiSubkernel::release() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary());
+  StringDictionary& param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -77,7 +77,7 @@ void OrderGuiSubkernel::release() {
 }
 
 void OrderGuiSubkernel::refund() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary());
+  StringDictionary& param(new StringDictionary());
 
   ManualReleaseRefundDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -90,7 +90,7 @@ void OrderGuiSubkernel::refund() {
 }
 
 void OrderGuiSubkernel::generateShipmentRegister() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary());
+  StringDictionary& param(new StringDictionary());
 
   PalletShippingDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -113,7 +113,7 @@ void OrderGuiSubkernel::initIssuers() {
 }
 
 void OrderGuiSubkernel::linkIssuerWithKeys() {
-  std::shared_ptr<StringDictionary> param(new StringDictionary);
+  StringDictionary& param(new StringDictionary);
 
   LinkIssuerKeyDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
@@ -132,10 +132,11 @@ void OrderGuiSubkernel::displayResponse(
 
 void OrderGuiSubkernel::connectDependecies() {
   const OrderManagerAsyncWrapper* om =
-      static_cast<const OrderManagerAsyncWrapper*>(
-          GlobalEnvironment::instance()->getObject("OrderManagerAsyncWrapper"));
-  const DatabaseAsyncWrapper* dm = static_cast<const DatabaseAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
+      GlobalEnvironment::instance()->getObject<const OrderManagerAsyncWrapper>(
+          "OrderManagerAsyncWrapper");
+  const DatabaseAsyncWrapper* dm =
+      GlobalEnvironment::instance()->getObject<const DatabaseAsyncWrapper>(
+          "DatabaseAsyncWrapper");
 
   // К менеджерам
   connect(this, &OrderGuiSubkernel::create_signal, om,

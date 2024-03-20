@@ -2,16 +2,16 @@
 #define PROGRESSABLEASYNCWRAPPER_H
 
 #include "i_async_wrapper.h"
-#include "progress_indicator_link.h"
-#include "status_indicator_link.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class ProgressableAsyncWrapper : public IAsyncWrapper {
- private:
-  StatusIndicatorLink SIL;
-  ProgressIndicatorLink PIB;
+class ProgressableAsyncWrapper : public NamedObject,
+                                 public IAsyncWrapper,
+                                 public LoggableObject {
+  Q_OBJECT
 
  public:
-  explicit ProgressableAsyncWrapper() = default;
+  explicit ProgressableAsyncWrapper(const QString& name);
   virtual ~ProgressableAsyncWrapper() = default;
 
  protected:
@@ -21,6 +21,12 @@ class ProgressableAsyncWrapper : public IAsyncWrapper {
 
  private:
   Q_DISABLE_COPY_MOVE(ProgressableAsyncWrapper)
+  void connectDependecies(void);
+
+ signals:
+  void returnStatusReady(ReturnStatus ret);
+  void executionStarted(const QString& name);
+  void executionFinished(const QString& name);
 };
 
 #endif // PROGRESSABLEASYNCWRAPPER_H

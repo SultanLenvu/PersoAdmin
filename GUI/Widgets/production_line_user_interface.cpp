@@ -62,8 +62,9 @@ void ProductionLineUserInterface::createDataDisplayGroup() {
 }
 
 void ProductionLineUserInterface::connectDependencies() {
-  ProductionLineGuiSubkernel* pls = static_cast<ProductionLineGuiSubkernel*>(
-      GlobalEnvironment::instance()->getObject("ProductionLineGuiSubkernel"));
+  ProductionLineGuiSubkernel* pls =
+      GlobalEnvironment::instance()->getObject<ProductionLineGuiSubkernel>(
+          "ProductionLineGuiSubkernel");
 
   connect(CreatePushButton, &QPushButton::clicked, pls,
           &ProductionLineGuiSubkernel::create);

@@ -40,18 +40,18 @@ class OrderGuiSubkernel final : public AbstractGuiSubkernel {
   void connectDependecies(void);
 
  signals:
-  void create_signal(const std::shared_ptr<StringDictionary> param);
-  void startAssembling_signal(const std::shared_ptr<StringDictionary> param);
-  void stopAssembling_signal(const std::shared_ptr<StringDictionary> param);
+  void create_signal(const StringDictionary& param);
+  void startAssembling_signal(const StringDictionary& param);
+  void stopAssembling_signal(const StringDictionary& param);
   void get_signal(const QString& name);
 
-  void release_signal(const std::shared_ptr<StringDictionary> param);
-  void refund_signal(const std::shared_ptr<StringDictionary> param);
-  void shipPallets_signal(const std::shared_ptr<StringDictionary> param);
+  void release_signal(const StringDictionary& param);
+  void refund_signal(const StringDictionary& param);
+  void shipPallets_signal(const StringDictionary& param);
 
   void initTransportMasterKeys_signal(void);
   void initIssuers_signal(void);
-  void linkIssuerWithKeys_signal(const std::shared_ptr<StringDictionary> param);
+  void linkIssuerWithKeys_signal(const StringDictionary& param);
 };
 
 #endif // ORDERGUISUBKERNEL_H

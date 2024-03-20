@@ -221,8 +221,9 @@ void SettingsDialog::create() {
 }
 
 void SettingsDialog::connectDependencies() {
-  ConfigurationSystem* cum = static_cast<ConfigurationSystem*>(
-      GlobalEnvironment::instance()->getObject("ConfigurationSystem"));
+  ConfigurationSystem* cum =
+      GlobalEnvironment::instance()->getObject<ConfigurationSystem>(
+          "ConfigurationSystem");
 
   connect(this, &SettingsDialog::applyNewSettings, cum,
           &ConfigurationSystem::applySettings_signal);

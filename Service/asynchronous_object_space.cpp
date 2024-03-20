@@ -1,5 +1,5 @@
 #include "asynchronous_object_space.h"
-
+#include "assembly_unit_manager_async_wrapper.h"
 #include "database_async_wrapper.h"
 #include "named_object_factory.h"
 #include "order_manager_async_wrapper.h"
@@ -31,6 +31,8 @@ void AsyncObjectSpace::createWrappers() {
   Managers.emplace_back(std::move(daw));
   Managers.emplace_back(factory.create<ServerConnectionAsyncWrapper>(
       "ServerConnectionAsyncWrapper"));
+  Managers.emplace_back(factory.create<AssemblyUnitManagerAsyncWrapper>(
+      "AssemblyUnitManagerAsyncWrapper"));
   Managers.emplace_back(
       factory.create<ProgrammerAsyncWrapper>("ProgrammerAsyncWrapper"));
   Managers.emplace_back(

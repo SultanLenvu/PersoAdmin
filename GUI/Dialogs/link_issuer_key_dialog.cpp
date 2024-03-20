@@ -1,7 +1,6 @@
 #include "link_issuer_key_dialog.h"
 
-LinkIssuerKeyDialog::LinkIssuerKeyDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+LinkIssuerKeyDialog::LinkIssuerKeyDialog() {
   setObjectName("LinkIssuerKeyDialog");
 
   // Считываем размеры дисплея
@@ -19,8 +18,6 @@ LinkIssuerKeyDialog::LinkIssuerKeyDialog(QWidget* parent)
 
   initMatchTable();
 }
-
-LinkIssuerKeyDialog::~LinkIssuerKeyDialog() {}
 
 void LinkIssuerKeyDialog::getData(StringDictionary& data) const {
   data.insert("issuer_id", IssuerIdLineEdit->text());

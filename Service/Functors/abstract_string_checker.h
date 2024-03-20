@@ -1,15 +1,18 @@
 #ifndef ABSTRACTCHECKER_H
 #define ABSTRACTCHECKER_H
 
-#include <string>
+#include <QString>
 
 class AbstractStringChecker {
  public:
-  AbstractStringChecker();
-  virtual ~AbstractStringChecker();
+  explicit AbstractStringChecker() = default;
+  virtual ~AbstractStringChecker() = default;
 
  public:
-  virtual bool operator()(const std::string&) const = 0;
+  virtual bool operator()(const QString&) const = 0;
+
+ private:
+  Q_DISABLE_COPY_MOVE(AbstractStringChecker)
 };
 
 #endif // ABSTRACTCHECKER_H

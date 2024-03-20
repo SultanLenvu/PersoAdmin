@@ -2,13 +2,9 @@
 #define STICKERPRINTERMANAGER_H
 
 #include "i_sticker_printer.h"
-#include "loggable_object.h"
-#include "named_object.h"
 #include "progressable_async_wrapper.h"
 
-class StickerPrinterAsyncWrapper final : public NamedObject,
-                                         public ProgressableAsyncWrapper,
-                                         public LoggableObject {
+class StickerPrinterAsyncWrapper final : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
   std::unique_ptr<IStickerPrinter> StickerPrinter;
@@ -19,9 +15,9 @@ class StickerPrinterAsyncWrapper final : public NamedObject,
 
   // Own
  public slots:
-  void printTransponderSticker(const std::shared_ptr<StringDictionary> param);
-  void printBoxSticker(const std::shared_ptr<StringDictionary> param);
-  void printPalletSticker(const std::shared_ptr<StringDictionary> param);
+  void printTransponderSticker(const StringDictionary& param);
+  void printBoxSticker(const StringDictionary& param);
+  void printPalletSticker(const StringDictionary& param);
   void execCommandScript(const std::shared_ptr<QStringList> script);
 
  private:

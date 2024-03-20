@@ -21,8 +21,8 @@ void ConfigurationSystem::init() {
 }
 
 void ConfigurationSystem::registerMetaTypes() {
-  qRegisterMetaType<std::shared_ptr<StringDictionary>>(
-      "std::shared_ptr<StringDictionary>");
+  qRegisterMetaType<StringDictionary&>(
+      "StringDictionary&");
   qRegisterMetaType<std::shared_ptr<QStringList>>(
       "std::shared_ptr<QStringList>");
   qRegisterMetaType<ReturnStatus>("ReturnStatus");

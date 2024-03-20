@@ -6,7 +6,7 @@
 
 #include "abstract_input_dialog.h"
 
-class PalletShippingDialog : public AbstractInputDialog {
+class PalletShippingDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -24,8 +24,8 @@ class PalletShippingDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit PalletShippingDialog(QWidget* parent = nullptr);
-  ~PalletShippingDialog();
+  explicit PalletShippingDialog();
+  ~PalletShippingDialog() = default;
 
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;

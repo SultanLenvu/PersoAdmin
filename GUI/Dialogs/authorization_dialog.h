@@ -6,7 +6,7 @@
 
 #include "abstract_input_dialog.h"
 
-class AuthorizationDialog : public AbstractInputDialog {
+class AuthorizationDialog final : public AbstractInputDialog {
   Q_OBJECT
 
  private:
@@ -28,8 +28,8 @@ class AuthorizationDialog : public AbstractInputDialog {
   QSpacerItem* MainLayoutVS;
 
  public:
-  explicit AuthorizationDialog(QWidget* parent = nullptr);
-  ~AuthorizationDialog();
+  explicit AuthorizationDialog();
+  ~AuthorizationDialog() = default;
 
   // AbstractInputDialog interface
  public:

@@ -8,21 +8,20 @@ class ServerUserInterface final : public AbstractUserInterface {
 
  private:
   QHBoxLayout* MainLayout;
+  QVBoxLayout* SubLayout;
 
-  // Панель управления
-  QGroupBox* ControlPanel;
-  QVBoxLayout* ControlPanelLayout;
-
+ private:  // Одиночные команды
   QGroupBox* RawCommandGroup;
   QVBoxLayout* RawCommandLayout;
   QComboBox* CommandComboBox;
   QPushButton* ExecuteCommandButton;
 
+ private:  // Команды сборочного юнита
+  QGroupBox* ControlPanel;
+  QVBoxLayout* ControlPanelLayout;
+
   QGroupBox* InitGroup;
   QVBoxLayout* InitGroupLayout;
-  QPushButton* ConnectPushButton;
-  QPushButton* DisconnectPushButton;
-  QPushButton* EchoPushButton;
   QPushButton* LogOnPushButton;
   QPushButton* LogOutPushButton;
 
@@ -30,12 +29,10 @@ class ServerUserInterface final : public AbstractUserInterface {
   QVBoxLayout* ProductionLineGroupLayout;
   QPushButton* LaunchProductionLinePushButton;
   QPushButton* ShutdownProductionLinePushButton;
-  QPushButton* GetProductionLineDataPushButton;
 
   QGroupBox* BoxGroup;
   QVBoxLayout* BoxGroupLayout;
   QPushButton* RequestBoxPushButton;
-  QPushButton* GetCurrentBoxDataPushButton;
   QPushButton* RefundBoxPushButton;
   QPushButton* CompleteCurrentBoxPushButton;
 
@@ -44,19 +41,10 @@ class ServerUserInterface final : public AbstractUserInterface {
   QPushButton* ReleaseTransponderPushButton;
   QPushButton* RereleaseTransponderPushButton;
   QPushButton* RollbackTransponderPushButton;
-  QPushButton* GetCurrentTransponderDataPushButton;
-  QPushButton* GetTransponderDataPushButton;
-
-  QGroupBox* PrintingGroup;
-  QVBoxLayout* PrintingGroupLayout;
-  QPushButton* PrintBoxStickerOnServerPushButton;
-  QPushButton* PrintLastBoxStickerOnServerPushButton;
-  QPushButton* PrintPalletStickerOnServerPushButton;
-  QPushButton* PrintLastPalletStickerOnServerPushButton;
 
   QSpacerItem* ControlPanelVS;
 
-  // Отображение данных
+ private:  // Отображение данных
   QGroupBox* DataDisplayPanel;
   QGridLayout* DataDisplayLayout;
 
@@ -72,17 +60,16 @@ class ServerUserInterface final : public AbstractUserInterface {
   QVBoxLayout* TransponderDataLayout;
   QTableView* TransponderDataView;
 
-  QGroupBox* AssembledFirmwareGroup;
-  QVBoxLayout* AssembledFirmwareLayout;
-  QPlainTextEdit* AssembledFirmwareView;
+  QGroupBox* FirmwareGroup;
+  QVBoxLayout* FirmwareLayout;
+  QListView* FirmwareView;
 
  public:
   explicit ServerUserInterface(QWidget* parent = nullptr);
   ~ServerUserInterface() = default;
 
  private:
-  void create(void);
-
+  void createWidgets(void);
   void createControlPanel(void);
   void createRawCommandGroup(void);
   void createInitGroup(void);
@@ -90,7 +77,6 @@ class ServerUserInterface final : public AbstractUserInterface {
   void createBoxGroup(void);
   void createTransponderGroup(void);
   void createPrintingGroup(void);
-
   void createDataDisplayPanel(void);
 
   void connectDependencies(void);

@@ -76,8 +76,9 @@ void DatabaseUserInterface::createDataDisplayGroup() {
 }
 
 void DatabaseUserInterface::connectDependecies() {
-  DatabaseGuiSubkernel* dui = static_cast<DatabaseGuiSubkernel*>(
-      GlobalEnvironment::instance()->getObject("DatabaseGuiSubkernel"));
+  DatabaseGuiSubkernel* dui =
+      GlobalEnvironment::instance()->getObject<DatabaseGuiSubkernel>(
+          "DatabaseGuiSubkernel");
 
   connect(ConnectPushButton, &QPushButton::clicked, dui,
           &DatabaseGuiSubkernel::connect);

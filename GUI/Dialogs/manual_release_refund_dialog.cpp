@@ -1,7 +1,6 @@
 #include "manual_release_refund_dialog.h"
 
-ManualReleaseRefundDialog::ManualReleaseRefundDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+ManualReleaseRefundDialog::ManualReleaseRefundDialog() {
   setObjectName("ManualReleaseRefundDialog");
 
   // Считываем размеры дисплея
@@ -19,8 +18,6 @@ ManualReleaseRefundDialog::ManualReleaseRefundDialog(QWidget* parent)
 
   initMatchTable();
 }
-
-ManualReleaseRefundDialog::~ManualReleaseRefundDialog() {}
 
 void ManualReleaseRefundDialog::getData(StringDictionary& data) const {
   data.insert("table", MatchingTable.value(UnitChoiceComboBox->currentText()));

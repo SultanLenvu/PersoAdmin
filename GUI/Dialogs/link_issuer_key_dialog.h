@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class LinkIssuerKeyDialog : public AbstractInputDialog {
+class LinkIssuerKeyDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -24,9 +24,10 @@ class LinkIssuerKeyDialog : public AbstractInputDialog {
   StringDictionary MatchingTable;
 
  public:
-  explicit LinkIssuerKeyDialog(QWidget* parent = nullptr);
-  ~LinkIssuerKeyDialog();
+  explicit LinkIssuerKeyDialog();
+  ~LinkIssuerKeyDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 

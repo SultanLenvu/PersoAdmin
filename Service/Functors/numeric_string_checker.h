@@ -5,11 +5,14 @@
 
 class NumericStringChecker final : public AbstractStringChecker {
  public:
-  NumericStringChecker();
-  ~NumericStringChecker();
+  explicit NumericStringChecker() = default;
+  ~NumericStringChecker() = default;
 
  public:
-  virtual bool operator()(const std::string&) const override;
+  virtual bool operator()(const QString&) const override;
+
+ private:
+  Q_DISABLE_COPY_MOVE(NumericStringChecker)
 };
 
 #endif // NUMERICSTRINGCHECKER_H

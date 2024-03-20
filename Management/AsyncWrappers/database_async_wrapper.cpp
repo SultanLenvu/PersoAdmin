@@ -2,14 +2,9 @@
 #include "postgre_sql_database.h"
 #include "sql_query_values.h"
 
-#include "response_ready_connection.h"
-
 DatabaseAsyncWrapper::DatabaseAsyncWrapper(const QString& name)
-    : NamedObject(name),
-      LoggableObject(name),
+    : ProgressableAsyncWrapper(name),
       Database(new PostgreSqlDatabase("PostgreSqlDatabase")) {}
-
-DatabaseAsyncWrapper::~DatabaseAsyncWrapper() {}
 
 std::shared_ptr<ISqlDatabase> DatabaseAsyncWrapper::database() {
   return Database;
@@ -88,10 +83,10 @@ void DatabaseAsyncWrapper::execCustomRequest(const QString& req) {
 }
 
 void DatabaseAsyncWrapper::getTransponderData(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("getTransponderData");
 
-  std::shared_ptr<StringDictionary> data(new StringDictionary());
+  StringDictionary& data(new StringDictionary());
 
   if (!generateTransponderData((*param)["id"], *data)) {
     processOperationError("getTransponderData",
@@ -104,10 +99,10 @@ void DatabaseAsyncWrapper::getTransponderData(
 }
 
 void DatabaseAsyncWrapper::getBoxData(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("getBoxData");
 
-  std::shared_ptr<StringDictionary> data(new StringDictionary());
+  StringDictionary& data(new StringDictionary());
 
   if (!generateBoxData((*param)["id"], *data)) {
     processOperationError("getBoxData", ReturnStatus::DatabaseTransactionError);
@@ -119,10 +114,10 @@ void DatabaseAsyncWrapper::getBoxData(
 }
 
 void DatabaseAsyncWrapper::getPalletData(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("getPalletData");
 
-  std::shared_ptr<StringDictionary> data(new StringDictionary());
+  StringDictionary& data(new StringDictionary());
 
   if (!generatePalletData((*param)["id"], *data)) {
     processOperationError("getPalletData",

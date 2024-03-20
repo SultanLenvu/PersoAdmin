@@ -1,17 +1,22 @@
 #ifndef ASSEMBLYUNITMANAGER_H
 #define ASSEMBLYUNITMANAGER_H
 
+#include "i_server_connection.h"
+#include "loggable_object.h"
 #include "named_object.h"
 #include "types.h"
 
-class AssemblyUnitManager : public NamedObject {
+class AssemblyUnitManager : public NamedObject, public LoggableObject {
   Q_OBJECT
+ private:
+  std::shared_ptr<IServerConnection> Server;
+
  public:
   explicit AssemblyUnitManager(const QString& name);
   ~AssemblyUnitManager() = default;
 
  public:
-  ReturnStatus logOn(const QString& param);
+  ReturnStatus logOn(const StringDictionary& param);
   ReturnStatus logOut(void);
 
   ReturnStatus requestBox(void);
@@ -19,19 +24,18 @@ class AssemblyUnitManager : public NamedObject {
   ReturnStatus completeCurrentBox(void);
 
   ReturnStatus releaseTransponder(void);
-  ReturnStatus rereleaseTransponder(const QString& param);
+  ReturnStatus rereleaseTransponder(const StringDictionary& param);
   ReturnStatus rollbackTransponder(void);
 
  private:
   Q_DISABLE_COPY_MOVE(AssemblyUnitManager)
-
   void connectDependecies(void);
 
  signals:
-  void productionLineDataReady(const std::shared_ptr<StringDictionary> data);
-  void transponderDataReady(const std::shared_ptr<StringDictionary> data);
-  void boxDataReady(const std::shared_ptr<StringDictionary> data);
-  void firwareReady(const std::shared_ptr<QByteArray> firmware);
+  void productionLineDataReady(const StringDictionary& data);
+  void transponderDataReady(const StringDictionary& data);
+  void boxDataReady(const StringDictionary& data);
+  void firwareReady(const QStringList firmware);
 
   void authorizationCompleted(void);
 

@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class ManualReleaseRefundDialog : public AbstractInputDialog {
+class ManualReleaseRefundDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -23,9 +23,10 @@ class ManualReleaseRefundDialog : public AbstractInputDialog {
   StringDictionary MatchingTable;
 
  public:
-  explicit ManualReleaseRefundDialog(QWidget* parent = nullptr);
-  ~ManualReleaseRefundDialog();
+  explicit ManualReleaseRefundDialog();
+  ~ManualReleaseRefundDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;
 

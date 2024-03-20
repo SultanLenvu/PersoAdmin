@@ -1,7 +1,6 @@
 #include "authorization_dialog.h"
 
-AuthorizationDialog::AuthorizationDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+AuthorizationDialog::AuthorizationDialog() {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
@@ -12,8 +11,6 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent)
   adjustSize();
   setFixedSize(size());
 }
-
-AuthorizationDialog::~AuthorizationDialog() {}
 
 AbstractInputDialog::InputDialogType AuthorizationDialog::type() const {
   return Authorization;

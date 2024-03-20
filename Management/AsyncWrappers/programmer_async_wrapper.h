@@ -2,13 +2,9 @@
 #define PROGRAMMERASYNCWRAPPER_H
 
 #include "i_async_wrapper.h"
-#include "loggable_object.h"
-#include "named_object.h"
 #include "progressable_async_wrapper.h"
 
-class ProgrammerAsyncWrapper : public NamedObject,
-                               public ProgressableAsyncWrapper,
-                               public LoggableObject {
+class ProgrammerAsyncWrapper : public ProgressableAsyncWrapper {
  public:
   Q_INVOKABLE explicit ProgrammerAsyncWrapper(const QString& name);
   ~ProgrammerAsyncWrapper();

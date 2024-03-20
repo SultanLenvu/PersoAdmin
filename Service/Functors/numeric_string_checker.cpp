@@ -1,15 +1,10 @@
 #include "numeric_string_checker.h"
 
-#include <regex>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
-NumericStringChecker::NumericStringChecker()
-{
-  
-}
-
-NumericStringChecker::~NumericStringChecker() {}
-
-bool NumericStringChecker::operator()(const std::string& str) const {
-  std::regex pattern("[0-9]+");
-  return std::regex_match(str, pattern);
+bool NumericStringChecker::operator()(const QString& str) const {
+  static QRegularExpression regex(R"("[0-9]+")");
+  QRegularExpressionMatch match = regex.match(str);
+  return match.hasMatch();
 }

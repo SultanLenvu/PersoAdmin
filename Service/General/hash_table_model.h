@@ -10,17 +10,17 @@
 
 class HashTableModel : public QAbstractTableModel {
  private:
-  std::shared_ptr<StringDictionary> MatchTable;
+  StringDictionary MatchTable;
 
-  std::unordered_map<int, QString> Converter;
-  std::shared_ptr<StringDictionary> Data;
+  QHash<int, QString> Converter;
+  StringDictionary Data;
 
  public:
   HashTableModel();
   ~HashTableModel();
 
-  void setData(std::shared_ptr<StringDictionary> match);
-  void setMatchTable(std::shared_ptr<StringDictionary> match);
+  void setData(const StringDictionary& match);
+  void setMatchTable(const StringDictionary& match);
   void clear(void);
   bool isEmpty(void) const;
 

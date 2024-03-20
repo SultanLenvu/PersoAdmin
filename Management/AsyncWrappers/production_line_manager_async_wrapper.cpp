@@ -3,14 +3,13 @@
 ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(
     const QString& name,
     std::shared_ptr<ISqlDatabase> database)
-    : NamedObject{name},
-      LoggableObject(name),
+    : ProgressableAsyncWrapper{name},
       Manager(new ProductionLineManager("ProductionLineManager", database)) {}
 
 ProductionLineManagerAsyncWrapper::~ProductionLineManagerAsyncWrapper() {}
 
 void ProductionLineManagerAsyncWrapper::create(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("create");
 
@@ -24,7 +23,7 @@ void ProductionLineManagerAsyncWrapper::create(
 }
 
 void ProductionLineManagerAsyncWrapper::activate(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("activate");
 
@@ -51,7 +50,7 @@ void ProductionLineManagerAsyncWrapper::activateAll() {
 }
 
 void ProductionLineManagerAsyncWrapper::deactivate(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("deactivate");
 
@@ -78,7 +77,7 @@ void ProductionLineManagerAsyncWrapper::deactivateAll() {
 }
 
 void ProductionLineManagerAsyncWrapper::edit(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("edit");
 
@@ -92,7 +91,7 @@ void ProductionLineManagerAsyncWrapper::edit(
 }
 
 void ProductionLineManagerAsyncWrapper::remove(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("remove");
 

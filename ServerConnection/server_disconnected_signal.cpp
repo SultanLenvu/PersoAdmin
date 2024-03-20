@@ -3,8 +3,10 @@
 #include "server_connection_async_wrapper.h"
 
 ServerDisconnectionSignal::ServerDisconnectionSignal() {
-  ServerConnectionAsyncWrapper* psaw = static_cast<ServerConnectionAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("ServerConnectionAsyncWrapper"));
+  const ServerConnectionAsyncWrapper* psaw =
+      GlobalEnvironment::instance()
+          ->getObject<const ServerConnectionAsyncWrapper>(
+              "ServerConnectionAsyncWrapper");
 
   QObject::connect(this, &ServerDisconnectionSignal::signal, psaw,
                    &ServerConnectionAsyncWrapper::onServerDisconnected);

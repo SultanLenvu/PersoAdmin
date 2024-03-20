@@ -33,12 +33,12 @@ class ProductionLineGuiSubkernel final : public AbstractGuiSubkernel {
   void connectDependecies(void);
 
  signals:
-  void create_signal(const std::shared_ptr<StringDictionary> param);
-  void activate_signal(const std::shared_ptr<StringDictionary> param);
+  void create_signal(const StringDictionary& param);
+  void activate_signal(const StringDictionary& param);
   void activateAll_signal(void);
-  void deactivate_signal(const std::shared_ptr<StringDictionary> param);
+  void deactivate_signal(const StringDictionary& param);
   void deactivateAll_signal(void);
-  void edit_signal(const std::shared_ptr<StringDictionary> param);
+  void edit_signal(const StringDictionary& param);
   void get_signal(const QString& name);
 };
 

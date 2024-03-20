@@ -20,13 +20,15 @@ class AbstractInputDialog : public QDialog {
     ManualReleaseRefund,
     TransponderStickerScan,
     Authorization,
+    ConfirmTransponderRerelease,
   };
   Q_ENUM(InputDialogType);
 
  public:
-  explicit AbstractInputDialog(QWidget* parent = nullptr);
-  virtual ~AbstractInputDialog();
+  explicit AbstractInputDialog() = default;
+  virtual ~AbstractInputDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const = 0;
   virtual InputDialogType type(void) const = 0;
 

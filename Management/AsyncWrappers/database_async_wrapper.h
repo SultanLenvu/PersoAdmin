@@ -2,21 +2,17 @@
 #define DATABASEMANAGER_H
 
 #include "i_sql_database.h"
-#include "loggable_object.h"
-#include "named_object.h"
 #include "progressable_async_wrapper.h"
 #include "types.h"
 
-class DatabaseAsyncWrapper final : public NamedObject,
-                                   public ProgressableAsyncWrapper,
-                                   public LoggableObject {
+class DatabaseAsyncWrapper final : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
   std::shared_ptr<ISqlDatabase> Database;
 
  public:
   Q_INVOKABLE explicit DatabaseAsyncWrapper(const QString& name);
-  ~DatabaseAsyncWrapper();
+  ~DatabaseAsyncWrapper() = default;
 
  public:
   std::shared_ptr<ISqlDatabase> database(void);
@@ -27,9 +23,9 @@ class DatabaseAsyncWrapper final : public NamedObject,
   void getTable(const QString& name);
   void execCustomRequest(const QString& req);
 
-  void getTransponderData(const std::shared_ptr<StringDictionary> param);
-  void getBoxData(const std::shared_ptr<StringDictionary> param);
-  void getPalletData(const std::shared_ptr<StringDictionary> param);
+  void getTransponderData(const StringDictionary& param);
+  void getBoxData(const StringDictionary& param);
+  void getPalletData(const StringDictionary& param);
 
  private:
   Q_DISABLE_COPY_MOVE(DatabaseAsyncWrapper)
@@ -39,7 +35,7 @@ class DatabaseAsyncWrapper final : public NamedObject,
   bool generatePalletData(const QString& id, StringDictionary& data);
 
  signals:
-  void dataReady(const std::shared_ptr<StringDictionary> data);
+  void dataReady(const StringDictionary& data);
   void responseReady(const std::shared_ptr<SqlQueryValues> response);
 };
 

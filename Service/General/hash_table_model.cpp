@@ -4,7 +4,7 @@ HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
 
 HashTableModel::~HashTableModel() {}
 
-void HashTableModel::setData(std::shared_ptr<StringDictionary> data) {
+void HashTableModel::setData(const StringDictionary& data) {
   beginResetModel();
 
   Data = data;
@@ -12,15 +12,14 @@ void HashTableModel::setData(std::shared_ptr<StringDictionary> data) {
   // Настраиваем конвертер
   Converter.clear();
   uint32_t i = 0;
-  for (auto itb = data->constBegin(), ite = data->constEnd(); itb != ite;
-       ++itb) {
+  for (auto itb = data.constBegin(), ite = data.constEnd(); itb != ite; ++itb) {
     Converter[i++] = itb.key();
   }
 
   endResetModel();
 }
 
-void HashTableModel::setMatchTable(std::shared_ptr<StringDictionary> match) {
+void HashTableModel::setMatchTable(const StringDictionary& match) {
   MatchTable = match;
 }
 
@@ -28,33 +27,21 @@ void HashTableModel::clear() {
   beginResetModel();
 
   Converter.clear();
-  Data.reset();
+  Data.clear();
 
   endResetModel();
 }
 
 bool HashTableModel::isEmpty() const {
-  if (!Data) {
-    return true;
-  }
-
   return false;
 }
 
 int HashTableModel::columnCount(const QModelIndex& parent) const {
-  if (!Data) {
-    return 0;
-  }
-
   return 1;
 }
 
 int HashTableModel::rowCount(const QModelIndex& parent) const {
-  if (!Data) {
-    return 0;
-  }
-
-  return Data->size();
+  return Data.size();
 }
 
 QVariant HashTableModel::data(const QModelIndex& index, int role) const {
@@ -62,7 +49,7 @@ QVariant HashTableModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  if (index.row() >= Data->size()) {
+  if (index.row() >= Data.size()) {
     return QVariant();
   }
 
@@ -70,7 +57,7 @@ QVariant HashTableModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  return Data->value(Converter.at(index.row()));
+  return Data.value(Converter[index.row()]);
 }
 
 QVariant HashTableModel::headerData(int section,
@@ -91,9 +78,9 @@ QVariant HashTableModel::headerData(int section,
     return QVariant();
   }
 
-  if (MatchTable) {
-    return MatchTable->value(Converter.at(section));
+  if (!MatchTable.isEmpty()) {
+    return MatchTable.value(Converter[section]);
   }
 
-  return Converter.at(section);
+  return Converter[section];
 }

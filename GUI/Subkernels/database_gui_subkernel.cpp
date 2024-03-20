@@ -44,8 +44,9 @@ void DatabaseGuiSubkernel::displayResponse(
 }
 
 void DatabaseGuiSubkernel::connectDependecies() {
-  DatabaseAsyncWrapper* dm = static_cast<DatabaseAsyncWrapper*>(
-      GlobalEnvironment::instance()->getObject("DatabaseAsyncWrapper"));
+  DatabaseAsyncWrapper* dm =
+      GlobalEnvironment::instance()->getObject<DatabaseAsyncWrapper>(
+          "DatabaseAsyncWrapper");
 
   // К менеджерам
   QObject::connect(this, &DatabaseGuiSubkernel::connect_signal, dm,

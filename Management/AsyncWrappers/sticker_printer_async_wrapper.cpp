@@ -2,7 +2,7 @@
 #include "te310_printer.h"
 
 StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
-    : NamedObject(name), LoggableObject(name) {
+    : ProgressableAsyncWrapper(name) {
   StickerPrinter =
       std::unique_ptr<IStickerPrinter>(new TE310Printer("TE310Printer"));
 }
@@ -10,7 +10,7 @@ StickerPrinterAsyncWrapper::StickerPrinterAsyncWrapper(const QString& name)
 StickerPrinterAsyncWrapper::~StickerPrinterAsyncWrapper() {}
 
 void StickerPrinterAsyncWrapper::printTransponderSticker(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("printTransponderSticker");
 
   ReturnStatus ret = StickerPrinter->printTransponderSticker(*param);
@@ -23,7 +23,7 @@ void StickerPrinterAsyncWrapper::printTransponderSticker(
 }
 
 void StickerPrinterAsyncWrapper::printBoxSticker(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("printBoxSticker");
 
   ReturnStatus ret = StickerPrinter->printBoxSticker(*param);
@@ -36,7 +36,7 @@ void StickerPrinterAsyncWrapper::printBoxSticker(
 }
 
 void StickerPrinterAsyncWrapper::printPalletSticker(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("printPalletSticker");
 
   ReturnStatus ret = StickerPrinter->printPalletSticker(*param);

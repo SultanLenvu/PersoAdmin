@@ -1,8 +1,7 @@
 #include "production_line_creation_dialog.h"
 #include "General/definitions.h"
 
-ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+ProductionLineCreationDialog::ProductionLineCreationDialog() {
   setObjectName("PanInputDialog");
 
   // Считываем размеры дисплея
@@ -18,8 +17,6 @@ ProductionLineCreationDialog::ProductionLineCreationDialog(QWidget* parent)
   adjustSize();
   setFixedHeight(size().height());
 }
-
-ProductionLineCreationDialog::~ProductionLineCreationDialog() {}
 
 void ProductionLineCreationDialog::getData(StringDictionary& data) const {
   data.insert("login", LoginLineEdit->text());

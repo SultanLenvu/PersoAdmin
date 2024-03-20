@@ -22,9 +22,14 @@ class StringInputDialog : public AbstractInputDialog {
   AbstractStringChecker* Checker;
 
  public:
+  explicit StringInputDialog();
+  explicit StringInputDialog(const QString& paramName);
   explicit StringInputDialog(const QString& paramName,
-                             QWidget* parent = nullptr);
-  ~StringInputDialog();
+                             AbstractStringChecker* checker);
+  ~StringInputDialog() = default;
+
+ public:
+  void setParamName(const QString& name);
 
  public:  // AbstractInputDialog interface
   virtual void getData(StringDictionary& data) const override;

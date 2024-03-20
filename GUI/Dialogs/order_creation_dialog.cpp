@@ -1,8 +1,7 @@
 #include "order_creation_dialog.h"
 #include "General/definitions.h"
 
-OrderCreationDialog::OrderCreationDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+OrderCreationDialog::OrderCreationDialog() {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
@@ -16,8 +15,6 @@ OrderCreationDialog::OrderCreationDialog(QWidget* parent)
   adjustSize();
   setFixedHeight(size().height());
 }
-
-OrderCreationDialog::~OrderCreationDialog() {}
 
 void OrderCreationDialog::getData(StringDictionary& data) const {
   data.insert("issuer_name", IssuerNameComboBox->currentText());

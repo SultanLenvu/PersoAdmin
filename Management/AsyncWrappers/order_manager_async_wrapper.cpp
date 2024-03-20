@@ -3,7 +3,7 @@
 OrderManagerAsyncWrapper::OrderManagerAsyncWrapper(
     const QString& name,
     std::shared_ptr<ISqlDatabase> database)
-    : NamedObject{name}, LoggableObject(name) {
+    : ProgressableAsyncWrapper{name} {
   Manager =
       std::unique_ptr<OrderManager>(new OrderManager("OrderManager", database));
 }
@@ -11,7 +11,7 @@ OrderManagerAsyncWrapper::OrderManagerAsyncWrapper(
 OrderManagerAsyncWrapper::~OrderManagerAsyncWrapper() {}
 
 void OrderManagerAsyncWrapper::create(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("create");
 
@@ -25,7 +25,7 @@ void OrderManagerAsyncWrapper::create(
 }
 
 void OrderManagerAsyncWrapper::startAssembling(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("startAssembling");
 
@@ -39,7 +39,7 @@ void OrderManagerAsyncWrapper::startAssembling(
 }
 
 void OrderManagerAsyncWrapper::stopAssembling(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("stopAssembling");
 
@@ -53,7 +53,7 @@ void OrderManagerAsyncWrapper::stopAssembling(
 }
 
 void OrderManagerAsyncWrapper::generateShipmentRegister(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("generateShipmentRegister");
 
@@ -67,7 +67,7 @@ void OrderManagerAsyncWrapper::generateShipmentRegister(
 }
 
 void OrderManagerAsyncWrapper::release(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("release");
 
@@ -81,7 +81,7 @@ void OrderManagerAsyncWrapper::release(
 }
 
 void OrderManagerAsyncWrapper::refund(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("refund");
 
@@ -121,7 +121,7 @@ void OrderManagerAsyncWrapper::initIssuers() {
 }
 
 void OrderManagerAsyncWrapper::linkIssuerWithKeys(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("linkIssuerWithKeys");
 

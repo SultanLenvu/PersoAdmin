@@ -87,8 +87,9 @@ void OrderUserInterface::createDataDisplayGroup() {
 }
 
 void OrderUserInterface::connectDependencies() {
-  OrderGuiSubkernel* ogs = static_cast<OrderGuiSubkernel*>(
-      GlobalEnvironment::instance()->getObject("OrderGuiSubkernel"));
+  OrderGuiSubkernel* ogs =
+      GlobalEnvironment::instance()->getObject<OrderGuiSubkernel>(
+          "OrderGuiSubkernel");
 
   connect(GetPushButton, &QPushButton::clicked, ogs, &OrderGuiSubkernel::get);
   connect(CreatePushButton, &QPushButton::clicked, ogs,

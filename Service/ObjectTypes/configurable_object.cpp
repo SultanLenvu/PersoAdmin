@@ -12,8 +12,9 @@ ConfigurationSystemConnection::ConfigurationSystemConnection(
     ConfigurableObject* object) {
   Object = object;
 
-  ConfigurationSystem* cum = static_cast<ConfigurationSystem*>(
-      GlobalEnvironment::instance()->getObject("ConfigurationSystem"));
+  ConfigurationSystem* cum =
+      GlobalEnvironment::instance()->getObject<ConfigurationSystem>(
+          "ConfigurationSystem");
 
   connect(cum, &ConfigurationSystem::applySettings_signal, this,
           &ConfigurationSystemConnection::apply);

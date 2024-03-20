@@ -3,7 +3,7 @@
 
 #include "abstract_input_dialog.h"
 
-class OrderCreationDialog : public AbstractInputDialog {
+class OrderCreationDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -45,8 +45,8 @@ class OrderCreationDialog : public AbstractInputDialog {
   QPushButton* RejectButton;
 
  public:
-  explicit OrderCreationDialog(QWidget* parent = nullptr);
-  ~OrderCreationDialog();
+  explicit OrderCreationDialog();
+  ~OrderCreationDialog() = default;
 
   virtual void getData(StringDictionary& data) const override;
   virtual InputDialogType type() const override;

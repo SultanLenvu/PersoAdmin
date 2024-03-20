@@ -1,8 +1,7 @@
 #include "transponder_sticker_scan_dialog.h"
 #include "General/definitions.h"
 
-TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
-    : AbstractInputDialog(parent) {
+TransponderStickerScanDialog::TransponderStickerScanDialog() {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
@@ -14,8 +13,6 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
 
   Regex.setPattern("^[0-9]+$");
 }
-
-TransponderStickerScanDialog::~TransponderStickerScanDialog() {}
 
 AbstractInputDialog::InputDialogType TransponderStickerScanDialog::type()
     const {

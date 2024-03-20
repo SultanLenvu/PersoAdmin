@@ -1,22 +1,23 @@
 #include "server_connection_async_wrapper.h"
+#include "assembly_unit_gui_subkernel.h"
+#include "global_environment.h"
+#include "perso_server_connection.h"
 
 #include <QDir>
 #include <QSettings>
 
-#include "perso_server_connection.h"
-
 ServerConnectionAsyncWrapper::ServerConnectionAsyncWrapper(const QString& name)
-    : NamedObject{name},
-      LoggableObject(name),
-      Server(new PersoServerConnection("PersoServerConnection")) {}
-
-ServerConnectionAsyncWrapper::~ServerConnectionAsyncWrapper() {}
+    : ProgressableAsyncWrapper{name},
+      Server(new PersoServerConnection("PersoServerConnection")) {
+  // Шерим подключение к серверу
+  GlobalEnvironment::instance()->registerSharedObject<PersoServerConnection>(
+      std::static_pointer_cast<PersoServerConnection>(Server));
+}
 
 void ServerConnectionAsyncWrapper::connect() {
   initOperation("connectToServer");
 
-  ReturnStatus ret;
-  ret = Server->connect();
+  ReturnStatus ret = Server->connect();
   if (ret != ReturnStatus::NoError) {
     processOperationError("connectToServer", ret);
     return;
@@ -34,25 +35,14 @@ void ServerConnectionAsyncWrapper::disconnect() {
 }
 
 void ServerConnectionAsyncWrapper::launchProductionLine(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("launchProductionLine");
 
-  ReturnStatus ret;
-  ret = Server->launchProductionLine(*param);
+  ReturnStatus ret = Server->launchProductionLine(*param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("launchProductionLine", ret);
     return;
   }
-
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
-  ret = Server->getProductionLineData(*pldata);
-  if (ret != ReturnStatus::NoError) {
-    emit boxDataReady(pldata);
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  emit productionLineDataReady(pldata);
 
   completeOperation("launchProductionLine");
 }
@@ -69,9 +59,9 @@ void ServerConnectionAsyncWrapper::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
+  StringDictionary pldata;
 
-  ret = Server->getProductionLineData(*pldata);
+  ret = Server->getProductionLineData(pldata);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getProductionLineData", ret);
     return;
@@ -80,54 +70,6 @@ void ServerConnectionAsyncWrapper::getProductionLineData() {
   emit productionLineDataReady(pldata);
 
   completeOperation("getProductionLineData");
-}
-
-void ServerConnectionAsyncWrapper::logOn(
-    const std::shared_ptr<StringDictionary> param) {
-  initOperation("logOnServer");
-
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
-
-  ret = checkConfig();
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  ret = Server->connect();
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  ret = Server->launchProductionLine(*param);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  ret = Server->getProductionLineData(*pldata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  emit productionLineDataReady(pldata);
-  emit authorizationCompleted();
-
-  completeOperation("logOnServer");
-}
-
-void ServerConnectionAsyncWrapper::logOut() {
-  initOperation("logOutServer");
-
-  if (Server->isConnected()) {
-    Server->shutdownProductionLine();
-    Server->disconnect();
-  }
-
-  completeOperation("logOutServer");
 }
 
 void ServerConnectionAsyncWrapper::echo() {
@@ -146,42 +88,10 @@ void ServerConnectionAsyncWrapper::echo() {
 void ServerConnectionAsyncWrapper::requestBox() {
   initOperation("requestBox");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> bdata(new StringDictionary());
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
-
-  ret = Server->requestBox();
+  ReturnStatus ret = Server->requestBox();
   if (ret != ReturnStatus::NoError) {
     processOperationError("requestBox", ret);
     return;
-  }
-
-  ret = Server->getCurrentBoxData(*bdata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("requestBox", ret);
-    return;
-  }
-
-  emit boxDataReady(bdata);
-
-  ret = Server->getProductionLineData(*pldata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("requestBox", ret);
-    return;
-  }
-
-  emit productionLineDataReady(pldata);
-
-  // Если в боксе есть собранные транспондеры
-  if (bdata->value("box_assembled_units").toInt() > 0) {
-    ret = Server->getCurrentTransponderData(*tdata);
-    if (ret != ReturnStatus::NoError) {
-      processOperationError("requestBox", ret);
-      return;
-    }
-
-    emit transponderDataReady(tdata);
   }
 
   completeOperation("requestBox");
@@ -190,9 +100,8 @@ void ServerConnectionAsyncWrapper::requestBox() {
 void ServerConnectionAsyncWrapper::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
-  std::shared_ptr<StringDictionary> bdata(new StringDictionary());
-
-  ReturnStatus ret = Server->getCurrentBoxData(*bdata);
+  StringDictionary bdata;
+  ReturnStatus ret = Server->getCurrentBoxData(bdata);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getCurrentBoxData", ret);
     return;
@@ -206,22 +115,11 @@ void ServerConnectionAsyncWrapper::getCurrentBoxData() {
 void ServerConnectionAsyncWrapper::refundCurrentBox() {
   initOperation("refundCurrentBox");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
-
-  ret = Server->refundCurrentBox();
+  ReturnStatus ret = Server->refundCurrentBox();
   if (ret != ReturnStatus::NoError) {
     processOperationError("refundCurrentBox", ret);
     return;
   }
-
-  ret = Server->getProductionLineData(*pldata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  emit productionLineDataReady(pldata);
 
   completeOperation("refundCurrentBox");
 }
@@ -229,22 +127,11 @@ void ServerConnectionAsyncWrapper::refundCurrentBox() {
 void ServerConnectionAsyncWrapper::completeCurrentBox() {
   initOperation("completeCurrentBox");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> pldata(new StringDictionary());
-
-  ret = Server->completeCurrentBox();
+  ReturnStatus ret = Server->completeCurrentBox();
   if (ret != ReturnStatus::NoError) {
     processOperationError("completeCurrentBox", ret);
     return;
   }
-
-  ret = Server->getProductionLineData(*pldata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("logOnServer", ret);
-    return;
-  }
-
-  emit productionLineDataReady(pldata);
 
   completeOperation("completeCurrentBox");
 }
@@ -252,103 +139,35 @@ void ServerConnectionAsyncWrapper::completeCurrentBox() {
 void ServerConnectionAsyncWrapper::releaseTransponder() {
   initOperation("releaseTransponder");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> bdata(new StringDictionary());
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
-
-  QString ucid;
   StringDictionary result;
-  StringDictionary param;
-
-  // Выпускаем транспондер
-  ret = Server->releaseTransponder(result);
+  ReturnStatus ret = Server->releaseTransponder(result);
   if (ret != ReturnStatus::NoError) {
     processOperationError("releaseTransponder", ret);
     return;
   }
-  sendLog(QString("Транспондер выпущен."));
-
-  // Подтверждаем выпуск транспондера
-  param.insert("transponder_ucid", ucid);
-  ret = Server->confirmTransponderRelease(param);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("releaseTransponder", ret);
-    return;
-  }
-  sendLog(QString("Выпуск транспондера подтвержден."));
-
-  // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(*bdata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("getCurrentBoxData", ret);
-    return;
-  }
-
-  emit boxDataReady(bdata);
-
-  // Запрашиваем данные выпущенного транспондера
-  ret = Server->getCurrentTransponderData(*tdata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("releaseTransponder", ret);
-    return;
-  }
-  sendLog(QString("Данные выпускаемого транспондера получены."));
-
-  emit transponderDataReady(tdata);
-
-  // Печатаем стикер
-  ret = ReturnStatus::StickerPrinterConnectionError;
-  emit printTransponderSticker_signal(*tdata, ret);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("releaseTransponder", ret);
-    return;
-  }
-  sendLog(QString("Стикер распечатан."));
 
   completeOperation("releaseTransponder");
 }
 
+void ServerConnectionAsyncWrapper::confirmTransponderRelease(
+    const StringDictionary& param) {
+  initOperation("confirmTransponderRelease");
+
+  ReturnStatus ret = Server->confirmTransponderRelease(*param);
+  if (ret != ReturnStatus::NoError) {
+    processOperationError("confirmTransponderRelease", ret);
+    return;
+  }
+
+  completeOperation("confirmTransponderRelease");
+}
+
 void ServerConnectionAsyncWrapper::rereleaseTransponder(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("rereleaseTransponder");
-  sendLog("Выпуск транспондера. ");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
-
-  QString ucid;
   StringDictionary result;
-  StringDictionary requestParam;
-
-  // Перевыпускаем транспондер
-  requestParam.insert("transponder_pan", param->value("transponder_pan"));
-  ret = Server->rereleaseTransponder(requestParam, result);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("rereleaseTransponder", ret);
-    return;
-  }
-
-  // Подтверждаем перевыпуск транспондера
-  requestParam.insert("transponder_ucid", ucid);
-  ret = Server->confirmTransponderRerelease(requestParam);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("rereleaseTransponder", ret);
-    return;
-  }
-
-  // Запрашиваем данные перевыпущенного транспондера
-  requestParam.remove("transponder_ucid");
-  ret = Server->getTransponderData(requestParam, *tdata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("releaseTransponder", ret);
-    return;
-  }
-
-  // Запрашиваем отображение данных транспондера
-  emit transponderDataReady(tdata);
-
-  // Печатаем стикер
-  emit printTransponderSticker_signal(*tdata, ret);
+  ReturnStatus ret = Server->rereleaseTransponder(*param, result);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
@@ -359,36 +178,11 @@ void ServerConnectionAsyncWrapper::rereleaseTransponder(
 
 void ServerConnectionAsyncWrapper::rollbackTransponder() {
   initOperation("rollbackTransponder");
-  sendLog("Откат производственной линии. ");
 
-  ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> bdata(new StringDictionary());
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
-
-  ret = Server->rollbackTransponder();
+  ReturnStatus ret = Server->rollbackTransponder();
   if (ret != ReturnStatus::NoError) {
     processOperationError("rollbackTransponder", ret);
     return;
-  }
-
-  // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(*bdata);
-  if (ret != ReturnStatus::NoError) {
-    processOperationError("rollbackTransponder", ret);
-    return;
-  }
-
-  emit boxDataReady(bdata);
-
-  // Если в боксе есть собранные транспондеры
-  if (bdata->value("box_assembled_units").toInt() > 0) {
-    ret = Server->getCurrentTransponderData(*tdata);
-    if (ret != ReturnStatus::NoError) {
-      processOperationError("rollbackTransponder", ret);
-      return;
-    }
-
-    emit transponderDataReady(tdata);
   }
 
   completeOperation("rollbackTransponder");
@@ -398,9 +192,9 @@ void ServerConnectionAsyncWrapper::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
+  StringDictionary tdata;
 
-  ret = Server->getCurrentTransponderData(*tdata);
+  ret = Server->getCurrentTransponderData(tdata);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getCurrentTransponderData", ret);
     return;
@@ -412,13 +206,13 @@ void ServerConnectionAsyncWrapper::getCurrentTransponderData() {
 }
 
 void ServerConnectionAsyncWrapper::getTransponderData(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("getTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  std::shared_ptr<StringDictionary> tdata(new StringDictionary());
+  StringDictionary tdata;
 
-  ret = Server->getTransponderData(*param, *tdata);
+  ret = Server->getTransponderData(*param, tdata);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getTransponderData", ret);
     return;
@@ -430,7 +224,7 @@ void ServerConnectionAsyncWrapper::getTransponderData(
 }
 
 void ServerConnectionAsyncWrapper::printBoxSticker(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("printBoxSticker");
 
   ReturnStatus ret;
@@ -457,7 +251,7 @@ void ServerConnectionAsyncWrapper::printLastBoxSticker() {
 }
 
 void ServerConnectionAsyncWrapper::printPalletSticker(
-    const std::shared_ptr<StringDictionary> param) {
+    const StringDictionary& param) {
   initOperation("printPalletSticker");
 
   ReturnStatus ret;
@@ -492,4 +286,19 @@ ReturnStatus ServerConnectionAsyncWrapper::checkConfig() {
 
   sendLog("Проверка конфигурации успешно завершена.");
   return ret;
+}
+
+void ServerConnectionAsyncWrapper::connectDependecies() {
+  AssemblyUnitGuiSubkernel* augs =
+      GlobalEnvironment::instance()->getObject<AssemblyUnitGuiSubkernel>(
+          "AssemblyUnitGuiSubkernel");
+
+  QObject::connect(this, &ServerConnectionAsyncWrapper::productionLineDataReady,
+                   augs, &AssemblyUnitGuiSubkernel::displayProductionLineData);
+  QObject::connect(this, &ServerConnectionAsyncWrapper::boxDataReady, augs,
+                   &AssemblyUnitGuiSubkernel::displayBoxData);
+  QObject::connect(this, &ServerConnectionAsyncWrapper::transponderDataReady,
+                   augs, &AssemblyUnitGuiSubkernel::displayTransponderData);
+  QObject::connect(this, &ServerConnectionAsyncWrapper::firwareReady, augs,
+                   &AssemblyUnitGuiSubkernel::displayFirmware);
 }

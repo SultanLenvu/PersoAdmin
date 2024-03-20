@@ -1,12 +1,12 @@
 #include "gui_kernel.h"
-
+#include "assembly_unit_gui_subkernel.h"
 #include "database_gui_subkernel.h"
 #include "mainwindow_gui.h"
 #include "order_gui_subkernel.h"
-#include "server_gui_subkernel.h"
 #include "production_line_gui_subkernel.h"
 #include "programmer_gui_subkernel.h"
 #include "progress_indicator.h"
+#include "server_connection_gui_subkernel.h"
 #include "settings_dialog.h"
 #include "status_indicator.h"
 #include "sticker_printer_gui_subkernel.h"
@@ -74,7 +74,9 @@ void GuiKernel::createGuiSubkernels() {
   Subkernels.emplace_back(
       new ProductionLineGuiSubkernel("ProductionLineGuiSubkernel"));
   Subkernels.emplace_back(
-      new ServerGuiSubkernel("ServerGuiSubkernel"));
+      new ServerConnectionGuiSubkernel("ServerConnectionGuiSubkernel"));
+  Subkernels.emplace_back(
+      new AssemblyUnitGuiSubkernel("AssemblyUnitGuiSubkernel"));
   Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
   Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));

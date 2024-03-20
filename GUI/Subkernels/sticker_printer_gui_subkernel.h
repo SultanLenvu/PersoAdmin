@@ -23,9 +23,9 @@ class StickerPrinterGuiSubkernel final : public AbstractGuiSubkernel {
 
  signals:
   void printTransponderSticker_signal(
-      const std::shared_ptr<StringDictionary> param);
-  void printBoxSticker_signal(const std::shared_ptr<StringDictionary> param);
-  void printPalletSticker_signal(const std::shared_ptr<StringDictionary> param);
+      const StringDictionary& param);
+  void printBoxSticker_signal(const StringDictionary& param);
+  void printPalletSticker_signal(const StringDictionary& param);
   void execCommandScript_signal(const std::shared_ptr<QStringList> script);
 };
 

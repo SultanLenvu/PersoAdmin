@@ -4,31 +4,24 @@
 #include <QFile>
 
 #include "i_server_connection.h"
-#include "loggable_object.h"
-#include "named_object.h"
 #include "progressable_async_wrapper.h"
 
-class ServerConnectionAsyncWrapper : public NamedObject,
-                                     public ProgressableAsyncWrapper,
-                                     public LoggableObject {
+class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
-  std::unique_ptr<IServerConnection> Server;
+  std::shared_ptr<IServerConnection> Server;
 
  public:
   Q_INVOKABLE explicit ServerConnectionAsyncWrapper(const QString& name);
-  ~ServerConnectionAsyncWrapper();
+  ~ServerConnectionAsyncWrapper() = default;
 
-  // Own
  public:
   void connect(void);
   void disconnect(void);
 
   void echo(void);
-  void logOn(const std::shared_ptr<StringDictionary> param);
-  void logOut(void);
 
-  void launchProductionLine(const std::shared_ptr<StringDictionary> param);
+  void launchProductionLine(const StringDictionary& param);
   void shutdownProductionLine(void);
   void getProductionLineData(void);
 
@@ -38,14 +31,17 @@ class ServerConnectionAsyncWrapper : public NamedObject,
   void completeCurrentBox(void);
 
   void releaseTransponder(void);
-  void rereleaseTransponder(const std::shared_ptr<StringDictionary> param);
+  void confirmTransponderRelease(const StringDictionary& param);
+  void rereleaseTransponder(const StringDictionary& param);
+  void confirmTransponderRerelease(
+      const StringDictionary& param);
   void rollbackTransponder(void);
   void getCurrentTransponderData(void);
-  void getTransponderData(const std::shared_ptr<StringDictionary> param);
+  void getTransponderData(const StringDictionary& param);
 
-  void printBoxSticker(const std::shared_ptr<StringDictionary> param);
+  void printBoxSticker(const StringDictionary& param);
   void printLastBoxSticker(void);
-  void printPalletSticker(const std::shared_ptr<StringDictionary> param);
+  void printPalletSticker(const StringDictionary& param);
   void printLastPalletSticker(void);
 
   void onServerDisconnected(void);
@@ -53,17 +49,13 @@ class ServerConnectionAsyncWrapper : public NamedObject,
  private:
   Q_DISABLE_COPY_MOVE(ServerConnectionAsyncWrapper)
   ReturnStatus checkConfig(void);
+  void connectDependecies(void);
 
  signals:
-  void productionLineDataReady(const std::shared_ptr<StringDictionary> data);
-  void transponderDataReady(const std::shared_ptr<StringDictionary> data);
-  void boxDataReady(const std::shared_ptr<StringDictionary> data);
-  void firwareReady(const std::shared_ptr<QByteArray> firmware);
-
-  void authorizationCompleted(void);
-
-  void printTransponderSticker_signal(const StringDictionary& data,
-                                      ReturnStatus& ret);
+  void productionLineDataReady(const StringDictionary& data);
+  void transponderDataReady(const StringDictionary& data);
+  void boxDataReady(const StringDictionary& data);
+  void firwareReady(const QStringList firmware);
 };
 
 #endif  // PERSOSERVERMANAGER_H

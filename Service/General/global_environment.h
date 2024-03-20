@@ -8,17 +8,38 @@
 class GlobalEnvironment : public QObject {
   Q_OBJECT
  private:
-  QHash<QString, NamedObject*> GlobalObjects;
+  QHash<QString, NamedObject*> Objects;
+  QHash<QString, std::weak_ptr<NamedObject>> SharedObjects;
 
  public:
   ~GlobalEnvironment();
   static GlobalEnvironment* instance(void);
 
   void registerObject(NamedObject* obj);
-  NamedObject* getObject(const QString& name);
+  template <typename T,
+            typename = std::enable_if_t<std::is_base_of_v<NamedObject, T>>>
+  T* getObject(const QString& name) {
+    if (!Objects.contains(name)) {
+      return nullptr;
+    }
+
+    return static_cast<T*>(Objects.value(name));
+  }
+
+  template <typename T,
+            typename = std::enable_if_t<std::is_base_of_v<NamedObject, T>>>
+  void registerSharedObject(std::shared_ptr<T> obj) {
+    SharedObjects.insert(obj->objectName(), obj);
+  }
+
+  template <typename T,
+            typename = std::enable_if_t<std::is_base_of_v<NamedObject, T>>>
+  std::shared_ptr<T> getSharedObject(const QString& name) {
+    return std::static_pointer_cast<T>(SharedObjects[name].lock());
+  }
 
  private:
-  GlobalEnvironment();
+  explicit GlobalEnvironment() = default;
   Q_DISABLE_COPY_MOVE(GlobalEnvironment)
 
  private slots:

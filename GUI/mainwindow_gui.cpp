@@ -75,8 +75,9 @@ void MainWindowGui::createLog() {
 }
 
 void MainWindowGui::connectDependecies() {
-  WidgetLogBackend* logger = static_cast<WidgetLogBackend*>(
-      GlobalEnvironment::instance()->getObject("WidgetLogBackend"));
+  const WidgetLogBackend* logger =
+      GlobalEnvironment::instance()->getObject<const WidgetLogBackend>(
+          "WidgetLogBackend");
 
   connect(logger, &WidgetLogBackend::clearLogDisplay_signal, this,
           &MainWindowGui::clearLogDisplay);

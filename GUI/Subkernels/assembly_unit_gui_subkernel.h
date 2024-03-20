@@ -1,27 +1,34 @@
 #ifndef ASSEMBLYUNITGUISUBKERNEL_H
 #define ASSEMBLYUNITGUISUBKERNEL_H
 
+#include <QStringListModel>
+
 #include "abstract_gui_subkernel.h"
 #include "hash_table_model.h"
+#include "types.h"
 
 class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
+  friend class ServerUserInterface;
 
  private:
-  HashTableModel ProductionLine;
-  HashTableModel Box;
-  HashTableModel Transponder;
+  HashTableModel ProductionLineModel;
+  HashTableModel BoxModel;
+  HashTableModel TransponderModel;
+
+  QStringListModel FirmwareModel;
 
  public:
   explicit AssemblyUnitGuiSubkernel(const QString& name);
   ~AssemblyUnitGuiSubkernel() = default;
 
- public:
-  HashTableModel& productionLine(void);
-  HashTableModel& box(void);
-  HashTableModel& transponder(void);
+ public slots:
+  void displayProductionLineData(const StringDictionary& data);
+  void displayBoxData(const StringDictionary& data);
+  void displayTransponderData(const StringDictionary& data);
+  void displayFirmware(const QStringList& firmware);
 
- public slots:  // Слоты для сигналов от GUI
+ private slots:  // Слоты для сигналов от GUI
   void logOn(void);
   void logOut(void);
 
@@ -33,18 +40,12 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   void rereleaseTransponder(void);
   void rollbackTransponder(void);
 
- public slots:  // Слоты для сигналов от менеджеров
-  void displayProductionLineData(const std::shared_ptr<StringDictionary> data);
-  void displayBoxData(const std::shared_ptr<StringDictionary> data);
-  void displayTransponderData(const std::shared_ptr<StringDictionary> data);
-  void displayFirmware(const std::shared_ptr<QByteArray> firmware);
-
  private:
-  void connectDependecies(void);
   void createModels(void);
+  void connectDependecies(void);
 
  signals:
-  void logOn_signal(const std::shared_ptr<StringDictionary> param);
+  void logOn_signal(const StringDictionary& param);
   void logOut_signal(void);
 
   void requestBox_signal(void);
@@ -53,7 +54,7 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
 
   void releaseTransponder_signal(void);
   void rereleaseTransponder_signal(
-      const std::shared_ptr<StringDictionary> param);
+      const StringDictionary& param);
   void rollbackTransponder_signal(void);
 };
 
