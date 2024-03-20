@@ -111,7 +111,7 @@ ReturnStatus OrderManager::generateShipmentRegister(
     return ReturnStatus::DatabaseMissed;
   }
 
-  ReturnStatus ret;
+  ReturnStatus ret = ReturnStatus::NoError;
   QString ShipmentRegisterName =
       QString("sr_pallets_%1_%2.csv")
           .arg(param.value("first_pallet_id"), param.value("last_pallet_id"));

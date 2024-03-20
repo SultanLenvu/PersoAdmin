@@ -7,8 +7,6 @@ ProgressIndicator::ProgressIndicator(const QString& name)
 }
 
 void ProgressIndicator::begin(const QString& operationName) {
-  sendLog(QString("Начало выполнения операции '%1'. ").arg(operationName));
-
   // Создаем  окно
   createProgressDialog();
 
@@ -31,8 +29,6 @@ void ProgressIndicator::begin(const QString& operationName) {
 }
 
 void ProgressIndicator::finish(const QString& operationName) {
-  sendLog(QString("Выполнение операции '%1' завершено. ").arg(operationName));
-
   // Измеряем и сохраняем длительность операции
   uint64_t duration = ODMeter->elapsed();
   sendLog(QString("Длительность операции: %1.").arg(QString::number(duration)));

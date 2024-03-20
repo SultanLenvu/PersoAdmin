@@ -61,7 +61,7 @@ class PostgreSqlTable : public AbstractSqlTable,
   void setCurrentOrder(Qt::SortOrder order);
 
   const QVector<QString>* columns() const;
-  const StringDictionary* relations() const;
+  const StringDictionary& relations() const;
 
  private:
   bool checkFieldNames(const SqlQueryValues& record) const;

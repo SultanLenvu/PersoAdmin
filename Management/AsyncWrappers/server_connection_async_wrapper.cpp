@@ -38,7 +38,7 @@ void ServerConnectionAsyncWrapper::launchProductionLine(
     const StringDictionary& param) {
   initOperation("launchProductionLine");
 
-  ReturnStatus ret = Server->launchProductionLine(*param);
+  ReturnStatus ret = Server->launchProductionLine(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("launchProductionLine", ret);
     return;
@@ -153,7 +153,7 @@ void ServerConnectionAsyncWrapper::confirmTransponderRelease(
     const StringDictionary& param) {
   initOperation("confirmTransponderRelease");
 
-  ReturnStatus ret = Server->confirmTransponderRelease(*param);
+  ReturnStatus ret = Server->confirmTransponderRelease(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("confirmTransponderRelease", ret);
     return;
@@ -167,7 +167,7 @@ void ServerConnectionAsyncWrapper::rereleaseTransponder(
   initOperation("rereleaseTransponder");
 
   StringDictionary result;
-  ReturnStatus ret = Server->rereleaseTransponder(*param, result);
+  ReturnStatus ret = Server->rereleaseTransponder(param, result);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
@@ -212,7 +212,7 @@ void ServerConnectionAsyncWrapper::getTransponderData(
   ReturnStatus ret = ReturnStatus::NoError;
   StringDictionary tdata;
 
-  ret = Server->getTransponderData(*param, tdata);
+  ret = Server->getTransponderData(param, tdata);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getTransponderData", ret);
     return;
@@ -228,7 +228,7 @@ void ServerConnectionAsyncWrapper::printBoxSticker(
   initOperation("printBoxSticker");
 
   ReturnStatus ret;
-  ret = Server->printBoxSticker(*param);
+  ret = Server->printBoxSticker(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("printBoxSticker", ret);
     return;
@@ -255,7 +255,7 @@ void ServerConnectionAsyncWrapper::printPalletSticker(
   initOperation("printPalletSticker");
 
   ReturnStatus ret;
-  ret = Server->printPalletSticker(*param);
+  ret = Server->printPalletSticker(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("printPalletSticker", ret);
     return;
@@ -276,8 +276,6 @@ void ServerConnectionAsyncWrapper::printLastPalletSticker() {
 
   completeOperation("printLastPalletSticker");
 }
-
-void ServerConnectionAsyncWrapper::onServerDisconnected() {}
 
 ReturnStatus ServerConnectionAsyncWrapper::checkConfig() {
   sendLog("Проверка конфигурации.");

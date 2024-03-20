@@ -17,26 +17,26 @@ SqlResponseModel* ProductionLineGuiSubkernel::productionLines() {
 }
 
 void ProductionLineGuiSubkernel::create() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   ProductionLineCreationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit create_signal(param);
 }
 
 void ProductionLineGuiSubkernel::activate() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit activate_signal(param);
@@ -48,13 +48,13 @@ void ProductionLineGuiSubkernel::activateAll() {
 }
 
 void ProductionLineGuiSubkernel::deactivate() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit deactivate_signal(param);

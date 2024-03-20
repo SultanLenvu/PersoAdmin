@@ -15,7 +15,7 @@ void OrderManagerAsyncWrapper::create(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("create");
 
-  ret = Manager->create(*param);
+  ret = Manager->create(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("create", ret);
     return;
@@ -29,7 +29,7 @@ void OrderManagerAsyncWrapper::startAssembling(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("startAssembling");
 
-  ret = Manager->startAssembling(*param);
+  ret = Manager->startAssembling(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("startAssembling", ret);
     return;
@@ -43,7 +43,7 @@ void OrderManagerAsyncWrapper::stopAssembling(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("stopAssembling");
 
-  ret = Manager->stopAssembling(*param);
+  ret = Manager->stopAssembling(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("stopAssembling", ret);
     return;
@@ -57,7 +57,7 @@ void OrderManagerAsyncWrapper::generateShipmentRegister(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("generateShipmentRegister");
 
-  ret = Manager->generateShipmentRegister(*param);
+  ret = Manager->generateShipmentRegister(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("generateShipmentRegister", ret);
     return;
@@ -71,7 +71,7 @@ void OrderManagerAsyncWrapper::release(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("release");
 
-  ret = Manager->release(*param);
+  ret = Manager->release(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("release", ret);
     return;
@@ -85,7 +85,7 @@ void OrderManagerAsyncWrapper::refund(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("refund");
 
-  ret = Manager->refund(*param);
+  ret = Manager->refund(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("refund", ret);
     return;
@@ -125,7 +125,7 @@ void OrderManagerAsyncWrapper::linkIssuerWithKeys(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("linkIssuerWithKeys");
 
-  ret = Manager->linkIssuerWithKeys(*param);
+  ret = Manager->linkIssuerWithKeys(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("linkIssuerWithKeys", ret);
     return;

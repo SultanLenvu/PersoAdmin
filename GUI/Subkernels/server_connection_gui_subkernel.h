@@ -21,6 +21,7 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
 
  public slots:  // Слоты для сигналов от GUI
   void executeCommand(const QString& name);
+  void onServerDisconnected(void);
 
  private:
   void connect(void);

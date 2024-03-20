@@ -4,7 +4,9 @@
 #include "status_indicator.h"
 
 ProgressableAsyncWrapper::ProgressableAsyncWrapper(const QString& name)
-    : NamedObject(name), LoggableObject(name) {}
+    : NamedObject(name), LoggableObject(name) {
+  connectDependecies();
+}
 
 void ProgressableAsyncWrapper::initOperation(const QString& name) {
   sendLog(QString("Начало выполнения операции %1.").arg(name));

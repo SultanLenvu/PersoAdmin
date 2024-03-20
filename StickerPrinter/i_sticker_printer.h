@@ -21,7 +21,7 @@ class IStickerPrinter {
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 
-  virtual ReturnStatus exec(const QStringList& commandScript) = 0;
+  virtual ReturnStatus exec(const QStringList&& commandScript) = 0;
 };
 
 #endif  // ISTICKERPRINTER_H

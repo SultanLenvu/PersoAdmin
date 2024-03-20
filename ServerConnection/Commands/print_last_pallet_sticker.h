@@ -20,7 +20,7 @@ class PrintLastPalletSticker final : public AbstractClientCommand {
   virtual ReturnStatus generate(const StringDictionary& param,
                                 QByteArray& dataBlock) override;
   virtual ReturnStatus processResponse(const QByteArray& dataBlock,
-                                       StringDictionary& responseData) override;
+                                       StringDictionary responseData) override;
 
  private:
   Q_DISABLE_COPY_MOVE(PrintLastPalletSticker)

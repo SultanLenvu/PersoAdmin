@@ -19,40 +19,40 @@ SqlResponseModel& OrderGuiSubkernel::orders() {
 }
 
 void OrderGuiSubkernel::create() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   OrderCreationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit create_signal(param);
 }
 
 void OrderGuiSubkernel::startAssembling() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
 
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit startAssembling_signal(param);
 }
 
 void OrderGuiSubkernel::stopAssembling() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit stopAssembling_signal(param);
@@ -64,39 +64,39 @@ void OrderGuiSubkernel::get() {
 }
 
 void OrderGuiSubkernel::release() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   ManualReleaseRefundDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit release_signal(param);
 }
 
 void OrderGuiSubkernel::refund() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   ManualReleaseRefundDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit refund_signal(param);
 }
 
 void OrderGuiSubkernel::generateShipmentRegister() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   PalletShippingDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit shipPallets_signal(param);
@@ -113,13 +113,13 @@ void OrderGuiSubkernel::initIssuers() {
 }
 
 void OrderGuiSubkernel::linkIssuerWithKeys() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   LinkIssuerKeyDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit linkIssuerWithKeys_signal(param);

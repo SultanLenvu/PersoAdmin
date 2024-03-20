@@ -35,7 +35,7 @@ class AssemblyUnitManager : public NamedObject, public LoggableObject {
   void productionLineDataReady(const StringDictionary& data);
   void transponderDataReady(const StringDictionary& data);
   void boxDataReady(const StringDictionary& data);
-  void firwareReady(const QStringList firmware);
+  void firwareReady(const QStringList& firmware);
 
   void authorizationCompleted(void);
 

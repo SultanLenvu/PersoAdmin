@@ -64,7 +64,7 @@ class TE310Printer final : public NamedObject,
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
 
-  virtual ReturnStatus exec(const QStringList& commandScript) override;
+  virtual ReturnStatus exec(const QStringList&& commandScript) override;
 
  private:
   Q_DISABLE_COPY_MOVE(TE310Printer);

@@ -18,6 +18,11 @@ void ServerConnectionGuiSubkernel::executeCommand(const QString& name) {
   (this->*CommandMethods.value(name))();
 }
 
+void ServerConnectionGuiSubkernel::onServerDisconnected() {
+  QMessageBox::critical(nullptr, "Ошибка", "Соединение с сервером оборвалось.",
+                        QMessageBox::Ok);
+}
+
 void ServerConnectionGuiSubkernel::connect() {
   emit clearLogDisplay();
   emit connect_signal();
@@ -34,13 +39,13 @@ void ServerConnectionGuiSubkernel::echo() {
 }
 
 void ServerConnectionGuiSubkernel::launchProductionLine() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   AuthorizationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit launchProductionLine_signal(param);
@@ -82,32 +87,41 @@ void ServerConnectionGuiSubkernel::releaseTransponder() {
 }
 
 void ServerConnectionGuiSubkernel::confirmTransponderRelease() {
+  StringDictionary param;
+
+  UcidChecker checker;
+  StringInputDialog dialog("transponder_ucid", &checker);
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(param);
+
   emit confirmTransponderRelease_signal(param);
   emit clearLogDisplay();
 }
 
 void ServerConnectionGuiSubkernel::rereleaseTransponder() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   NumericStringChecker checker;
   StringInputDialog dialog("transponder_pan", &checker);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit rereleaseTransponder_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::confirmTransponderRerelease() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   ConfirmTransponderRereleaseInputDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit confirmTransponderRerelease_signal(param);
@@ -124,7 +138,7 @@ void ServerConnectionGuiSubkernel::getCurrentTransponderData() {
 }
 
 void ServerConnectionGuiSubkernel::getTransponderData() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   StringInputDialog dialog("transponder_pan");
   NumericStringChecker checker;
@@ -132,20 +146,20 @@ void ServerConnectionGuiSubkernel::getTransponderData() {
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit getTransponderData_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::printBoxSticker() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   StringInputDialog dialog("transponder_pan");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit printBoxSticker_signal(param);
@@ -157,13 +171,13 @@ void ServerConnectionGuiSubkernel::printLastBoxSticker() {
 }
 
 void ServerConnectionGuiSubkernel::printPalletSticker() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   StringInputDialog dialog("transponder_pan");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit printPalletSticker_signal(param);

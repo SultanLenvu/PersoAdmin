@@ -20,7 +20,7 @@ ReturnStatus PrintLastPalletSticker::generate(const StringDictionary& param,
 
 ReturnStatus PrintLastPalletSticker::processResponse(
     const QByteArray& dataBlock,
-    StringDictionary& responseData) {
+    StringDictionary responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

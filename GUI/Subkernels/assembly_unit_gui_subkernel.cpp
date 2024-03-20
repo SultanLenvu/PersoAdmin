@@ -10,13 +10,13 @@ AssemblyUnitGuiSubkernel::AssemblyUnitGuiSubkernel(const QString& name)
 }
 
 void AssemblyUnitGuiSubkernel::logOn() {
-  StringDictionary& param(new StringDictionary());
+  StringDictionary param;
 
   AuthorizationDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit logOn_signal(param);
@@ -53,7 +53,7 @@ void AssemblyUnitGuiSubkernel::displayTransponderData(
   TransponderModel.setData(data);
 }
 
-void AssemblyUnitGuiSubkernel::displayFirmware(const QStringList& firmware) {
+void AssemblyUnitGuiSubkernel::displayFirmware(const QStringList&& firmware) {
   FirmwareModel.setStringList(firmware);
 }
 

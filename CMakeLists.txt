@@ -122,7 +122,6 @@ add_executable(PersoAdmin WIN32
 
     ServerConnection/i_server_connection.cpp ServerConnection/i_server_connection.h
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
-    ServerConnection/server_disconnected_signal.h ServerConnection/server_disconnected_signal.cpp
 
     ServerConnection/Commands/abstract_client_command.cpp ServerConnection/Commands/abstract_client_command.h
     ServerConnection/Commands/complete_current_box.cpp ServerConnection/Commands/complete_current_box.h

@@ -13,7 +13,7 @@ void ProductionLineManagerAsyncWrapper::create(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("create");
 
-  ret = Manager->create(*param);
+  ret = Manager->create(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("create", ReturnStatus::DatabaseMissed);
     return;
@@ -27,7 +27,7 @@ void ProductionLineManagerAsyncWrapper::activate(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("activate");
 
-  ret = Manager->activate(*param);
+  ret = Manager->activate(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("activate", ReturnStatus::DatabaseMissed);
     return;
@@ -54,7 +54,7 @@ void ProductionLineManagerAsyncWrapper::deactivate(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("deactivate");
 
-  ret = Manager->deactivate(*param);
+  ret = Manager->deactivate(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("deactivate", ReturnStatus::DatabaseMissed);
     return;
@@ -81,7 +81,7 @@ void ProductionLineManagerAsyncWrapper::edit(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("edit");
 
-  ret = Manager->deactivate(*param);
+  ret = Manager->deactivate(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("edit", ReturnStatus::DatabaseMissed);
     return;
@@ -95,7 +95,7 @@ void ProductionLineManagerAsyncWrapper::remove(
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("remove");
 
-  ret = Manager->deactivate(*param);
+  ret = Manager->deactivate(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("remove", ReturnStatus::DatabaseMissed);
     return;

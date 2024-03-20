@@ -17,7 +17,7 @@ class NamedObjectFactory final : public QObject {
 
  public:
   NamedObjectFactory(QThread* thread);
-  ~NamedObjectFactory();
+  ~NamedObjectFactory() = default;
 
  public:
   template <typename T>

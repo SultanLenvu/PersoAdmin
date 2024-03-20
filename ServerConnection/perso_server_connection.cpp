@@ -10,6 +10,7 @@
 #include "get_current_transponder_data.h"
 #include "get_production_line_data.h"
 #include "get_transponder_data.h"
+#include "global_environment.h"
 #include "launch_production_line.h"
 #include "perso_server_connection.h"
 #include "print_box_sticker.h"
@@ -21,6 +22,7 @@
 #include "request_box.h"
 #include "rerelease_transponder.h"
 #include "rollback_transponder.h"
+#include "server_connection_gui_subkernel.h"
 #include "shutdown_production_line.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
@@ -104,7 +106,7 @@ ReturnStatus PersoServerConnection::shutdownProductionLine() {
 }
 
 ReturnStatus PersoServerConnection::getProductionLineData(
-    StringDictionary& data) {
+    StringDictionary data) {
   CurrentCommand = Commands.at(GetProductionLineData);
 
   StringDictionary param;
@@ -123,7 +125,7 @@ ReturnStatus PersoServerConnection::requestBox() {
 }
 
 ReturnStatus PersoServerConnection::getCurrentBoxData(
-    StringDictionary& result) {
+    StringDictionary result) {
   CurrentCommand = Commands.at(GetCurrentBoxData);
 
   StringDictionary param;
@@ -151,7 +153,7 @@ ReturnStatus PersoServerConnection::refundCurrentBox() {
 }
 
 ReturnStatus PersoServerConnection::getCurrentTransponderData(
-    StringDictionary& result) {
+    StringDictionary result) {
   CurrentCommand = Commands.at(GetCurrentTransponderData);
 
   StringDictionary param;
@@ -161,7 +163,7 @@ ReturnStatus PersoServerConnection::getCurrentTransponderData(
 
 ReturnStatus PersoServerConnection::getTransponderData(
     const StringDictionary& param,
-    StringDictionary& result) {
+    StringDictionary result) {
   CurrentCommand = Commands.at(GetTransponderData);
 
   ReturnStatus ret = processCurrentCommand(param, result);
@@ -170,7 +172,7 @@ ReturnStatus PersoServerConnection::getTransponderData(
 }
 
 ReturnStatus PersoServerConnection::releaseTransponder(
-    StringDictionary& result) {
+    StringDictionary result) {
   CurrentCommand = Commands.at(ReleaseTransponder);
 
   StringDictionary param;
@@ -191,7 +193,7 @@ ReturnStatus PersoServerConnection::confirmTransponderRelease(
 
 ReturnStatus PersoServerConnection::rereleaseTransponder(
     const StringDictionary& param,
-    StringDictionary& result) {
+    StringDictionary result) {
   CurrentCommand = Commands.at(RereleaseTransponder);
 
   ReturnStatus ret = processCurrentCommand(param, result);
@@ -256,6 +258,16 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
   return ret;
 }
 
+void PersoServerConnection::connectDependencies() {
+  const ServerConnectionGuiSubkernel* scgs =
+      GlobalEnvironment::instance()
+          ->getObject<const ServerConnectionGuiSubkernel>(
+              "ServerConnectionGuiSubkernel");
+
+  QObject::connect(this, &PersoServerConnection::disconnected, scgs,
+                   &ServerConnectionGuiSubkernel::onServerDisconnected);
+}
+
 void PersoServerConnection::loadSettings() {
   sendLog("Загрузка настроек.");
   doLoadSettings();
@@ -271,7 +283,7 @@ void PersoServerConnection::doLoadSettings() {
 
 ReturnStatus PersoServerConnection::processCurrentCommand(
     const StringDictionary& param,
-    StringDictionary& result) {
+    StringDictionary result) {
   sendLog(
       QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
@@ -453,7 +465,7 @@ void PersoServerConnection::socketDisconnected_slot() {
 
   // Если отключение произошло в результате ошибки
   if (Socket->error() != QTcpSocket::UnknownSocketError) {
-    emit Disconnection.signal();
+    emit disconnected();
   }
 }
 

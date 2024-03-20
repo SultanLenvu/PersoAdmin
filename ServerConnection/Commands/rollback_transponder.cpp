@@ -20,7 +20,7 @@ ReturnStatus RollbackTransponder::generate(
 
 ReturnStatus RollbackTransponder::processResponse(
     const QByteArray& dataBlock,
-    StringDictionary& responseData) {
+    StringDictionary responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

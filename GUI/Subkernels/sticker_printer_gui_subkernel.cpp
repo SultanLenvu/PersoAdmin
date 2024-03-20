@@ -11,46 +11,45 @@ StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
 StickerPrinterGuiSubkernel::~StickerPrinterGuiSubkernel() {}
 
 void StickerPrinterGuiSubkernel::printTransponderSticker() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit printTransponderSticker_signal(param);
 }
 
 void StickerPrinterGuiSubkernel::printBoxSticker() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit printBoxSticker_signal(param);
 }
 
 void StickerPrinterGuiSubkernel::printPalletSticker() {
-  StringDictionary& param(new StringDictionary);
+  StringDictionary param;
 
   StringInputDialog dialog("id");
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
-  dialog.getData(*param);
+  dialog.getData(param);
 
   emit clearLogDisplay();
   emit printPalletSticker_signal(param);
 }
 
-void StickerPrinterGuiSubkernel::execCommandScript(
-    const std::shared_ptr<QStringList> script) {
+void StickerPrinterGuiSubkernel::execCommandScript(const QStringList&& script) {
   emit clearLogDisplay();
   emit execCommandScript_signal(script);
 }

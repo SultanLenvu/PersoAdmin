@@ -13,7 +13,7 @@ void StickerPrinterAsyncWrapper::printTransponderSticker(
     const StringDictionary& param) {
   initOperation("printTransponderSticker");
 
-  ReturnStatus ret = StickerPrinter->printTransponderSticker(*param);
+  ReturnStatus ret = StickerPrinter->printTransponderSticker(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("printBoxSticker", ret);
     return;
@@ -26,7 +26,7 @@ void StickerPrinterAsyncWrapper::printBoxSticker(
     const StringDictionary& param) {
   initOperation("printBoxSticker");
 
-  ReturnStatus ret = StickerPrinter->printBoxSticker(*param);
+  ReturnStatus ret = StickerPrinter->printBoxSticker(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("printBoxSticker", ret);
     return;
@@ -39,7 +39,7 @@ void StickerPrinterAsyncWrapper::printPalletSticker(
     const StringDictionary& param) {
   initOperation("printPalletSticker");
 
-  ReturnStatus ret = StickerPrinter->printPalletSticker(*param);
+  ReturnStatus ret = StickerPrinter->printPalletSticker(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("printPalletSticker", ret);
     return;
@@ -48,11 +48,10 @@ void StickerPrinterAsyncWrapper::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void StickerPrinterAsyncWrapper::execCommandScript(
-    const std::shared_ptr<QStringList> script) {
+void StickerPrinterAsyncWrapper::execCommandScript(const QStringList&& script) {
   initOperation("execCommandScript");
 
-  ReturnStatus ret = StickerPrinter->exec(*script);
+  ReturnStatus ret = StickerPrinter->exec(script);
   if (ret != ReturnStatus::NoError) {
     processOperationError("execPrinterStickerCommandScript", ret);
     return;

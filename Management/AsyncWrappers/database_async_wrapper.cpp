@@ -82,13 +82,12 @@ void DatabaseAsyncWrapper::execCustomRequest(const QString& req) {
   completeOperation("execCustomRequest");
 }
 
-void DatabaseAsyncWrapper::getTransponderData(
-    const StringDictionary& param) {
+void DatabaseAsyncWrapper::getTransponderData(const StringDictionary& param) {
   initOperation("getTransponderData");
 
-  StringDictionary& data(new StringDictionary());
+  StringDictionary data;
 
-  if (!generateTransponderData((*param)["id"], *data)) {
+  if (!generateTransponderData((param)["id"], data)) {
     processOperationError("getTransponderData",
                           ReturnStatus::DatabaseTransactionError);
     return;
@@ -98,13 +97,12 @@ void DatabaseAsyncWrapper::getTransponderData(
   completeOperation("getTransponderData");
 }
 
-void DatabaseAsyncWrapper::getBoxData(
-    const StringDictionary& param) {
+void DatabaseAsyncWrapper::getBoxData(const StringDictionary& param) {
   initOperation("getBoxData");
 
-  StringDictionary& data(new StringDictionary());
+  StringDictionary data;
 
-  if (!generateBoxData((*param)["id"], *data)) {
+  if (!generateBoxData((param)["id"], data)) {
     processOperationError("getBoxData", ReturnStatus::DatabaseTransactionError);
     return;
   }
@@ -113,13 +111,12 @@ void DatabaseAsyncWrapper::getBoxData(
   completeOperation("getBoxData");
 }
 
-void DatabaseAsyncWrapper::getPalletData(
-    const StringDictionary& param) {
+void DatabaseAsyncWrapper::getPalletData(const StringDictionary& param) {
   initOperation("getPalletData");
 
-  StringDictionary& data(new StringDictionary());
+  StringDictionary data;
 
-  if (!generatePalletData((*param)["id"], *data)) {
+  if (!generatePalletData((param)["id"], data)) {
     processOperationError("getPalletData",
                           ReturnStatus::DatabaseTransactionError);
     return;
@@ -130,7 +127,7 @@ void DatabaseAsyncWrapper::getPalletData(
 }
 
 bool DatabaseAsyncWrapper::generateTransponderData(const QString& id,
-                                                   StringDictionary& data) {
+                                                   StringDictionary data) {
   QStringList tables{"transponders", "boxes", "pallets", "orders"};
   SqlQueryValues record;
   uint32_t quantity;
@@ -192,7 +189,7 @@ bool DatabaseAsyncWrapper::generateTransponderData(const QString& id,
 }
 
 bool DatabaseAsyncWrapper::generateBoxData(const QString& id,
-                                           StringDictionary& data) {
+                                           StringDictionary data) {
   SqlQueryValues box;
   SqlQueryValues transponders;
   StringDictionary transponderData;
@@ -238,7 +235,7 @@ bool DatabaseAsyncWrapper::generateBoxData(const QString& id,
 }
 
 bool DatabaseAsyncWrapper::generatePalletData(const QString& id,
-                                              StringDictionary& data) {
+                                              StringDictionary data) {
   SqlQueryValues boxes;
   SqlQueryValues pallet;
   SqlQueryValues order;

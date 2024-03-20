@@ -11,7 +11,7 @@ class AssemblyUnitManagerAsyncWrapper : public ProgressableAsyncWrapper {
   std::unique_ptr<AssemblyUnitManager> Manager;
 
  public:
-  explicit AssemblyUnitManagerAsyncWrapper(const QString& name);
+  Q_INVOKABLE explicit AssemblyUnitManagerAsyncWrapper(const QString& name);
   ~AssemblyUnitManagerAsyncWrapper() = default;
 
  public slots:

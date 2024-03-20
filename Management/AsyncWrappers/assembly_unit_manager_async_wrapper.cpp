@@ -4,12 +4,11 @@ AssemblyUnitManagerAsyncWrapper::AssemblyUnitManagerAsyncWrapper(
     const QString& name)
     : ProgressableAsyncWrapper(name) {}
 
-void AssemblyUnitManagerAsyncWrapper::logOn(
-    const StringDictionary& param) {
+void AssemblyUnitManagerAsyncWrapper::logOn(const StringDictionary& param) {
   initOperation("logOn");
 
   ReturnStatus ret;
-  ret = Manager->logOn(*param);
+  ret = Manager->logOn(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("logOn", ret);
     return;
@@ -82,7 +81,7 @@ void AssemblyUnitManagerAsyncWrapper::rereleaseTransponder(
     const StringDictionary& param) {
   initOperation("rereleaseTransponder");
 
-  ReturnStatus ret = Manager->rereleaseTransponder(*param);
+  ReturnStatus ret = Manager->rereleaseTransponder(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;

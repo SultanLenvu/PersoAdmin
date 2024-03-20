@@ -19,7 +19,7 @@ ReturnStatus Echo::generate(const StringDictionary& param,
 }
 
 ReturnStatus Echo::processResponse(const QByteArray& dataBlock,
-                                   StringDictionary& responseData) {
+                                   StringDictionary responseData) {
   if (!processDataBlock(dataBlock)) {
     return ReturnStatus::ServerResponseDataBlockError;
   }

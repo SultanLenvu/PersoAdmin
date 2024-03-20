@@ -46,13 +46,13 @@ class ISqlDatabase {
   virtual bool clearTable(const QString& table) const = 0;
 
   // Multi table CRUD
-  virtual bool readMergedRecords(const QStringList& tables,
+  virtual bool readMergedRecords(const QStringList&& tables,
                                  const QString& conditions,
                                  SqlQueryValues& records) const = 0;
-  virtual bool updateMergedRecords(const QStringList& tables,
+  virtual bool updateMergedRecords(const QStringList&& tables,
                                    const QString& conditions,
                                    const SqlQueryValues& newValues) const = 0;
-  virtual bool deleteMergedRecords(const QStringList& tables,
+  virtual bool deleteMergedRecords(const QStringList&& tables,
                                    const QString& conditions) const = 0;
 
   // Aggregation

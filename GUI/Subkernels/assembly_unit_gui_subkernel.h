@@ -22,12 +22,6 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   explicit AssemblyUnitGuiSubkernel(const QString& name);
   ~AssemblyUnitGuiSubkernel() = default;
 
- public slots:
-  void displayProductionLineData(const StringDictionary& data);
-  void displayBoxData(const StringDictionary& data);
-  void displayTransponderData(const StringDictionary& data);
-  void displayFirmware(const QStringList& firmware);
-
  private slots:  // Слоты для сигналов от GUI
   void logOn(void);
   void logOut(void);
@@ -40,7 +34,14 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   void rereleaseTransponder(void);
   void rollbackTransponder(void);
 
+ public slots:
+  void displayProductionLineData(const StringDictionary& data);
+  void displayBoxData(const StringDictionary& data);
+  void displayTransponderData(const StringDictionary& data);
+  void displayFirmware(const QStringList&& firmware);
+
  private:
+  Q_DISABLE_COPY_MOVE(AssemblyUnitGuiSubkernel)
   void createModels(void);
   void connectDependecies(void);
 

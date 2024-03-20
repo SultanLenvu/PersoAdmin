@@ -17,22 +17,22 @@ class IServerConnection {
 
   virtual ReturnStatus launchProductionLine(const StringDictionary& param) = 0;
   virtual ReturnStatus shutdownProductionLine(void) = 0;
-  virtual ReturnStatus getProductionLineData(StringDictionary& result) = 0;
+  virtual ReturnStatus getProductionLineData(StringDictionary result) = 0;
 
   virtual ReturnStatus requestBox(void) = 0;
-  virtual ReturnStatus getCurrentBoxData(StringDictionary& result) = 0;
+  virtual ReturnStatus getCurrentBoxData(StringDictionary result) = 0;
   virtual ReturnStatus completeCurrentBox(void) = 0;
   virtual ReturnStatus refundCurrentBox(void) = 0;
 
-  virtual ReturnStatus getCurrentTransponderData(StringDictionary& result) = 0;
+  virtual ReturnStatus getCurrentTransponderData(StringDictionary result) = 0;
   virtual ReturnStatus getTransponderData(const StringDictionary& param,
-                                          StringDictionary& result) = 0;
+                                          StringDictionary result) = 0;
 
-  virtual ReturnStatus releaseTransponder(StringDictionary& result) = 0;
+  virtual ReturnStatus releaseTransponder(StringDictionary result) = 0;
   virtual ReturnStatus confirmTransponderRelease(
       const StringDictionary& param) = 0;
   virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
-                                            StringDictionary& result) = 0;
+                                            StringDictionary result) = 0;
   virtual ReturnStatus confirmTransponderRerelease(
       const StringDictionary& param) = 0;
   virtual ReturnStatus rollbackTransponder(void) = 0;

@@ -16,7 +16,6 @@ GuiKernel::GuiKernel()
       DesktopGeometry(QApplication::primaryScreen()->size()) {
   Service = std::make_unique<ServiceObjectSpace>();
   createReactions();
-
   Async = std::make_unique<AsyncObjectSpace>();
 
   createGuiSubkernels();

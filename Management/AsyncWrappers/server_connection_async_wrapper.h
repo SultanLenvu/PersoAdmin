@@ -44,8 +44,6 @@ class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
   void printPalletSticker(const StringDictionary& param);
   void printLastPalletSticker(void);
 
-  void onServerDisconnected(void);
-
  private:
   Q_DISABLE_COPY_MOVE(ServerConnectionAsyncWrapper)
   ReturnStatus checkConfig(void);
@@ -55,7 +53,7 @@ class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
   void productionLineDataReady(const StringDictionary& data);
   void transponderDataReady(const StringDictionary& data);
   void boxDataReady(const StringDictionary& data);
-  void firwareReady(const QStringList firmware);
+  void firwareReady(const QStringList& firmware);
 };
 
 #endif  // PERSOSERVERMANAGER_H

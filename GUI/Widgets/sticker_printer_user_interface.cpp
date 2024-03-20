@@ -92,7 +92,6 @@ void StickerPrinterUserInterface::execCommandScriptPushButton_slot() {
   QString rawScript = CommandScriptInput->toPlainText();
   rawScript.remove("\r");
 
-  std::shared_ptr<QStringList> script(new QStringList(rawScript.split("\n")));
-
+  QStringList script = QStringList(rawScript.split("\n"));
   emit execCommandScript_signal(script);
 }

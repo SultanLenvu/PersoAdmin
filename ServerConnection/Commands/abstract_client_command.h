@@ -17,7 +17,7 @@ class AbstractClientCommand : public NamedObject, public LoggableObject {
   virtual ReturnStatus generate(const StringDictionary& param,
                                 QByteArray& dataBlock) = 0;
   virtual ReturnStatus processResponse(const QByteArray& dataBlock,
-                                       StringDictionary& responseData) = 0;
+                                       StringDictionary responseData) = 0;
 
  public:
   void clear(void);

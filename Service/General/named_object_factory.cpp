@@ -7,8 +7,6 @@ NamedObjectFactory::NamedObjectFactory(QThread* thread) {
   moveToThread(Thread);
 }
 
-NamedObjectFactory::~NamedObjectFactory() {}
-
 NamedObject* NamedObjectFactory::doCreate(const QString& objectName) {
   NamedObject* createdObject = reinterpret_cast<NamedObject*>(
       CreatedMetaObject->newInstance(objectName));

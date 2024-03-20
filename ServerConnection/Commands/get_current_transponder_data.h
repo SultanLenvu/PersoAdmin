@@ -23,7 +23,7 @@ class GetCurrentTransponderData final : public AbstractClientCommand {
   virtual ReturnStatus generate(const StringDictionary& param,
                                 QByteArray& dataBlock) override;
   virtual ReturnStatus processResponse(const QByteArray& dataBlock,
-                                       StringDictionary& responseData) override;
+                                       StringDictionary responseData) override;
 
  private:
   bool checkSyntax(void);

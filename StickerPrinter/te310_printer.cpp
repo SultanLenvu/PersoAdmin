@@ -293,7 +293,7 @@ ReturnStatus TE310Printer::printLastPalletSticker() {
   return printPalletSticker(LastPalletSticker);
 }
 
-ReturnStatus TE310Printer::exec(const QStringList& commandScript) {
+ReturnStatus TE310Printer::exec(const QStringList&& commandScript) {
   if (!initConnection()) {
     return ReturnStatus::StickerPrinterConnectionError;
   }

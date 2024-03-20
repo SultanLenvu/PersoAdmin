@@ -30,9 +30,9 @@ class DatabaseAsyncWrapper final : public ProgressableAsyncWrapper {
  private:
   Q_DISABLE_COPY_MOVE(DatabaseAsyncWrapper)
 
-  bool generateTransponderData(const QString& id, StringDictionary& data);
-  bool generateBoxData(const QString& id, StringDictionary& data);
-  bool generatePalletData(const QString& id, StringDictionary& data);
+  bool generateTransponderData(const QString& id, StringDictionary data);
+  bool generateBoxData(const QString& id, StringDictionary data);
+  bool generatePalletData(const QString& id, StringDictionary data);
 
  signals:
   void dataReady(const StringDictionary& data);

@@ -293,8 +293,8 @@ const QVector<QString>* PostgreSqlTable::columns() const {
   return &Columns;
 }
 
-const StringDictionary* PostgreSqlTable::relations() const {
-  return &Relations;
+const StringDictionary& PostgreSqlTable::relations() const {
+  return Relations;
 }
 
 bool PostgreSqlTable::checkFieldNames(const SqlQueryValues& records) const {
