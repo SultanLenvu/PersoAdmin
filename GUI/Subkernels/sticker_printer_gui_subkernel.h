@@ -14,7 +14,7 @@ class StickerPrinterGuiSubkernel final : public AbstractGuiSubkernel {
   void printTransponderSticker(void);
   void printBoxSticker(void);
   void printPalletSticker(void);
-  void execCommandScript(const QStringList&& script);
+  void execCommandScript(const QStringList& script);
 
  public slots:  // Слоты для сигналов от менеджеров
 
@@ -26,7 +26,7 @@ class StickerPrinterGuiSubkernel final : public AbstractGuiSubkernel {
       const StringDictionary& param);
   void printBoxSticker_signal(const StringDictionary& param);
   void printPalletSticker_signal(const StringDictionary& param);
-  void execCommandScript_signal(const QStringList&& script);
+  void execCommandScript_signal(const QStringList& script);
 };
 
 #endif // STICKERPRINTERGUISUBKERNEL_H

@@ -64,7 +64,7 @@ class NamedObjectFactory final : public QObject {
       return nullptr;
     }
 
-    return reinterpret_cast<T*>(createdObject);
+    return static_cast<T*>(createdObject);
   }
 
  private:

@@ -18,7 +18,7 @@ class StickerPrinterAsyncWrapper final : public ProgressableAsyncWrapper {
   void printTransponderSticker(const StringDictionary& param);
   void printBoxSticker(const StringDictionary& param);
   void printPalletSticker(const StringDictionary& param);
-  void execCommandScript(const QStringList&& script);
+  void execCommandScript(const QStringList& script);
 
  private:
   Q_DISABLE_COPY_MOVE(StickerPrinterAsyncWrapper)

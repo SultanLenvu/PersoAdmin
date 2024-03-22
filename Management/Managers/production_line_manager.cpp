@@ -92,7 +92,6 @@ ReturnStatus ProductionLineManager::deactivate(const StringDictionary& param) {
   SqlQueryValues productionLineNewValue;
   productionLineNewValue.add("in_process", "false");
   productionLineNewValue.add("launched", "false");
-  productionLineNewValue.add("completed", "false");
   productionLineNewValue.add("active", "false");
   productionLineNewValue.add("box_id", "NULL");
   productionLineNewValue.add("transponder_id", "NULL");

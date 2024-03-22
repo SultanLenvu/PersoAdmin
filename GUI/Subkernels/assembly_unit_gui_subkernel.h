@@ -38,7 +38,7 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   void displayProductionLineData(const StringDictionary& data);
   void displayBoxData(const StringDictionary& data);
   void displayTransponderData(const StringDictionary& data);
-  void displayFirmware(const QStringList&& firmware);
+  void displayFirmware(const QStringList& firmware);
 
  private:
   Q_DISABLE_COPY_MOVE(AssemblyUnitGuiSubkernel)

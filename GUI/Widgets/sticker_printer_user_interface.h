@@ -42,7 +42,7 @@ class StickerPrinterUserInterface : public AbstractUserInterface {
   void execCommandScriptPushButton_slot(void);
 
  signals:
-  void execCommandScript_signal(const QStringList&& script);
+  void execCommandScript_signal(const QStringList& script);
 };
 
 #endif // STICKERPRINTERUSERINTERFACE_H

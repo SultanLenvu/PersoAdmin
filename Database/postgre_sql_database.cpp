@@ -284,7 +284,7 @@ bool PostgreSqlDatabase::clearTable(const QString& table) const {
   return Tables.at(table)->clear();
 }
 
-bool PostgreSqlDatabase::readMergedRecords(const QStringList&& tables,
+bool PostgreSqlDatabase::readMergedRecords(const QStringList& tables,
                                            const QString& conditions,
                                            SqlQueryValues& response) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
@@ -342,7 +342,7 @@ bool PostgreSqlDatabase::readMergedRecords(const QStringList&& tables,
 }
 
 bool PostgreSqlDatabase::updateMergedRecords(
-    const QStringList&& tables,
+    const QStringList& tables,
     const QString& conditions,
     const SqlQueryValues& newValues) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
@@ -398,7 +398,7 @@ bool PostgreSqlDatabase::updateMergedRecords(
   return true;
 }
 
-bool PostgreSqlDatabase::deleteMergedRecords(const QStringList&& tables,
+bool PostgreSqlDatabase::deleteMergedRecords(const QStringList& tables,
                                              const QString& conditions) const {
   if (!QSqlDatabase::database(ConnectionName).isOpen()) {
     sendLog("Соединение с Postgres не установлено. ");
@@ -534,7 +534,7 @@ bool PostgreSqlDatabase::createTable(const QString& name) {
   return true;
 }
 
-bool PostgreSqlDatabase::checkTableNames(const QStringList&& names) const {
+bool PostgreSqlDatabase::checkTableNames(const QStringList& names) const {
   for (auto it1 = names.cbegin(), it2 = names.cend(); it1 != it2; ++it1) {
     if (Tables.count(*it1) == 0) {
       return false;

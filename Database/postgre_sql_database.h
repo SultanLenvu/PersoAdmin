@@ -73,14 +73,14 @@ class PostgreSqlDatabase : public NamedObject,
   virtual bool clearTable(const QString& table) const override;
 
   // Multi table CRUD
-  virtual bool readMergedRecords(const QStringList&& tables,
+  virtual bool readMergedRecords(const QStringList& tables,
                                  const QString& conditions,
                                  SqlQueryValues& records) const override;
   virtual bool updateMergedRecords(
-      const QStringList&& tables,
+      const QStringList& tables,
       const QString& conditions,
       const SqlQueryValues& newValues) const override;
-  virtual bool deleteMergedRecords(const QStringList&& tables,
+  virtual bool deleteMergedRecords(const QStringList& tables,
                                    const QString& conditions) const override;
 
   // Aggregation
@@ -99,7 +99,7 @@ class PostgreSqlDatabase : public NamedObject,
   bool init(void);
   bool createTable(const QString& name);
 
-  bool checkTableNames(const QStringList&& names) const;
+  bool checkTableNames(const QStringList& names) const;
 
  signals:
   void disconnected(void);

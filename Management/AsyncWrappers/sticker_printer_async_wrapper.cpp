@@ -48,7 +48,7 @@ void StickerPrinterAsyncWrapper::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void StickerPrinterAsyncWrapper::execCommandScript(const QStringList&& script) {
+void StickerPrinterAsyncWrapper::execCommandScript(const QStringList& script) {
   initOperation("execCommandScript");
 
   ReturnStatus ret = StickerPrinter->exec(script);

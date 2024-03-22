@@ -49,7 +49,7 @@ void StickerPrinterGuiSubkernel::printPalletSticker() {
   emit printPalletSticker_signal(param);
 }
 
-void StickerPrinterGuiSubkernel::execCommandScript(const QStringList&& script) {
+void StickerPrinterGuiSubkernel::execCommandScript(const QStringList& script) {
   emit clearLogDisplay();
   emit execCommandScript_signal(script);
 }

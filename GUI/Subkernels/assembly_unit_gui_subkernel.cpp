@@ -53,7 +53,7 @@ void AssemblyUnitGuiSubkernel::displayTransponderData(
   TransponderModel.setData(data);
 }
 
-void AssemblyUnitGuiSubkernel::displayFirmware(const QStringList&& firmware) {
+void AssemblyUnitGuiSubkernel::displayFirmware(const QStringList& firmware) {
   FirmwareModel.setStringList(firmware);
 }
 
