@@ -16,8 +16,8 @@ class HashTableModel : public QAbstractTableModel {
   StringDictionary Data;
 
  public:
-  HashTableModel();
-  ~HashTableModel();
+  HashTableModel() = default;
+  ~HashTableModel() = default;
 
   void setData(const StringDictionary& match);
   void setMatchTable(const StringDictionary& match);

@@ -1,9 +1,5 @@
 #include "hash_table_model.h"
 
-HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
-
-HashTableModel::~HashTableModel() {}
-
 void HashTableModel::setData(const StringDictionary& data) {
   beginResetModel();
 

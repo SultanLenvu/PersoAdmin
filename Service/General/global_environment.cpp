@@ -3,8 +3,6 @@
 #include <QApplication>
 #include <QThread>
 
-GlobalEnvironment::~GlobalEnvironment() {}
-
 GlobalEnvironment* GlobalEnvironment::instance() {
   static GlobalEnvironment context;
 

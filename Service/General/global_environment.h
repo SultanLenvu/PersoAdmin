@@ -12,7 +12,7 @@ class GlobalEnvironment : public QObject {
   QHash<QString, std::weak_ptr<NamedObject>> SharedObjects;
 
  public:
-  ~GlobalEnvironment();
+  ~GlobalEnvironment() = default;
   static GlobalEnvironment* instance(void);
 
   void registerObject(NamedObject* obj);
