@@ -22,10 +22,6 @@ GuiKernel::GuiKernel()
   createMainWindowGui();
 }
 
-/*
- * Приватные методы
- */
-
 void GuiKernel::createTopMenu() {
   menuBar()->clear();
   createTopMenuActions();
@@ -81,7 +77,7 @@ void GuiKernel::createGuiSubkernels() {
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
 }
 
-void GuiKernel::settingsActionTrigger_slot() {
+void GuiKernel::displaySettingsDialog() {
   emit clearLogDisplay();
 
   SettingsDialog dialog;

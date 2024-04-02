@@ -18,9 +18,8 @@ class OrderManager final : public NamedObject,
  public:
   explicit OrderManager(const QString& name,
                         std::shared_ptr<ISqlDatabase> database);
-  ~OrderManager();
+  ~OrderManager() = default;
 
-  // Own
  public:
   ReturnStatus create(const StringDictionary& param);
   ReturnStatus startAssembling(const StringDictionary& param);

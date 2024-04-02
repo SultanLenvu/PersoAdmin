@@ -48,7 +48,7 @@ class GuiKernel final : public QMainWindow {
   void createGuiSubkernels(void);
 
  private slots:
-  void settingsActionTrigger_slot(void);
+  void displaySettingsDialog(void);
 
  signals:
   void clearLogDisplay(void);

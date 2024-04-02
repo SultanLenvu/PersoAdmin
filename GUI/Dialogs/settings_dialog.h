@@ -88,7 +88,6 @@ class SettingsDialog : public QDialog {
  private:
   Q_DISABLE_COPY_MOVE(SettingsDialog)
 
- private:
   void create(void);
   void connectDependencies(void);
 

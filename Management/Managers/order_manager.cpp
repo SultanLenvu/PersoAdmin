@@ -11,8 +11,6 @@ OrderManager::OrderManager(const QString& name,
   doLoadSettings();
 }
 
-OrderManager::~OrderManager() {}
-
 ReturnStatus OrderManager::create(const StringDictionary& param) {
   if (!Database) {
     sendLog("База данных не определена.");
