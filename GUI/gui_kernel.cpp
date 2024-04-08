@@ -37,7 +37,7 @@ void GuiKernel::createTopMenuActions() {
   SettingsAction = new QAction("Настройки");
   SettingsAction->setStatusTip("Открыть меню настроек");
   connect(SettingsAction, &QAction::triggered, this,
-          &GuiKernel::settingsActionTrigger_slot);
+          &GuiKernel::displaySettingsDialog);
 
   AboutProgramAction = new QAction("О программе", this);
   AboutProgramAction->setStatusTip("Показать сведения о программе");
