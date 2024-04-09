@@ -1,4 +1,4 @@
-#include <QHostAddress>
+4 #include<QHostAddress>
 #include <QPrinterInfo>
 #include <QTextCodec>
 #include <QtPrintSupport>
@@ -404,7 +404,7 @@ void TE310Printer::printMssSticker(const StringDictionary& param) {
     GAP 2 mm, 1 mm
     DIRECTION 1
     CLS
-    TEXT 180,12,"D.FNT",0,1,1,2,"SN: 5012341234567890"
+    TEXT 180,12,"2",0,1,1,2,"SN: 5012341234567890"
     BARCODE 18,36,"128",144,2,0,2,2,"1234567890123456789"
     PRINT 1
   */
@@ -413,7 +413,7 @@ void TE310Printer::printMssSticker(const StringDictionary& param) {
   sendCommand("GAP 2 mm, 1 mm");
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
-  sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1\"")
+  sendCommand(QString("TEXT 180,12,\"2\",0,1,1,2,\"SN: %1\"")
                   .arg(param.value("transponder_sn"))
                   .toUtf8()
                   .data());
