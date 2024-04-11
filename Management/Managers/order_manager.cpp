@@ -279,7 +279,8 @@ ReturnStatus OrderManager::initIssuers() {
 
   newValues.add("id", QString::number(++id));
   newValues.add("name", "Магистраль северной столицы");
-  newValues.add("efc_context_mark", "570001FF0070");
+  //  newValues.add("efc_context_mark", "570001FF0070");
+  newValues.add("efc_context_mark", "000000000001");
   newValues.add("transport_master_keys_id", "1");
 
   newValues.add("id", QString::number(++id));
