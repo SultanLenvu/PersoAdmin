@@ -880,7 +880,7 @@ ReturnStatus OrderManager::shipPallet(const QString& id,
         QString::number(records.get(i, "manufacturer_id").toInt(nullptr, 16));
 
     // Дата сборки
-    QStringList tempDate = records.get(i, "boxes.assembling_start").split("T");
+    QStringList tempDate = records.get(i, "assembling_start").split("T");
     QDate date = QDate::fromString(tempDate.first(), POSTGRES_DATE_TEMPLATE);
     QString batteryInsertationDate =
         QString("%1%2")
